@@ -1939,22 +1939,26 @@ score_modifier_relation_from_hypotheses <- function(
     return(0L)
   }
 
-  src_hypotheses <- src_hypotheses |>
-    tidytable::mutate(
-      .row_weight = score_modifier_hypothesis_row(
-        source = source,
-        candidate_adduct_origin = candidate_adduct_origin,
-        adduct_support = adduct_support
+  if (!".row_weight" %in% names(src_hypotheses)) {
+    src_hypotheses <- src_hypotheses |>
+      tidytable::mutate(
+        .row_weight = score_modifier_hypothesis_row(
+          source = source,
+          candidate_adduct_origin = candidate_adduct_origin,
+          adduct_support = adduct_support
+        )
       )
-    )
-  dest_hypotheses <- dest_hypotheses |>
-    tidytable::mutate(
-      .row_weight = score_modifier_hypothesis_row(
-        source = source,
-        candidate_adduct_origin = candidate_adduct_origin,
-        adduct_support = adduct_support
+  }
+  if (!".row_weight" %in% names(dest_hypotheses)) {
+    dest_hypotheses <- dest_hypotheses |>
+      tidytable::mutate(
+        .row_weight = score_modifier_hypothesis_row(
+          source = source,
+          candidate_adduct_origin = candidate_adduct_origin,
+          adduct_support = adduct_support
+        )
       )
-    )
+  }
 
   if (identical(relation, "cluster")) {
     expected <- apply_modifier_to_adducts(src_hypotheses$adduct, modifier, "+")
@@ -1980,27 +1984,26 @@ score_modifier_relation_from_hypotheses <- function(
     return(0L)
   }
 
-  src_scored <- tidytable::tidytable(
-    state_key = src_keys,
-    row_weight = src_hypotheses$.row_weight
-  ) |>
-    tidytable::filter(!is.na(state_key)) |>
-    tidytable::summarize(src_score = max(row_weight), .by = state_key)
-
-  dest_scored <- tidytable::tidytable(
-    state_key = dest_keys,
-    row_weight = dest_hypotheses$.row_weight
-  ) |>
-    tidytable::filter(!is.na(state_key)) |>
-    tidytable::summarize(dest_score = max(row_weight), .by = state_key)
-
-  matched <- src_scored |>
-    tidytable::inner_join(dest_scored, by = "state_key")
-  if (nrow(matched) == 0L) {
+  valid_s <- which(!is.na(src_keys))
+  valid_d <- which(!is.na(dest_keys))
+  if (length(valid_s) == 0L || length(valid_d) == 0L) {
     return(0L)
   }
-
-  as.integer(sum(matched$src_score + matched$dest_score, na.rm = TRUE))
+  sk_s <- src_keys[valid_s]
+  sk_d <- dest_keys[valid_d]
+  common_keys <- intersect(sk_s, sk_d)
+  if (length(common_keys) == 0L) {
+    return(0L)
+  }
+  w_s <- src_hypotheses$.row_weight[valid_s]
+  w_d <- dest_hypotheses$.row_weight[valid_d]
+  total_score <- 0L
+  for (ck in common_keys) {
+    total_score <- total_score +
+      as.integer(max(w_s[sk_s == ck])) +
+      as.integer(max(w_d[sk_d == ck]))
+  }
+  as.integer(total_score)
 }
 
 #' Resolve competing cluster/loss interpretations using node hypotheses
@@ -2228,20 +2231,27 @@ resolve_competing_cluster_loss_edges_by_hypotheses <- function(
     ,
     drop = FALSE
   ]
+  hyp_sub$.row_weight <- score_modifier_hypothesis_row(
+    source = hyp_sub$source,
+    candidate_adduct_origin = hyp_sub$candidate_adduct_origin,
+    adduct_support = hyp_sub$adduct_support
+  )
   hyp_by_feature <- split(hyp_sub, hyp_sub$feature_id)
-  decisions <- lapply(seq_len(nrow(ambiguous_pairs)), function(i) {
-    pair_i <- ambiguous_pairs[i, ]
-    src_id <- pair_i$feature_id[[1L]]
-    dest_id <- pair_i$feature_id_dest[[1L]]
-    modifier_key <- pair_i$.modifier_key[[1L]]
-    src_hypotheses <- hyp_by_feature[[src_id]]
-    dest_hypotheses <- hyp_by_feature[[dest_id]]
-    if (is.null(src_hypotheses)) {
-      src_hypotheses <- hyp_min[0L, ]
-    }
-    if (is.null(dest_hypotheses)) {
-      dest_hypotheses <- hyp_min[0L, ]
-    }
+  n_ambig <- nrow(ambiguous_pairs)
+  amb_src <- ambiguous_pairs$feature_id
+  amb_dest <- ambiguous_pairs$feature_id_dest
+  amb_mod <- ambiguous_pairs$.modifier_key
+  c_scores <- integer(n_ambig)
+  l_scores <- integer(n_ambig)
+  keep_c_vec <- logical(n_ambig)
+  keep_l_vec <- logical(n_ambig)
+
+  for (i in seq_len(n_ambig)) {
+    src_id <- amb_src[[i]]
+    dest_id <- amb_dest[[i]]
+    modifier_key <- amb_mod[[i]]
+    src_hypotheses <- hyp_by_feature[[src_id]] %||% hyp_sub[0L, ]
+    dest_hypotheses <- hyp_by_feature[[dest_id]] %||% hyp_sub[0L, ]
 
     cluster_score <- score_modifier_relation_from_hypotheses(
       src_hypotheses = src_hypotheses,
@@ -2255,61 +2265,63 @@ resolve_competing_cluster_loss_edges_by_hypotheses <- function(
       modifier = modifier_key,
       relation = "loss"
     )
-
-    cluster_neighbor_score <- sum(
-      cluster_cmp$.modifier_key == modifier_key &
-        cluster_cmp$feature_id == src_id &
-        cluster_cmp$feature_id_dest != dest_id,
-      na.rm = TRUE
-    ) +
-      sum(
-        cluster_cmp$.modifier_key == modifier_key &
-          cluster_cmp$feature_id_dest == dest_id &
-          cluster_cmp$feature_id != src_id,
-        na.rm = TRUE
-      )
-
-    loss_neighbor_score <- sum(
-      loss_cmp$.modifier_key == modifier_key &
-        loss_cmp$feature_id == src_id &
-        loss_cmp$feature_id_dest != dest_id,
-      na.rm = TRUE
-    ) +
-      sum(
-        loss_cmp$.modifier_key == modifier_key &
-          loss_cmp$feature_id_dest == dest_id &
-          loss_cmp$feature_id != src_id,
-        na.rm = TRUE
-      )
+    c_scores[[i]] <- cluster_score
+    l_scores[[i]] <- loss_score
 
     if (cluster_score > loss_score) {
-      keep_cluster <- TRUE
-      keep_loss <- FALSE
+      keep_c_vec[[i]] <- TRUE
+      keep_l_vec[[i]] <- FALSE
     } else if (loss_score > cluster_score) {
-      keep_cluster <- FALSE
-      keep_loss <- TRUE
-    } else if (cluster_neighbor_score > loss_neighbor_score) {
-      keep_cluster <- TRUE
-      keep_loss <- FALSE
-    } else if (loss_neighbor_score > cluster_neighbor_score) {
-      keep_cluster <- FALSE
-      keep_loss <- TRUE
+      keep_c_vec[[i]] <- FALSE
+      keep_l_vec[[i]] <- TRUE
     } else {
-      keep_cluster <- TRUE
-      keep_loss <- TRUE
-    }
+      cluster_neighbor_score <- sum(
+        cluster_cmp$.modifier_key == modifier_key &
+          cluster_cmp$feature_id == src_id &
+          cluster_cmp$feature_id_dest != dest_id,
+        na.rm = TRUE
+      ) +
+        sum(
+          cluster_cmp$.modifier_key == modifier_key &
+            cluster_cmp$feature_id_dest == dest_id &
+            cluster_cmp$feature_id != src_id,
+          na.rm = TRUE
+        )
 
-    tidytable::tidytable(
-      feature_id = src_id,
-      feature_id_dest = dest_id,
-      .modifier_key = modifier_key,
-      cluster_score = cluster_score,
-      loss_score = loss_score,
-      keep_cluster = keep_cluster,
-      keep_loss = keep_loss
-    )
-  })
-  decisions <- tidytable::bind_rows(decisions)
+      loss_neighbor_score <- sum(
+        loss_cmp$.modifier_key == modifier_key &
+          loss_cmp$feature_id == src_id &
+          loss_cmp$feature_id_dest != dest_id,
+        na.rm = TRUE
+      ) +
+        sum(
+          loss_cmp$.modifier_key == modifier_key &
+            loss_cmp$feature_id_dest == dest_id &
+            loss_cmp$feature_id != src_id,
+          na.rm = TRUE
+        )
+
+      if (cluster_neighbor_score > loss_neighbor_score) {
+        keep_c_vec[[i]] <- TRUE
+        keep_l_vec[[i]] <- FALSE
+      } else if (loss_neighbor_score > cluster_neighbor_score) {
+        keep_c_vec[[i]] <- FALSE
+        keep_l_vec[[i]] <- TRUE
+      } else {
+        keep_c_vec[[i]] <- TRUE
+        keep_l_vec[[i]] <- TRUE
+      }
+    }
+  }
+  decisions <- tidytable::tidytable(
+    feature_id = amb_src,
+    feature_id_dest = amb_dest,
+    .modifier_key = amb_mod,
+    cluster_score = c_scores,
+    loss_score = l_scores,
+    keep_cluster = keep_c_vec,
+    keep_loss = keep_l_vec
+  )
 
   n_cluster_only <- sum(
     decisions$keep_cluster & !decisions$keep_loss,

@@ -88,6 +88,7 @@ process_smiles <- function(
 
   # Load or Initialize Cache ----
   table_processed_1 <- load_smiles_cache(cache, smiles_colname)
+  extra_parts <- list()
 
   # Reuse cached entries when the input SMILES is already a canonical stereo
   # or 2D (no-stereo) SMILES present in the cache.
@@ -121,7 +122,7 @@ process_smiles <- function(
       if (any(hit_can)) {
         extra_can <- table_processed_1[m_can[hit_can], ]
         extra_can[[smiles_colname]] <- unmatched[hit_can]
-        table_processed_1 <- tidytable::bind_rows(table_processed_1, extra_can)
+        extra_parts[[length(extra_parts) + 1L]] <- extra_can
         unmatched <- unmatched[!hit_can]
       }
     }
@@ -145,42 +146,62 @@ process_smiles <- function(
             stri_sub(str = ik[valid_ik], from = -1L, to = -1L)
           )
         }
-        table_processed_1 <- tidytable::bind_rows(table_processed_1, extra_2d)
+        extra_parts[[length(extra_parts) + 1L]] <- extra_2d
+        unmatched <- unmatched[!hit_2d]
       }
     }
+    table_smiles_to_process <- if (length(unmatched) == 0L) {
+      table_smiles[0L, ]
+    } else {
+      out_unm <- tidytable::tidytable(tmp__ = unmatched)
+      names(out_unm) <- smiles_colname
+      out_unm
+    }
+  } else {
+    # Identify SMILES not yet in cache
+    in_cache <- !is.na(fastmatch::fmatch(
+      table_smiles[[smiles_colname]],
+      table_processed_1[[smiles_colname]]
+    ))
+    table_smiles_to_process <- table_smiles[!in_cache, ]
   }
-
-  # Identify SMILES not yet in cache
-  in_cache <- !is.na(fastmatch::fmatch(
-    table_smiles[[smiles_colname]],
-    table_processed_1[[smiles_colname]]
-  ))
-  table_smiles_to_process <- table_smiles[!in_cache, ]
 
   n_to_process <- nrow(table_smiles_to_process)
 
   if (n_to_process == 0L) {
     log_info("All SMILES already in cache, no processing needed")
-    keep_cached <- !is.na(fastmatch::fmatch(
-      table_processed_1[[smiles_colname]],
-      table_smiles[[smiles_colname]]
-    ))
-    out_cached <- table_processed_1[keep_cached, ] |>
-      tidytable::distinct(!!as.name(smiles_colname), .keep_all = TRUE) |>
-      tidytable::mutate(
-        structure_inchikey_connectivity_layer = stri_sub(
-          str = structure_inchikey,
-          from = 1L,
-          to = 14L
-        ),
-        structure_inchikey_no_stereo = paste0(
-          stri_sub(str = structure_inchikey, from = 1L, to = 14L),
-          "-",
-          stri_sub(str = structure_inchikey, from = -1L, to = -1L)
-        )
-      )
+    keep_1 <- which(
+      !is.na(fastmatch::fmatch(
+        table_processed_1[[smiles_colname]],
+        table_smiles[[smiles_colname]]
+      ))
+    )
+    out_cached <- if (length(extra_parts) > 0L) {
+      tidytable::bind_rows(c(list(table_processed_1[keep_1, ]), extra_parts))
+    } else {
+      table_processed_1[keep_1, ]
+    }
+    sc_vec <- out_cached[[smiles_colname]]
+    if (anyDuplicated(sc_vec) > 0L) {
+      out_cached <- out_cached[!duplicated(sc_vec), ]
+    }
+    ik_c <- out_cached$structure_inchikey
+    cl_c <- stri_sub(str = ik_c, from = 1L, to = 14L)
+    out_cached$structure_inchikey_connectivity_layer <- cl_c
+    out_cached$structure_inchikey_no_stereo <- ifelse(
+      is.na(ik_c),
+      NA_character_,
+      paste0(cl_c, "-", stri_sub(str = ik_c, from = -1L, to = -1L))
+    )
     log_complete(ctx, n_processed = nrow(out_cached))
     return(out_cached)
+  }
+
+  if (length(extra_parts) > 0L) {
+    table_processed_1 <- tidytable::bind_rows(c(
+      list(table_processed_1),
+      extra_parts
+    ))
   }
 
   # Load Python Processor only when new SMILES actually require RDKit.
@@ -234,10 +255,13 @@ process_smiles <- function(
   )
 
   # Combine cached and new results
-  combined_processed <- table_processed_1 |>
-    tidytable::bind_rows(table_processed_2) |>
-    tidytable::filter(!is.na(!!as.name(smiles_colname))) |>
-    tidytable::distinct(!!as.name(smiles_colname), .keep_all = TRUE)
+  combined_processed <- tidytable::bind_rows(
+    table_processed_1,
+    table_processed_2
+  )
+  cp_sc <- combined_processed[[smiles_colname]]
+  keep_cp <- which(!is.na(cp_sc) & !duplicated(cp_sc))
+  combined_processed <- combined_processed[keep_cp, ]
 
   # Persist updated SMILES cache to disk when a valid cache path is provided
   if (
@@ -260,6 +284,7 @@ process_smiles <- function(
           compress = compress_method,
           showProgress = FALSE
         )
+        .smiles_cache_store$invalidate()
       },
       error = function(e) {
         log_debug("Could not update SMILES cache %s: %s", cache, e$message)
@@ -267,23 +292,21 @@ process_smiles <- function(
     )
   }
 
-  keep_final <- !is.na(fastmatch::fmatch(
-    combined_processed[[smiles_colname]],
-    table_smiles[[smiles_colname]]
-  ))
-  table_final <- combined_processed[keep_final, ] |>
-    tidytable::mutate(
-      structure_inchikey_connectivity_layer = stri_sub(
-        str = structure_inchikey,
-        from = 1L,
-        to = 14L
-      ),
-      structure_inchikey_no_stereo = paste0(
-        stri_sub(str = structure_inchikey, from = 1L, to = 14L),
-        "-",
-        stri_sub(str = structure_inchikey, from = -1L, to = -1L)
-      )
-    )
+  keep_final <- which(
+    !is.na(fastmatch::fmatch(
+      combined_processed[[smiles_colname]],
+      table_smiles[[smiles_colname]]
+    ))
+  )
+  table_final <- combined_processed[keep_final, ]
+  ik_f <- table_final$structure_inchikey
+  cl_f <- stri_sub(str = ik_f, from = 1L, to = 14L)
+  table_final$structure_inchikey_connectivity_layer <- cl_f
+  table_final$structure_inchikey_no_stereo <- ifelse(
+    is.na(ik_f),
+    NA_character_,
+    paste0(cl_f, "-", stri_sub(str = ik_f, from = -1L, to = -1L))
+  )
 
   log_complete(ctx, n_processed = nrow(table_final))
 
@@ -321,16 +344,58 @@ load_python_smiles_processor <- function() {
 #' Extract unique SMILES from dataframe
 #' @keywords internal
 extract_unique_smiles <- function(df, smiles_colname) {
-  df |>
-    tidytable::filter(!is.na(!!as.name(smiles_colname))) |>
-    tidytable::distinct(!!as.name(smiles_colname))
+  col_vec <- df[[smiles_colname]]
+  u_sm <- unique(col_vec)
+  u_sm <- u_sm[!is.na(u_sm)]
+  out <- tidytable::tidytable(tmp__ = u_sm)
+  names(out) <- smiles_colname
+  out
 }
+
+.smiles_cache_store <- local({
+  .env <- new.env(parent = emptyenv())
+  list(
+    get = function(key) {
+      if (exists(key, envir = .env, inherits = FALSE)) {
+        .env[[key]]
+      } else {
+        NULL
+      }
+    },
+    set = function(key, val) {
+      rm(list = ls(envir = .env, all.names = TRUE), envir = .env)
+      .env[[key]] <- val
+      invisible(val)
+    },
+    invalidate = function() {
+      rm(list = ls(envir = .env, all.names = TRUE), envir = .env)
+      invisible(NULL)
+    }
+  )
+})
 
 #' Load SMILES cache or create empty template
 #' @keywords internal
 load_smiles_cache <- function(cache, smiles_colname) {
   if (is.null(cache)) {
     return(create_empty_smiles_template(smiles_colname))
+  }
+
+  cache_key <- NULL
+  if (is.character(cache) && length(cache) == 1L && file.exists(cache)) {
+    fi <- file.info(cache)
+    cache_key <- paste(
+      normalizePath(cache, mustWork = FALSE),
+      as.character(fi$mtime),
+      as.character(fi$size),
+      smiles_colname,
+      sep = "|"
+    )
+    hit <- .smiles_cache_store$get(cache_key)
+    if (!is.null(hit)) {
+      log_debug("Loaded %d cached SMILES (in-memory)", nrow(hit))
+      return(hit)
+    }
   }
 
   tryCatch(
@@ -340,6 +405,9 @@ load_smiles_cache <- function(cache, smiles_colname) {
         file_type = "SMILES cache"
       )
       log_debug("Loaded %d cached SMILES", nrow(cached))
+      if (!is.null(cache_key)) {
+        .smiles_cache_store$set(cache_key, cached)
+      }
       cached
     },
     error = function(e) {

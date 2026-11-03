@@ -1023,6 +1023,38 @@ collect_node_adduct_hypotheses <- function(
   out
 }
 
+.apply_modifier_column_fast <- function(adducts, mods, mod_sign) {
+  n <- length(adducts)
+  if (n == 0L) {
+    return(character(0L))
+  }
+  u_a <- unique(adducts)
+  u_m <- unique(mods)
+  a_id <- if (anyNA(u_a)) {
+    match(adducts, u_a)
+  } else {
+    fastmatch::fmatch(adducts, u_a)
+  }
+  m_id <- if (anyNA(u_m)) match(mods, u_m) else fastmatch::fmatch(mods, u_m)
+  n_m <- max(1L, length(u_m))
+  pair_code <- if (as.double(length(u_a)) * n_m < .Machine$integer.max) {
+    (a_id - 1L) * n_m + m_id
+  } else {
+    as.double(a_id - 1L) * n_m + m_id
+  }
+  u_code <- unique(pair_code)
+  first_pos <- fastmatch::fmatch(u_code, pair_code)
+
+  u_a_sub <- adducts[first_pos]
+  u_m_sub <- mods[first_pos]
+  base_part <- sub("M(?![a-z]).*", "M", u_a_sub, perl = TRUE)
+  char_part <- sub(".*M(?![a-z])", "", u_a_sub, perl = TRUE)
+  u_simp <- .simplify_adduct_after_modifier(
+    paste0(base_part, mod_sign, u_m_sub, char_part)
+  )
+  u_simp[fastmatch::fmatch(pair_code, u_code)]
+}
+
 #' Propagate a modifier from the SOURCE feature's hypothesis to the DESTINATION
 #' feature, creating a new hypothesis for the destination.
 #'
@@ -1069,14 +1101,12 @@ propagate_modifier_src_to_dest <- function(
     tidytable::inner_join(src_dest, by = "feature_id") |>
     tidytable::mutate(
       feature_id = feature_id_dest,
-      .base_part = sub("M(?![a-z]).*", "M", adduct, perl = TRUE),
-      .char_part = sub(".*M(?![a-z])", "", adduct, perl = TRUE),
-      adduct = .simplify_adduct_after_modifier(
-        paste0(.base_part, mod_sign, !!as.name(mod_col), .char_part)
+      adduct = .apply_modifier_column_fast(
+        adduct,
+        !!as.name(mod_col),
+        mod_sign
       ),
       source = source_label,
-      .base_part = NULL,
-      .char_part = NULL,
       feature_id_dest = NULL
     )
 
@@ -1135,14 +1165,12 @@ propagate_modifier_dest_to_src <- function(
     tidytable::inner_join(dest_src, by = "feature_id") |>
     tidytable::mutate(
       feature_id = feature_id_src,
-      .base_part = sub("M(?![a-z]).*", "M", adduct, perl = TRUE),
-      .char_part = sub(".*M(?![a-z])", "", adduct, perl = TRUE),
-      adduct = .simplify_adduct_after_modifier(
-        paste0(.base_part, mod_sign, !!as.name(mod_col), .char_part)
+      adduct = .apply_modifier_column_fast(
+        adduct,
+        !!as.name(mod_col),
+        mod_sign
       ),
       source = source_label,
-      .base_part = NULL,
-      .char_part = NULL,
       feature_id_src = NULL
     )
 
@@ -1186,15 +1214,12 @@ expand_with_modifier <- function(
   out <- base_hyps |>
     tidytable::inner_join(targets, by = "feature_id") |>
     tidytable::mutate(
-      # Extract base adduct (M part) and suffix (post-M part)
-      .base_part = sub("M(?![a-z]).*", "M", adduct, perl = TRUE),
-      .char_part = sub(".*M(?![a-z])", "", adduct, perl = TRUE),
-      adduct = .simplify_adduct_after_modifier(
-        paste0(.base_part, mod_sign, !!as.name(mod_col), .char_part)
+      adduct = .apply_modifier_column_fast(
+        adduct,
+        !!as.name(mod_col),
+        mod_sign
       ),
-      source = if (mod_sign == "+") "cluster" else "loss",
-      .base_part = NULL,
-      .char_part = NULL
+      source = if (mod_sign == "+") "cluster" else "loss"
     )
 
   if (identical(mod_col, "loss")) {

@@ -97,3 +97,16 @@ test_that("round_reals rejects invalid dig", {
 test_that("round_reals rejects non-data-frame input", {
   expect_error(round_reals("x"), "data frame")
 })
+
+test_that("round_reals deduplicates large (>1024) numeric and character columns accurately", {
+  vals_num <- rep(c(1.2345678, 9.8765432, NA_real_, Inf), length.out = 2048L)
+  vals_chr <- as.character(vals_num)
+  df <- tidytable::tidytable(
+    structure_exact_mass = vals_num,
+    structure_xlogp = vals_chr
+  )
+  out <- round_reals(df, dig = 4L)
+  expected <- rep(c(1.2346, 9.8765, NA_real_, Inf), length.out = 2048L)
+  expect_equal(out$structure_exact_mass, expected)
+  expect_equal(out$structure_xlogp, expected)
+})

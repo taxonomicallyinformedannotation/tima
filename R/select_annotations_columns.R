@@ -186,6 +186,18 @@ select_annotations_columns <- function(
   df
 }
 
+.fast_trim_and_na <- function(v) {
+  ws <- grep("^[ \t\r\n]|[ \t\r\n]$", v)
+  if (length(ws) > 0L) {
+    v[ws] <- trimws(v[ws])
+  }
+  bad <- fastmatch::fmatch(v, c("N/A", "null", ""), nomatch = 0L) > 0L
+  if (any(bad)) {
+    v[bad] <- NA_character_
+  }
+  v
+}
+
 .normalize_annotation_text <- function(x) {
   if (length(x) == 0L) {
     return(x)
@@ -193,14 +205,14 @@ select_annotations_columns <- function(
   if (length(x) > 1024L) {
     ux <- unique(x)
     if (length(ux) * 2L < length(x)) {
-      vals <- trimws(ux)
-      vals[vals %in% c("N/A", "null", "")] <- NA_character_
+      vals <- .fast_trim_and_na(ux)
+      if (identical(vals, ux)) {
+        return(x)
+      }
       return(vals[fastmatch::fmatch(x, ux)])
     }
   }
-  vals <- trimws(x)
-  vals[vals %in% c("N/A", "null", "")] <- NA_character_
-  vals
+  .fast_trim_and_na(x)
 }
 
 .annotation_projection_columns <- function(model) {
@@ -258,8 +270,16 @@ recompute_structure_fields_from_smiles <- function(df, cache = NULL) {
   }
 
   smiles_vec <- as.character(df[[smiles_col]])
-  unique_smiles <- unique(smiles_vec[!is.na(smiles_vec)])
-  unique_smiles <- unique_smiles[nzchar(trimws(unique_smiles))]
+  unique_smiles <- unique(smiles_vec)
+  unique_smiles <- unique_smiles[!is.na(unique_smiles)]
+  ws_sm <- grep("^[ \t\r\n]|[ \t\r\n]$", unique_smiles)
+  if (length(ws_sm) > 0L) {
+    trimmed_sm <- unique_smiles
+    trimmed_sm[ws_sm] <- trimws(unique_smiles[ws_sm])
+    unique_smiles <- unique_smiles[nzchar(trimmed_sm)]
+  } else {
+    unique_smiles <- unique_smiles[nzchar(unique_smiles)]
+  }
   if (length(unique_smiles) == 0L) {
     return(df)
   }
@@ -288,20 +308,19 @@ recompute_structure_fields_from_smiles <- function(df, cache = NULL) {
     return(df)
   }
 
-  # Build a lookup keyed by original (input) SMILES.
-  lookup <- processed |>
-    tidytable::select(
-      tidyselect::any_of(c(
-        ".input_smiles" = "structure_smiles_initial",
-        ".recomputed_smiles_no_stereo" = "structure_smiles_no_stereo",
-        ".recomputed_inchikey_connectivity_layer" = "structure_inchikey_connectivity_layer",
-        ".recomputed_inchikey_no_stereo" = "structure_inchikey_no_stereo",
-        ".recomputed_molecular_formula" = "structure_molecular_formula",
-        ".recomputed_exact_mass" = "structure_exact_mass",
-        ".recomputed_xlogp" = "structure_xlogp"
-      ))
-    ) |>
-    tidytable::distinct(.input_smiles, .keep_all = TRUE)
+  # Build a lookup keyed by original (input) SMILES without full-table distinct() copy.
+  if (anyDuplicated(processed$structure_smiles_initial) > 0L) {
+    processed <- processed[!duplicated(processed$structure_smiles_initial), ]
+  }
+  lookup <- list(
+    .input_smiles = processed$structure_smiles_initial,
+    .recomputed_smiles_no_stereo = processed$structure_smiles_no_stereo,
+    .recomputed_inchikey_connectivity_layer = processed$structure_inchikey_connectivity_layer,
+    .recomputed_inchikey_no_stereo = processed$structure_inchikey_no_stereo,
+    .recomputed_molecular_formula = processed$structure_molecular_formula,
+    .recomputed_exact_mass = processed$structure_exact_mass,
+    .recomputed_xlogp = processed$structure_xlogp
+  )
 
   # Ensure target columns exist before overwrite/coalesce.
   df <- tidytable::as_tidytable(df)

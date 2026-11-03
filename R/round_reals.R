@@ -73,7 +73,10 @@ round_reals <- function(
 
   # Apply Rounding ----
   .round_col <- function(x) {
-    if (length(x) > 1024L && is.character(x)) {
+    if (is.numeric(x)) {
+      return(round(x, digits = dig))
+    }
+    if (is.character(x) && length(x) > 1024L) {
       ux <- unique(x)
       if (length(ux) * 2L < length(x)) {
         rux <- round(as.numeric(ux), digits = dig)
@@ -83,11 +86,11 @@ round_reals <- function(
     round(as.numeric(x), digits = dig)
   }
 
-  df |>
-    tidytable::mutate(tidytable::across(
-      .cols = tidyselect::any_of(x = matching_cols),
-      .fns = .round_col
-    ))
+  out <- tidytable::as_tidytable(as.list(df))
+  for (col in matching_cols) {
+    data.table::set(out, j = col, value = .round_col(out[[col]]))
+  }
+  out
 }
 
 #' Find columns matching any pattern

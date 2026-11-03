@@ -522,3 +522,39 @@ test_that("extract_unique_smiles keeps distinct non-NA rows", {
   expect_equal(nrow(out), 2L)
   expect_true(!anyNA(out$structure_smiles_initial))
 })
+
+test_that("load_smiles_cache reuses in-memory cache and invalidates when file changes", {
+  cache_path <- temp_test_path("smiles_mem_cache.tsv")
+  df1 <- tidytable::tidytable(
+    structure_smiles_initial = "C",
+    structure_smiles = "C",
+    structure_inchikey = "VNWKTOKETHGBQD-UHFFFAOYSA-N",
+    structure_molecular_formula = "CH4",
+    structure_exact_mass = 16.0313,
+    structure_smiles_no_stereo = "C",
+    structure_xlogp = 0.63
+  )
+  data.table::fwrite(df1, cache_path, sep = "\t")
+
+  res1 <- load_smiles_cache(cache_path, "structure_smiles_initial")
+  res2 <- load_smiles_cache(cache_path, "structure_smiles_initial")
+  expect_equal(nrow(res1), 1L)
+  expect_identical(res1, res2)
+
+  # Appending a second row changes file size and invalidates the in-memory entry
+  df2 <- tidytable::bind_rows(
+    df1,
+    tidytable::tidytable(
+      structure_smiles_initial = "CC",
+      structure_smiles = "CC",
+      structure_inchikey = "OTMSDBZUPAUEDD-UHFFFAOYSA-N",
+      structure_molecular_formula = "C2H6",
+      structure_exact_mass = 30.04695,
+      structure_smiles_no_stereo = "CC",
+      structure_xlogp = 1.02
+    )
+  )
+  data.table::fwrite(df2, cache_path, sep = "\t")
+  res3 <- load_smiles_cache(cache_path, "structure_smiles_initial")
+  expect_equal(nrow(res3), 2L)
+})

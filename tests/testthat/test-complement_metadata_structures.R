@@ -751,4 +751,84 @@ test_that(".normalize_enrichment_text normalizes sentinels on both small and lar
     .normalize_enrichment_text(large),
     rep(c("alpha", rep(NA_character_, 6L)), length.out = 2048L)
   )
+
+  # Clean large vector fast-path returns identical values and respects normalized attribute
+  clean_large <- rep(c("Alpha", "Beta"), length.out = 2048L)
+  expect_identical(.normalize_enrichment_text(clean_large), clean_large)
+  marked <- c(" N/A ", "null")
+  attr(marked, "normalized") <- TRUE
+  expect_identical(.normalize_enrichment_text(marked), marked)
+})
+
+test_that(".build_name_lookup_from_stereo resolves multi-row stereoisomer groups accurately", {
+  stereo_df <- tidytable::tidytable(
+    structure_inchikey_no_stereo = c(
+      "IK_SINGLE-N",
+      "IK_MULTI_OK-N",
+      "IK_MULTI_OK-N",
+      "IK_MULTI_OK-N",
+      "IK_MULTI_CONF-N",
+      "IK_MULTI_CONF-N",
+      NA_character_
+    ),
+    structure_name = c(
+      "  SingleName  ",
+      "Quercetin",
+      "quercetin",
+      "Isoquercetin",
+      "Luteolin",
+      "Kaempferol",
+      "Ignored"
+    ),
+    structure_tag = c(
+      "  tag1  ",
+      "flavonoid",
+      "flavonoid",
+      "polyphenol",
+      "",
+      NA_character_,
+      "IgnoredTag"
+    ),
+    structure_xlogp = c(
+      " 1.5 ",
+      "1.800000001",
+      "1.800000005",
+      NA_character_,
+      "2.1",
+      "2.5",
+      "0.0"
+    )
+  )
+
+  res <- .build_name_lookup_from_stereo(stereo_df)
+  res_by_key <- split(res, res$candidate_structure_inchikey_no_stereo)
+
+  expect_equal(nrow(res), 3L)
+  expect_equal(res_by_key[["IK_SINGLE-N"]]$.lk_name, "SingleName")
+  expect_equal(res_by_key[["IK_SINGLE-N"]]$.lk_tag, "tag1")
+  expect_equal(res_by_key[["IK_SINGLE-N"]]$.lk_xlogp, "1.5")
+
+  # Case-insensitive name dedup preserves first casing; tags dedup exact
+  expect_equal(
+    res_by_key[["IK_MULTI_OK-N"]]$.lk_name,
+    "Quercetin $ Isoquercetin"
+  )
+  expect_equal(
+    res_by_key[["IK_MULTI_OK-N"]]$.lk_tag,
+    "flavonoid $ polyphenol"
+  )
+  # Within 1e-8 tolerance -> resolves to first finite numeric string
+  expect_equal(
+    as.numeric(res_by_key[["IK_MULTI_OK-N"]]$.lk_xlogp),
+    1.800000001,
+    tolerance = 1e-9
+  )
+
+  # Conflicting xlogp (> 1e-8) -> NA_character_
+  expect_equal(
+    res_by_key[["IK_MULTI_CONF-N"]]$.lk_name,
+    "Luteolin $ Kaempferol"
+  )
+  expect_true(is.na(res_by_key[["IK_MULTI_CONF-N"]]$.lk_tag))
+  expect_true(is.na(res_by_key[["IK_MULTI_CONF-N"]]$.lk_xlogp))
 })

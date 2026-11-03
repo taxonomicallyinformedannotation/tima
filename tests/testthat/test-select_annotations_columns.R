@@ -245,6 +245,20 @@ test_that("recompute_structure_fields_from_smiles updates fields without join ar
   expect_false(any(grepl("^\\.recomputed_", names(result))))
 })
 
+test_that(".normalize_annotation_text handles large (>1024) clean and dirty vectors", {
+  clean <- rep(c("Alpha", "Beta", NA_character_), length.out = 2048L)
+  expect_identical(.normalize_annotation_text(clean), clean)
+
+  dirty <- rep(c(" Alpha ", "N/A", "null", ""), length.out = 2048L)
+  expect_equal(
+    .normalize_annotation_text(dirty),
+    rep(
+      c("Alpha", NA_character_, NA_character_, NA_character_),
+      length.out = 2048L
+    )
+  )
+})
+
 # test_that(
 #   skip("Not implemented")
 # )
