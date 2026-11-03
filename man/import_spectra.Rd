@@ -65,4 +65,7 @@ Other mass-spectrometry:
 \code{\link[=harmonize_adducts]{harmonize_adducts()}},
 \code{\link[=parse_adduct]{parse_adduct()}}
 }
+\concept{EDAM:data_0943 Mass spectrum}
+\concept{EDAM:format_3651 MGF}
+\concept{EDAM:operation_1812 Parsing}
 \concept{mass-spectrometry}

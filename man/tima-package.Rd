@@ -34,4 +34,11 @@ Other contributors:
 }
 
 }
+\concept{EDAM:operation_3803 Natural product identification}
+\concept{EDAM:topic_0154 Small molecules}
+\concept{EDAM:topic_0637 Taxonomy}
+\concept{EDAM:topic_0769 Workflows}
+\concept{EDAM:topic_2258 Cheminformatics}
+\concept{EDAM:topic_3172 Metabolomics}
+\concept{EDAM:topic_3370 Analytical chemistry}
 \keyword{internal}

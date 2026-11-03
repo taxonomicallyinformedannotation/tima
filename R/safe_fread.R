@@ -133,6 +133,55 @@ safe_fread <- function(
 }
 
 # Internal wrapper to make error branches easy to test without brittle FS setup.
+# Decompresses .gz/.bgz/.bz2 with Base R connections so data.table::fread does
+# not require the R.utils package at runtime (and avoids full-file decompression
+# when nrows = 0L is used to inspect headers).
 .safe_fread_read <- function(file, ...) {
+  if (
+    is.character(file) &&
+      length(file) == 1L &&
+      file.exists(file) &&
+      grepl("\\.(gz|bgz|bz2)$", file, ignore.case = TRUE)
+  ) {
+    dots <- list(...)
+    is_bz2 <- grepl("\\.bz2$", file, ignore.case = TRUE)
+    open_con <- if (is_bz2) bzfile else gzfile
+
+    if (identical(as.integer(dots$nrows), 0L)) {
+      con <- open_con(file, open = "rt")
+      on.exit(close(con), add = TRUE)
+      header_line <- readLines(con, n = 1L, warn = FALSE)
+      if (length(header_line) == 0L) {
+        return(tidytable::tidytable())
+      }
+      dots$nrows <- NULL
+      return(do.call(
+        tidytable::fread,
+        c(list(text = paste0(header_line, "\n"), nrows = 0L), dots)
+      ))
+    }
+
+    tmp_file <- tempfile(fileext = ".tsv")
+    on.exit(unlink(tmp_file), add = TRUE)
+    in_con <- open_con(file, open = "rb")
+    out_con <- file(tmp_file, open = "wb")
+    tryCatch(
+      {
+        repeat {
+          buf <- readBin(in_con, what = "raw", n = 16777216L)
+          if (length(buf) == 0L) {
+            break
+          }
+          writeBin(buf, out_con)
+        }
+      },
+      finally = {
+        close(in_con)
+        close(out_con)
+      }
+    )
+    return(tidytable::fread(file = tmp_file, ...))
+  }
+
   tidytable::fread(file = file, ...)
 }

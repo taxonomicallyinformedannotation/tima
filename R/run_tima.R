@@ -230,6 +230,8 @@ execute_targets_pipeline <- function(target_pattern = "^(ann_wei|exp_mzt)$") {
 #'     timestamped log files in data/processed/
 #'
 #' @family workflow
+#' @concept EDAM:operation_3803 Natural product identification
+#' @concept EDAM:topic_3172 Metabolomics
 #'
 #' @export
 #'
@@ -368,6 +370,8 @@ run_tima <- function(
 #' @return Invisible NULL (same as \code{\link{run_tima}})
 #'
 #' @family workflow
+#' @concept EDAM:operation_3803 Natural product identification
+#' @concept EDAM:topic_3172 Metabolomics
 #'
 #' @export
 #'

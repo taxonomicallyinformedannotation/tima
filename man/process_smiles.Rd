@@ -46,4 +46,8 @@ result_labeled <- process_smiles(df_labeled)
 # InChIKey differs from natural glucose
 }
 }
+\concept{EDAM:data_2301 SMILES string}
+\concept{EDAM:format_1196 SMILES}
+\concept{EDAM:format_1199 InChIKey}
+\concept{EDAM:topic_2258 Cheminformatics}
 \concept{chemical-classification}

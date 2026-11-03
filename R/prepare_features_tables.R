@@ -182,7 +182,7 @@ prepare_features_tables <- function(
     name_mz = name_mz
   )
   # Validate all parameters
-  purrr::iwalk(col_params, .validate_column_name_param)
+  Map(.validate_column_name_param, col_params, names(col_params))
 
   invisible(NULL)
 }

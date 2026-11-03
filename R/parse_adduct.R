@@ -98,13 +98,16 @@ parse_adduct <- function(
     alternatives <- alternatives[nchar(alternatives) > 0L]
 
     # Try each alternative until one parses successfully
-    result <- purrr::detect(
-      .x = alternatives,
-      .f = .is_parseable_adduct,
-      regex = regex,
-      failed_parse = failed_parse,
-      adduct_string = adduct_string,
-      .default = NULL
+    result <- Find(
+      f = function(alt) {
+        .is_parseable_adduct(
+          alt,
+          regex = regex,
+          failed_parse = failed_parse,
+          adduct_string = adduct_string
+        )
+      },
+      x = alternatives
     )
 
     # If we found a valid alternative, parse and return it
@@ -540,7 +543,7 @@ parse_modification_components <- function(modifications_clean) {
   # Handle isotopic labels: when the coefficient is >= 10 and the element is a
   # simple element symbol (e.g., "C", "N", "O"), the digits represent an isotope
   # mass number (e.g., 13C, 15N, 18O), NOT a stoichiometric count. Merge the
-  # coefficient into the element string so MetaboCoreUtils::calculateMass
+  # coefficient into the element string so calculate_formula_mass
   # resolves the exact isotope mass (e.g., 13.00335 for 13C) instead of
   # computing count * average mass (e.g., 13 * 12.0 = 156).
   # Per IUPAC and PSI-OBO conventions, digits >= 10 immediately before an
@@ -569,7 +572,7 @@ parse_modification_components <- function(modifications_clean) {
 calculate_modification_masses <- function(elements, signs, multiplicities) {
   mod_masses <- tryCatch(
     {
-      MetaboCoreUtils::calculateMass(x = elements)
+      calculate_formula_mass(x = elements)
     },
     error = function(e) {
       log_debug(

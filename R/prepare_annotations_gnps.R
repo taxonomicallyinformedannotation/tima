@@ -83,22 +83,19 @@ prepare_annotations_gnps <- function(
   if (length(input) == 0) {
     input <- "w1llN3v3r3v3r3x1st"
   }
-  if (
-    all(
-      purrr::map(.x = input, .f = file.exists) |>
-        unlist()
-    )
-  ) {
+  if (all(file.exists(unlist(input)))) {
     ## See https://github.com/CCMS-UCSD/GNPS_Workflows/issues/747
-    table <- purrr::map2(
-      .x = input,
-      .y = seq_along(input),
-      .f = ~ safe_fread(
-        file = .x,
-        file_type = paste0("GNPS results file ", .y),
-        na.strings = c("", "NA"),
-        colClasses = "character"
-      )
+    table <- Map(
+      function(x, y) {
+        safe_fread(
+          file = x,
+          file_type = paste0("GNPS results file ", y),
+          na.strings = c("", "NA"),
+          colClasses = "character"
+        )
+      },
+      input,
+      seq_along(input)
     ) |>
       tidytable::bind_rows() |>
       tidytable::mutate(

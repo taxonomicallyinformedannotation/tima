@@ -20,6 +20,7 @@
 #' @return Invisible TRUE if all checks pass, stops with error otherwise
 #'
 #' @family workflow
+#' @concept EDAM:operation_0336 Format validation
 #'
 #' @export
 #'

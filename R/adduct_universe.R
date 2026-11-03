@@ -397,5 +397,5 @@ calculate_mz_from_neutral_mass <- function(
   token
 }
 
-# Tiny default helper (mirrors `rlang::%||%` to avoid pulling rlang here).
+# Tiny default helper for NULL or zero-length fallback.
 `%||%` <- function(a, b) if (is.null(a) || length(a) == 0L) b else a

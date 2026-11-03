@@ -1,0 +1,235 @@
+{
+  "name": "TIMA",
+  "biotoolsID": "tima",
+  "description": "Taxonomically Informed Metabolite Annotation (TIMA) provides a reproducible workflow for metabolite annotation from LC-MS/MS feature tables, fragmentation spectra, and optional SIRIUS or GNPS outputs by integrating mass, spectral, taxonomic, and structural evidence.",
+  "homepage": "https://github.com/taxonomicallyinformedannotation/tima",
+  "version": [
+    "2.13.0"
+  ],
+  "license": "AGPL-3.0",
+  "language": [
+    "R",
+    "C",
+    "Python"
+  ],
+  "operatingSystem": [
+    "Linux",
+    "Mac",
+    "Windows"
+  ],
+  "toolType": [
+    "Library",
+    "Command-line tool",
+    "Web application",
+    "Workflow"
+  ],
+  "topic": [
+    {
+      "uri": "http://edamontology.org/topic_3172",
+      "term": "Metabolomics"
+    },
+    {
+      "uri": "http://edamontology.org/topic_0154",
+      "term": "Small molecules"
+    },
+    {
+      "uri": "http://edamontology.org/topic_2258",
+      "term": "Cheminformatics"
+    },
+    {
+      "uri": "http://edamontology.org/topic_0637",
+      "term": "Taxonomy"
+    },
+    {
+      "uri": "http://edamontology.org/topic_3370",
+      "term": "Analytical chemistry"
+    },
+    {
+      "uri": "http://edamontology.org/topic_0769",
+      "term": "Workflows"
+    }
+  ],
+  "function": [
+    {
+      "operation": [
+        {
+          "uri": "http://edamontology.org/operation_3803",
+          "term": "Natural product identification"
+        },
+        {
+          "uri": "http://edamontology.org/operation_3801",
+          "term": "Spectral library search"
+        },
+        {
+          "uri": "http://edamontology.org/operation_3214",
+          "term": "Spectral analysis"
+        },
+        {
+          "uri": "http://edamontology.org/operation_3629",
+          "term": "Deisotoping"
+        },
+        {
+          "uri": "http://edamontology.org/operation_3460",
+          "term": "Taxonomic classification"
+        },
+        {
+          "uri": "http://edamontology.org/operation_3927",
+          "term": "Network analysis"
+        },
+        {
+          "uri": "http://edamontology.org/operation_3766",
+          "term": "Weighted correlation network analysis"
+        },
+        {
+          "uri": "http://edamontology.org/operation_3695",
+          "term": "Filtering"
+        }
+      ],
+      "input": [
+        {
+          "data": {
+            "uri": "http://edamontology.org/data_0943",
+            "term": "Mass spectrum"
+          },
+          "format": [
+            {
+              "uri": "http://edamontology.org/format_3651",
+              "term": "MGF"
+            },
+            {
+              "uri": "http://edamontology.org/format_3681",
+              "term": "mzTab"
+            }
+          ]
+        },
+        {
+          "data": {
+            "uri": "http://edamontology.org/data_2536",
+            "term": "Mass spectrometry data"
+          },
+          "format": [
+            {
+              "uri": "http://edamontology.org/format_3475",
+              "term": "TSV"
+            },
+            {
+              "uri": "http://edamontology.org/format_3752",
+              "term": "CSV"
+            },
+            {
+              "uri": "http://edamontology.org/format_3681",
+              "term": "mzTab"
+            }
+          ]
+        },
+        {
+          "data": {
+            "uri": "http://edamontology.org/data_3028",
+            "term": "Taxonomy"
+          },
+          "format": [
+            {
+              "uri": "http://edamontology.org/format_3475",
+              "term": "TSV"
+            }
+          ]
+        },
+        {
+          "data": {
+            "uri": "http://edamontology.org/data_2301",
+            "term": "SMILES string"
+          },
+          "format": [
+            {
+              "uri": "http://edamontology.org/format_1196",
+              "term": "SMILES"
+            },
+            {
+              "uri": "http://edamontology.org/format_3814",
+              "term": "SDF"
+            }
+          ]
+        }
+      ],
+      "output": [
+        {
+          "data": {
+            "uri": "http://edamontology.org/data_2536",
+            "term": "Mass spectrometry data"
+          },
+          "format": [
+            {
+              "uri": "http://edamontology.org/format_3681",
+              "term": "mzTab"
+            },
+            {
+              "uri": "http://edamontology.org/format_3475",
+              "term": "TSV"
+            }
+          ]
+        },
+        {
+          "data": {
+            "uri": "http://edamontology.org/data_0962",
+            "term": "Small molecule report"
+          },
+          "format": [
+            {
+              "uri": "http://edamontology.org/format_3681",
+              "term": "mzTab"
+            },
+            {
+              "uri": "http://edamontology.org/format_3475",
+              "term": "TSV"
+            },
+            {
+              "uri": "http://edamontology.org/format_1199",
+              "term": "InChIKey"
+            }
+          ]
+        },
+        {
+          "data": {
+            "uri": "http://edamontology.org/data_2600",
+            "term": "Pathway or network"
+          },
+          "format": [
+            {
+              "uri": "http://edamontology.org/format_3475",
+              "term": "TSV"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "publication": [
+    {
+      "doi": "10.3389/fpls.2019.01329",
+      "type": [
+        "Primary"
+      ]
+    }
+  ],
+  "credit": [
+    {
+      "name": "Adriano Rutz",
+      "email": "adafede@gmail.com",
+      "orcidid": "https://orcid.org/0000-0003-0443-9902",
+      "typeEntity": "Person",
+      "typeRole": [
+        "Developer",
+        "Maintainer"
+      ]
+    },
+    {
+      "name": "Pierre-Marie Allard",
+      "email": "pierre-marie.allard@unifr.ch",
+      "orcidid": "https://orcid.org/0000-0003-3389-2191",
+      "typeEntity": "Person",
+      "typeRole": [
+        "Contributor"
+      ]
+    }
+  ]
+}

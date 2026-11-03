@@ -7,7 +7,8 @@
 read_mgf_opti(
   f,
   msLevel = 2L,
-  mapping = Spectra::spectraVariableMapping(object = MsBackendMgf::MsBackendMgf())
+  mapping = c(rtime = "RTINSECONDS", acquisitionNum = "SCANS", precursorMz = "PEPMASS",
+    precursorIntensity = "PEPMASSINT", precursorCharge = "CHARGE")
 )
 }
 \arguments{
@@ -18,8 +19,7 @@ file}
 for MS2)}
 
 \item{mapping}{\link{character} Named character vector mapping MGF field names to
-standard
-spectra variable names. Default uses the mapping from MsBackendMgf.}
+standard spectra variable names.}
 }
 \value{
 A DataFrame containing the parsed spectra data with standardized
@@ -27,20 +27,18 @@ variable names
 }
 \description{
 This function reads a Mascot Generic Format (MGF) file using
-a memory-efficient approach. It mimics the \code{MsBackendMgf} implementation
-but uses significantly lower memory, making it suitable for processing
-large MGF files that might otherwise cause memory issues.
+a fast, vectorized approach. It mimics the \code{MsBackendMgf} implementation
+while avoiding per-spectrum \code{data.frame} allocations and quadratic
+row-binding overhead.
 }
 \details{
-The function processes spectra in batches to minimize memory usage
-and avoid loading the entire file into memory at once. It extracts all
-MGF fields and maps them to standard spectra variable names.
+The function extracts all MGF fields and maps them to standard
+spectra variable names.
 }
 \examples{
 \dontrun{
 # Read MGF file with memory-efficient approach
 library(Spectra)
-library(MsBackendMgf)
 
 spectra_data <- read_mgf_opti(
   f = "path/to/spectra.mgf",

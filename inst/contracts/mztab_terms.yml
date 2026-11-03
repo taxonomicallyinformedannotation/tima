@@ -52,3 +52,11 @@ cv_registry:
     full_name: The Statistical Methods Ontology
     version: unknown
     uri: https://purl.obolibrary.org/obo/stato.obo
+  - label: TIMA
+    full_name: Taxonomically Informed Metabolite Annotation user vocabulary
+    version: "{{software_version}}"
+    uri: https://github.com/taxonomicallyinformedannotation/tima
+  - label: EDAM
+    full_name: EMBRACE Data and Methods
+    version: "1.25"
+    uri: https://edamontology.org/EDAM.owl

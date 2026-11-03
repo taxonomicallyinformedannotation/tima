@@ -77,13 +77,14 @@ read_from_sirius_zip <- function(sirius_zip, file) {
   log_debug("Extracting file: %s", matching_file)
 
   # Read and parse the file from archive
-  result <- archive::archive_read(archive = sirius_zip, file = matching_file) |>
-    utils::read.delim(
-      quote = "",
-      na.strings = c("", "NA"),
-      colClasses = "character",
-      stringsAsFactors = FALSE
-    ) |>
+  con <- unz(description = sirius_zip, filename = matching_file)
+  result <- utils::read.delim(
+    con,
+    quote = "",
+    na.strings = c("", "NA"),
+    colClasses = "character",
+    stringsAsFactors = FALSE
+  ) |>
     tidytable::tidytable()
 
   result

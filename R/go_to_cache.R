@@ -45,7 +45,7 @@ go_to_cache <- function(dir = ".tima") {
   validate_character(dir, param_name = "dir", allow_empty = FALSE)
 
   # Construct and Create Cache Path ----
-  cache <- fs::path_home(dir)
+  cache <- path.expand(file.path("~", dir))
   log_debug("Cache directory: %s", cache)
 
   ensure_cache_exists(cache)
@@ -70,7 +70,12 @@ ensure_cache_exists <- function(cache) {
 
   tryCatch(
     {
-      fs::dir_create(path = cache)
+      if (
+        !dir.create(path = cache, recursive = TRUE, showWarnings = FALSE) &&
+          !dir.exists(cache)
+      ) {
+        stop(sprintf("Failed to create directory: %s", cache), call. = FALSE)
+      }
       log_debug("Cache created")
     },
     error = function(e) {

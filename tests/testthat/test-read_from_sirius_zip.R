@@ -269,10 +269,10 @@ test_that("read_from_sirius_zip is reasonably fast", {
 
 # Integration Tests ----
 
-test_that("read_from_sirius_zip integrates with archive package", {
+test_that("read_from_sirius_zip integrates with base unz connection", {
   test_zip <- create_test_sirius_zip()
 
-  # Should successfully use archive::archive_read
+  # Should successfully read from zip via base::unz
   result <- read_from_sirius_zip(
     sirius_zip = test_zip$zip_file,
     file = "structure\\.tsv$"

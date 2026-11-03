@@ -21,6 +21,10 @@
 #'     xLogP, and connectivity layer
 #'
 #' @family chemical-classification
+#' @concept EDAM:topic_2258 Cheminformatics
+#' @concept EDAM:data_2301 SMILES string
+#' @concept EDAM:format_1196 SMILES
+#' @concept EDAM:format_1199 InChIKey
 #'
 #' @export
 #'
@@ -85,29 +89,98 @@ process_smiles <- function(
   # Load or Initialize Cache ----
   table_processed_1 <- load_smiles_cache(cache, smiles_colname)
 
+  # Reuse cached entries when the input SMILES is already a canonical stereo
+  # or 2D (no-stereo) SMILES present in the cache.
+  if (
+    nrow(table_processed_1) > 0L &&
+      all(
+        c(
+          "structure_smiles",
+          "structure_inchikey",
+          "structure_molecular_formula",
+          "structure_exact_mass",
+          "structure_smiles_no_stereo",
+          "structure_xlogp"
+        ) %in%
+          names(table_processed_1)
+      )
+  ) {
+    unmatched <- table_smiles[[smiles_colname]][
+      is.na(fastmatch::fmatch(
+        table_smiles[[smiles_colname]],
+        table_processed_1[[smiles_colname]]
+      ))
+    ]
+    if (length(unmatched) > 0L) {
+      # 1. Exact match against canonical stereo SMILES
+      m_can <- fastmatch::fmatch(
+        unmatched,
+        table_processed_1$structure_smiles
+      )
+      hit_can <- !is.na(m_can)
+      if (any(hit_can)) {
+        extra_can <- table_processed_1[m_can[hit_can], ]
+        extra_can[[smiles_colname]] <- unmatched[hit_can]
+        table_processed_1 <- tidytable::bind_rows(table_processed_1, extra_can)
+        unmatched <- unmatched[!hit_can]
+      }
+    }
+    if (length(unmatched) > 0L) {
+      # 2. Exact match against standardized 2D (no-stereo) SMILES
+      m_2d <- fastmatch::fmatch(
+        unmatched,
+        table_processed_1$structure_smiles_no_stereo
+      )
+      hit_2d <- !is.na(m_2d)
+      if (any(hit_2d)) {
+        extra_2d <- table_processed_1[m_2d[hit_2d], ]
+        extra_2d[[smiles_colname]] <- unmatched[hit_2d]
+        extra_2d$structure_smiles <- extra_2d$structure_smiles_no_stereo
+        ik <- extra_2d$structure_inchikey
+        valid_ik <- !is.na(ik) & nchar(ik) >= 27L
+        if (any(valid_ik)) {
+          extra_2d$structure_inchikey[valid_ik] <- paste0(
+            stri_sub(str = ik[valid_ik], from = 1L, to = 14L),
+            "-UHFFFAOYSA-",
+            stri_sub(str = ik[valid_ik], from = -1L, to = -1L)
+          )
+        }
+        table_processed_1 <- tidytable::bind_rows(table_processed_1, extra_2d)
+      }
+    }
+  }
+
   # Identify SMILES not yet in cache
-  table_smiles_to_process <- table_smiles |>
-    tidytable::anti_join(y = table_processed_1)
+  in_cache <- !is.na(fastmatch::fmatch(
+    table_smiles[[smiles_colname]],
+    table_processed_1[[smiles_colname]]
+  ))
+  table_smiles_to_process <- table_smiles[!in_cache, ]
 
   n_to_process <- nrow(table_smiles_to_process)
 
   if (n_to_process == 0L) {
     log_info("All SMILES already in cache, no processing needed")
-    return(
-      table_processed_1 |>
-        tidytable::mutate(
-          structure_inchikey_connectivity_layer = stri_sub(
-            str = structure_inchikey,
-            from = 1L,
-            to = 14L
-          ),
-          structure_inchikey_no_stereo = paste0(
-            stri_sub(str = structure_inchikey, from = 1L, to = 14L),
-            "-",
-            stri_sub(str = structure_inchikey, from = -1L, to = -1L)
-          )
+    keep_cached <- !is.na(fastmatch::fmatch(
+      table_processed_1[[smiles_colname]],
+      table_smiles[[smiles_colname]]
+    ))
+    out_cached <- table_processed_1[keep_cached, ] |>
+      tidytable::distinct(!!as.name(smiles_colname), .keep_all = TRUE) |>
+      tidytable::mutate(
+        structure_inchikey_connectivity_layer = stri_sub(
+          str = structure_inchikey,
+          from = 1L,
+          to = 14L
+        ),
+        structure_inchikey_no_stereo = paste0(
+          stri_sub(str = structure_inchikey, from = 1L, to = 14L),
+          "-",
+          stri_sub(str = structure_inchikey, from = -1L, to = -1L)
         )
-    )
+      )
+    log_complete(ctx, n_processed = nrow(out_cached))
+    return(out_cached)
   }
 
   # Load Python Processor only when new SMILES actually require RDKit.
@@ -161,12 +234,44 @@ process_smiles <- function(
   )
 
   # Combine cached and new results
-  table_final <- table_smiles |>
-    tidytable::inner_join(
-      y = table_processed_1 |>
-        tidytable::bind_rows(table_processed_2) |>
-        tidytable::filter(!is.na(!!as.name(smiles_colname)))
-    ) |>
+  combined_processed <- table_processed_1 |>
+    tidytable::bind_rows(table_processed_2) |>
+    tidytable::filter(!is.na(!!as.name(smiles_colname))) |>
+    tidytable::distinct(!!as.name(smiles_colname), .keep_all = TRUE)
+
+  # Persist updated SMILES cache to disk when a valid cache path is provided
+  if (
+    !is.null(cache) &&
+      is.character(cache) &&
+      length(cache) == 1L &&
+      nzchar(cache) &&
+      dir.exists(dirname(cache))
+  ) {
+    tryCatch(
+      {
+        compress_method <- if (grepl("\\.gz$", cache, ignore.case = TRUE)) {
+          "gzip"
+        } else {
+          "none"
+        }
+        tidytable::fwrite(
+          x = combined_processed,
+          file = cache,
+          compress = compress_method,
+          showProgress = FALSE
+        )
+      },
+      error = function(e) {
+        log_debug("Could not update SMILES cache %s: %s", cache, e$message)
+      }
+    )
+  }
+
+  keep_final <- !is.na(fastmatch::fmatch(
+    combined_processed[[smiles_colname]],
+    table_smiles[[smiles_colname]]
+  ))
+  table_final <- combined_processed[keep_final, ] |>
     tidytable::mutate(
       structure_inchikey_connectivity_layer = stri_sub(
         str = structure_inchikey,

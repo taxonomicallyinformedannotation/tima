@@ -70,4 +70,5 @@ Other workflow:
 \code{\link[=run_tima]{run_tima()}},
 \code{\link[=tima_full]{tima_full()}}
 }
+\concept{EDAM:operation_0336 Format validation}
 \concept{workflow}

@@ -63,7 +63,7 @@ replace_id <- function(
 
   # Determine Replacement ID ----
   # GNPS ID takes precedence over filename pattern
-  new_id <- rlang::`%||%`(user_gnps, user_filename)
+  new_id <- user_gnps %||% user_filename
 
   # Replace ID ----
   new_file_name <- replace_id_in_filename(file_name, old_id, new_id)

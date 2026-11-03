@@ -25,6 +25,8 @@
 #'   \pkg{targets} \code{format = "file"} compatibility.
 #'
 #' @family data-retrieval
+#' @concept EDAM:operation_3282 ID mapping
+#' @concept EDAM:data_2082 Matrix
 #'
 #' @export
 #'
@@ -167,7 +169,7 @@ get_compounds_xrefs <- function(
 
     data <- httr2::resp_body_json(resp)
     preferred <- data[["banana"]] %||% data[["preferred_prefix"]]
-    rlang::`%||%`(preferred, entry_key)
+    preferred %||% entry_key
   }
 
   preferred_prefixes <- vapply(

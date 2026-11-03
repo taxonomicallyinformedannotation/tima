@@ -58,24 +58,24 @@
   }
 
   if (!is.null(prefil_fea_raw) && !file.exists(prefil_fea_raw_1)) {
-    fs::file_copy(
-      path = prefil_fea_raw[[4L]],
-      new_path = file.path(prefil_fea_raw_1),
+    file.copy(
+      from = prefil_fea_raw[[4L]],
+      to = file.path(prefil_fea_raw_1),
       overwrite = TRUE
     )
   }
   if (!is.null(prefil_spe_raw) && !file.exists(prefil_spe_raw_1)) {
-    fs::file_copy(
-      path = prefil_spe_raw[[4L]],
-      new_path = file.path(prefil_spe_raw_1),
+    file.copy(
+      from = prefil_spe_raw[[4L]],
+      to = file.path(prefil_spe_raw_1),
       overwrite = TRUE
     )
   }
   if (!is.null(prefil_met_raw)) {
     if (!file.exists(prefil_met_raw_1)) {
-      fs::file_copy(
-        path = prefil_met_raw[[4L]],
-        new_path = file.path(prefil_met_raw_1),
+      file.copy(
+        from = prefil_met_raw[[4L]],
+        to = file.path(prefil_met_raw_1),
         overwrite = TRUE
       )
     }
@@ -86,9 +86,9 @@
     if (!file.exists(prefil_mzm_raw_1)) {
       ## safety
       .create_dir(paths_data_interim_annotations)
-      fs::file_copy(
-        path = prefil_mzm_raw[[4L]],
-        new_path = file.path(prefil_mzm_raw_1),
+      file.copy(
+        from = prefil_mzm_raw[[4L]],
+        to = file.path(prefil_mzm_raw_1),
         overwrite = TRUE
       )
     }
@@ -99,9 +99,9 @@
     if (!file.exists(prefil_mzt_raw_1)) {
       ## safety
       .create_dir(paths_data_source)
-      fs::file_copy(
-        path = prefil_mzt_raw[[4L]],
-        new_path = file.path(prefil_mzt_raw_1),
+      file.copy(
+        from = prefil_mzt_raw[[4L]],
+        to = file.path(prefil_mzt_raw_1),
         overwrite = TRUE
       )
     }
@@ -110,9 +110,9 @@
     if (!file.exists(prefil_sir_raw_1)) {
       ## safety
       .create_dir(paths_data_interim_annotations)
-      fs::file_copy(
-        path = prefil_sir_raw[[4L]],
-        new_path = file.path(prefil_sir_raw_1),
+      file.copy(
+        from = prefil_sir_raw[[4L]],
+        to = file.path(prefil_sir_raw_1),
         overwrite = TRUE
       )
     }
@@ -163,9 +163,9 @@
   }
   if (!is.null(lib_tmp_exp_csv)) {
     if (!file.exists(lib_tmp_exp_csv)) {
-      fs::file_copy(
-        path = lib_tmp_exp_csv[[4L]],
-        new_path = file.path(lib_tmp_exp_csv),
+      file.copy(
+        from = lib_tmp_exp_csv[[4L]],
+        to = file.path(lib_tmp_exp_csv),
         overwrite = TRUE
       )
     }
@@ -174,9 +174,9 @@
   }
   if (!is.null(lib_tmp_is_csv)) {
     if (!file.exists(lib_tmp_is_csv)) {
-      fs::file_copy(
-        path = lib_tmp_is_csv[[4L]],
-        new_path = file.path(lib_tmp_is_csv),
+      file.copy(
+        from = lib_tmp_is_csv[[4L]],
+        to = file.path(lib_tmp_is_csv),
         overwrite = TRUE
       )
     }
@@ -290,54 +290,10 @@
   yaml_advanced$files$features$prepared <-
     yaml_advanced$files$features$prepared |>
     .replace_id()
-  # TODO
-  # yaml_advanced$files$libraries$sop$raw$closed <-
-  #   input$todo
-  # yaml_advanced$files$libraries$sop$raw$ecmdb <-
-  #   input$todo
-  # yaml_advanced$files$libraries$sop$raw$hmdb <-
-  #   input$todo
-  # yaml_advanced$files$libraries$sop$raw$lotus <-
-  #   input$todo
-  # yaml_advanced$files$libraries$sop$prepared$closed <-
-  #   input$todo
-  # yaml_advanced$files$libraries$sop$prepared$ecmdb <-
-  #   input$todo
-  # yaml_advanced$files$libraries$sop$prepared$hmdb <-
-  #   input$todo
-  # yaml_advanced$files$libraries$sop$prepared$lotus <-
-  #   input$todo
-  # yaml_advanced$files$libraries$sop$prepared$rt <-
-  #   input$todo
-  # yaml_advanced$files$libraries$sop$prepared$spectral <-
-  #   input$todo
-  # yaml_advanced$files$libraries$sop$merged$keys <-
-  #   input$todo
-  # yaml_advanced$files$libraries$sop$merged$organisms$names <-
-  #   input$todo
-  # yaml_advanced$files$libraries$sop$merged$organisms$taxonomies$ott <-
-  #   input$todo
-  # yaml_advanced$files$libraries$sop$merged$structures$processed <-
-  #   input$todo
-  # yaml_advanced$files$libraries$sop$merged$structures$stereo <-
-  #   input$todo
-  # yaml_advanced$files$libraries$sop$merged$structures$metadata <-
-  #   input$todo
-  # yaml_advanced$files$libraries$sop$merged$structures$names <-
-  #   input$todo
-  # yaml_advanced$files$libraries$sop$merged$structures$taxonomies$cla <-
-  #   input$todo
-  # yaml_advanced$files$libraries$sop$merged$structures$taxonomies$npc <-
-  #   input$todo
   yaml_advanced$files$libraries$spectral$raw <-
     input$lib_spe_mgf
   yaml_advanced$files$libraries$temporal$exp$csv <- lib_tmp_exp_csv
   yaml_advanced$files$libraries$temporal$is$csv <- lib_tmp_is_csv
-  # TODO
-  # other relative paths, not necessary
-  # TODO
-  # yaml_advanced$files$libraries$temporal$prepared <-
-  #   input$todo
   yaml_advanced$files$networks$spectral$edges$raw$ms1 <-
     yaml_advanced$files$networks$spectral$edges$raw$ms1 |>
     .replace_id()
@@ -629,15 +585,15 @@ server <- function(input, output) {
     }
     if (
       anyNA(
-        stri_split_fixed(str = taxon, pattern = "|") |>
-          purrr::map(
-            .f = function(taxon) {
-              rotl::tnrs_match_names(
-                names = taxon,
-                do_approximate_matching = FALSE
-              )$ott_id
-            }
-          )
+        lapply(
+          X = stri_split_fixed(str = taxon, pattern = "|"),
+          FUN = function(taxon) {
+            rotl::tnrs_match_names(
+              names = taxon,
+              do_approximate_matching = FALSE
+            )$ott_id
+          }
+        )
       )
     ) {
       "Taxon not found in Open Tree of Life"

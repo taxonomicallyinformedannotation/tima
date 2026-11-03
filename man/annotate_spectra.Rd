@@ -129,4 +129,7 @@ Other annotation:
 \code{\link[=weight_annotations]{weight_annotations()}},
 \code{\link[=write_mztab]{write_mztab()}}
 }
+\concept{EDAM:data_0943 Mass spectrum}
+\concept{EDAM:operation_3214 Spectral analysis}
+\concept{EDAM:operation_3801 Spectral library search}
 \concept{annotation}

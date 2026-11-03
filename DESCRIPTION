@@ -31,27 +31,18 @@ BugReports: https://github.com/taxonomicallyinformedannotation/tima/issues
 Depends:
     R (>= 4.4.0)
 Imports:
-    archive (>= 1.1.14),
     cli (>= 3.6.6),
+    data.table (>= 1.15.0),
     docopt (>= 0.7.2),
     fastmatch (>= 1.1.8),
-    fs (>= 2.1.0),
-    httr (>= 1.4.8),
     httr2 (>= 1.3.0),
     igraph (>= 2.3.3),
     jsonlite (>= 2.0.0),
     lgr (>= 0.5.2),
     lifecycle (>= 1.0.5),
     methods,
-    MetaboCoreUtils (>= 1.18.1),
-    MsBackendMgf (>= 1.18.0),
-    MsBackendMsp (>= 1.14.0),
-    MsCoreUtils (>= 1.22.1),
     msentropy (>= 0.1.4),
-    purrr (>= 1.2.2),
-    R.utils (>= 2.13.0),
     reticulate (>= 1.46.0),
-    rlang (>= 1.3.0),
     rotl (>= 3.1.1),
     Spectra (>= 1.20.1),
     stats,
@@ -66,6 +57,8 @@ Suggests:
     BiocVersion (>= 3.22.0),
     grateful (>= 0.3.0),
     knitr (>= 1.51),
+    MsBackendMgf (>= 1.18.0),
+    MsBackendMsp (>= 1.14.0),
     pkgload (>= 1.5.2),
     quarto (>= 1.5.1),
     shiny (>= 1.13.0),
@@ -233,5 +226,5 @@ Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en-US
 LazyData: TRUE
-biocViews: metaboliteAnnotation, chemotaxonomy, scoringSystem, naturalProducts, computationalMetabolomics, taxonomicDistance, specializedMetabolome
-X-schema.org-keywords: metaboliteAnnotation, chemotaxonomy, scoringSystem, naturalProducts, computationalMetabolomics, taxonomicDistance, specializedMetabolome
+biocViews: Metabolomics, MassSpectrometry, Cheminformatics, Clustering, Taxonomy, metaboliteAnnotation, chemotaxonomy, scoringSystem, naturalProducts, computationalMetabolomics, taxonomicDistance, specializedMetabolome
+X-schema.org-keywords: EDAM:topic_3172, EDAM:topic_0154, EDAM:topic_2258, EDAM:topic_0637, EDAM:topic_3370, EDAM:topic_0769, EDAM:operation_3803, EDAM:operation_3801, EDAM:operation_3214, EDAM:operation_3629, EDAM:operation_3460, EDAM:operation_3927, EDAM:format_3681, EDAM:format_3651, EDAM:format_1196, EDAM:format_1199, metaboliteAnnotation, chemotaxonomy, scoringSystem, naturalProducts, computationalMetabolomics, taxonomicDistance, specializedMetabolome

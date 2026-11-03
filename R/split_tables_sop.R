@@ -75,7 +75,8 @@ split_tables_sop <- function(table, cache) {
     tidytable::distinct()
 
   table_structural_standardized <- table_structural_initial |>
-    process_smiles(cache = cache)
+    process_smiles(cache = cache) |>
+    tidytable::distinct(structure_smiles_initial, .keep_all = TRUE)
 
   log_debug("Joining structural data with computed properties")
   table_structural <- table_structural_initial |>
@@ -85,13 +86,27 @@ split_tables_sop <- function(table, cache) {
       tidyselect::contains(match = "_tag"),
       tidyselect::contains(match = "_tax")
     ) |>
-    tidytable::distinct() |>
-    tidytable::left_join(
-      y = table_structural_standardized,
-      by = "structure_smiles_initial"
-    ) |>
     tidytable::distinct()
-  rm(table_structural_initial, table_structural_standardized)
+  rm(table_structural_initial)
+
+  std_cols <- setdiff(
+    names(table_structural_standardized),
+    "structure_smiles_initial"
+  )
+  if (length(std_cols) > 0L) {
+    s_idx <- fastmatch::fmatch(
+      table_structural$structure_smiles_initial,
+      table_structural_standardized$structure_smiles_initial
+    )
+    for (col in std_cols) {
+      data.table::set(
+        table_structural,
+        j = col,
+        value = table_structural_standardized[[col]][s_idx]
+      )
+    }
+  }
+  table_structural <- tidytable::distinct(table_structural)
   log_debug(
     "table_structural: %s rows x %d cols",
     format_count(nrow(table_structural)),
@@ -99,36 +114,41 @@ split_tables_sop <- function(table, cache) {
   )
 
   log_debug("Building structure-organism-reference table")
-  table <- table |>
-    tidytable::select(
-      structure_smiles_initial,
-      tidyselect::contains(match = "organism"),
-      tidyselect::contains(match = "reference")
-    ) |>
-    tidytable::distinct() |>
-    tidytable::left_join(
-      y = table_structural,
-      by = "structure_smiles_initial"
-    ) |>
-    tidytable::distinct()
+  t_idx <- fastmatch::fmatch(
+    table$structure_smiles_initial,
+    table_structural_standardized$structure_smiles_initial
+  )
+  ik_vec <- table_structural_standardized$structure_inchikey[t_idx]
+  sm2d_vec <- table_structural_standardized$structure_smiles_no_stereo[t_idx]
+  rm(table_structural_standardized)
 
-  table_keys <- table |>
-    tidytable::filter(!is.na(structure_inchikey)) |>
-    tidytable::filter(!is.na(structure_smiles_no_stereo)) |>
-    tidytable::filter(!is.na(organism_name)) |>
-    tidytable::select(
-      structure_inchikey,
-      structure_smiles_no_stereo,
-      organism_name,
-      reference_doi
-    ) |>
-    tidytable::distinct() |>
-    tidytable::group_by(structure_inchikey, organism_name) |>
-    tidytable::add_count() |>
-    tidytable::ungroup() |>
-    tidytable::filter(!is.na(reference_doi) | n == 1) |>
-    tidytable::select(-n)
+  org_vec <- if ("organism_name" %in% names(table)) {
+    table$organism_name
+  } else {
+    rep(NA_character_, nrow(table))
+  }
+  doi_vec <- if ("reference_doi" %in% names(table)) {
+    table$reference_doi
+  } else {
+    rep(NA_character_, nrow(table))
+  }
   rm(table)
+
+  keep_key <- !is.na(ik_vec) & !is.na(sm2d_vec) & !is.na(org_vec)
+  table_keys <- tidytable::tidytable(
+    structure_inchikey = ik_vec[keep_key],
+    structure_smiles_no_stereo = sm2d_vec[keep_key],
+    organism_name = org_vec[keep_key],
+    reference_doi = doi_vec[keep_key]
+  ) |>
+    tidytable::distinct() |>
+    tidytable::mutate(
+      .n_ref = .N,
+      .by = c(structure_inchikey, organism_name)
+    ) |>
+    tidytable::filter(!is.na(reference_doi) | .n_ref == 1L) |>
+    tidytable::select(-.n_ref)
+  rm(ik_vec, sm2d_vec, org_vec, doi_vec, keep_key)
   log_with_count("Referenced structure-organism pairs", n = nrow(table_keys))
 
   # str_can: Canonicalization mapping (smiles_initial -> smiles with stereo)
@@ -161,27 +181,15 @@ split_tables_sop <- function(table, cache) {
       )
     )
 
-  # Calculate structure statistics
-  n_stereoisomers <- nrow(
-    table_structures_stereo |>
-      tidytable::filter(
-        !grepl(INCHI_NO_STEREO_PATTERN, structure_inchikey, fixed = TRUE)
-      ) |>
-      tidytable::distinct(structure_inchikey)
-  )
-  n_no_stereo <- nrow(
-    table_structures_stereo |>
-      tidytable::filter(grepl(
-        INCHI_NO_STEREO_PATTERN,
-        structure_inchikey,
-        fixed = TRUE
-      )) |>
-      tidytable::distinct(structure_inchikey)
-  )
-  n_constitutional <- nrow(
-    table_structures_stereo |>
-      tidytable::distinct(structure_inchikey_connectivity_layer)
-  )
+  # Calculate structure statistics in one pass over unique InChIKeys
+  u_ik <- unique(table_structures_stereo$structure_inchikey)
+  no_stereo_mask <- grepl(INCHI_NO_STEREO_PATTERN, u_ik, fixed = TRUE)
+  n_no_stereo <- sum(no_stereo_mask)
+  n_stereoisomers <- length(u_ik) - n_no_stereo
+  n_constitutional <- length(unique(
+    table_structures_stereo$structure_inchikey_connectivity_layer
+  ))
+  rm(u_ik, no_stereo_mask)
 
   log_info(
     "Structures: %s stereoisomers, %s without stereochemistry, %s constitutional isomers",

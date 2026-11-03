@@ -114,3 +114,20 @@ test_that("safe_fread uses generic fallback guidance for non-specific fread erro
     "Failed to read"
   )
 })
+
+test_that("safe_fread reads .gz files and nrows=0 headers without R.utils", {
+  tf <- tempfile(fileext = ".tsv.gz")
+  on.exit(unlink(tf))
+  con <- gzfile(tf, open = "wt")
+  writeLines(c("col1\tcol2", "1\ta", "2\tb"), con)
+  close(con)
+
+  hdr <- safe_fread(file = tf, nrows = 0L, showProgress = FALSE)
+  expect_equal(names(hdr), c("col1", "col2"))
+  expect_equal(nrow(hdr), 0L)
+
+  full <- safe_fread(file = tf, showProgress = FALSE)
+  expect_equal(nrow(full), 2L)
+  expect_equal(names(full), c("col1", "col2"))
+  expect_equal(as.character(full$col2), c("a", "b"))
+})

@@ -110,6 +110,32 @@
     },
     {
       "@type": "SoftwareApplication",
+      "identifier": "MsBackendMgf",
+      "name": "MsBackendMgf",
+      "version": ">= 1.18.0",
+      "provider": {
+        "@id": "https://www.bioconductor.org",
+        "@type": "Organization",
+        "name": "Bioconductor",
+        "url": "https://www.bioconductor.org"
+      },
+      "sameAs": "https://bioconductor.org/packages/release/bioc/html/MsBackendMgf.html"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "MsBackendMsp",
+      "name": "MsBackendMsp",
+      "version": ">= 1.14.0",
+      "provider": {
+        "@id": "https://www.bioconductor.org",
+        "@type": "Organization",
+        "name": "Bioconductor",
+        "url": "https://www.bioconductor.org"
+      },
+      "sameAs": "https://bioconductor.org/packages/release/bioc/html/MsBackendMsp.html"
+    },
+    {
+      "@type": "SoftwareApplication",
       "identifier": "pkgload",
       "name": "pkgload",
       "version": ">= 1.5.2",
@@ -260,19 +286,6 @@
     },
     "2": {
       "@type": "SoftwareApplication",
-      "identifier": "archive",
-      "name": "archive",
-      "version": ">= 1.1.14",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=archive"
-    },
-    "3": {
-      "@type": "SoftwareApplication",
       "identifier": "cli",
       "name": "cli",
       "version": ">= 3.6.6",
@@ -284,7 +297,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=cli"
     },
-    "4": {
+    "3": {
       "@type": "SoftwareApplication",
       "identifier": "docopt",
       "name": "docopt",
@@ -297,7 +310,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=docopt"
     },
-    "5": {
+    "4": {
       "@type": "SoftwareApplication",
       "identifier": "fastmatch",
       "name": "fastmatch",
@@ -310,33 +323,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=fastmatch"
     },
-    "6": {
-      "@type": "SoftwareApplication",
-      "identifier": "fs",
-      "name": "fs",
-      "version": ">= 2.1.0",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=fs"
-    },
-    "7": {
-      "@type": "SoftwareApplication",
-      "identifier": "httr",
-      "name": "httr",
-      "version": ">= 1.4.8",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=httr"
-    },
-    "8": {
+    "5": {
       "@type": "SoftwareApplication",
       "identifier": "httr2",
       "name": "httr2",
@@ -349,7 +336,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=httr2"
     },
-    "9": {
+    "6": {
       "@type": "SoftwareApplication",
       "identifier": "igraph",
       "name": "igraph",
@@ -362,7 +349,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=igraph"
     },
-    "10": {
+    "7": {
       "@type": "SoftwareApplication",
       "identifier": "jsonlite",
       "name": "jsonlite",
@@ -375,7 +362,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=jsonlite"
     },
-    "11": {
+    "8": {
       "@type": "SoftwareApplication",
       "identifier": "lgr",
       "name": "lgr",
@@ -388,7 +375,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=lgr"
     },
-    "12": {
+    "9": {
       "@type": "SoftwareApplication",
       "identifier": "lifecycle",
       "name": "lifecycle",
@@ -401,64 +388,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=lifecycle"
     },
-    "13": {
+    "10": {
       "@type": "SoftwareApplication",
       "identifier": "methods",
       "name": "methods"
     },
-    "14": {
-      "@type": "SoftwareApplication",
-      "identifier": "MetaboCoreUtils",
-      "name": "MetaboCoreUtils",
-      "version": ">= 1.18.1",
-      "provider": {
-        "@id": "https://www.bioconductor.org",
-        "@type": "Organization",
-        "name": "Bioconductor",
-        "url": "https://www.bioconductor.org"
-      },
-      "sameAs": "https://bioconductor.org/packages/release/bioc/html/MetaboCoreUtils.html"
-    },
-    "15": {
-      "@type": "SoftwareApplication",
-      "identifier": "MsBackendMgf",
-      "name": "MsBackendMgf",
-      "version": ">= 1.18.0",
-      "provider": {
-        "@id": "https://www.bioconductor.org",
-        "@type": "Organization",
-        "name": "Bioconductor",
-        "url": "https://www.bioconductor.org"
-      },
-      "sameAs": "https://bioconductor.org/packages/release/bioc/html/MsBackendMgf.html"
-    },
-    "16": {
-      "@type": "SoftwareApplication",
-      "identifier": "MsBackendMsp",
-      "name": "MsBackendMsp",
-      "version": ">= 1.14.0",
-      "provider": {
-        "@id": "https://www.bioconductor.org",
-        "@type": "Organization",
-        "name": "Bioconductor",
-        "url": "https://www.bioconductor.org"
-      },
-      "sameAs": "https://bioconductor.org/packages/release/bioc/html/MsBackendMsp.html"
-    },
-    "17": {
-      "@type": "SoftwareApplication",
-      "identifier": "MsCoreUtils",
-      "name": "MsCoreUtils",
-      "version": ">= 1.22.1",
-      "provider": {
-        "@id": "https://www.bioconductor.org",
-        "@type": "Organization",
-        "name": "Bioconductor",
-        "url": "https://www.bioconductor.org"
-      },
-      "sameAs": "https://bioconductor.org/packages/release/bioc/html/MsCoreUtils.html"
-    },
-    "18": {
+    "11": {
       "@type": "SoftwareApplication",
       "identifier": "msentropy",
       "name": "msentropy",
@@ -471,33 +406,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=msentropy"
     },
-    "19": {
-      "@type": "SoftwareApplication",
-      "identifier": "purrr",
-      "name": "purrr",
-      "version": ">= 1.2.2",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=purrr"
-    },
-    "20": {
-      "@type": "SoftwareApplication",
-      "identifier": "R.utils",
-      "name": "R.utils",
-      "version": ">= 2.13.0",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=R.utils"
-    },
-    "21": {
+    "12": {
       "@type": "SoftwareApplication",
       "identifier": "reticulate",
       "name": "reticulate",
@@ -510,20 +419,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=reticulate"
     },
-    "22": {
-      "@type": "SoftwareApplication",
-      "identifier": "rlang",
-      "name": "rlang",
-      "version": ">= 1.3.0",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=rlang"
-    },
-    "23": {
+    "13": {
       "@type": "SoftwareApplication",
       "identifier": "rotl",
       "name": "rotl",
@@ -536,7 +432,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=rotl"
     },
-    "24": {
+    "14": {
       "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
@@ -549,12 +445,12 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/Spectra.html"
     },
-    "25": {
+    "15": {
       "@type": "SoftwareApplication",
       "identifier": "stats",
       "name": "stats"
     },
-    "26": {
+    "16": {
       "@type": "SoftwareApplication",
       "identifier": "targets",
       "name": "targets",
@@ -567,7 +463,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=targets"
     },
-    "27": {
+    "17": {
       "@type": "SoftwareApplication",
       "identifier": "tidyselect",
       "name": "tidyselect",
@@ -580,7 +476,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidyselect"
     },
-    "28": {
+    "18": {
       "@type": "SoftwareApplication",
       "identifier": "tidytable",
       "name": "tidytable",
@@ -593,12 +489,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidytable"
     },
-    "29": {
+    "19": {
       "@type": "SoftwareApplication",
       "identifier": "utils",
       "name": "utils"
     },
-    "30": {
+    "20": {
       "@type": "SoftwareApplication",
       "identifier": "yaml",
       "name": "yaml",
@@ -613,7 +509,21 @@
     },
     "SystemRequirements": "\n    python (>= 3.12, < 3.16)"
   },
-  "keywords": ["metaboliteAnnotation", "chemotaxonomy", "scoringSystem", "naturalProducts", "computationalMetabolomics", "taxonomicDistance", "specializedMetabolome", "lc-msms", "metabolite-annotation", "metabolomics", "natural-products", "scoring-system", "taxonomy", "specialized-metabolome", "r"],
+  "applicationSubCategory": [
+    "https://edamontology.org/topic_3172",
+    "https://edamontology.org/topic_0154",
+    "https://edamontology.org/topic_2258",
+    "https://edamontology.org/topic_0637",
+    "https://edamontology.org/topic_3370",
+    "https://edamontology.org/topic_0769",
+    "https://edamontology.org/operation_3803",
+    "https://edamontology.org/operation_3801",
+    "https://edamontology.org/operation_3214",
+    "https://edamontology.org/operation_3629",
+    "https://edamontology.org/operation_3460",
+    "https://edamontology.org/operation_3927"
+  ],
+  "keywords": ["EDAM:topic_3172", "EDAM:topic_0154", "EDAM:topic_2258", "EDAM:topic_0637", "EDAM:topic_3370", "EDAM:topic_0769", "EDAM:operation_3803", "EDAM:operation_3801", "EDAM:operation_3214", "EDAM:operation_3629", "EDAM:operation_3460", "EDAM:operation_3927", "EDAM:format_3681", "EDAM:format_3651", "EDAM:format_1196", "EDAM:format_1199", "Metabolomics", "MassSpectrometry", "Cheminformatics", "Clustering", "Taxonomy", "metaboliteAnnotation", "chemotaxonomy", "scoringSystem", "naturalProducts", "computationalMetabolomics", "taxonomicDistance", "specializedMetabolome", "lc-msms", "metabolite-annotation", "metabolomics", "natural-products", "scoring-system", "taxonomy", "specialized-metabolome", "r"],
   "fileSize": "126033.113KB",
   "citation": [
     {

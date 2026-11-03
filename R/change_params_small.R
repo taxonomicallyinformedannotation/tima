@@ -54,9 +54,9 @@ copy_file_to_target <- function(file_path, target_dir, file_description) {
     target_path
   )
 
-  fs::file_copy(
-    path = file_path,
-    new_path = target_path,
+  file.copy(
+    from = file_path,
+    to = target_path,
     overwrite = TRUE
   )
 

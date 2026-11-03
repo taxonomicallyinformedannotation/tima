@@ -83,21 +83,18 @@ prepare_annotations_mzmine <- function(
   if (length(input) == 0) {
     input <- "w1llN3v3r3v3r3x1st"
   }
-  if (
-    all(
-      purrr::map(.x = input, .f = file.exists) |>
-        unlist()
-    )
-  ) {
-    table <- purrr::map2(
-      .x = input,
-      .y = seq_along(input),
-      .f = ~ safe_fread(
-        file = .x,
-        file_type = paste0("mzmine results file ", .y),
-        na.strings = c("", "NA"),
-        colClasses = "character"
-      )
+  if (all(file.exists(unlist(input)))) {
+    table <- Map(
+      function(x, y) {
+        safe_fread(
+          file = x,
+          file_type = paste0("mzmine results file ", y),
+          na.strings = c("", "NA"),
+          colClasses = "character"
+        )
+      },
+      input,
+      seq_along(input)
     ) |>
       tidytable::bind_rows() |>
       tidytable::select(

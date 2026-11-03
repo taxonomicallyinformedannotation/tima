@@ -57,4 +57,6 @@ Other data-retrieval:
 \code{\link[=get_last_version_from_zenodo]{get_last_version_from_zenodo()}},
 \code{\link[=get_organism_taxonomy_ott]{get_organism_taxonomy_ott()}}
 }
+\concept{EDAM:data_2082 Matrix}
+\concept{EDAM:operation_3282 ID mapping}
 \concept{data-retrieval}

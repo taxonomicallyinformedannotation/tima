@@ -97,17 +97,17 @@ validate_sop_merged_inputs <- function(
 #'
 #' @keywords internal
 load_and_merge_libraries <- function(files, cache) {
-  libraries <- files |>
-    purrr::map(
-      .f = function(file) {
-        safe_fread(
-          file = file,
-          file_type = "library",
-          na.strings = c("", "NA"),
-          colClasses = "character"
-        )
-      }
-    )
+  libraries <- lapply(
+    X = files,
+    FUN = function(file) {
+      safe_fread(
+        file = file,
+        file_type = "library",
+        na.strings = c("", "NA"),
+        colClasses = "character"
+      )
+    }
+  )
 
   libraries |>
     tidytable::bind_rows() |>
@@ -404,8 +404,9 @@ export_library_tables <- function(
     return(NULL)
   }
 
-  cache_supplement <- cache_data |>
-    tidytable::filter(.data[[key_col]] %in% missing_keys)
+  idx <- fastmatch::fmatch(cache_data[[key_col]], missing_keys, nomatch = 0L) >
+    0L
+  cache_supplement <- cache_data[idx, ]
 
   if (nrow(cache_supplement) == 0) {
     log_info(
@@ -428,13 +429,97 @@ export_library_tables <- function(
   cache_supplement
 }
 
+# Helper function: Read taxonomy cache file with automatic delimiter and
+# headerless-TSV detection (e.g., ClassyFire cache files starting directly
+# with InChIKey + CHEMONTID rows).
+.read_taxonomy_cache_file <- function(
+  cache_path,
+  taxonomy_name,
+  key_col,
+  all_keys,
+  expected_cols,
+  col_mapping
+) {
+  open_con <- if (grepl("\\.bz2$", cache_path, ignore.case = TRUE)) {
+    bzfile
+  } else if (grepl("\\.(gz|bgz)$", cache_path, ignore.case = TRUE)) {
+    gzfile
+  } else {
+    file
+  }
+  con <- open_con(cache_path, open = "rt")
+  first_line <- tryCatch(
+    readLines(con, n = 1L, warn = FALSE),
+    finally = close(con)
+  )
+  if (length(first_line) == 0L || !nzchar(trimws(first_line))) {
+    return(tidytable::tidytable())
+  }
+
+  sep <- if (grepl("\t", first_line, fixed = TRUE)) {
+    "\t"
+  } else if (grepl(",", first_line, fixed = TRUE)) {
+    ","
+  } else {
+    "\t"
+  }
+
+  first_tokens <- strsplit(first_line, sep, fixed = TRUE)[[1L]]
+  first_tokens <- gsub('^"|"$', "", trimws(first_tokens))
+
+  known_cols <- tolower(unique(c(
+    key_col,
+    expected_cols,
+    if (!is.null(col_mapping)) {
+      c(names(col_mapping), unlist(col_mapping, use.names = FALSE))
+    }
+  )))
+
+  looks_headerless <- !any(tolower(first_tokens) %in% known_cols) &&
+    length(first_tokens) >= 2L &&
+    (grepl("^[A-Z]{14}-[A-Z]{10}-[A-Z]$", first_tokens[[1L]]) ||
+      grepl("^CHEMONTID:[0-9]+$", first_tokens[[2L]], ignore.case = TRUE) ||
+      (length(all_keys) > 0L &&
+        !is.na(fastmatch::fmatch(first_tokens[[1L]], all_keys))))
+
+  quote_arg <- if (identical(sep, "\t") && looks_headerless) "" else "\""
+
+  cache_data <- safe_fread(
+    file = cache_path,
+    file_type = paste(taxonomy_name, "additional cache"),
+    sep = sep,
+    header = !looks_headerless,
+    quote = quote_arg,
+    fill = TRUE,
+    na.strings = c("", "NA"),
+    colClasses = "character"
+  )
+
+  if (looks_headerless && ncol(cache_data) > 0L) {
+    target_cols <- if (length(expected_cols) > 0L) {
+      expected_cols
+    } else if (!is.null(col_mapping) && length(col_mapping) > 0L) {
+      names(col_mapping)
+    } else {
+      character(0L)
+    }
+    n_assign <- min(ncol(cache_data), length(target_cols))
+    if (n_assign > 0L) {
+      names(cache_data)[seq_len(n_assign)] <- target_cols[seq_len(n_assign)]
+    }
+  }
+
+  cache_data
+}
+
 # Helper function: Write back enriched taxonomy to cache
 .write_enriched_taxonomy_to_cache <- function(
   enriched,
   cache_path,
   expected_cols,
   col_mapping,
-  taxonomy_name
+  taxonomy_name,
+  existing_cache = NULL
 ) {
   tryCatch(
     {
@@ -442,33 +527,22 @@ export_library_tables <- function(
         tidytable::select(tidyselect::all_of(expected_cols)) |>
         tidytable::distinct()
 
-      # Read existing cache again (may have entries for keys NOT in this library)
-      existing_cache <- tryCatch(
-        safe_fread(
-          file = cache_path,
-          file_type = paste(taxonomy_name, "cache for write-back"),
-          na.strings = c("", "NA"),
-          colClasses = "character"
-        ),
-        error = function(e) tidytable::tidytable()
-      )
+      # Reuse in-memory cache when provided; otherwise read from disk
+      if (is.null(existing_cache)) {
+        existing_cache <- tryCatch(
+          safe_fread(
+            file = cache_path,
+            file_type = paste(taxonomy_name, "cache for write-back"),
+            na.strings = c("", "NA"),
+            colClasses = "character"
+          ),
+          error = function(e) tidytable::tidytable()
+        )
+      }
 
       # Apply same column mapping to existing cache before merging
       if (!is.null(col_mapping) && nrow(existing_cache) > 0) {
-        for (internal_name in names(col_mapping)) {
-          if (internal_name %in% names(existing_cache)) {
-            next
-          }
-          possible_names <- col_mapping[[internal_name]]
-          for (cache_name in possible_names) {
-            if (cache_name %in% names(existing_cache)) {
-              names(existing_cache)[
-                names(existing_cache) == cache_name
-              ] <- internal_name
-              break
-            }
-          }
-        }
+        existing_cache <- .apply_col_mapping(existing_cache, col_mapping)
       }
 
       # Keep only expected columns from existing cache
@@ -482,18 +556,13 @@ export_library_tables <- function(
           tidytable::select(tidyselect::all_of(expected_cols))
       }
 
-      combined_cache <- tidytable::bind_rows(existing_cache, cache_to_write) |>
-        tidytable::mutate(
-          tidytable::across(
-            tidyselect::everything(),
-            ~ {
-              x <- as.character(.x)
-              x[!is.na(x) & x == "notClassified"] <- NA_character_
-              x
-            }
-          )
-        ) |>
-        tidytable::distinct()
+      combined_cache <- tidytable::bind_rows(existing_cache, cache_to_write)
+      for (col in names(combined_cache)) {
+        x <- as.character(combined_cache[[col]])
+        x[!is.na(x) & x == "notClassified"] <- NA_character_
+        data.table::set(combined_cache, j = col, value = x)
+      }
+      combined_cache <- tidytable::distinct(combined_cache)
 
       create_dir(export = cache_path)
       compress_method <- if (grepl("\\.gz$", cache_path, ignore.case = TRUE)) {
@@ -568,13 +637,25 @@ enrich_taxonomy_from_cache <- function(
     cache_path
   )
 
+  expected_cols_hint <- if (
+    !is.null(taxonomy_table) && ncol(taxonomy_table) > 0
+  ) {
+    names(taxonomy_table)
+  } else if (!is.null(col_mapping) && length(col_mapping) > 0L) {
+    names(col_mapping)
+  } else {
+    character(0L)
+  }
+
   # Read cache data
   cache_data <- tryCatch(
-    safe_fread(
-      file = cache_path,
-      file_type = paste(taxonomy_name, "additional cache"),
-      na.strings = c("", "NA"),
-      colClasses = "character"
+    .read_taxonomy_cache_file(
+      cache_path = cache_path,
+      taxonomy_name = taxonomy_name,
+      key_col = key_col,
+      all_keys = all_keys,
+      expected_cols = expected_cols_hint,
+      col_mapping = col_mapping
     ),
     error = function(e) {
       log_warn(
@@ -582,11 +663,15 @@ enrich_taxonomy_from_cache <- function(
         taxonomy_name,
         conditionMessage(e)
       )
-      taxonomy_table
+      NULL
     }
   )
 
-  if (is.null(cache_data) || nrow(cache_data) == 0) {
+  if (is.null(cache_data)) {
+    return(taxonomy_table)
+  }
+
+  if (nrow(cache_data) == 0) {
     log_info("Additional %s cache is empty", taxonomy_name)
     return(taxonomy_table)
   }
@@ -594,6 +679,17 @@ enrich_taxonomy_from_cache <- function(
   # Apply column mapping if provided
   if (!is.null(col_mapping)) {
     cache_data <- .apply_col_mapping(cache_data, col_mapping)
+  }
+
+  # Verify key column exists in cache BEFORE touching the cache file on disk
+  if (!key_col %in% names(cache_data)) {
+    log_warn(
+      "Key column '%s' not found in additional %s cache. Available: %s",
+      key_col,
+      taxonomy_name,
+      paste(names(cache_data), collapse = ", ")
+    )
+    return(taxonomy_table)
   }
 
   # Normalize chemontid values
@@ -608,26 +704,7 @@ enrich_taxonomy_from_cache <- function(
   expected_cols <- if (!is.null(taxonomy_table) && ncol(taxonomy_table) > 0) {
     names(taxonomy_table)
   } else {
-    intersect(names(cache_data), names(cache_data))
-  }
-
-  # Normalize cache file on disk
-  .normalize_and_write_cache(
-    cache_data,
-    cache_path,
-    expected_cols,
-    taxonomy_name
-  )
-
-  # Verify key column exists in cache
-  if (!key_col %in% names(cache_data)) {
-    log_warn(
-      "Key column '%s' not found in additional %s cache. Available: %s",
-      key_col,
-      taxonomy_name,
-      paste(names(cache_data), collapse = ", ")
-    )
-    return(taxonomy_table)
+    names(cache_data)
   }
 
   # Get existing keys
@@ -644,6 +721,13 @@ enrich_taxonomy_from_cache <- function(
   )
 
   if (is.null(cache_supplement)) {
+    # Normalize cache file on disk when no supplement is needed
+    .normalize_and_write_cache(
+      cache_data,
+      cache_path,
+      expected_cols,
+      taxonomy_name
+    )
     return(taxonomy_table)
   }
 
@@ -659,13 +743,14 @@ enrich_taxonomy_from_cache <- function(
     nrow(cache_supplement)
   )
 
-  # Write back the full enriched taxonomy to cache for persistence
+  # Write back the full enriched taxonomy to cache for persistence (reusing in-memory cache_data)
   .write_enriched_taxonomy_to_cache(
-    enriched,
-    cache_path,
-    expected_cols,
-    col_mapping,
-    taxonomy_name
+    enriched = enriched,
+    cache_path = cache_path,
+    expected_cols = expected_cols,
+    col_mapping = col_mapping,
+    taxonomy_name = taxonomy_name,
+    existing_cache = cache_data
   )
 
   enriched

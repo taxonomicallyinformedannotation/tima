@@ -1,9 +1,29 @@
 .copy_backbone_dir_create <- function(path) {
-  fs::dir_create(path = path)
+  if (
+    !dir.exists(path) &&
+      !dir.create(path = path, recursive = TRUE, showWarnings = FALSE)
+  ) {
+    stop(sprintf("Failed to create directory: %s", path), call. = FALSE)
+  }
 }
 
 .copy_backbone_dir_copy <- function(path, new_path, overwrite = TRUE) {
-  fs::dir_copy(path = path, new_path = new_path, overwrite = overwrite)
+  .copy_backbone_dir_create(new_path)
+  items <- list.files(path, all.files = TRUE, full.names = TRUE, no.. = TRUE)
+  if (length(items) > 0L) {
+    ok <- file.copy(
+      from = items,
+      to = new_path,
+      overwrite = overwrite,
+      recursive = TRUE
+    )
+    if (!all(ok)) {
+      stop(
+        sprintf("Failed to copy directory from %s to %s", path, new_path),
+        call. = FALSE
+      )
+    }
+  }
 }
 
 #' @title Copy backbone
@@ -28,7 +48,7 @@
 #' copy_backbone(cache_dir = "~/my_tima_cache")
 #' }
 copy_backbone <- function(
-  cache_dir = fs::path_home(".tima"),
+  cache_dir = path.expand("~/.tima"),
   package = "tima"
 ) {
   # Validate inputs

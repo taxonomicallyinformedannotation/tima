@@ -187,4 +187,6 @@ Other annotation:
 \code{\link[=filter_annotations]{filter_annotations()}},
 \code{\link[=weight_annotations]{weight_annotations()}}
 }
+\concept{EDAM:format_3681 mzTab}
+\concept{EDAM:operation_0335 Formatting}
 \concept{annotation}

@@ -1423,12 +1423,12 @@ test_that("load_sirius_tables v6 keeps only formulaRank 1 when ranks are charact
 
 test_that("read_sirius_internal_file reads from archive stream when available", {
   local_mocked_bindings(
-    archive_read = function(archive, file) {
-      force(archive)
-      force(file)
+    unz = function(description, filename, ...) {
+      force(description)
+      force(filename)
       textConnection("colA\tcolB\n1\tx\n")
     },
-    .package = "archive"
+    .package = "base"
   )
 
   out <- read_sirius_internal_file("dummy.zip", "internal.tsv")
@@ -1439,12 +1439,12 @@ test_that("read_sirius_internal_file reads from archive stream when available", 
 
 test_that("read_sirius_internal_file falls back to directory path when archive read fails", {
   local_mocked_bindings(
-    archive_read = function(archive, file) {
-      force(archive)
-      force(file)
+    unz = function(description, filename, ...) {
+      force(description)
+      force(filename)
       stop("archive unavailable", call. = FALSE)
     },
-    .package = "archive"
+    .package = "base"
   )
 
   tmp <- temp_test_dir("read_sirius_internal_file_fallback")
@@ -1459,12 +1459,12 @@ test_that("read_sirius_internal_file falls back to directory path when archive r
 
 test_that("read_sirius_internal_file returns empty tidytable for missing fallback file", {
   local_mocked_bindings(
-    archive_read = function(archive, file) {
-      force(archive)
-      force(file)
+    unz = function(description, filename, ...) {
+      force(description)
+      force(filename)
       stop("archive unavailable", call. = FALSE)
     },
-    .package = "archive"
+    .package = "base"
   )
 
   tmp <- temp_test_dir("read_sirius_internal_file_missing")

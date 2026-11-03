@@ -53,4 +53,6 @@ Other data-retrieval:
 \code{\link[=get_gnps_tables]{get_gnps_tables()}},
 \code{\link[=get_last_version_from_zenodo]{get_last_version_from_zenodo()}}
 }
+\concept{EDAM:data_3028 Taxonomy}
+\concept{EDAM:operation_3460 Taxonomic classification}
 \concept{data-retrieval}

@@ -39,7 +39,7 @@ NULL
 #' used to compose charge carriers.
 #' @keywords internal
 ATOMIC_MONOISOTOPIC_MASS <- c(
-  # Same values as MetaboCoreUtils::calculateMass(), so that carrier masses
+  # Same values as calculate_formula_mass(), so that carrier masses
   # and library exact masses come from one element table
   H = 1.007825032,
   Li = 7.01600455,

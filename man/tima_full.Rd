@@ -69,4 +69,6 @@ Other workflow:
 \code{\link[=run_tima]{run_tima()}},
 \code{\link[=validate_inputs]{validate_inputs()}}
 }
+\concept{EDAM:operation_3803 Natural product identification}
+\concept{EDAM:topic_3172 Metabolomics}
 \concept{workflow}

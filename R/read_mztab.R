@@ -46,6 +46,8 @@
 #'   export step is skipped).
 #'
 #' @family preparation
+#' @concept EDAM:operation_1812 Parsing
+#' @concept EDAM:format_3681 mzTab
 #' @export
 #'
 #' @examples
@@ -781,20 +783,17 @@ read_mztab <- function(
       entry <- c(entry, paste0("MSLEVEL=", ms_level))
     }
 
-    for (p in seq_len(n_peaks)) {
-      mz_p <- suppressWarnings(as.numeric(mz_parts[[p]]))
-      int_p <- suppressWarnings(as.numeric(int_parts[[p]]))
-      if (
-        !is.na(mz_p) && is.finite(mz_p) && !is.na(int_p) && is.finite(int_p)
-      ) {
-        entry <- c(
-          entry,
-          paste(
-            format(mz_p, scientific = FALSE, trim = TRUE),
-            format(int_p, scientific = FALSE, trim = TRUE)
-          )
+    mz_p <- suppressWarnings(as.numeric(mz_parts[seq_len(n_peaks)]))
+    int_p <- suppressWarnings(as.numeric(int_parts[seq_len(n_peaks)]))
+    valid_p <- !is.na(mz_p) & is.finite(mz_p) & !is.na(int_p) & is.finite(int_p)
+    if (any(valid_p)) {
+      entry <- c(
+        entry,
+        paste(
+          format(mz_p[valid_p], scientific = FALSE, trim = TRUE),
+          format(int_p[valid_p], scientific = FALSE, trim = TRUE)
         )
-      }
+      )
     }
 
     entry <- c(entry, "END IONS", "")

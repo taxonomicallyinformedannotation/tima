@@ -56,4 +56,7 @@ Other workflow:
 \code{\link[=tima_full]{tima_full()}},
 \code{\link[=validate_inputs]{validate_inputs()}}
 }
+\concept{EDAM:data_2600 Pathway or network}
+\concept{EDAM:operation_3766 Weighted correlation network analysis}
+\concept{EDAM:operation_3927 Network analysis}
 \concept{workflow}

@@ -45,7 +45,7 @@ test_that("go_to_cache creates cache directory", {
   with_temp_wd({
     # Use unique cache name to avoid conflicts
     cache_name <- paste0(".test_cache_", Sys.getpid())
-    cache_path <- fs::path_home(cache_name)
+    cache_path <- path.expand(file.path("~", cache_name))
 
     # Ensure it doesn't exist
     if (dir.exists(cache_path)) {
@@ -66,7 +66,7 @@ test_that("go_to_cache changes working directory", {
   with_temp_wd({
     old_wd <- getwd()
     cache_name <- paste0(".test_cache_", Sys.getpid())
-    cache_path <- fs::path_home(cache_name)
+    cache_path <- path.expand(file.path("~", cache_name))
 
     # Ensure clean state
     if (dir.exists(cache_path)) {
@@ -88,7 +88,7 @@ test_that("go_to_cache changes working directory", {
 test_that("go_to_cache works with existing cache", {
   with_temp_wd({
     cache_name <- paste0(".test_cache_existing_", Sys.getpid())
-    cache_path <- fs::path_home(cache_name)
+    cache_path <- path.expand(file.path("~", cache_name))
 
     # Create cache manually
     dir.create(cache_path, showWarnings = FALSE)
@@ -109,7 +109,7 @@ test_that("go_to_cache works with existing cache", {
 test_that("go_to_cache uses default directory name", {
   with_temp_wd({
     old_wd <- getwd()
-    default_cache <- fs::path_home(".tima")
+    default_cache <- path.expand("~/.tima")
 
     # Create if doesn't exist, or just navigate
     result <- go_to_cache()
@@ -126,7 +126,7 @@ test_that("go_to_cache uses default directory name", {
 test_that("go_to_cache returns cache path invisibly", {
   with_temp_wd({
     cache_name <- paste0(".test_cache_return_", Sys.getpid())
-    cache_path <- fs::path_home(cache_name)
+    cache_path <- path.expand(file.path("~", cache_name))
 
     if (dir.exists(cache_path)) {
       unlink(cache_path, recursive = TRUE)
@@ -148,7 +148,7 @@ test_that("go_to_cache returns cache path invisibly", {
 test_that("go_to_cache returns correct path", {
   with_temp_wd({
     cache_name <- paste0(".test_cache_path_", Sys.getpid())
-    expected_path <- fs::path_home(cache_name)
+    expected_path <- path.expand(file.path("~", cache_name))
 
     if (dir.exists(expected_path)) {
       unlink(expected_path, recursive = TRUE)
@@ -172,7 +172,7 @@ test_that("go_to_cache handles special characters in name", {
 
   with_temp_wd({
     cache_name <- paste0(".test_cache_special-chars_", Sys.getpid())
-    cache_path <- fs::path_home(cache_name)
+    cache_path <- path.expand(file.path("~", cache_name))
 
     if (dir.exists(cache_path)) {
       unlink(cache_path, recursive = TRUE)
@@ -194,7 +194,7 @@ test_that("go_to_cache handles nested directory names", {
     # Note: This creates a single directory named ".cache/nested"
     # Not a nested structure
     cache_name <- paste0(".test_cache_nested_", Sys.getpid())
-    cache_path <- fs::path_home(cache_name)
+    cache_path <- path.expand(file.path("~", cache_name))
 
     if (dir.exists(cache_path)) {
       unlink(cache_path, recursive = TRUE)
@@ -214,7 +214,7 @@ test_that("go_to_cache handles nested directory names", {
 test_that("go_to_cache is idempotent", {
   with_temp_wd({
     cache_name <- paste0(".test_cache_idempotent_", Sys.getpid())
-    cache_path <- fs::path_home(cache_name)
+    cache_path <- path.expand(file.path("~", cache_name))
 
     if (dir.exists(cache_path)) {
       unlink(cache_path, recursive = TRUE)
@@ -348,7 +348,7 @@ test_that("go_to_cache works in typical workflow", {
     cache_name <- paste0(".workflow_test_", Sys.getpid())
 
     # Clean state
-    cache_path <- fs::path_home(cache_name)
+    cache_path <- path.expand(file.path("~", cache_name))
     if (dir.exists(cache_path)) {
       unlink(cache_path, recursive = TRUE)
     }
@@ -381,7 +381,7 @@ test_that("go_to_cache works in typical workflow", {
 test_that("go_to_cache persists across function calls", {
   with_temp_wd({
     cache_name <- paste0(".persist_test_", Sys.getpid())
-    cache_path <- fs::path_home(cache_name)
+    cache_path <- path.expand(file.path("~", cache_name))
 
     if (dir.exists(cache_path)) {
       unlink(cache_path, recursive = TRUE)
@@ -411,7 +411,7 @@ test_that("go_to_cache persists across function calls", {
 test_that("go_to_cache works on current platform", {
   with_temp_wd({
     cache_name <- paste0(".platform_test_", Sys.getpid())
-    cache_path <- fs::path_home(cache_name)
+    cache_path <- path.expand(file.path("~", cache_name))
 
     if (dir.exists(cache_path)) {
       unlink(cache_path, recursive = TRUE)
@@ -435,7 +435,7 @@ test_that("go_to_cache works on current platform", {
 test_that("go_to_cache is deterministic", {
   with_temp_wd({
     cache_name <- paste0(".deterministic_test_", Sys.getpid())
-    cache_path <- fs::path_home(cache_name)
+    cache_path <- path.expand(file.path("~", cache_name))
 
     if (dir.exists(cache_path)) {
       unlink(cache_path, recursive = TRUE)
@@ -479,7 +479,7 @@ test_that("go_to_cache only changes working directory", {
     expect_true(length(env_diff) == 0 || all(env_diff == "PWD"))
 
     # Cleanup
-    cache_path <- fs::path_home(cache_name)
+    cache_path <- path.expand(file.path("~", cache_name))
     setwd(dirname(cache_path))
     unlink(cache_path, recursive = TRUE)
   })

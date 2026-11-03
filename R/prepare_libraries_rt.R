@@ -159,8 +159,7 @@ prepare_libraries_rt <- function(
   rts_from_mgf <- function(mgf) {
     # Metadata only: RT records need no peaks nor precursor, and importing
     # them as spectra would drop such entries
-    mgf |>
-      purrr::map(.f = read_mgf_metadata) |>
+    lapply(mgf, read_mgf_metadata) |>
       tidytable::bind_rows() |>
       tidytable::select(
         tidyselect::any_of(
@@ -175,14 +174,16 @@ prepare_libraries_rt <- function(
   }
 
   rts_from_tab <- function(tab) {
-    tab |>
-      purrr::map2(
-        .y = seq_along(tab),
-        .f = ~ safe_fread(
-          file = .x,
-          file_type = paste0("RT library ", .y)
+    Map(
+      function(x, y) {
+        safe_fread(
+          file = x,
+          file_type = paste0("RT library ", y)
         )
-      ) |>
+      },
+      tab,
+      seq_along(tab)
+    ) |>
       tidytable::bind_rows() |>
       tidytable::select(
         tidyselect::any_of(

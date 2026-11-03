@@ -416,9 +416,9 @@ targets_section_libraries <- function() {
           name = lib_sop_hmd_fam_raw,
           command = {
             hmdb_family_names <- names(paths$urls$hmdb_family)
-            lib_sop_hmd_fam_raw <- purrr::map_chr(
-              .x = hmdb_family_names,
-              .f = function(lib_name) {
+            lib_sop_hmd_fam_raw <- vapply(
+              X = hmdb_family_names,
+              FUN = function(lib_name) {
                 output_file <- paths$data$source$libraries$sop[[lib_name]]
                 tryCatch(
                   expr = {
@@ -436,7 +436,8 @@ targets_section_libraries <- function() {
                   }
                 )
                 output_file
-              }
+              },
+              FUN.VALUE = character(1L)
             )
             names(lib_sop_hmd_fam_raw) <- hmdb_family_names
             lib_sop_hmd_fam_raw
@@ -658,9 +659,9 @@ targets_section_libraries <- function() {
                 names(paths$urls$hmdb_family)[seq_along(raw_hmdb_family_files)]
               )
             }
-            hmdb_family_prepared <- purrr::map_chr(
-              .x = hmdb_family_names,
-              .f = function(lib_name) {
+            hmdb_family_prepared <- vapply(
+              X = hmdb_family_names,
+              FUN = function(lib_name) {
                 input_file <- raw_hmdb_family_files[[lib_name]]
                 if (
                   is.null(input_file) ||
@@ -677,7 +678,8 @@ targets_section_libraries <- function() {
                   organism_taxonomy = hmdb_family_taxonomy[[lib_name]],
                   tag = hmdb_family_tags[[lib_name]]
                 )
-              }
+              },
+              FUN.VALUE = character(1L)
             )
             hmdb_family_prepared
           },

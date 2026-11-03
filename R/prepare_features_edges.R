@@ -126,14 +126,20 @@ prepare_features_edges <- function(
   # Load edges tables
   edges_tables <- tryCatch(
     {
-      purrr::imap(
-        .x = input,
-        .f = ~ safe_fread(
-          file = .x,
-          file_type = paste0(.y, " edges"),
-          na.strings = c("", "NA"),
-          colClasses = "character"
-        )
+      stats::setNames(
+        Map(
+          function(x, y) {
+            safe_fread(
+              file = x,
+              file_type = paste0(y, " edges"),
+              na.strings = c("", "NA"),
+              colClasses = "character"
+            )
+          },
+          input,
+          names(input)
+        ),
+        names(input)
       )
     },
     error = function(e) {

@@ -4,7 +4,7 @@
 \alias{copy_backbone}
 \title{Copy backbone}
 \usage{
-copy_backbone(cache_dir = fs::path_home(".tima"), package = "tima")
+copy_backbone(cache_dir = path.expand("~/.tima"), package = "tima")
 }
 \arguments{
 \item{cache_dir}{Character string path to the cache directory

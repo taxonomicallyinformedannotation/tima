@@ -13,10 +13,10 @@
     return(list())
   }
 
-  purrr::map(
-    .x = seq(1L, length(items), batch_size),
+  lapply(
+    X = seq(1L, length(items), batch_size),
     # Split items into batches, removing NA values
-    .f = function(i) {
+    FUN = function(i) {
       end_idx <- min(i + batch_size - 1L, length(items))
       items[i:end_idx][!is.na(items[i:end_idx])]
     }
@@ -25,21 +25,14 @@
 
 #' Query OTT API for a single batch
 #' @description Queries the Open Tree of Life API for taxonomic names.
-#'     Disables SSL verification as workaround for rotl issue #147.
 #' @param batch [character] Vector of organism names
 #' @return Data frame with taxonomy matches
 #' @keywords internal
 .query_ott_batch <- function(batch) {
-  # SSL verification disabled due to rotl package issue #147
-  # See: https://github.com/ropensci/rotl/issues/147
-  # httr is an indirect dependency via rotl, so always available here
-  httr::with_config(
-    httr::config(ssl_verifypeer = FALSE),
-    rotl::tnrs_match_names(
-      names = batch,
-      do_approximate_matching = FALSE,
-      include_suppressed = FALSE
-    )
+  rotl::tnrs_match_names(
+    names = batch,
+    do_approximate_matching = FALSE,
+    include_suppressed = FALSE
   )
 }
 
@@ -82,13 +75,13 @@
   }
 
   # Combine taxon info with lineage for each OTT ID
-  list_df <- seq_along(taxon_lineage) |>
-    purrr::map(
-      .f = .combine_single_taxon,
-      taxon_info = taxon_info,
-      taxon_lineage = taxon_lineage,
-      ott_ids = ott_ids
-    )
+  list_df <- lapply(
+    X = seq_along(taxon_lineage),
+    FUN = .combine_single_taxon,
+    taxon_info = taxon_info,
+    taxon_lineage = taxon_lineage,
+    ott_ids = ott_ids
+  )
 
   tidytable::bind_rows(list_df) |>
     tidytable::mutate(
@@ -173,6 +166,8 @@
 #'     rows.
 #'
 #' @family data-retrieval
+#' @concept EDAM:operation_3460 Taxonomic classification
+#' @concept EDAM:data_3028 Taxonomy
 #'
 #' @export
 #'
@@ -291,8 +286,7 @@ get_organism_taxonomy_ott <- function(
   log_info("Querying OTT API in %d batches", length(organism_batches))
 
   # Query OTT API for each batch
-  taxonomy_matches <- organism_batches |>
-    purrr::map(.f = .query_ott_batch)
+  taxonomy_matches <- lapply(organism_batches, .query_ott_batch)
 
   log_debug("Initial taxonomy queries completed")
 
@@ -347,8 +341,7 @@ get_organism_taxonomy_ott <- function(
     batch_size <- 100L
     genus_batches <- .create_batches(genus_names, batch_size)
 
-    retry_matches <- genus_batches |>
-      purrr::map(.f = .query_ott_batch) |>
+    retry_matches <- lapply(genus_batches, .query_ott_batch) |>
       tidytable::bind_rows() |>
       tidytable::filter(!is.na(ott_id)) |>
       tidytable::mutate(tidytable::across(
@@ -395,13 +388,10 @@ get_organism_taxonomy_ott <- function(
     # Query OTT API for detailed taxonomic information
     # SSL verification disabled due to rotl package issue #147
     # httr is an indirect dependency via rotl, so always available here
-    taxon_info <- httr::with_config(
-      httr::config(ssl_verifypeer = FALSE),
-      rotl::taxonomy_taxon_info(
-        ott_ids = ott_ids,
-        include_lineage = TRUE,
-        include_terminal_descendants = TRUE
-      )
+    taxon_info <- rotl::taxonomy_taxon_info(
+      ott_ids = ott_ids,
+      include_lineage = TRUE,
+      include_terminal_descendants = TRUE
     )
 
     log_debug("Taxonomy information retrieved successfully")

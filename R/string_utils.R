@@ -40,18 +40,38 @@ stri_length <- function(str) {
 }
 
 stri_match_first_regex <- function(str, pattern) {
-  if (length(str) == 0L) {
+  n <- length(str)
+  if (n == 0L) {
     return(matrix(character(0), nrow = 0L, ncol = 0L))
   }
 
-  m <- regexec(pattern, str, perl = TRUE)
-  matches <- regmatches(str, m)
-  n_cols <- max(max(lengths(m)), 2L)
-  out <- matrix(NA_character_, nrow = length(str), ncol = n_cols)
+  str <- as.character(str)
+  m <- regexpr(pattern, str, perl = TRUE)
+  cap_start <- attr(m, "capture.start")
+  cap_len <- attr(m, "capture.length")
+  n_caps <- if (is.null(cap_start)) 0L else ncol(cap_start)
+  n_cols <- max(1L + n_caps, 2L)
 
-  for (i in seq_along(matches)) {
-    if (length(matches[[i]]) > 0L) {
-      out[i, seq_along(matches[[i]])] <- matches[[i]]
+  out <- matrix(NA_character_, nrow = n, ncol = n_cols)
+  hit <- which(!is.na(m) & m > 0L)
+  if (length(hit) == 0L) {
+    return(out)
+  }
+
+  match_len <- attr(m, "match.length")
+  out[hit, 1L] <- substr(str[hit], m[hit], m[hit] + match_len[hit] - 1L)
+
+  for (j in seq_len(n_caps)) {
+    cs <- cap_start[hit, j]
+    cl <- cap_len[hit, j]
+    valid_cap <- cs > 0L
+    if (any(valid_cap)) {
+      h_idx <- hit[valid_cap]
+      out[h_idx, j + 1L] <- substr(
+        str[h_idx],
+        cs[valid_cap],
+        cs[valid_cap] + cl[valid_cap] - 1L
+      )
     }
   }
 

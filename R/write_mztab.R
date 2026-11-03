@@ -133,6 +133,8 @@
 #' @return Character path to the written mzTab-M file (invisibly).
 #'
 #' @family annotation
+#' @concept EDAM:operation_0335 Formatting
+#' @concept EDAM:format_3681 mzTab
 #' @export
 #'
 #' @examples

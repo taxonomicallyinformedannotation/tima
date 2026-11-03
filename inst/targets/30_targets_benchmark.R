@@ -46,11 +46,7 @@ targets_section_benchmark <- function() {
           tidytable::tidytable(
             adduct = sp_clean$adduct,
             inchikey = sp_clean$inchikey,
-            fragments = as.numeric(as.character(purrr::map(
-              .x = sp_clean@backend@peaksData,
-              .f = length
-            ))) /
-              2,
+            fragments = lengths(sp_clean@backend@peaksData) / 2,
             precursorMz = sp_clean$precursorMz,
             smiles = sp_clean$smiles,
             ccmslib = sp_clean$spectrum_id,

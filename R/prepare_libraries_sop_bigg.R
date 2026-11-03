@@ -131,17 +131,14 @@ prepare_libraries_sop_bigg <- function(
             inchikeys,
             ceiling(seq_along(inchikeys) / batch_size)
           )
-          batches |>
-            purrr::map(.f = query_pubchem_batch) |>
+          lapply(batches, query_pubchem_batch) |>
             tidytable::bind_rows()
         }
 
         # Main processing
-        models <- bigg_models |>
-          purrr::map(.f = get_bigg_model)
+        models <- lapply(bigg_models, get_bigg_model)
 
-        metabolites <- models |>
-          purrr::map(.f = get_metabolites) |>
+        metabolites <- lapply(models, get_metabolites) |>
           tidytable::bind_rows(.id = "organism_name") |>
           tidytable::arrange(name) |>
           tidytable::distinct(organism_name, inchikey, .keep_all = TRUE)
@@ -259,20 +256,22 @@ prepare_libraries_sop_bigg <- function(
         }
 
         # Create tables only for organisms in bigg_models
-        organism_tables <- purrr::keep(
-          purrr::map(
-            .x = names(bigg_models),
-            .f = function(org_name) {
-              doi <- bigg_models[[org_name]]["doi"]
-              taxonomy <- taxonomy_templates[[org_name]]
-              if (is.null(taxonomy)) {
-                return(NULL)
+        organism_tables <- Filter(
+          Negate(is.null),
+          stats::setNames(
+            lapply(
+              X = names(bigg_models),
+              FUN = function(org_name) {
+                doi <- bigg_models[[org_name]]["doi"]
+                taxonomy <- taxonomy_templates[[org_name]]
+                if (is.null(taxonomy)) {
+                  return(NULL)
+                }
+                create_organism_table(org_name, taxonomy, doi)
               }
-              create_organism_table(org_name, taxonomy, doi)
-            }
-          ) |>
-            stats::setNames(names(bigg_models)),
-          .p = Negate(is.null)
+            ),
+            names(bigg_models)
+          )
         )
 
         # Create Biota table (universal)
@@ -315,14 +314,16 @@ prepare_libraries_sop_bigg <- function(
           )
 
         # Process metabolites for each organism
-        metabolites_by_organism <- organism_tables |>
-          purrr::map(.f = function(org_table) {
+        metabolites_by_organism <- lapply(
+          organism_tables,
+          function(org_table) {
             metabolites_prefinal |>
               tidytable::inner_join(org_table) |>
               select_sop_columns() |>
               round_reals() |>
               tidytable::distinct()
-          }) |>
+          }
+        ) |>
           tidytable::bind_rows()
 
         metabolites_biota <- metabolites_prefinal |>

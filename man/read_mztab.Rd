@@ -96,4 +96,6 @@ Other preparation:
 \code{\link[=prepare_params]{prepare_params()}},
 \code{\link[=prepare_taxa]{prepare_taxa()}}
 }
+\concept{EDAM:format_3681 mzTab}
+\concept{EDAM:operation_1812 Parsing}
 \concept{preparation}

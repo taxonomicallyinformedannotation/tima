@@ -38,21 +38,28 @@ validate_file_existence <- function(file_list, allow_null = FALSE) {
   }
 
   # Validate each file and collect results
-  validation_results <- purrr::imap(
-    .x = file_list,
-    .f = .validate_single_file_path,
-    allow_null = allow_null
+  nms <- names(file_list) %||% as.character(seq_along(file_list))
+  validation_results <- Map(
+    function(x, idx) {
+      .validate_single_file_path(x, idx, allow_null = allow_null)
+    },
+    file_list,
+    nms
   )
 
   # Filter and categorize results
-  validation_results <- purrr::compact(validation_results)
-  invalid_files <- purrr::map_chr(
-    purrr::keep(validation_results, ~ .x$type == "invalid"),
-    ~ .x$msg
+  validation_results <- Filter(Negate(is.null), validation_results)
+  invalid_files <- vapply(
+    Filter(function(x) x$type == "invalid", validation_results),
+    `[[`,
+    character(1L),
+    "msg"
   )
-  missing_files <- purrr::map_chr(
-    purrr::keep(validation_results, ~ .x$type == "missing"),
-    ~ .x$msg
+  missing_files <- vapply(
+    Filter(function(x) x$type == "missing", validation_results),
+    `[[`,
+    character(1L),
+    "msg"
   )
 
   # Report errors

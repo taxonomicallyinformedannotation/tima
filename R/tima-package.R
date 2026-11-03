@@ -1,3 +1,10 @@
+#' @concept EDAM:topic_3172 Metabolomics
+#' @concept EDAM:topic_0154 Small molecules
+#' @concept EDAM:topic_2258 Cheminformatics
+#' @concept EDAM:topic_0637 Taxonomy
+#' @concept EDAM:topic_3370 Analytical chemistry
+#' @concept EDAM:topic_0769 Workflows
+#' @concept EDAM:operation_3803 Natural product identification
 #' @keywords internal
 "_PACKAGE"
 
@@ -10,9 +17,6 @@ NULL
 .datatable.aware <- TRUE # nolint: object_name_linter. datatable convention.
 
 .onLoad <- function(libname, pkgname) {
-  # Hints/operators to appease R CMD check and lazy loading quirks
-  R.utils::Arguments()
-
   # NOTE: Logging is NOT initialized here to avoid creating empty log files
   # when the package is loaded. Instead, logging is initialized on-demand
   # when functions that need logging are called (e.g., run_tima()).

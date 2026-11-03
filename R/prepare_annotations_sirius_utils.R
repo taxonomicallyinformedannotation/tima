@@ -167,10 +167,12 @@ load_sirius_tables <- function(input_directory, version) {
   if (!is.null(fnames$spectral)) {
     spectral_files <- files$Name[grepl(fnames$spectral, files$Name)]
     if (length(spectral_files) > 0L) {
-      spectral <- purrr::map(
+      spectral <- lapply(
         spectral_files,
-        ~ read_sirius_internal_file(input_directory, .x) |>
-          tidytable::mutate(.sirius_source_file = .x)
+        function(x) {
+          read_sirius_internal_file(input_directory, x) |>
+            tidytable::mutate(.sirius_source_file = x)
+        }
       ) |>
         tidytable::bind_rows()
     }
@@ -228,14 +230,14 @@ load_sirius_summaries <- function(input_directory) {
     gsub(pattern = base_name, replacement = "") |>
     gsub(pattern = "^/", replacement = "")
   log_debug("Loading %d structure summary files", length(summary_files))
-  summaries <- purrr::map(
+  summaries <- lapply(
     summary_files,
-    ~ read_from_sirius_zip(input_directory, file = .x)
+    function(x) read_from_sirius_zip(input_directory, file = x)
   )
   names(summaries) <- summary_files |>
     pre_harmonize_names_sirius() |>
     harmonize_names_sirius()
-  summaries <- summaries[purrr::map_int(.x = summaries, .f = nrow) > 0L]
+  summaries <- summaries[vapply(summaries, nrow, integer(1L)) > 0L]
   if (length(summaries) == 0L) {
     return(tidytable::tidytable())
   }
@@ -595,8 +597,6 @@ merge_sirius_structures_with_spectral <- function(
     return(spectral_keyed)
   }
 
-  join_syms <- rlang::syms(join_key)
-
   spectral_keyed |>
     tidytable::mutate(
       .sim_rank = tidytable::if_else(
@@ -611,12 +611,12 @@ merge_sirius_structures_with_spectral <- function(
       )
     ) |>
     tidytable::arrange(
-      !!!join_syms,
+      tidytable::across(tidyselect::all_of(join_key)),
       tidytable::desc(.sim_rank),
       tidytable::desc(.peak_rank)
     ) |>
     tidytable::distinct(
-      !!!join_syms,
+      tidyselect::all_of(join_key),
       .keep_all = TRUE
     ) |>
     tidytable::select(-.sim_rank, -.peak_rank)

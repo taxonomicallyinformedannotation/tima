@@ -307,4 +307,6 @@ Other annotation:
 \code{\link[=filter_annotations]{filter_annotations()}},
 \code{\link[=write_mztab]{write_mztab()}}
 }
+\concept{EDAM:operation_3460 Taxonomic classification}
+\concept{EDAM:operation_3803 Natural product identification}
 \concept{annotation}

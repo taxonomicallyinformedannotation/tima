@@ -520,25 +520,29 @@ parse_cli_params <- function(arguments, parameters) {
     summarize = list(path = c("options", "summarize"), type = as.logical)
   )
 
-  # Helper: apply single argument to parameters
-  .apply_argument <- function(parameters, arg_name, arguments, mappings) {
-    if (!is.null(arguments[[arg_name]])) {
-      parameters |>
-        purrr::modify_in(
-          mappings[[arg_name]]$path,
-          ~ mappings[[arg_name]]$type(arguments[[arg_name]])
-        )
+  # Helper: recursively set a value in a nested list
+  .modify_nested <- function(x, path, value) {
+    if (length(path) == 1L) {
+      x[[path]] <- value
     } else {
-      parameters
+      elt <- x[[path[1L]]]
+      x[[path[1L]]] <- .modify_nested(
+        if (is.list(elt)) elt else list(),
+        path[-1L],
+        value
+      )
     }
+    x
   }
 
-  parameters <- names(mappings) |>
-    purrr::reduce(
-      .f = .apply_argument,
-      arguments = arguments,
-      mappings = mappings,
-      .init = parameters
-    )
+  for (arg_name in names(mappings)) {
+    if (!is.null(arguments[[arg_name]])) {
+      parameters <- .modify_nested(
+        parameters,
+        mappings[[arg_name]]$path,
+        mappings[[arg_name]]$type(arguments[[arg_name]])
+      )
+    }
+  }
   parameters
 }

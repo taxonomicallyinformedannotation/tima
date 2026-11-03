@@ -1249,3 +1249,91 @@ test_that("enrich_taxonomy_from_cache handles marimo CSV format (smiles key colu
   added <- result[result$structure_smiles == "CC", ]
   expect_equal(added$structure_tax_npc_01pat, "PathB")
 })
+
+test_that("enrich_taxonomy_from_cache parses headerless TSV ClassyFire cache (.csv extension)", {
+  tmpdir <- tempfile()
+  dir.create(tmpdir, recursive = TRUE)
+  on.exit(unlink(tmpdir, recursive = TRUE))
+
+  taxonomy <- tidytable::tidytable(
+    structure_inchikey = "EXISTINGIK00001-UHFFFAOYSA-N",
+    structure_tax_cla_chemontid = "CHEMONTID:0000001",
+    structure_tax_cla_01kin = "Organic compounds",
+    structure_tax_cla_02sup = "Lipids",
+    structure_tax_cla_03cla = "Fatty Acyls",
+    structure_tax_cla_04dirpar = "Fatty acids"
+  )
+
+  # Exact format from production classyfire_cache.csv (headerless TSV with spaces and commas in values)
+  cache_path <- file.path(tmpdir, "classyfire_cache.csv")
+  writeLines(
+    c(
+      paste(
+        "AAABBEXKLPHOMC-UHFFFAOYSA-N",
+        "CHEMONTID:0003469",
+        "Organic compounds",
+        "Benzenoids",
+        "Benzene and substituted derivatives",
+        "N-benzylbenzamides",
+        sep = "\t"
+      ),
+      paste(
+        "BBBBBBBBBBBBBB-UHFFFAOYSA-N",
+        "CHEMONTID:0001234",
+        "Organic compounds",
+        "Phenylpropanoids and polyketides",
+        "Flavonoids, 3-substituted",
+        "Flavones",
+        sep = "\t"
+      )
+    ),
+    con = cache_path
+  )
+
+  result <- enrich_taxonomy_from_cache(
+    taxonomy_table = taxonomy,
+    cache_path = cache_path,
+    key_col = "structure_inchikey",
+    all_keys = c(
+      "EXISTINGIK00001-UHFFFAOYSA-N",
+      "AAABBEXKLPHOMC-UHFFFAOYSA-N"
+    ),
+    col_mapping = list(
+      "structure_inchikey" = "inchikey",
+      "structure_tax_cla_chemontid" = c(
+        "chemontid",
+        "structure_taxonomy_classyfire_chemontid"
+      ),
+      "structure_tax_cla_01kin" = c(
+        "kingdom",
+        "structure_taxonomy_classyfire_01kingdom"
+      ),
+      "structure_tax_cla_02sup" = c(
+        "superclass",
+        "structure_taxonomy_classyfire_02superclass"
+      ),
+      "structure_tax_cla_03cla" = c(
+        "class",
+        "structure_taxonomy_classyfire_03class"
+      ),
+      "structure_tax_cla_04dirpar" = c(
+        "directparent",
+        "structure_taxonomy_classyfire_04directparent"
+      )
+    ),
+    taxonomy_name = "ClassyFire"
+  )
+
+  expect_equal(nrow(result), 2L)
+  added <- result[
+    result$structure_inchikey == "AAABBEXKLPHOMC-UHFFFAOYSA-N",
+  ]
+  expect_equal(added$structure_tax_cla_chemontid, "CHEMONTID:0003469")
+  expect_equal(added$structure_tax_cla_01kin, "Organic compounds")
+  expect_equal(added$structure_tax_cla_02sup, "Benzenoids")
+  expect_equal(
+    added$structure_tax_cla_03cla,
+    "Benzene and substituted derivatives"
+  )
+  expect_equal(added$structure_tax_cla_04dirpar, "N-benzylbenzamides")
+})

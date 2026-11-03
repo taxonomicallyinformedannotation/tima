@@ -36,7 +36,7 @@ intensity}
 \item{return_matched_peaks}{\link{logical} Return matched peaks count?
 Not compatible with 'entropy' method. Default: FALSE}
 
-\item{...}{Additional arguments passed to MsCoreUtils::join (cosine only)}
+\item{...}{Additional arguments (currently unused)}
 }
 \value{
 Numeric similarity score (0-1), or list with score and matches

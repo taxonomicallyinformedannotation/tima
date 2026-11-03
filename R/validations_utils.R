@@ -383,7 +383,7 @@ validate_numeric_range <- function(
         param_name,
         value,
         recommended_min,
-        rlang::`%||%`(context, "")
+        context %||% ""
       ),
       call. = FALSE,
       immediate. = TRUE
@@ -397,7 +397,7 @@ validate_numeric_range <- function(
         param_name,
         value,
         recommended_max,
-        rlang::`%||%`(context, "")
+        context %||% ""
       ),
       call. = FALSE,
       immediate. = TRUE

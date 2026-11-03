@@ -23,6 +23,8 @@
 #' @return NULL (invisibly). Launches the Shiny app as a side effect.
 #'
 #' @family workflow
+#' @concept EDAM:operation_3803 Natural product identification
+#' @concept EDAM:topic_3172 Metabolomics
 #'
 #' @export
 #'

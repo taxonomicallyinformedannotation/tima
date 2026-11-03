@@ -89,7 +89,7 @@ load_yaml_files_from_paths <- function(
   # Load all YAML files with error handling
   yamls_parsed <- tryCatch(
     {
-      purrr::map(.x = yaml_files, .f = read_yaml_fn)
+      lapply(yaml_files, read_yaml_fn)
     },
     error = function(e) {
       cli::cli_abort(

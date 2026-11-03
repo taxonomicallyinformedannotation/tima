@@ -42,9 +42,9 @@ harmonize_spectra_polarity <- function(
   col_sp,
   col_sy
 ) {
-  purrr::map(
-    .x = spectra_extracted,
-    .f = harmonize_spectra,
+  harmonized_list <- lapply(
+    X = spectra_extracted,
+    FUN = harmonize_spectra,
     mode = mode,
     metad = metad,
     col_ad = col_ad,
@@ -61,21 +61,34 @@ harmonize_spectra_polarity <- function(
     col_si = col_si,
     col_sp = col_sp,
     col_sy = col_sy
-  ) |>
-    purrr::map(
-      .f = function(x) {
-        df <- x |>
-          tidytable::rename(precursor_mz = precursorMz) |>
-          data.frame(check.names = FALSE)
-        for (.col in intersect(c("mz", "intensity"), names(df))) {
-          if (!is.list(df[[.col]])) {
-            df[[.col]] <- as.list(df[[.col]])
-          }
+  )
+  df_list <- lapply(
+    X = harmonized_list,
+    FUN = function(x) {
+      df <- x |>
+        tidytable::rename(precursor_mz = precursorMz) |>
+        data.frame(check.names = FALSE)
+      for (.col in intersect(c("mz", "intensity"), names(df))) {
+        if (!is.list(df[[.col]])) {
+          df[[.col]] <- as.list(df[[.col]])
         }
-        df
       }
-    ) |>
-    purrr::list_rbind()
+      df
+    }
+  )
+  all_cols <- unique(unlist(lapply(df_list, names), use.names = FALSE))
+  df_list <- lapply(df_list, function(df) {
+    missing_cols <- setdiff(all_cols, names(df))
+    for (col in missing_cols) {
+      df[[col]] <- rep(NA, nrow(df))
+    }
+    df[, all_cols, drop = FALSE]
+  })
+  res <- do.call(rbind, df_list)
+  if (!is.null(res)) {
+    rownames(res) <- NULL
+  }
+  res
 }
 
 #' Create Empty Spectral Library Template
@@ -279,15 +292,15 @@ prepare_libraries_spectra <-
     } else {
       # Import and extract ----
       log_metadata(ctx, phase = "importing", n_files = length(input))
-      spectra <- purrr::map(
-        .x = input,
-        .f = import_spectra,
+      spectra <- lapply(
+        X = input,
+        FUN = import_spectra,
         min_fragments = min_fragments,
         combine = FALSE
       )
 
       log_metadata(ctx, phase = "extracting")
-      spectra_extracted <- purrr::map(.x = spectra, .f = extract_spectra)
+      spectra_extracted <- lapply(X = spectra, FUN = extract_spectra)
 
       # Harmonize for both polarities ----
       log_metadata(ctx, phase = "harmonizing", polarity = "positive")

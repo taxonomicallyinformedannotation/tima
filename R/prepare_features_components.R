@@ -91,15 +91,17 @@ prepare_features_components <- function(
   # Load and combine component tables
   table <- tryCatch(
     {
-      purrr::map2(
-        .x = input,
-        .y = seq_along(input),
-        .f = ~ safe_fread(
-          file = .x,
-          file_type = paste0("component file ", .y),
-          na.strings = c("", "NA"),
-          colClasses = "character"
-        )
+      Map(
+        function(x, y) {
+          safe_fread(
+            file = x,
+            file_type = paste0("component file ", y),
+            na.strings = c("", "NA"),
+            colClasses = "character"
+          )
+        },
+        input,
+        seq_along(input)
       ) |>
         tidytable::bind_rows()
     },

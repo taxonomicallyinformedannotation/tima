@@ -73,4 +73,6 @@ Other annotation:
 \code{\link[=weight_annotations]{weight_annotations()}},
 \code{\link[=write_mztab]{write_mztab()}}
 }
+\concept{EDAM:operation_3695 Filtering}
+\concept{EDAM:operation_3803 Natural product identification}
 \concept{annotation}

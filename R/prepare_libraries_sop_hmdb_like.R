@@ -168,10 +168,10 @@ prepare_libraries_sop_hmdb_like <- function(
 
 parse_hmdb_like_input <- function(input) {
   if (grepl("\\.zip$", input, ignore.case = TRUE)) {
-    archive_index <- archive::archive(input)
-    sdf_entries <- archive_index$path[grepl(
+    archive_index <- utils::unzip(input, list = TRUE)
+    sdf_entries <- archive_index$Name[grepl(
       "\\.sdf$",
-      archive_index$path,
+      archive_index$Name,
       ignore.case = TRUE
     )]
 
@@ -183,14 +183,40 @@ parse_hmdb_like_input <- function(input) {
       )
     }
 
-    parsed_tables <- lapply(sdf_entries, function(sdf_entry) {
-      con <- archive::archive_read(input, file = sdf_entry)
+    if (length(sdf_entries) == 1L) {
+      con <- unz(description = input, filename = sdf_entries[[1L]])
       on.exit(close(con), add = TRUE)
-      parse_hmdb_like_sdf_lines(readLines(
+      return(parse_hmdb_like_sdf_lines(readLines(
         con = con,
         warn = FALSE,
         encoding = "UTF-8"
-      ))
+      )))
+    }
+
+    # For archives with many individual .sdf files (e.g., SMPDB with ~50,000
+    # files), opening unz() per entry rescans the central directory O(N^2)
+    # times. Extract once to a temporary directory and parse in batches.
+    tmp_dir <- tempfile("tima_sdf_")
+    dir.create(tmp_dir, recursive = TRUE)
+    on.exit(unlink(tmp_dir, recursive = TRUE), add = TRUE)
+    extracted_paths <- utils::unzip(input, files = sdf_entries, exdir = tmp_dir)
+
+    batch_size <- 2000L
+    n_files <- length(extracted_paths)
+    batches <- split(
+      extracted_paths,
+      ceiling(seq_len(n_files) / batch_size)
+    )
+    parsed_tables <- lapply(batches, function(batch_files) {
+      lines_list <- lapply(batch_files, function(f) {
+        lines <- readLines(con = f, warn = FALSE, encoding = "UTF-8")
+        if (length(lines) > 0L && lines[[length(lines)]] != "$$$$") {
+          c(lines, "$$$$")
+        } else {
+          lines
+        }
+      })
+      parse_hmdb_like_sdf_lines(unlist(lines_list, use.names = FALSE))
     })
 
     return(tidytable::bind_rows(parsed_tables))
@@ -258,17 +284,23 @@ parse_hmdb_like_sdf_lines <- function(sdf_lines) {
     name = rep(NA_character_, n_records)
   )
 
-  header_match <- stri_match_first_regex(
-    str = sdf_lines,
-    pattern = "^>\\s*<([^>]+)>"
-  )
-  header_idx <- which(!is.na(header_match[, 2]))
-
-  if (length(header_idx) == 0L) {
+  cand_idx <- which(startsWith(sdf_lines, ">"))
+  if (length(cand_idx) == 0L) {
     return(tidytable::as_tidytable(out))
   }
 
-  header_fields <- toupper(trimws(header_match[header_idx, 2]))
+  header_match <- stri_match_first_regex(
+    str = sdf_lines[cand_idx],
+    pattern = "^>\\s*<([^>]+)>"
+  )
+  valid_hdr <- which(!is.na(header_match[, 2]))
+
+  if (length(valid_hdr) == 0L) {
+    return(tidytable::as_tidytable(out))
+  }
+
+  header_idx <- cand_idx[valid_hdr]
+  header_fields <- toupper(trimws(header_match[valid_hdr, 2]))
   canonical_fields <- unname(field_map[header_fields])
   keep_idx <- which(!is.na(canonical_fields))
 

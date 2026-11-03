@@ -152,4 +152,8 @@ Other annotation:
 \code{\link[=weight_annotations]{weight_annotations()}},
 \code{\link[=write_mztab]{write_mztab()}}
 }
+\concept{EDAM:data_2536 Mass spectrometry data}
+\concept{EDAM:operation_3629 Deisotoping}
+\concept{EDAM:operation_3766 Weighted correlation network analysis}
+\concept{EDAM:operation_3803 Natural product identification}
 \concept{annotation}
