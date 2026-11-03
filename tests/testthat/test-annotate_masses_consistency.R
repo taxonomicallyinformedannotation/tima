@@ -272,3 +272,27 @@ test_that("join_couples_with_neutral_losses and join_multi_with_addlossed join o
   expect_equal(nrow(joined_multi), 1L)
   expect_identical(joined_multi$feature_id[[1L]], "f1")
 })
+
+test_that("enforce_graph_adduct_consistency resolves mixed singleton and conflicting components", {
+  # Component 1: singleton edge S1 -> S2 (no ambiguity, fast path)
+  # Component 2: conflicting node X1 with two candidate adducts ([M+H]+ supported by X2 and X3,
+  # vs [M+Na]+ only supported by X4)
+  df_add <- tidytable::tidytable(
+    feature_id = c("S1", "X1", "X1", "X1"),
+    adduct = c("[M+H]+", "[M+H]+", "[M+H]+", "[M+Na]+"),
+    feature_id_dest = c("S2", "X2", "X3", "X4"),
+    adduct_dest = c("[M+Na]+", "[M+Na]+", "[M+K]+", "[M+K]+")
+  )
+
+  kept <- enforce_graph_adduct_consistency(df_add)
+  expect_equal(nrow(kept), 3L)
+  expect_true("S1" %in% kept$feature_id)
+  x1_rows <- kept[kept$feature_id == "X1", ]
+  expect_equal(nrow(x1_rows), 2L)
+  expect_true(all(x1_rows$adduct == "[M+H]+"))
+  audit <- attr(kept, "consistency_audit")
+  expect_type(audit, "list")
+  expect_identical(audit$n_input, 4L)
+  expect_identical(audit$n_kept, 3L)
+  expect_identical(audit$n_dropped, 1L)
+})

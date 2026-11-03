@@ -258,3 +258,44 @@ test_that("weight_bio result contains score_biological and score_weighted_bio", 
   expect_true("score_weighted_bio" %in% names(out))
   expect_true("feature_id" %in% names(out))
 })
+
+test_that("weight_bio handles multiple sample organisms and SIRIUS confidence fallback", {
+  ann <- tidytable::bind_rows(
+    create_test_annotation(
+      "F1",
+      "IK1",
+      sample_organism = "Gentiana lutea",
+      species = "Gentiana lutea",
+      score_similarity = 0.8,
+      score_sirius = -100
+    ) |>
+      tidytable::mutate(candidate_score_sirius_confidence = 0.6),
+    create_test_annotation(
+      "F2",
+      "IK1",
+      sample_organism = "Swertia perennis",
+      genus = "Swertia",
+      species = "Swertia perennis",
+      score_similarity = NA_real_,
+      score_sirius = NA_real_
+    ) |>
+      tidytable::mutate(candidate_score_sirius_confidence = NA_real_)
+  )
+  sop <- sop_for("IK1", organism = "Gentiana lutea", species = "Gentiana lutea")
+
+  out <- call_wb(ann, sop)
+  expect_equal(nrow(out), 2L)
+  # F1 matches species (0.9); F2 matches family Gentianaceae (0.6)
+  expect_equal(out$score_biological[out$feature_id == "F1"], 0.9)
+  expect_equal(out$score_biological[out$feature_id == "F2"], 0.6)
+  # F1 pseudo initial is average of similarity (0.8) and confidence (0.6) = 0.7
+  expect_equal(
+    out$candidate_score_pseudo_initial[out$feature_id == "F1"],
+    0.7,
+    tolerance = 1e-6
+  )
+  # F2 has no MS2 scores so pseudo initial is NA
+  expect_true(is.na(out$candidate_score_pseudo_initial[out$feature_id == "F2"]))
+  # Temporary organism columns should be removed
+  expect_false(any(grepl("^(candidate_organism|sample_organism)", names(out))))
+})

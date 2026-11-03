@@ -383,36 +383,42 @@ weight_bio <- function(
       by = "candidate_structure_inchikey_connectivity_layer"
     )
 
+  # Collapse df1 (~1.5M structure-organism rows) to distinct
+  # (sample_organism_name, candidate_organism_name) pairs (<=37k rows) BEFORE
+  # joining wide 20-column taxonomy metadata.
+  sample_tax_distinct <- annotation_table_taxed |>
+    tidytable::select(
+      sample_organism_name,
+      sample_organism_01_domain,
+      sample_organism_02_kingdom,
+      sample_organism_03_phylum,
+      sample_organism_04_class,
+      sample_organism_05_order,
+      sample_organism_06_family,
+      sample_organism_07_tribe,
+      sample_organism_08_genus,
+      sample_organism_09_species,
+      sample_organism_10_varietas
+    ) |>
+    tidytable::distinct()
+
+  cand_tax_distinct <- df0 |>
+    tidytable::select(-candidate_structure_inchikey_connectivity_layer) |>
+    tidytable::distinct()
+  rm(df0)
+
   df2 <- df1 |>
+    tidytable::distinct(sample_organism_name, candidate_organism_name) |>
+    tidytable::filter(
+      !is.na(sample_organism_name) & !is.na(candidate_organism_name)
+    ) |>
     tidytable::inner_join(
-      y = annotation_table_taxed |>
-        tidytable::select(
-          sample_organism_name,
-          sample_organism_01_domain,
-          sample_organism_02_kingdom,
-          sample_organism_03_phylum,
-          sample_organism_04_class,
-          sample_organism_05_order,
-          # sample_organism_05_1_infraorder,
-          sample_organism_06_family,
-          # sample_organism_06_1_subfamily,
-          sample_organism_07_tribe,
-          # sample_organism_07_1_subtribe,
-          sample_organism_08_genus,
-          # sample_organism_08_1_subgenus,
-          sample_organism_09_species,
-          # sample_organism_09_1_subspecies,
-          sample_organism_10_varietas
-        ) |>
-        tidytable::distinct(),
+      y = sample_tax_distinct,
       by = "sample_organism_name"
     ) |>
     tidytable::inner_join(
-      y = df0,
-      by = c(
-        "candidate_structure_inchikey_connectivity_layer",
-        "candidate_organism_name"
-      )
+      y = cand_tax_distinct,
+      by = "candidate_organism_name"
     ) |>
     tidytable::distinct(
       sample_organism_name,
@@ -421,15 +427,10 @@ weight_bio <- function(
       sample_organism_03_phylum,
       sample_organism_04_class,
       sample_organism_05_order,
-      # sample_organism_05_1_infraorder,
       sample_organism_06_family,
-      # sample_organism_06_1_subfamily,
       sample_organism_07_tribe,
-      # sample_organism_07_1_subtribe,
       sample_organism_08_genus,
-      # sample_organism_08_1_subgenus,
       sample_organism_09_species,
-      # sample_organism_09_1_subspecies,
       sample_organism_10_varietas,
       candidate_organism_name,
       candidate_organism_01_domain,
@@ -437,18 +438,13 @@ weight_bio <- function(
       candidate_organism_03_phylum,
       candidate_organism_04_class,
       candidate_organism_05_order,
-      # candidate_organism_05_1_infraorder,
       candidate_organism_06_family,
-      # candidate_organism_06_1_subfamily,
       candidate_organism_07_tribe,
-      # candidate_organism_07_1_subtribe,
       candidate_organism_08_genus,
-      # candidate_organism_08_1_subgenus,
       candidate_organism_09_species,
-      # candidate_organism_09_1_subspecies,
       candidate_organism_10_varietas
     )
-  rm(df0)
+  rm(sample_tax_distinct, cand_tax_distinct)
 
   # OPTIMIZATION: Pre-compute the distinct pairs once to avoid 10x distinct+filter+regex
   df_pairs <- df2 |>
@@ -822,88 +818,112 @@ weight_bio <- function(
       .keep_all = TRUE
     )
 
-  # Join back to full annotation table using only the correct keys.
-  # IMPORTANT: Do NOT use implicit `by` here. The implicit join would include
-  # `candidate_structure_organism_occurrence_closest` as a key, which was
-  # freshly computed above and won't match the original (usually NA) value
-  # in annotation_table_taxed, silently dropping most rows.
-  # Remove columns from annotation_table_taxed that we've recomputed in
-  # annot_table_wei_bio_init, to avoid .x/.y suffix duplication.
-  cols_from_bio <- c(
-    "candidate_structure_organism_occurrence_closest",
-    "candidate_organism_name",
-    "score_biological"
-  )
-  annotation_table_taxed_slim <- annotation_table_taxed |>
-    tidytable::select(-tidyselect::any_of(cols_from_bio))
+  # Attach biological scores onto annotation_table_taxed in-place via fmatch
+  # (avoids 7 full-table copies across up to 14.5M rows).
+  annot_table_wei_bio <- tidytable::as_tidytable(annotation_table_taxed)
+  rm(annotation_table_taxed)
 
-  annot_table_wei_bio_big <- annotation_table_taxed_slim |>
-    tidytable::left_join(
-      y = annot_table_wei_bio_init,
-      by = c(
-        "candidate_structure_inchikey_connectivity_layer",
-        "sample_organism_name"
+  n_ann <- nrow(annot_table_wei_bio)
+  if (nrow(annot_table_wei_bio_init) > 0L && n_ann > 0L) {
+    u_so <- unique(c(
+      annot_table_wei_bio$sample_organism_name,
+      annot_table_wei_bio_init$sample_organism_name
+    ))
+    if (length(u_so) == 1L && !is.na(u_so[[1L]])) {
+      m_bio <- fastmatch::fmatch(
+        annot_table_wei_bio$candidate_structure_inchikey_connectivity_layer,
+        annot_table_wei_bio_init$candidate_structure_inchikey_connectivity_layer
       )
-    ) |>
-    tidytable::select(
-      -tidyselect::contains(match = "candidate_organism"),
-      -tidyselect::contains(match = "sample_organism")
-    )
-  rm(
-    annot_table_wei_bio_init,
-    annotation_table_taxed,
-    annotation_table_taxed_slim
-  )
+    } else {
+      lhs_key <- paste(
+        annot_table_wei_bio$candidate_structure_inchikey_connectivity_layer,
+        annot_table_wei_bio$sample_organism_name,
+        sep = "\r"
+      )
+      rhs_key <- paste(
+        annot_table_wei_bio_init$candidate_structure_inchikey_connectivity_layer,
+        annot_table_wei_bio_init$sample_organism_name,
+        sep = "\r"
+      )
+      m_bio <- fastmatch::fmatch(lhs_key, rhs_key)
+    }
+    score_bio_v <- annot_table_wei_bio_init$score_biological[m_bio]
+    occ_closest_v <- annot_table_wei_bio_init$candidate_structure_organism_occurrence_closest[
+      m_bio
+    ]
+  } else {
+    score_bio_v <- rep(NA_real_, n_ann)
+    occ_closest_v <- rep(NA_character_, n_ann)
+  }
+  rm(annot_table_wei_bio_init)
 
-  # Ensure candidate_score_sirius_confidence column exists (may be absent when
-  # the input comes from non-SIRIUS sources or older fixture files).
-  if (
-    !"candidate_score_sirius_confidence" %in% names(annot_table_wei_bio_big)
-  ) {
-    annot_table_wei_bio_big <- annot_table_wei_bio_big |>
-      tidytable::mutate(candidate_score_sirius_confidence = NA_real_)
+  drop_org_cols <- grep(
+    "^(candidate_organism|sample_organism)",
+    names(annot_table_wei_bio),
+    value = TRUE
+  )
+  if (length(drop_org_cols) > 0L) {
+    data.table::set(annot_table_wei_bio, j = drop_org_cols, value = NULL)
+  }
+  data.table::set(
+    annot_table_wei_bio,
+    j = "score_biological",
+    value = score_bio_v
+  )
+  data.table::set(
+    annot_table_wei_bio,
+    j = "candidate_structure_organism_occurrence_closest",
+    value = occ_closest_v
+  )
+  rm(score_bio_v, occ_closest_v)
+
+  if (!"candidate_score_sirius_confidence" %in% names(annot_table_wei_bio)) {
+    data.table::set(
+      annot_table_wei_bio,
+      j = "candidate_score_sirius_confidence",
+      value = rep(NA_real_, n_ann)
+    )
   }
 
-  annot_table_wei_bio <- annot_table_wei_bio_big |>
-    tidytable::mutate(
-      candidate_score_sirius_csi_tmp = transform_score_sirius_csi(
-        as.numeric(candidate_score_sirius_csi)
-      ),
-      # Prefer the already-normalised confidence score (0-1) when available
-      # (set for the top-1 candidate per feature by SIRIUS v5 ConfidenceScore
-      # and v6 ConfidenceScoreApproximate).  Fall back to the transformed CSI
-      # for rank-2+ candidates where confidence is NA.
-      candidate_score_sirius_tmp = tidytable::coalesce(
-        as.numeric(candidate_score_sirius_confidence),
-        candidate_score_sirius_csi_tmp
-      )
-    ) |>
-    tidytable::mutate(
-      candidate_score_pseudo_initial = tidytable::case_when(
-        !is.na(candidate_score_similarity) &
-          !is.na(candidate_score_sirius_tmp) ~
-          (as.numeric(candidate_score_similarity) +
-            candidate_score_sirius_tmp) /
-          2,
-        !is.na(candidate_score_similarity) ~
-          as.numeric(candidate_score_similarity),
-        !is.na(candidate_score_sirius_tmp) ~ candidate_score_sirius_tmp,
-        TRUE ~ NA_real_ # MS1-only hits have no MS2 spectrum data, so score is NA not 0
-      )
-    ) |>
-    tidytable::select(
-      -candidate_score_sirius_csi_tmp,
-      -candidate_score_sirius_tmp
-    ) |>
-    tidytable::mutate(
-      score_weighted_bio = compute_weighted_sum(
-        score_biological,
-        candidate_score_pseudo_initial,
-        weights = c(weight_biological, weight_spectral)
-      )
-    )
+  csi_tmp <- transform_score_sirius_csi(
+    as.numeric(annot_table_wei_bio$candidate_score_sirius_csi)
+  )
+  conf_num <- as.numeric(annot_table_wei_bio$candidate_score_sirius_confidence)
+  sirius_tmp <- ifelse(!is.na(conf_num), conf_num, csi_tmp)
+  sim_num <- as.numeric(annot_table_wei_bio$candidate_score_similarity)
 
-  rm(annot_table_wei_bio_big)
+  has_sim <- !is.na(sim_num)
+  has_sir <- !is.na(sirius_tmp)
+  pseudo_init <- rep(NA_real_, n_ann)
+  both_idx <- which(has_sim & has_sir)
+  if (length(both_idx) > 0L) {
+    pseudo_init[both_idx] <- (sim_num[both_idx] + sirius_tmp[both_idx]) / 2
+  }
+  sim_only <- which(has_sim & !has_sir)
+  if (length(sim_only) > 0L) {
+    pseudo_init[sim_only] <- sim_num[sim_only]
+  }
+  sir_only <- which(!has_sim & has_sir)
+  if (length(sir_only) > 0L) {
+    pseudo_init[sir_only] <- sirius_tmp[sir_only]
+  }
+  rm(csi_tmp, conf_num, sirius_tmp, sim_num, has_sim, has_sir)
+
+  data.table::set(
+    annot_table_wei_bio,
+    j = "candidate_score_pseudo_initial",
+    value = pseudo_init
+  )
+  data.table::set(
+    annot_table_wei_bio,
+    j = "score_weighted_bio",
+    value = compute_weighted_sum(
+      annot_table_wei_bio$score_biological,
+      pseudo_init,
+      weights = c(weight_biological, weight_spectral)
+    )
+  )
+  rm(pseudo_init)
 
   log_complete(ctx, n_weighted = nrow(annot_table_wei_bio))
 

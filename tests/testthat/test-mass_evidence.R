@@ -331,3 +331,52 @@ test_that("evidence engine does not share support across samples", {
   expect_equal(nrow(baseline_s2), 1L)
   expect_equal(baseline_s2$evidence_score, 0L)
 })
+
+test_that("evidence engine applies adaptive per-feature cap when cap_eff < cap_in without error", {
+  # With n_feat = 20 and max_hypotheses_per_feature = 100000L:
+  # cap_adaptive = floor(1.5e6 / 20) = 75000 < 100000, triggering the
+  # cap_eff < cap_in code path while preserving baseline [M+H]+.
+  feats <- tidytable::tidytable(
+    feature_id = sprintf("F%02d", seq_len(20L)),
+    rt = rep(1.0, 20L),
+    mz = rep(181.0707, 20L),
+    sample = rep("S", 20L)
+  )
+  u <- .mini_universe()
+
+  hyps <- build_evidence_supported_hypotheses(
+    df_fea_min = feats,
+    universe = u,
+    tolerance_ppm = 10,
+    tolerance_rt = 0.05,
+    ms_mode = "pos",
+    exact_masses = 180.0634,
+    max_hypotheses_per_feature = 100000L
+  )
+
+  expect_gt(nrow(hyps), 0L)
+  expect_true(all(feats$feature_id %in% hyps$feature_id))
+  expect_true(all(
+    feats$feature_id %in% hyps$feature_id[hyps$adduct == "[M+H]+"]
+  ))
+})
+
+test_that("build_evidence_edges selects top representative per feature and filters incompatible M", {
+  hyps <- tidytable::tidytable(
+    feature_id = c("F1", "F1", "F2", "F3"),
+    mz = c(100.0, 100.0, 122.0, 150.0),
+    adduct = c("[M+Na]+", "[M+H]+", "[M+Na]+", "[M+K]+"),
+    evidence_cluster = c("CL1", "CL1", "CL1", "CL1"),
+    evidence_count = c(1L, 3L, 2L, 2L),
+    implied_M = c(99.0, 99.0, 99.0001, 110.0)
+  )
+
+  edges <- build_evidence_edges(hyps, tolerance_ppm = 5)
+  # F1 picks [M+H]+ (higher evidence_count = 3 > 1) and links to F2 (implied_M within 5 ppm),
+  # while F2 -> F3 is rejected because 99.0001 vs 110.0 exceeds 5 ppm.
+  expect_equal(nrow(edges), 1L)
+  expect_equal(edges$feature_id[[1L]], "F1")
+  expect_equal(edges$adduct[[1L]], "[M+H]+")
+  expect_equal(edges$feature_id_dest[[1L]], "F2")
+  expect_equal(edges$adduct_dest[[1L]], "[M+Na]+")
+})

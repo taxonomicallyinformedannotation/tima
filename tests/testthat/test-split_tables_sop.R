@@ -378,3 +378,52 @@ test_that("split_tables_sop handles missing optional structure columns", {
   expect_true("structure_tag" %in% names(result$str_stereo))
   expect_true(all(is.na(result$str_stereo$structure_xlogp)))
 })
+
+test_that("split_tables_sop drops NA reference_doi only when non-NA reference exists for same pair", {
+  sop_table <- tidytable::tidytable(
+    structure_smiles = c("CCO", "CCO", "CCC"),
+    structure_smiles_no_stereo = c("CCO", "CCO", "CCC"),
+    structure_tax_npc_01pat = NA_character_,
+    structure_tax_npc_02sup = NA_character_,
+    structure_tax_npc_03cla = NA_character_,
+    structure_tax_cla_chemontid = NA_character_,
+    structure_tax_cla_01kin = NA_character_,
+    structure_tax_cla_02sup = NA_character_,
+    structure_tax_cla_03cla = NA_character_,
+    structure_tax_cla_04dirpar = NA_character_,
+    organism_name = c("Org1", "Org1", "Org2"),
+    organism_taxonomy_ottid = c("1", "1", "2"),
+    reference_doi = c("10.1000/valid", NA_character_, NA_character_)
+  )
+
+  with_mocked_bindings(
+    process_smiles = function(table, cache) {
+      tidytable::tidytable(
+        structure_smiles_initial = c("CCO", "CCC"),
+        structure_inchikey = c(
+          "LFQSCWFLJHTTHZ-UHFFFAOYSA-N",
+          "ATUOYWHBWRKTHZ-UHFFFAOYSA-N"
+        ),
+        structure_inchikey_connectivity_layer = c(
+          "LFQSCWFLJHTTHZ",
+          "ATUOYWHBWRKTHZ"
+        ),
+        structure_smiles = c("CCO", "CCC"),
+        structure_smiles_no_stereo = c("CCO", "CCC"),
+        structure_molecular_formula = c("C2H6O", "C3H8"),
+        structure_exact_mass = c(46.0419, 44.0626)
+      )
+    },
+    {
+      res <- split_tables_sop(table = sop_table, cache = NULL)
+    }
+  )
+
+  expect_equal(nrow(res$key), 2L)
+  org1_rows <- res$key[res$key$organism_name == "Org1", ]
+  org2_rows <- res$key[res$key$organism_name == "Org2", ]
+  expect_equal(nrow(org1_rows), 1L)
+  expect_equal(org1_rows$reference_doi[[1L]], "10.1000/valid")
+  expect_equal(nrow(org2_rows), 1L)
+  expect_true(is.na(org2_rows$reference_doi[[1L]]))
+})

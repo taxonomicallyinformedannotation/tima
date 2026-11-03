@@ -38,16 +38,6 @@ enrich_with_structure_metadata <- function(combined, structure_table) {
       .fns = as.character
     ))
 
-  enriched <- combined |>
-    tidytable::mutate(
-      structure_exact_mass = as.character(structure_exact_mass)
-    )
-  join_keys <- intersect(colnames(enriched), colnames(struct_unique))
-  if (length(join_keys) > 0L) {
-    enriched <- enriched |>
-      tidytable::left_join(struct_unique, by = join_keys)
-  }
-
   tax_cols <- c(
     "structure_inchikey_connectivity_layer",
     "structure_smiles_no_stereo",
@@ -60,9 +50,49 @@ enrich_with_structure_metadata <- function(combined, structure_table) {
     "structure_tax_cla_03cla",
     "structure_tax_cla_04dirpar"
   )
-  if (any(tax_cols %in% colnames(structure_table))) {
-    taxonomy_table <- structure_table |>
+  has_tax_cols <- any(tax_cols %in% colnames(structure_table))
+  taxonomy_table <- if (has_tax_cols) {
+    structure_table |>
       tidytable::distinct(tidyselect::any_of(tax_cols))
+  } else {
+    NULL
+  }
+
+  # Join taxonomy onto struct_unique (~250k rows) before expanding combined to
+  # millions of isomer rows when tax keys come from struct_unique
+  tax_joined_early <- FALSE
+  if (!is.null(taxonomy_table) && nrow(struct_unique) > 0L) {
+    tax_keys_early <- intersect(
+      colnames(struct_unique),
+      colnames(taxonomy_table)
+    )
+    tax_keys_in_comb <- intersect(colnames(combined), colnames(taxonomy_table))
+    if (
+      length(tax_keys_early) > 0L &&
+        length(setdiff(tax_keys_in_comb, colnames(struct_unique))) == 0L
+    ) {
+      struct_unique <- struct_unique |>
+        tidytable::left_join(taxonomy_table, by = tax_keys_early) |>
+        tidytable::distinct()
+      tax_joined_early <- TRUE
+    }
+  }
+
+  enriched <- combined |>
+    tidytable::mutate(
+      structure_exact_mass = as.character(structure_exact_mass),
+      candidate_library = "TIMA MS1",
+      candidate_structure_error_mz = as.numeric(error_mz)
+    ) |>
+    tidytable::distinct()
+
+  join_keys <- intersect(colnames(enriched), colnames(struct_unique))
+  if (length(join_keys) > 0L) {
+    enriched <- enriched |>
+      tidytable::left_join(struct_unique, by = join_keys)
+  }
+
+  if (!is.null(taxonomy_table) && !tax_joined_early) {
     tax_keys <- intersect(colnames(enriched), colnames(taxonomy_table))
     if (length(tax_keys) > 0L) {
       enriched <- enriched |>
@@ -70,21 +100,7 @@ enrich_with_structure_metadata <- function(combined, structure_table) {
     }
   }
 
-  # canonical_adduct <- vapply(
-  #   X = enriched$adduct,
-  #   FUN = function(a) {
-  #     if (is.na(a)) NA_character_ else canonicalize_adduct_notation(a)
-  #   },
-  #   FUN.VALUE = character(1L),
-  #   USE.NAMES = FALSE
-  # )
-
-  enriched |>
-    tidytable::mutate(
-      # candidate_adduct = canonical_adduct,
-      candidate_library = "TIMA MS1",
-      candidate_structure_error_mz = as.numeric(error_mz)
-    ) |>
+  enriched <- enriched |>
     tidytable::rename(
       candidate_structure_name = tidyselect::any_of("structure_name"),
       candidate_structure_inchikey_connectivity_layer = tidyselect::any_of(
@@ -124,8 +140,11 @@ enrich_with_structure_metadata <- function(combined, structure_table) {
       candidate_structure_tax_cla_04dirpar = tidyselect::any_of(
         "structure_tax_cla_04dirpar"
       )
-    ) |>
-    tidytable::distinct()
+    )
+  if (!tax_joined_early) {
+    enriched <- enriched |> tidytable::distinct()
+  }
+  enriched
 }
 
 #' Extract per-element atom requirements implied by a loss formula token
@@ -504,41 +523,44 @@ build_output_edges <- function(
       ) |>
       tidytable::distinct()
   }
-  if (nrow(loss_edges) > 0L) {
-    loss_edges <- loss_edges |>
-      tidytable::mutate(
-        .drop_redundant = vapply(
-          seq_len(nrow(loss_edges)),
-          function(i) {
-            if (!all(c("adduct", "adduct_dest") %in% colnames(adduct_edges))) {
-              return(FALSE)
-            }
-            same_pair <- adduct_edges |>
-              tidytable::filter(
-                feature_id == loss_edges$feature_id[[i]] &
-                  feature_id_dest == loss_edges$feature_id_dest[[i]]
-              )
-            if (nrow(same_pair) == 0L) {
-              return(FALSE)
-            }
-            loss_formula <- loss_edges$loss[[i]]
-            any(vapply(
-              seq_len(nrow(same_pair)),
-              function(j) {
-                adduct_has_explicit_loss(same_pair$adduct[[j]], loss_formula) &&
-                  adduct_has_explicit_loss(
-                    same_pair$adduct_dest[[j]],
-                    loss_formula
-                  )
-              },
-              logical(1L)
-            ))
-          },
-          logical(1L)
-        )
-      ) |>
-      tidytable::filter(!.drop_redundant) |>
-      tidytable::select(-.drop_redundant)
+  if (
+    nrow(loss_edges) > 0L &&
+      nrow(adduct_edges) > 0L &&
+      all(c("adduct", "adduct_dest") %in% colnames(adduct_edges))
+  ) {
+    ae_pairs <- paste(
+      adduct_edges$feature_id,
+      adduct_edges$feature_id_dest,
+      sep = "\r"
+    )
+    le_pairs <- paste(
+      loss_edges$feature_id,
+      loss_edges$feature_id_dest,
+      sep = "\r"
+    )
+    hit_le <- which(!is.na(fastmatch::fmatch(le_pairs, ae_pairs)))
+    if (length(hit_le) > 0L) {
+      ae_by_pair <- split(seq_len(nrow(adduct_edges)), ae_pairs)
+      ae_add <- adduct_edges$adduct
+      ae_add_dst <- adduct_edges$adduct_dest
+      drop_redundant <- logical(nrow(loss_edges))
+      for (i in hit_le) {
+        j_vec <- ae_by_pair[[le_pairs[[i]]]]
+        loss_formula <- loss_edges$loss[[i]]
+        for (j in j_vec) {
+          if (
+            adduct_has_explicit_loss(ae_add[[j]], loss_formula) &&
+              adduct_has_explicit_loss(ae_add_dst[[j]], loss_formula)
+          ) {
+            drop_redundant[[i]] <- TRUE
+            break
+          }
+        }
+      }
+      if (any(drop_redundant)) {
+        loss_edges <- loss_edges[!drop_redundant, ]
+      }
+    }
   }
   if (nrow(loss_edges) > 0L) {
     parts[[length(parts) + 1L]] <- loss_edges |>

@@ -1139,12 +1139,16 @@ expand_with_modifier <- function(
 #'   pair < cluster/loss < preassigned < baseline < multi
 #' @keywords internal
 dedupe_node_hypotheses <- function(node_hypotheses) {
-  if (nrow(node_hypotheses) == 0L) {
+  n_rows <- nrow(node_hypotheses)
+  if (n_rows == 0L) {
     return(node_hypotheses)
   }
-  if (!"candidate_adduct_origin" %in% colnames(node_hypotheses)) {
-    node_hypotheses <- node_hypotheses |>
-      tidytable::mutate(candidate_adduct_origin = "supported")
+  is_pre <- node_hypotheses$is_preassigned
+  if (is.null(is_pre)) {
+    is_pre <- logical(n_rows)
+  } else {
+    is_pre <- as.logical(is_pre)
+    is_pre[is.na(is_pre)] <- FALSE
   }
   ranks <- c(
     pair = 1L,
@@ -1156,43 +1160,90 @@ dedupe_node_hypotheses <- function(node_hypotheses) {
     baseline = 4L,
     multi = 5L
   )
-  node_hypotheses |>
-    tidytable::mutate(
-      is_preassigned = tidytable::if_else(
-        is.na(is_preassigned),
-        FALSE,
-        is_preassigned
-      ),
-      source_rank = unname(ranks[source]),
-      source_rank = tidytable::if_else(
-        is.na(source_rank),
-        99L,
-        source_rank
-      ),
-      adduct_support = tidytable::if_else(
-        is.na(adduct_support),
-        0L,
-        as.integer(adduct_support)
-      ),
-      candidate_adduct_origin = tidytable::if_else(
-        is.na(candidate_adduct_origin),
-        "supported",
-        candidate_adduct_origin
-      )
-    ) |>
-    tidytable::arrange(source_rank, tidytable::desc(adduct_support)) |>
-    tidytable::group_by(feature_id, adduct) |>
-    tidytable::mutate(
-      is_preassigned = any(is_preassigned),
-      candidate_adduct_origin = tidytable::case_when(
-        any(candidate_adduct_origin == "supported") ~ "supported",
-        any(candidate_adduct_origin == "supported_weak") ~ "supported_weak",
-        TRUE ~ "baseline"
-      )
-    ) |>
-    tidytable::ungroup() |>
-    tidytable::distinct(feature_id, adduct, .keep_all = TRUE) |>
-    tidytable::select(-source_rank)
+  src_rank <- unname(ranks[as.character(node_hypotheses$source)])
+  src_rank[is.na(src_rank)] <- 99L
+
+  add_supp <- as.integer(node_hypotheses$adduct_support)
+  add_supp[is.na(add_supp)] <- 0L
+
+  orig <- if ("candidate_adduct_origin" %in% colnames(node_hypotheses)) {
+    as.character(node_hypotheses$candidate_adduct_origin)
+  } else {
+    rep("supported", n_rows)
+  }
+  orig[is.na(orig)] <- "supported"
+  orig_code <- rep(3L, n_rows)
+  orig_code[orig == "supported_weak"] <- 2L
+  orig_code[orig == "supported"] <- 1L
+
+  f_col <- node_hypotheses$feature_id
+  a_col <- node_hypotheses$adduct
+  u_f <- unique(f_col)
+  u_a <- unique(a_col)
+  f_id <- if (anyNA(u_f)) {
+    match(f_col, u_f)
+  } else {
+    fastmatch::fmatch(f_col, u_f)
+  }
+  a_id <- if (anyNA(u_a)) {
+    match(a_col, u_a)
+  } else {
+    fastmatch::fmatch(a_col, u_a)
+  }
+  n_a <- length(u_a)
+  use_int_key <- as.double(length(u_f)) * n_a < .Machine$integer.max
+  pair_key <- if (use_int_key) {
+    (f_id - 1L) * n_a + a_id
+  } else {
+    as.double(f_id - 1L) * n_a + a_id
+  }
+
+  ord <- order(src_rank, -add_supp, method = "radix")
+  pair_key_ord <- pair_key[ord]
+  is_dup <- duplicated(pair_key_ord)
+
+  if (any(is_dup)) {
+    kept_pos <- which(!is_dup)
+    dup_pos <- which(is_dup)
+    win_idx <- ord[kept_pos]
+    dup_idx <- ord[dup_pos]
+    kept_keys <- pair_key_ord[kept_pos]
+    kept_pre <- is_pre[win_idx]
+    kept_orig <- orig_code[win_idx]
+
+    dup_pre <- dup_idx[is_pre[dup_idx]]
+    if (length(dup_pre) > 0L) {
+      m_pre <- fastmatch::fmatch(unique(pair_key[dup_pre]), kept_keys)
+      kept_pre[m_pre[!is.na(m_pre)]] <- TRUE
+    }
+    dup_1 <- dup_idx[orig_code[dup_idx] == 1L]
+    if (length(dup_1) > 0L) {
+      m_1 <- fastmatch::fmatch(unique(pair_key[dup_1]), kept_keys)
+      kept_orig[m_1[!is.na(m_1)]] <- 1L
+    }
+    dup_2 <- dup_idx[orig_code[dup_idx] == 2L]
+    if (length(dup_2) > 0L) {
+      m_2 <- fastmatch::fmatch(unique(pair_key[dup_2]), kept_keys)
+      m_2 <- m_2[!is.na(m_2)]
+      kept_orig[m_2] <- pmin.int(kept_orig[m_2], 2L)
+    }
+    add_supp <- add_supp[win_idx]
+  } else {
+    win_idx <- ord
+    kept_pre <- is_pre[win_idx]
+    kept_orig <- orig_code[win_idx]
+    add_supp <- add_supp[win_idx]
+  }
+
+  cols <- lapply(as.list(node_hypotheses), `[`, win_idx)
+  cols$is_preassigned <- kept_pre
+  cols$adduct_support <- add_supp
+  cols$candidate_adduct_origin <- c(
+    "supported",
+    "supported_weak",
+    "baseline"
+  )[kept_orig]
+  tidytable::as_tidytable(cols)
 }
 
 #' Discover additional ion-species hypotheses/edges via typed-universe evidence
@@ -1895,62 +1946,80 @@ propagate_annotations_across_m_cliques <- function(
     return(annotations)
   }
 
-  # Get matched annotations with structures
-  matched <- annotations |>
-    tidytable::filter(!is.na(structure_exact_mass)) |>
-    tidytable::select(
-      feature_id,
-      mz,
-      rt,
-      adduct,
-      mass,
-      structure_exact_mass
-    )
+  # Only components with >= 2 distinct features can propagate across features
+  comp_mem_u <- component_membership |>
+    tidytable::distinct(feature_id, component_id) |>
+    tidytable::filter(!is.na(component_id))
+  dup_comps <- unique(comp_mem_u$component_id[duplicated(
+    comp_mem_u$component_id
+  )])
+  if (length(dup_comps) == 0L) {
+    return(annotations)
+  }
+  comp_mem_multi <- comp_mem_u[
+    !is.na(fastmatch::fmatch(comp_mem_u$component_id, dup_comps)),
+  ]
+  multi_features <- unique(comp_mem_multi$feature_id)
 
-  if (nrow(matched) == 0L) {
+  # Pre-filter annotations to multi-feature components with matched structures
+  # before selecting or deduplicating (avoids copying 9M rows)
+  idx_match <- which(
+    !is.na(annotations$structure_exact_mass) &
+      !is.na(fastmatch::fmatch(annotations$feature_id, multi_features))
+  )
+  if (length(idx_match) == 0L) {
     return(annotations)
   }
 
-  # Matched annotations with their components
+  cov_audit <- attr(annotations, "coverage_audit")
+
+  matched <- tidytable::tidytable(
+    feature_id = annotations$feature_id[idx_match],
+    mz = annotations$mz[idx_match],
+    rt = annotations$rt[idx_match],
+    adduct = annotations$adduct[idx_match],
+    mass = annotations$mass[idx_match],
+    structure_exact_mass = annotations$structure_exact_mass[idx_match]
+  ) |>
+    tidytable::distinct()
+
   matched_with_component <- matched |>
-    tidytable::left_join(
-      component_membership |>
+    tidytable::inner_join(
+      comp_mem_multi |>
         tidytable::rename(source_component = component_id),
       by = "feature_id"
-    ) |>
-    tidytable::filter(!is.na(source_component))
+    )
 
   if (nrow(matched_with_component) == 0L) {
     return(annotations)
   }
 
-  # Get all features in same components (targets for propagation)
-  component_features <- component_membership |>
-    tidytable::left_join(
-      matched_with_component |>
-        tidytable::select(source_component) |>
-        tidytable::distinct() |>
-        tidytable::rename(component_id = source_component),
-      by = c("component_id")
-    ) |>
-    tidytable::filter(!is.na(component_id))
+  source_comps <- unique(matched_with_component$source_component)
+  component_features <- comp_mem_multi[
+    !is.na(fastmatch::fmatch(comp_mem_multi$component_id, source_comps)),
+  ]
 
   if (nrow(component_features) == 0L) {
     return(annotations)
   }
 
-  # Create source->target mapping with single cross_join
+  # Create source->target mapping via equijoin on component_id (not cross_join)
   propagation_map <- matched_with_component |>
-    tidytable::select(feature_id, source_component, adduct) |>
-    tidytable::rename(source_feature = feature_id) |>
-    tidytable::cross_join(
+    tidytable::select(
+      source_feature = feature_id,
+      source_component,
+      adduct
+    ) |>
+    tidytable::distinct() |>
+    tidytable::inner_join(
       component_features |>
-        tidytable::rename(target_feature = feature_id)
+        tidytable::rename(
+          target_feature = feature_id,
+          source_component = component_id
+        ),
+      by = "source_component"
     ) |>
-    tidytable::filter(
-      source_component == component_id &
-        source_feature != target_feature
-    ) |>
+    tidytable::filter(source_feature != target_feature) |>
     tidytable::select(source_feature, target_feature, source_component, adduct)
 
   if (nrow(propagation_map) == 0L) {
@@ -1983,9 +2052,15 @@ propagate_annotations_across_m_cliques <- function(
   propagation_combined <- propagation_map |>
     tidytable::left_join(
       matched |>
-        tidytable::select(feature_id, mz, rt, mass, structure_exact_mass) |>
-        tidytable::rename(source_feature = feature_id),
-      by = "source_feature"
+        tidytable::select(
+          source_feature = feature_id,
+          adduct,
+          mz,
+          rt,
+          mass,
+          structure_exact_mass
+        ),
+      by = c("source_feature", "adduct")
     ) |>
     tidytable::left_join(target_meta, by = "target_feature") |>
     tidytable::left_join(
@@ -2050,9 +2125,30 @@ propagate_annotations_across_m_cliques <- function(
     ) |>
     tidytable::distinct()
 
-  # Combine with original annotations
-  result <- tidytable::bind_rows(annotations, propagated_annotations) |>
-    tidytable::distinct()
+  if ("source" %in% colnames(annotations)) {
+    existing_prop_idx <- which(
+      !is.na(annotations$source) &
+        annotations$source == "propagated_clique_supported"
+    )
+    if (length(existing_prop_idx) > 0L) {
+      propagated_annotations <- propagated_annotations |>
+        tidytable::anti_join(
+          annotations[existing_prop_idx, ],
+          by = intersect(
+            colnames(propagated_annotations),
+            colnames(annotations)
+          )
+        )
+    }
+  }
+  if (nrow(propagated_annotations) == 0L) {
+    return(annotations)
+  }
+
+  result <- tidytable::bind_rows(annotations, propagated_annotations)
+  if (!is.null(cov_audit)) {
+    attr(result, "coverage_audit") <- cov_audit
+  }
 
   result
 }

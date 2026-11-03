@@ -151,10 +151,25 @@ load_structural_library <- function(
     supp_files,
     supp_names
   )
-  joined <- Reduce(
-    f = tidytable::left_join,
-    x = c(list(library_table), supp_tables)
-  )
+  joined <- tidytable::as_tidytable(library_table)
+  for (st in supp_tables) {
+    by_cols <- intersect(names(joined), names(st))
+    if (
+      length(by_cols) == 1L &&
+        anyDuplicated(st[[by_cols]]) == 0L &&
+        !anyNA(st[[by_cols]])
+    ) {
+      key_col <- by_cols[[1L]]
+      m_idx <- fastmatch::fmatch(joined[[key_col]], st[[key_col]])
+      new_cols <- setdiff(names(st), key_col)
+      for (col in new_cols) {
+        data.table::set(joined, j = col, value = st[[col]][m_idx])
+      }
+    } else if (length(by_cols) > 0L) {
+      joined <- tidytable::left_join(joined, st, by = by_cols)
+    }
+  }
+  rm(library_table, supp_tables)
 
   structures <- joined |>
     tidytable::filter(!is.na(structure_exact_mass)) |>
@@ -216,20 +231,36 @@ log_adduct_breakdown <- function(annotations) {
   # Unmatched hypotheses retained for downstream use are excluded here to
   # avoid inflating counts with speculative cross-join candidates.
   has_error_col <- "candidate_structure_error_mz" %in% colnames(annotations)
-  matched_ann <- if (has_error_col) {
-    annotations |> tidytable::filter(!is.na(candidate_structure_error_mz))
+  add_col <- annotations[["adduct"]]
+  f_col <- annotations[["feature_id"]]
+  keep_m <- if (has_error_col) {
+    which(
+      !is.na(add_col) & !is.na(annotations[["candidate_structure_error_mz"]])
+    )
   } else {
-    annotations |> tidytable::filter(!is.na(adduct))
+    which(!is.na(add_col))
   }
 
-  if (nrow(matched_ann) > 0L) {
-    adduct_bd <- matched_ann |>
-      tidytable::filter(!is.na(adduct)) |>
-      tidytable::summarise(
-        N_features = tidytable::n_distinct(feature_id),
-        N_annotations = .N,
-        .by = adduct
-      ) |>
+  if (length(keep_m) > 0L) {
+    a_m <- add_col[keep_m]
+    f_m <- f_col[keep_m]
+    u_a <- unique(a_m)
+    u_f <- unique(f_m)
+    a_id <- fastmatch::fmatch(a_m, u_a)
+    f_id <- if (anyNA(u_f)) match(f_m, u_f) else fastmatch::fmatch(f_m, u_f)
+    n_a <- length(u_a)
+    n_ann_v <- tabulate(a_id, nbins = n_a)
+    fa_key <- if (as.double(length(u_f)) * n_a < .Machine$integer.max) {
+      (f_id - 1L) * n_a + a_id
+    } else {
+      as.double(f_id - 1L) * n_a + a_id
+    }
+    n_feat_v <- tabulate(a_id[!duplicated(fa_key)], nbins = n_a)
+    adduct_bd <- tidytable::tidytable(
+      adduct = u_a,
+      N_features = n_feat_v,
+      N_annotations = n_ann_v
+    ) |>
       tidytable::arrange(
         tidytable::desc(N_features),
         tidytable::desc(N_annotations)
@@ -267,12 +298,15 @@ log_adduct_breakdown <- function(annotations) {
   # matched; they still carry adduct-network evidence and are useful for
   # downstream tools.  Log a compact summary grouped by source.
   if (has_error_col && "source" %in% colnames(annotations)) {
-    unmatched_ann <- annotations |>
-      tidytable::filter(
-        !is.na(adduct) & is.na(candidate_structure_error_mz)
-      )
-    if (nrow(unmatched_ann) > 0L) {
-      unmatched_bd <- unmatched_ann |>
+    keep_u <- which(
+      !is.na(add_col) & is.na(annotations[["candidate_structure_error_mz"]])
+    )
+    if (length(keep_u) > 0L) {
+      unmatched_bd <- tidytable::tidytable(
+        feature_id = f_col[keep_u],
+        adduct = add_col[keep_u],
+        source = annotations[["source"]][keep_u]
+      ) |>
         tidytable::summarise(
           N_features = tidytable::n_distinct(feature_id),
           N_adduct_types = tidytable::n_distinct(adduct),

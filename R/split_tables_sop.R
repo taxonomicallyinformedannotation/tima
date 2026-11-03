@@ -141,14 +141,31 @@ split_tables_sop <- function(table, cache) {
     organism_name = org_vec[keep_key],
     reference_doi = doi_vec[keep_key]
   ) |>
-    tidytable::distinct() |>
-    tidytable::mutate(
-      .n_ref = .N,
-      .by = c(structure_inchikey, organism_name)
-    ) |>
-    tidytable::filter(!is.na(reference_doi) | .n_ref == 1L) |>
-    tidytable::select(-.n_ref)
+    tidytable::distinct()
   rm(ik_vec, sm2d_vec, org_vec, doi_vec, keep_key)
+
+  na_doi <- is.na(table_keys$reference_doi)
+  if (any(na_doi) && nrow(table_keys) > 1L) {
+    u_ik_k <- unique(table_keys$structure_inchikey)
+    u_org_k <- unique(table_keys$organism_name)
+    ik_id_k <- fastmatch::fmatch(table_keys$structure_inchikey, u_ik_k)
+    org_id_k <- fastmatch::fmatch(table_keys$organism_name, u_org_k)
+    n_org_k <- length(u_org_k)
+    io_key <- if (as.double(length(u_ik_k)) * n_org_k < .Machine$integer.max) {
+      (ik_id_k - 1L) * n_org_k + org_id_k
+    } else {
+      as.double(ik_id_k - 1L) * n_org_k + org_id_k
+    }
+    dup_io <- unique(io_key[duplicated(io_key)])
+    if (length(dup_io) > 0L) {
+      drop_na <- na_doi & !is.na(fastmatch::fmatch(io_key, dup_io))
+      if (any(drop_na)) {
+        table_keys <- table_keys[!drop_na, ]
+      }
+    }
+    rm(u_ik_k, u_org_k, ik_id_k, org_id_k, io_key, dup_io)
+  }
+  rm(na_doi)
   log_with_count("Referenced structure-organism pairs", n = nrow(table_keys))
 
   # str_can: Canonicalization mapping (smiles_initial -> smiles with stereo)
@@ -230,66 +247,141 @@ split_tables_sop <- function(table, cache) {
     tidytable::distinct()
 
   # Optimization: most inchikeys map to a single row after distinct().
-  # Only multi-row groups need collapsing. Split into singletons (fast
-  # pass-through) and duplicates (need R-level collapse).
-  table_structures_stereo <- table_structures_stereo |>
-    tidytable::mutate(.n_grp = .N, .by = structure_inchikey)
+  # Only multi-row groups need collapsing. Split into singletons and
+  # duplicates without per-group .by overhead, and collapse vectorially.
+  .collapse_delimited_col <- function(
+    grp_id,
+    n_grp,
+    vals,
+    ignore_case = FALSE,
+    na_default = NA_character_
+  ) {
+    out <- rep(na_default, n_grp)
+    ok <- which(!is.na(vals))
+    if (length(ok) == 0L) {
+      return(out)
+    }
+    v_ok <- as.character(vals[ok])
+    u_v <- unique(v_ok)
+    u_trim <- trimws(u_v)
+    v_trim <- u_trim[fastmatch::fmatch(v_ok, u_v)]
+    nz <- nzchar(v_trim)
+    if (!any(nz)) {
+      return(out)
+    }
+    g_ok <- grp_id[ok[nz]]
+    v_trim <- v_trim[nz]
 
-  singletons <- table_structures_stereo |>
-    tidytable::filter(.n_grp == 1L) |>
-    tidytable::select(-.n_grp)
+    dedup_val <- if (ignore_case) {
+      u_t <- unique(v_trim)
+      u_low <- tolower(u_t)
+      u_low[fastmatch::fmatch(v_trim, u_t)]
+    } else {
+      v_trim
+    }
+    u_dv <- unique(dedup_val)
+    dv_id <- fastmatch::fmatch(dedup_val, u_dv)
+    n_dv <- length(u_dv)
+    gv_key <- if (as.double(n_grp) * n_dv < .Machine$integer.max) {
+      (g_ok - 1L) * n_dv + dv_id
+    } else {
+      as.double(g_ok - 1L) * n_dv + dv_id
+    }
+    keep <- !duplicated(gv_key)
+    g_ok <- g_ok[keep]
+    v_trim <- v_trim[keep]
 
-  multi <- table_structures_stereo |>
-    tidytable::filter(.n_grp > 1L) |>
-    tidytable::select(-.n_grp)
+    if (!is.unsorted(g_ok)) {
+      g_ord <- g_ok
+      v_ord <- v_trim
+    } else {
+      ord <- order(g_ok, method = "radix")
+      g_ord <- g_ok[ord]
+      v_ord <- v_trim[ord]
+    }
 
-  if (nrow(multi) > 0L) {
+    n_m <- length(g_ord)
+    new_g <- if (n_m > 1L) c(TRUE, g_ord[-1L] != g_ord[-n_m]) else TRUE
+    r_m <- seq_len(n_m) - cummax(ifelse(new_g, seq_len(n_m), 0L)) + 1L
+    max_r <- max(r_m)
+
+    idx1 <- which(r_m == 1L)
+    u_g <- g_ord[idx1]
+    acc <- v_ord[idx1]
+    if (max_r > 1L) {
+      for (k in 2L:max_r) {
+        idx_k <- which(r_m == k)
+        pos_k <- fastmatch::fmatch(g_ord[idx_k], u_g)
+        acc[pos_k] <- paste(acc[pos_k], v_ord[idx_k], sep = " $ ")
+      }
+    }
+    out[u_g] <- acc
+    out
+  }
+
+  ik_st <- table_structures_stereo$structure_inchikey
+  dup_ik_st <- unique(ik_st[duplicated(ik_st)])
+  if (length(dup_ik_st) > 0L) {
+    is_multi_st <- !is.na(fastmatch::fmatch(ik_st, dup_ik_st))
+    singletons <- table_structures_stereo[!is_multi_st, ]
+    multi <- table_structures_stereo[is_multi_st, ]
     log_debug(
       "Collapsing names/tags for %d multi-source inchikeys (%d rows)",
-      length(unique(multi$structure_inchikey)),
+      length(dup_ik_st),
       nrow(multi)
     )
-    multi <- multi |>
-      tidytable::summarize(
-        structure_smiles = structure_smiles[1L],
-        structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer[
-          1L
-        ],
-        structure_inchikey_no_stereo = structure_inchikey_no_stereo[1L],
-        structure_smiles_no_stereo = structure_smiles_no_stereo[1L],
-        structure_xlogp = {
-          v <- structure_xlogp[!is.na(structure_xlogp)]
-          if (length(v) == 0L) NA_character_ else v[1L]
-        },
-        structure_name = {
-          vals <- structure_name[!is.na(structure_name)]
-          vals <- trimws(vals)
-          vals <- vals[nzchar(vals)]
-          keys <- tolower(vals)
-          vals <- vals[!duplicated(keys)]
-          if (length(vals) == 0L) {
-            NA_character_
-          } else {
-            paste(vals, collapse = " $ ")
-          }
-        },
-        structure_tag = {
-          vals <- structure_tag[!is.na(structure_tag)]
-          vals <- trimws(vals)
-          vals <- unique(vals[nzchar(vals)])
-          if (length(vals) == 0L) {
-            NA_character_
-          } else {
-            paste(vals, collapse = " $ ")
-          }
-        },
-        .by = structure_inchikey
+    u_ik_m <- unique(multi$structure_inchikey)
+    n_grp_m <- length(u_ik_m)
+    grp_id_m <- fastmatch::fmatch(multi$structure_inchikey, u_ik_m)
+    first_idx_m <- which(!duplicated(grp_id_m))
+
+    ok_xl <- which(!is.na(multi$structure_xlogp))
+    first_xl <- ok_xl[!duplicated(grp_id_m[ok_xl])]
+    xl_out <- rep(NA_character_, n_grp_m)
+    xl_out[grp_id_m[first_xl]] <- multi$structure_xlogp[first_xl]
+
+    multi <- tidytable::tidytable(
+      structure_inchikey = u_ik_m,
+      structure_smiles = multi$structure_smiles[first_idx_m],
+      structure_inchikey_connectivity_layer = multi$structure_inchikey_connectivity_layer[
+        first_idx_m
+      ],
+      structure_inchikey_no_stereo = multi$structure_inchikey_no_stereo[
+        first_idx_m
+      ],
+      structure_smiles_no_stereo = multi$structure_smiles_no_stereo[
+        first_idx_m
+      ],
+      structure_xlogp = xl_out,
+      structure_name = .collapse_delimited_col(
+        grp_id_m,
+        n_grp_m,
+        multi$structure_name,
+        ignore_case = TRUE,
+        na_default = NA_character_
+      ),
+      structure_tag = .collapse_delimited_col(
+        grp_id_m,
+        n_grp_m,
+        multi$structure_tag,
+        ignore_case = FALSE,
+        na_default = NA_character_
       )
+    )
     table_structures_stereo <- tidytable::bind_rows(singletons, multi)
-  } else {
-    table_structures_stereo <- singletons
+    rm(
+      is_multi_st,
+      singletons,
+      multi,
+      u_ik_m,
+      grp_id_m,
+      first_idx_m,
+      ok_xl,
+      first_xl,
+      xl_out
+    )
   }
-  rm(singletons, multi)
+  rm(ik_st, dup_ik_st)
 
   # str_met: Stereo-invariant properties keyed by inchikey_no_stereo
   ## formula and exact_mass are deterministically derived from SMILES via
@@ -342,52 +434,45 @@ split_tables_sop <- function(table, cache) {
     "structure_tax_npc_02sup",
     "structure_tax_npc_03cla"
   )
-  table_structures_taxonomy_npc <- table_structures_taxonomy_npc |>
-    tidytable::mutate(.n_grp = .N, .by = structure_smiles)
-
-  npc_single <- table_structures_taxonomy_npc |>
-    tidytable::filter(.n_grp == 1L) |>
-    tidytable::select(-.n_grp) |>
-    tidytable::mutate(
-      tidytable::across(
-        tidyselect::all_of(npc_cols),
-        ~ {
-          x <- as.character(.x)
-          x[is.na(x)] <- "notClassified"
-          x
-        }
-      )
-    )
-
-  npc_multi <- table_structures_taxonomy_npc |>
-    tidytable::filter(.n_grp > 1L) |>
-    tidytable::select(-.n_grp)
-
+  sm_npc <- table_structures_taxonomy_npc$structure_smiles
+  dup_sm_npc <- unique(sm_npc[duplicated(sm_npc)])
+  if (length(dup_sm_npc) > 0L) {
+    is_multi_npc <- !is.na(fastmatch::fmatch(sm_npc, dup_sm_npc))
+    npc_single <- table_structures_taxonomy_npc[!is_multi_npc, ]
+    npc_multi <- table_structures_taxonomy_npc[is_multi_npc, ]
+  } else {
+    npc_single <- table_structures_taxonomy_npc
+    npc_multi <- table_structures_taxonomy_npc[0L, ]
+  }
+  for (col in npc_cols) {
+    v_col <- as.character(npc_single[[col]])
+    v_col[is.na(v_col)] <- "notClassified"
+    data.table::set(npc_single, j = col, value = v_col)
+  }
   if (nrow(npc_multi) > 0L) {
-    npc_multi <- npc_multi |>
-      tidytable::summarize(
-        tidytable::across(
-          tidyselect::all_of(npc_cols),
-          ~ {
-            vals <- unique(trimws(stats::na.omit(.x)))
-            vals <- vals[nzchar(vals)]
-            if (length(vals) == 0L) {
-              "notClassified"
-            } else {
-              paste(vals, collapse = " $ ")
-            }
-          }
-        ),
-        .by = structure_smiles
+    u_sm_m <- unique(npc_multi$structure_smiles)
+    n_npc_m <- length(u_sm_m)
+    grp_npc_m <- fastmatch::fmatch(npc_multi$structure_smiles, u_sm_m)
+    npc_multi_list <- list(structure_smiles = u_sm_m)
+    for (col in npc_cols) {
+      npc_multi_list[[col]] <- .collapse_delimited_col(
+        grp_npc_m,
+        n_npc_m,
+        npc_multi[[col]],
+        ignore_case = FALSE,
+        na_default = "notClassified"
       )
+    }
+    npc_multi <- tidytable::as_tidytable(npc_multi_list)
     table_structures_taxonomy_npc <- tidytable::bind_rows(
       npc_single,
       npc_multi
     )
+    rm(u_sm_m, grp_npc_m, npc_multi_list)
   } else {
     table_structures_taxonomy_npc <- npc_single
   }
-  rm(npc_single, npc_multi)
+  rm(sm_npc, dup_sm_npc, npc_single, npc_multi)
 
   # str_tax_cla: keyed by full inchikey
   table_structures_taxonomy_cla <- table_structural |>
@@ -418,52 +503,45 @@ split_tables_sop <- function(table, cache) {
     "structure_tax_cla_03cla",
     "structure_tax_cla_04dirpar"
   )
-  table_structures_taxonomy_cla <- table_structures_taxonomy_cla |>
-    tidytable::mutate(.n_grp = .N, .by = structure_inchikey)
-
-  cla_single <- table_structures_taxonomy_cla |>
-    tidytable::filter(.n_grp == 1L) |>
-    tidytable::select(-.n_grp) |>
-    tidytable::mutate(
-      tidytable::across(
-        tidyselect::all_of(cla_cols),
-        ~ {
-          x <- as.character(.x)
-          x[is.na(x)] <- "notClassified"
-          x
-        }
-      )
-    )
-
-  cla_multi <- table_structures_taxonomy_cla |>
-    tidytable::filter(.n_grp > 1L) |>
-    tidytable::select(-.n_grp)
-
+  ik_cla <- table_structures_taxonomy_cla$structure_inchikey
+  dup_ik_cla <- unique(ik_cla[duplicated(ik_cla)])
+  if (length(dup_ik_cla) > 0L) {
+    is_multi_cla <- !is.na(fastmatch::fmatch(ik_cla, dup_ik_cla))
+    cla_single <- table_structures_taxonomy_cla[!is_multi_cla, ]
+    cla_multi <- table_structures_taxonomy_cla[is_multi_cla, ]
+  } else {
+    cla_single <- table_structures_taxonomy_cla
+    cla_multi <- table_structures_taxonomy_cla[0L, ]
+  }
+  for (col in cla_cols) {
+    v_col <- as.character(cla_single[[col]])
+    v_col[is.na(v_col)] <- "notClassified"
+    data.table::set(cla_single, j = col, value = v_col)
+  }
   if (nrow(cla_multi) > 0L) {
-    cla_multi <- cla_multi |>
-      tidytable::summarize(
-        tidytable::across(
-          tidyselect::all_of(cla_cols),
-          ~ {
-            vals <- unique(trimws(stats::na.omit(.x)))
-            vals <- vals[nzchar(vals)]
-            if (length(vals) == 0L) {
-              "notClassified"
-            } else {
-              paste(vals, collapse = " $ ")
-            }
-          }
-        ),
-        .by = structure_inchikey
+    u_ik_c <- unique(cla_multi$structure_inchikey)
+    n_cla_m <- length(u_ik_c)
+    grp_cla_m <- fastmatch::fmatch(cla_multi$structure_inchikey, u_ik_c)
+    cla_multi_list <- list(structure_inchikey = u_ik_c)
+    for (col in cla_cols) {
+      cla_multi_list[[col]] <- .collapse_delimited_col(
+        grp_cla_m,
+        n_cla_m,
+        cla_multi[[col]],
+        ignore_case = FALSE,
+        na_default = "notClassified"
       )
+    }
+    cla_multi <- tidytable::as_tidytable(cla_multi_list)
     table_structures_taxonomy_cla <- tidytable::bind_rows(
       cla_single,
       cla_multi
     )
+    rm(u_ik_c, grp_cla_m, cla_multi_list)
   } else {
     table_structures_taxonomy_cla <- cla_single
   }
-  rm(cla_single, cla_multi)
+  rm(ik_cla, dup_ik_cla, cla_single, cla_multi)
 
   table_organisms_names <- table_organisms |>
     tidytable::filter(!is.na(organism_name)) |>

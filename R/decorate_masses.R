@@ -45,21 +45,17 @@ decorate_masses <- function(annotation_table_ms1) {
     return(annotation_table_ms1)
   }
 
-  # Filter Valid Annotations ----
-  valid_annotations <- annotation_table_ms1 |>
-    tidytable::filter(
-      !is.na(candidate_structure_inchikey_connectivity_layer) &
-        candidate_structure_inchikey_connectivity_layer != "notAnnotated"
-    )
-
-  # Count Statistics ----
-  n_unique_structures <- valid_annotations |>
-    tidytable::distinct(candidate_structure_inchikey_connectivity_layer) |>
-    nrow()
-
-  n_unique_features <- valid_annotations |>
-    tidytable::distinct(feature_id) |>
-    nrow()
+  # Filter Valid Annotations & Count Statistics (vectorized, zero table copy) ----
+  ik_col <- annotation_table_ms1[[
+    "candidate_structure_inchikey_connectivity_layer"
+  ]]
+  valid_idx <- which(!is.na(ik_col) & ik_col != "notAnnotated")
+  n_unique_structures <- length(unique(ik_col[valid_idx]))
+  n_unique_features <- if ("feature_id" %in% colnames(annotation_table_ms1)) {
+    length(unique(annotation_table_ms1[["feature_id"]][valid_idx]))
+  } else {
+    0L
+  }
 
   # Log Summary ----
   log_info(

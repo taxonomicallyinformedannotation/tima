@@ -371,146 +371,169 @@ enforce_graph_adduct_consistency <- function(df_add) {
     directed = FALSE
   )
   comp_membership <- igraph::components(g)$membership
-  edge_comp_id <- comp_membership[as.character(scored$feature_id)]
-  scored_by_comp <- split(scored, edge_comp_id)
 
-  component_results <- vector("list", length(scored_by_comp))
-  for (ci in seq_along(scored_by_comp)) {
-    sub <- scored_by_comp[[ci]]
-    if (nrow(sub) == 0L) {
-      next
-    }
+  # Compute node candidates, priors, and initial assignments globally ONCE
+  # instead of running 9 tidytable pipelines per connected component.
+  node_data <- tidytable::bind_rows(
+    scored |>
+      tidytable::transmute(
+        feature = as.character(feature_id),
+        state_key = as.character(adduct_state_key),
+        edge_score = edge_score
+      ),
+    scored |>
+      tidytable::transmute(
+        feature = as.character(feature_id_dest),
+        state_key = as.character(adduct_dest_state_key),
+        edge_score = edge_score
+      )
+  )
+  node_priors <- node_data |>
+    tidytable::summarize(prior = sum(edge_score), .by = c(feature, state_key))
 
-    node_data <- tidytable::bind_rows(
-      sub |>
-        tidytable::transmute(
-          feature = feature_id,
-          state_key = adduct_state_key,
-          edge_score = edge_score
-        ),
-      sub |>
-        tidytable::transmute(
-          feature = feature_id_dest,
-          state_key = adduct_dest_state_key,
-          edge_score = edge_score
-        )
-    )
-    node_candidates <- node_data |>
-      tidytable::distinct()
+  assignments <- node_priors |>
+    tidytable::mutate(.key_len = nchar(state_key)) |>
+    tidytable::arrange(feature, tidytable::desc(prior), .key_len) |>
+    tidytable::distinct(feature, .keep_all = TRUE)
+  assign_map <- stats::setNames(assignments$state_key, assignments$feature)
 
-    node_priors <- node_data |>
-      tidytable::summarize(prior = sum(edge_score), .by = c(feature, state_key))
+  # Only components containing at least one node with >1 candidate state_key
+  # can ever change during iterative coordinate ascent.
+  ambig_features <- unique(
+    node_priors$feature[duplicated(node_priors$feature)]
+  )
+  if (length(ambig_features) > 0L) {
+    ambig_comps <- unique(comp_membership[ambig_features])
+    edge_comp_id <- comp_membership[as.character(scored$feature_id)]
+    in_ambig_comp <- which(!is.na(fastmatch::fmatch(edge_comp_id, ambig_comps)))
 
-    # Initial assignment
-    assignments <- node_priors |>
-      tidytable::arrange(feature, tidytable::desc(prior), nchar(state_key)) |>
-      tidytable::distinct(feature, .keep_all = TRUE) |>
-      tidytable::select(feature, state_key)
-    assign_map <- stats::setNames(assignments$state_key, assignments$feature)
+    if (length(in_ambig_comp) > 0L) {
+      sub_all <- as.data.frame(
+        scored[in_ambig_comp, ],
+        stringsAsFactors = FALSE,
+        check.names = FALSE
+      )
+      sub_by_comp <- split(
+        sub_all,
+        edge_comp_id[in_ambig_comp]
+      )
+      np_ambig <- node_priors[
+        !is.na(fastmatch::fmatch(
+          comp_membership[node_priors$feature],
+          ambig_comps
+        )),
+      ]
+      candidate_lookup <- split(np_ambig$state_key, np_ambig$feature)
+      prior_lookup <- stats::setNames(
+        np_ambig$prior,
+        paste(np_ambig$feature, np_ambig$state_key, sep = "\u001f")
+      )
 
-    # Early termination detection & reduced iterations
-    max_iter <- 20L
-    prev_map <- NULL
-    unchanged_count <- 0L
-    sub_df <- as.data.frame(sub, stringsAsFactors = FALSE, check.names = FALSE)
-    src_idx <- split(seq_len(nrow(sub_df)), sub_df$feature_id)
-    dest_idx <- split(seq_len(nrow(sub_df)), sub_df$feature_id_dest)
-    candidate_lookup <- split(
-      node_candidates$state_key,
-      node_candidates$feature
-    )
-    prior_lookup <- stats::setNames(
-      node_priors$prior,
-      paste(node_priors$feature, node_priors$state_key, sep = "\u001f")
-    )
-
-    for (iter in seq_len(max_iter)) {
-      # Store previous to detect convergence
-      if (identical(prev_map, assign_map)) {
-        unchanged_count <- unchanged_count + 1L
-        if (unchanged_count >= 2L) break # Early exit if no changes for 2 iterations
-      } else {
-        unchanged_count <- 0L
-      }
-      prev_map <- assign_map
-
-      changed <- FALSE
-      for (f in names(assign_map)) {
-        candidates_f <- candidate_lookup[[f]]
-        if (length(candidates_f) <= 1L) {
+      for (ci in seq_along(sub_by_comp)) {
+        sub_df <- sub_by_comp[[ci]]
+        if (nrow(sub_df) == 0L) {
+          next
+        }
+        comp_nodes <- unique(c(
+          as.character(sub_df$feature_id),
+          as.character(sub_df$feature_id_dest)
+        ))
+        multi_nodes <- comp_nodes[
+          lengths(candidate_lookup[comp_nodes]) > 1L
+        ]
+        if (length(multi_nodes) == 0L) {
           next
         }
 
-        cand_scores <- rep(0, length(candidates_f))
-        src_rows <- sub_df[src_idx[[f]], , drop = FALSE]
-        dest_rows <- sub_df[dest_idx[[f]], , drop = FALSE]
+        src_idx <- split(seq_len(nrow(sub_df)), sub_df$feature_id)
+        dest_idx <- split(seq_len(nrow(sub_df)), sub_df$feature_id_dest)
+        max_iter <- 20L
+        prev_sub_map <- NULL
+        unchanged_count <- 0L
 
-        if (nrow(src_rows) > 0L) {
-          assigned_dest_state <- unname(assign_map[as.character(
-            src_rows$feature_id_dest
-          )])
-          for (k in seq_along(candidates_f)) {
-            cand <- candidates_f[[k]]
-            src_mask <- src_rows$adduct_state_key == cand &
-              src_rows$adduct_dest_state_key == assigned_dest_state
-            cand_scores[[k]] <- cand_scores[[k]] +
-              sum(src_rows$edge_score[src_mask], na.rm = TRUE)
+        for (iter in seq_len(max_iter)) {
+          cur_sub_map <- assign_map[comp_nodes]
+          if (identical(prev_sub_map, cur_sub_map)) {
+            unchanged_count <- unchanged_count + 1L
+            if (unchanged_count >= 2L) break
+          } else {
+            unchanged_count <- 0L
           }
-        }
+          prev_sub_map <- cur_sub_map
 
-        if (nrow(dest_rows) > 0L) {
-          assigned_src_state <- unname(assign_map[as.character(
-            dest_rows$feature_id
-          )])
-          for (k in seq_along(candidates_f)) {
-            cand <- candidates_f[[k]]
-            dest_mask <- dest_rows$adduct_dest_state_key == cand &
-              dest_rows$adduct_state_key == assigned_src_state
-            cand_scores[[k]] <- cand_scores[[k]] +
-              sum(dest_rows$edge_score[dest_mask], na.rm = TRUE)
+          changed <- FALSE
+          for (f in multi_nodes) {
+            candidates_f <- candidate_lookup[[f]]
+            cand_scores <- rep(0, length(candidates_f))
+            s_i <- src_idx[[f]]
+            d_i <- dest_idx[[f]]
+
+            if (length(s_i) > 0L) {
+              src_rows <- sub_df[s_i, , drop = FALSE]
+              assigned_dest_state <- unname(assign_map[as.character(
+                src_rows$feature_id_dest
+              )])
+              for (k in seq_along(candidates_f)) {
+                cand <- candidates_f[[k]]
+                src_mask <- src_rows$adduct_state_key == cand &
+                  src_rows$adduct_dest_state_key == assigned_dest_state
+                cand_scores[[k]] <- cand_scores[[k]] +
+                  sum(src_rows$edge_score[src_mask], na.rm = TRUE)
+              }
+            }
+
+            if (length(d_i) > 0L) {
+              dest_rows <- sub_df[d_i, , drop = FALSE]
+              assigned_src_state <- unname(assign_map[as.character(
+                dest_rows$feature_id
+              )])
+              for (k in seq_along(candidates_f)) {
+                cand <- candidates_f[[k]]
+                dest_mask <- dest_rows$adduct_dest_state_key == cand &
+                  dest_rows$adduct_state_key == assigned_src_state
+                cand_scores[[k]] <- cand_scores[[k]] +
+                  sum(dest_rows$edge_score[dest_mask], na.rm = TRUE)
+              }
+            }
+
+            for (k in seq_along(candidates_f)) {
+              cand <- candidates_f[[k]]
+              prior_val <- prior_lookup[[paste(f, cand, sep = "\u001f")]]
+              if (!is.null(prior_val) && length(prior_val) > 0L) {
+                cand_scores[[k]] <- cand_scores[[k]] + (0.01 * prior_val[[1L]])
+              }
+            }
+
+            best_idx <- which(cand_scores == max(cand_scores))
+            if (length(best_idx) > 1L) {
+              lens <- nchar(candidates_f[best_idx])
+              best_idx <- best_idx[which.min(lens)]
+            }
+            best_cand <- candidates_f[[best_idx[[1L]]]]
+            if (!identical(assign_map[[f]], best_cand)) {
+              assign_map[[f]] <- best_cand
+              changed <- TRUE
+            }
           }
-        }
-
-        for (k in seq_along(candidates_f)) {
-          cand <- candidates_f[[k]]
-          prior_val <- prior_lookup[[paste(f, cand, sep = "\u001f")]]
-          if (!is.null(prior_val) && length(prior_val) > 0L) {
-            cand_scores[[k]] <- cand_scores[[k]] + (0.01 * prior_val[[1L]])
-          }
-        }
-
-        # Select best candidate
-        best_idx <- which(cand_scores == max(cand_scores))
-        if (length(best_idx) > 1L) {
-          lens <- nchar(candidates_f[best_idx])
-          best_idx <- best_idx[which.min(lens)]
-        }
-        best_cand <- candidates_f[[best_idx[[1L]]]]
-        if (!identical(assign_map[[f]], best_cand)) {
-          assign_map[[f]] <- best_cand
-          changed <- TRUE
+          if (!changed) break
         }
       }
-      if (!changed) break
     }
-
-    # Final filtering with assignment map
-    kept <- sub |>
-      tidytable::filter(
-        adduct_state_key == unname(assign_map[feature_id]) &
-          adduct_dest_state_key == unname(assign_map[feature_id_dest])
-      ) |>
-      tidytable::arrange(
-        feature_id,
-        feature_id_dest,
-        tidytable::desc(edge_score),
-        edge_complexity
-      ) |>
-      tidytable::distinct(feature_id, feature_id_dest, .keep_all = TRUE)
-    component_results[[ci]] <- kept
   }
 
-  kept_all <- tidytable::bind_rows(component_results) |>
+  kept_all <- scored |>
+    tidytable::filter(
+      adduct_state_key == unname(assign_map[as.character(feature_id)]) &
+        adduct_dest_state_key ==
+          unname(assign_map[as.character(feature_id_dest)])
+    ) |>
+    tidytable::arrange(
+      feature_id,
+      feature_id_dest,
+      tidytable::desc(edge_score),
+      edge_complexity
+    ) |>
+    tidytable::distinct(feature_id, feature_id_dest, .keep_all = TRUE) |>
     tidytable::select(feature_id, adduct, adduct_dest, feature_id_dest) |>
     tidytable::distinct()
 

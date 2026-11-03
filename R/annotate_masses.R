@@ -294,15 +294,14 @@ annotate_masses <- function(
   evidence_signal <- edge_sets$evidence_signal
   covariance_edges <- edge_sets$covariance_edges
 
-  # Free memory from large intermediate objects
+  # Free memory from large intermediate objects (keep clusters and
+  # neutral_losses_list until after append_component_weak_hypotheses()).
   rm(
     edge_sets,
     ion_tables,
     pairs,
     adducts,
-    clusters,
     adduct_edges,
-    neutral_losses_list,
     solvents_list,
     adducts_list
   )
@@ -421,7 +420,7 @@ annotate_masses <- function(
     )
   }
 
-  rm(multi_adducts)
+  rm(multi_adducts, clusters, neutral_losses_list)
 
   start_time_lib <- Sys.time()
   annotations <- build_annotate_masses_annotations(
@@ -433,6 +432,7 @@ annotate_masses <- function(
     adduct_edges = adduct_edges_combined,
     baseline_adduct = baseline_adduct
   )
+  coverage_audit <- attr(annotations, "coverage_audit")
   elapsed_lib <- difftime(Sys.time(), start_time_lib, units = "secs")
   log_info(
     "Library matching complete in %.2f seconds: %d annotations",
@@ -473,7 +473,11 @@ annotate_masses <- function(
   # Free memory from graph structures
   rm(supported_graph, evidence_signal)
 
-  coverage_audit <- attr(annotations, "coverage_audit")
+  if (!is.list(coverage_audit)) {
+    coverage_audit <- attr(annotations, "coverage_audit")
+  } else {
+    attr(annotations, "coverage_audit") <- coverage_audit
+  }
   if (is.list(coverage_audit)) {
     log_info(
       paste0(
@@ -598,115 +602,180 @@ derive_primary_secondary_annotations <- function(
   annotations,
   baseline_adducts
 ) {
-  if (nrow(annotations) == 0L) {
+  n <- nrow(annotations)
+  if (n == 0L) {
     return(annotations)
   }
-  out <- annotations
+  cov_audit <- attr(annotations, "coverage_audit")
+  out <- tidytable::as_tidytable(annotations)
 
-  # Ensure all required columns exist efficiently
   if (!"source" %in% colnames(out)) {
-    out$source <- NA_character_
+    data.table::set(out, j = "source", value = rep(NA_character_, n))
   }
   if (!"adduct_support" %in% colnames(out)) {
-    out$adduct_support <- 0L
+    data.table::set(out, j = "adduct_support", value = rep(0L, n))
   }
   if (!"error_mz" %in% colnames(out)) {
-    out$error_mz <- NA_real_
+    data.table::set(out, j = "error_mz", value = rep(NA_real_, n))
   }
   if (!"candidate_adduct_origin" %in% colnames(out)) {
-    out <- out |>
-      tidytable::mutate(
-        candidate_adduct_origin = tidytable::if_else(
-          source == "baseline" |
-            !is.na(fastmatch::fmatch(adduct, baseline_adducts)),
-          "baseline",
-          "supported"
-        )
-      )
+    orig_v <- ifelse(
+      (!is.na(out$source) & out$source == "baseline") |
+        !is.na(fastmatch::fmatch(out$adduct, baseline_adducts)),
+      "baseline",
+      "supported"
+    )
+    data.table::set(out, j = "candidate_adduct_origin", value = orig_v)
   }
 
-  # Single comprehensive mutation pass with all ranking logic
-  out <- out |>
-    tidytable::mutate(
-      evidence_tier = tidytable::case_when(
-        candidate_adduct_origin == "supported" ~ "supported_strong",
-        candidate_adduct_origin == "supported_weak" ~ "supported_weak",
-        TRUE ~ "baseline"
-      ),
-      has_structure = !is.na(structure_exact_mass),
-      support_rank = tidytable::case_when(
-        evidence_tier == "supported_strong" ~ 1L,
-        evidence_tier == "supported_weak" ~ 2L,
-        TRUE ~ 3L
-      ),
-      source_rank = tidytable::case_when(
-        source == "pair" ~ 1L,
-        source == "evidence" ~ 2L,
-        source == "loss" ~ 3L,
-        source == "cluster" ~ 4L,
-        source == "preassigned" ~ 5L,
-        source == "preassigned_propagated" ~ 6L,
-        source == "multi" ~ 7L,
-        source == "baseline" ~ 8L,
-        source == "weak_component" ~ 9L,
-        source == "weak_component_loss" ~ 10L,
-        source == "weak_component_cluster" ~ 11L,
-        TRUE ~ 12L
-      ),
-      abs_error = abs(as.numeric(error_mz))
-    )
+  orig_col <- out$candidate_adduct_origin
+  ev_tier <- rep("baseline", n)
+  ev_tier[!is.na(orig_col) & orig_col == "supported_weak"] <- "supported_weak"
+  ev_tier[!is.na(orig_col) & orig_col == "supported"] <- "supported_strong"
+  data.table::set(out, j = "evidence_tier", value = ev_tier)
 
-  # Single aggregation pass for all statistics per feature-adduct pair
-  picked <- out |>
-    tidytable::summarize(
-      any_structure = any(has_structure, na.rm = TRUE),
-      max_support = max(adduct_support, na.rm = TRUE),
-      best_support_rank = min(support_rank, na.rm = TRUE),
-      best_source_rank = min(source_rank, na.rm = TRUE),
-      min_abs_error = suppressWarnings(min(abs_error, na.rm = TRUE)),
-      .by = c(feature_id, adduct)
-    ) |>
-    tidytable::mutate(
-      min_abs_error = tidytable::if_else(
-        !is.finite(min_abs_error),
-        Inf,
-        min_abs_error
-      )
-    ) |>
-    tidytable::arrange(
-      feature_id,
-      tidytable::desc(any_structure),
-      best_support_rank,
-      tidytable::desc(max_support),
-      best_source_rank,
-      min_abs_error,
-      adduct
-    ) |>
-    tidytable::distinct(feature_id, .keep_all = TRUE) |>
-    tidytable::select(feature_id, primary_adduct = adduct)
+  supp_rank <- rep(3L, n)
+  supp_rank[ev_tier == "supported_weak"] <- 2L
+  supp_rank[ev_tier == "supported_strong"] <- 1L
 
-  # Final annotation level assignment with cleanup
-  # Keep all adducts per feature; mark only the best-ranked as "primary"
-  out |>
-    tidytable::left_join(picked, by = "feature_id") |>
-    tidytable::mutate(
-      annotation_level = tidytable::if_else(
-        is.na(primary_adduct),
-        "secondary",
-        tidytable::if_else(
-          adduct == primary_adduct,
-          "primary",
-          "secondary"
-        )
-      )
-    ) |>
-    tidytable::select(
-      -has_structure,
-      -support_rank,
-      -source_rank,
-      -abs_error,
-      -primary_adduct
+  src_ranks <- c(
+    pair = 1L,
+    evidence = 2L,
+    loss = 3L,
+    cluster = 4L,
+    preassigned = 5L,
+    preassigned_propagated = 6L,
+    multi = 7L,
+    baseline = 8L,
+    weak_component = 9L,
+    weak_component_loss = 10L,
+    weak_component_cluster = 11L
+  )
+  src_rank <- unname(src_ranks[as.character(out$source)])
+  src_rank[is.na(src_rank)] <- 12L
+
+  has_str <- !is.na(out$structure_exact_mass)
+  supp_v <- as.integer(out$adduct_support)
+  abs_err <- abs(as.numeric(out$error_mz))
+  abs_err_inf <- ifelse(is.finite(abs_err), abs_err, Inf)
+
+  u_f <- unique(out$feature_id)
+  u_a <- sort(unique(out$adduct), na.last = TRUE)
+  f_id <- if (anyNA(u_f)) {
+    match(out$feature_id, u_f)
+  } else {
+    fastmatch::fmatch(out$feature_id, u_f)
+  }
+  a_id <- if (anyNA(u_a)) {
+    match(out$adduct, u_a)
+  } else {
+    fastmatch::fmatch(out$adduct, u_a)
+  }
+
+  same_prev <- if (n > 1L) {
+    c(
+      FALSE,
+      f_id[-1L] == f_id[-n] &
+        a_id[-1L] == a_id[-n] &
+        has_str[-1L] == has_str[-n] &
+        supp_rank[-1L] == supp_rank[-n] &
+        (is.na(supp_v[-1L]) == is.na(supp_v[-n]) &
+          (is.na(supp_v[-1L]) | supp_v[-1L] == supp_v[-n])) &
+        src_rank[-1L] == src_rank[-n] &
+        abs_err_inf[-1L] == abs_err_inf[-n]
     )
+  } else {
+    FALSE
+  }
+  keep_sub <- which(!same_prev)
+  f_s <- f_id[keep_sub]
+  a_s <- a_id[keep_sub]
+  hs_s <- has_str[keep_sub]
+  sr_s <- supp_rank[keep_sub]
+  sp_s <- supp_v[keep_sub]
+  sp_s[is.na(sp_s)] <- -999999L
+  src_s <- src_rank[keep_sub]
+  err_s <- abs_err_inf[keep_sub]
+
+  n_a <- length(u_a)
+  fa_key <- if (as.double(length(u_f)) * n_a < .Machine$integer.max) {
+    (f_s - 1L) * n_a + a_s
+  } else {
+    as.double(f_s - 1L) * n_a + a_s
+  }
+
+  if (anyDuplicated(fa_key) > 0L) {
+    u_fa <- unique(fa_key)
+    fa_id <- fastmatch::fmatch(fa_key, u_fa)
+    n_fa <- length(u_fa)
+    first_pos <- which(!duplicated(fa_id))
+    f_fa <- f_s[first_pos]
+    a_fa <- a_s[first_pos]
+
+    any_str_fa <- logical(n_fa)
+    any_str_fa[fa_id[hs_s]] <- TRUE
+
+    best_sr_fa <- rep(3L, n_fa)
+    best_sr_fa[fa_id[sr_s == 2L]] <- 2L
+    best_sr_fa[fa_id[sr_s == 1L]] <- 1L
+
+    max_sp_fa <- sp_s[first_pos]
+    best_src_fa <- src_s[first_pos]
+    min_err_fa <- err_s[first_pos]
+
+    is_multi_fa <- logical(n_fa)
+    is_multi_fa[fa_id[duplicated(fa_id)]] <- TRUE
+    m_idx <- which(is_multi_fa[fa_id])
+    if (length(m_idx) > 0L) {
+      ord_sp <- m_idx[order(-sp_s[m_idx], method = "radix")]
+      win_sp <- ord_sp[!duplicated(fa_id[ord_sp])]
+      max_sp_fa[fa_id[win_sp]] <- sp_s[win_sp]
+
+      ord_src <- m_idx[order(src_s[m_idx], method = "radix")]
+      win_src <- ord_src[!duplicated(fa_id[ord_src])]
+      best_src_fa[fa_id[win_src]] <- src_s[win_src]
+
+      ord_err <- m_idx[order(err_s[m_idx], method = "radix")]
+      win_err <- ord_err[!duplicated(fa_id[ord_err])]
+      min_err_fa[fa_id[win_err]] <- err_s[win_err]
+    }
+  } else {
+    f_fa <- f_s
+    a_fa <- a_s
+    any_str_fa <- hs_s
+    best_sr_fa <- sr_s
+    max_sp_fa <- sp_s
+    best_src_fa <- src_s
+    min_err_fa <- err_s
+  }
+
+  ord_fa <- order(
+    f_fa,
+    !any_str_fa,
+    best_sr_fa,
+    -max_sp_fa,
+    best_src_fa,
+    min_err_fa,
+    a_fa,
+    method = "radix"
+  )
+  win_fa <- ord_fa[!duplicated(f_fa[ord_fa])]
+  prim_a_lut <- rep(NA_integer_, length(u_f))
+  prim_a_lut[f_fa[win_fa]] <- a_fa[win_fa]
+  prim_adduct_vec <- u_a[prim_a_lut[f_id]]
+
+  ann_level <- ifelse(
+    !is.na(prim_adduct_vec) &
+      !is.na(out$adduct) &
+      out$adduct == prim_adduct_vec,
+    "primary",
+    "secondary"
+  )
+  data.table::set(out, j = "annotation_level", value = ann_level)
+  if (!is.null(cov_audit)) {
+    attr(out, "coverage_audit") <- cov_audit
+  }
+  out
 }
 
 #' Recover weak (component-M coherent) hypotheses for unresolved nodes
@@ -957,15 +1026,30 @@ retain_supported_single_m_edges <- function(
   cluster_kept <- modifier_filtered$cluster_edges
   loss_kept <- modifier_filtered$loss_edges
 
-  annotations <- annotations |>
-    tidytable::left_join(comp_members, by = "feature_id") |>
-    tidytable::mutate(
-      component_id = tidytable::if_else(
-        is.na(component_id),
-        paste0("M_singleton_", feature_id),
-        component_id
-      )
+  if (nrow(annotations) > 0L) {
+    cov_audit <- attr(annotations, "coverage_audit")
+    annotations <- tidytable::as_tidytable(annotations)
+    u_f <- unique(annotations$feature_id)
+    m_comp <- fastmatch::fmatch(u_f, comp_members$feature_id)
+    u_comp_id <- comp_members$component_id[m_comp]
+    na_comp <- is.na(u_comp_id)
+    if (any(na_comp)) {
+      u_comp_id[na_comp] <- paste0("M_singleton_", u_f[na_comp])
+    }
+    f_idx <- if (anyNA(u_f)) {
+      match(annotations$feature_id, u_f)
+    } else {
+      fastmatch::fmatch(annotations$feature_id, u_f)
+    }
+    data.table::set(
+      annotations,
+      j = "component_id",
+      value = u_comp_id[f_idx]
     )
+    if (!is.null(cov_audit)) {
+      attr(annotations, "coverage_audit") <- cov_audit
+    }
+  }
 
   list(
     adduct_edges = adduct_kept,
@@ -2487,7 +2571,8 @@ enforce_non_conflicting_annotation_states <- function(
   baseline_adduct = NULL,
   coverage_mode = "best_supported_conflict_free"
 ) {
-  if (nrow(annotations) == 0L || nrow(adduct_edges) == 0L) {
+  n_in <- nrow(annotations)
+  if (n_in == 0L || nrow(adduct_edges) == 0L) {
     return(annotations)
   }
   required_cols <- c("feature_id", "adduct")
@@ -2511,127 +2596,146 @@ enforce_non_conflicting_annotation_states <- function(
     return(annotations)
   }
 
-  state_map <- build_adduct_state_key_map(unique(c(
-    annotations$adduct,
-    assigned_states$adduct
-  ))) |>
-    tidytable::rename(adduct_state_key = state_key)
+  u_add_all <- unique(c(annotations$adduct, assigned_states$adduct))
+  state_map <- build_adduct_state_key_map(u_add_all)
+  sm_adduct <- as.character(state_map$adduct)
+  sm_key <- as.character(state_map$state_key)
+  sm_key[is.na(sm_key)] <- sm_adduct[is.na(sm_key)]
 
-  assigned_states <- assigned_states |>
-    tidytable::left_join(state_map, by = "adduct") |>
-    tidytable::mutate(
-      assigned_state_key = tidytable::coalesce(adduct_state_key, adduct)
-    ) |>
-    tidytable::select(feature_id, assigned_state_key) |>
+  ass_m <- fastmatch::fmatch(assigned_states$adduct, sm_adduct)
+  ass_key <- ifelse(is.na(ass_m), assigned_states$adduct, sm_key[ass_m])
+  assigned_states <- tidytable::tidytable(
+    feature_id = assigned_states$feature_id,
+    assigned_state_key = ass_key
+  ) |>
     tidytable::distinct()
 
-  out <- annotations |>
-    tidytable::left_join(state_map, by = "adduct") |>
-    tidytable::mutate(
-      adduct_state_key = tidytable::coalesce(adduct_state_key, adduct)
-    ) |>
-    tidytable::left_join(assigned_states, by = "feature_id") |>
-    tidytable::mutate(
-      keep = is.na(assigned_state_key) |
-        (adduct_state_key == assigned_state_key)
+  row_m_add <- fastmatch::fmatch(annotations$adduct, sm_adduct)
+  row_state_key <- ifelse(
+    is.na(row_m_add),
+    as.character(annotations$adduct),
+    sm_key[row_m_add]
+  )
+
+  # Fast path when each constrained feature has a single assigned_state_key
+  if (anyDuplicated(assigned_states$feature_id) == 0L) {
+    m_feat <- fastmatch::fmatch(
+      annotations$feature_id,
+      assigned_states$feature_id
     )
+    ass_row_key <- assigned_states$assigned_state_key[m_feat]
+    keep <- is.na(ass_row_key) |
+      (!is.na(row_state_key) & row_state_key == ass_row_key)
+    feat_is_unconstrained <- is.na(ass_row_key)
+  } else {
+    # Fallback if multiple assigned states exist for a feature
+    ass_pairs <- paste(
+      assigned_states$feature_id,
+      assigned_states$assigned_state_key,
+      sep = "\r"
+    )
+    row_pairs <- paste(annotations$feature_id, row_state_key, sep = "\r")
+    feat_is_unconstrained <- is.na(fastmatch::fmatch(
+      annotations$feature_id,
+      assigned_states$feature_id
+    ))
+    keep <- feat_is_unconstrained |
+      !is.na(fastmatch::fmatch(row_pairs, ass_pairs))
+  }
+
+  f_col <- annotations$feature_id
+  u_f <- unique(f_col)
+  n_u_f <- length(u_f)
+  f_id <- if (anyNA(u_f)) match(f_col, u_f) else fastmatch::fmatch(f_col, u_f)
 
   coverage_mode <- resolve_annotate_masses_coverage_mode(coverage_mode)
   if (coverage_mode == "best_supported_conflict_free") {
-    if (!"source" %in% colnames(out)) {
-      out$source <- NA_character_
+    src_col <- if ("source" %in% colnames(annotations)) {
+      as.character(annotations$source)
+    } else {
+      rep(NA_character_, n_in)
     }
-    if (!"candidate_structure_error_mz" %in% colnames(out)) {
-      out$candidate_structure_error_mz <- NA_real_
+    has_err <- if ("candidate_structure_error_mz" %in% colnames(annotations)) {
+      !is.na(annotations$candidate_structure_error_mz)
+    } else {
+      logical(n_in)
     }
-    if (!"adduct_support" %in% colnames(out)) {
-      out$adduct_support <- 0L
+    supp_strength <- if ("adduct_support" %in% colnames(annotations)) {
+      s_tmp <- as.integer(annotations$adduct_support)
+      s_tmp[is.na(s_tmp)] <- 0L
+      s_tmp
+    } else {
+      integer(n_in)
     }
+
     baseline_on <- !is.null(baseline_adduct) &&
       length(baseline_adduct) >= 1L &&
       !is.na(baseline_adduct[[1L]]) &&
       nzchar(baseline_adduct[[1L]])
     baseline_label <- if (baseline_on) baseline_adduct[[1L]] else NA_character_
 
-    out <- out |>
-      tidytable::mutate(
-        support_class_rank = tidytable::case_when(
-          !is.na(candidate_structure_error_mz) ~ 1L,
-          source %in% c("pair", "preassigned", "preassigned_propagated") ~ 2L,
-          source == "multi" ~ 3L,
-          source %in% c("cluster", "loss") ~ 4L,
-          source == "evidence" ~ 5L,
-          baseline_on & !is.na(adduct) & adduct == baseline_label ~ 6L,
-          TRUE ~ 7L
-        ),
-        support_strength = tidytable::if_else(
-          is.na(adduct_support),
-          0L,
-          as.integer(adduct_support)
-        )
-      )
+    supp_class_rank <- rep(7L, n_in)
+    if (baseline_on) {
+      supp_class_rank[
+        !is.na(annotations$adduct) & annotations$adduct == baseline_label
+      ] <- 6L
+    }
+    supp_class_rank[!is.na(src_col) & src_col == "evidence"] <- 5L
+    supp_class_rank[!is.na(src_col) & src_col %in% c("cluster", "loss")] <- 4L
+    supp_class_rank[!is.na(src_col) & src_col == "multi"] <- 3L
+    supp_class_rank[
+      !is.na(src_col) &
+        src_col %in% c("pair", "preassigned", "preassigned_propagated")
+    ] <- 2L
+    supp_class_rank[has_err] <- 1L
 
-    feat_best <- out |>
-      tidytable::distinct(
-        feature_id,
-        assigned_state_key,
-        keep,
-        support_class_rank,
-        support_strength
-      ) |>
-      tidytable::summarize(
-        feature_is_unconstrained = all(is.na(assigned_state_key)),
-        best_rank = {
-          any_keep <- any(keep, na.rm = TRUE)
-          if (isTRUE(any_keep)) {
-            min(support_class_rank[keep], na.rm = TRUE)
-          } else {
-            min(support_class_rank, na.rm = TRUE)
-          }
-        },
-        best_support = {
-          br <- if (isTRUE(any(keep, na.rm = TRUE))) {
-            min(support_class_rank[keep], na.rm = TRUE)
-          } else {
-            min(support_class_rank, na.rm = TRUE)
-          }
-          keep_at_best <- keep & support_class_rank == br
-          if (isTRUE(any(keep_at_best, na.rm = TRUE))) {
-            max(support_strength[keep_at_best], na.rm = TRUE)
-          } else {
-            max(support_strength[support_class_rank == br], na.rm = TRUE)
-          }
-        },
-        .by = feature_id
-      )
+    # Unconstrained features have keep == TRUE for all their rows; pick best
+    # (min supp_class_rank, max supp_strength) per unconstrained feature.
+    unc_idx <- which(feat_is_unconstrained)
+    if (length(unc_idx) > 0L) {
+      f_unc <- f_id[unc_idx]
+      r_unc <- supp_class_rank[unc_idx]
+      s_unc <- supp_strength[unc_idx]
+      max_s <- max(s_unc, 0L) + 2L
+      score_unc <- r_unc * max_s - s_unc
 
-    out <- out |>
-      tidytable::left_join(feat_best, by = "feature_id") |>
-      tidytable::mutate(
-        keep = keep &
-          (!feature_is_unconstrained |
-            (support_class_rank == best_rank &
-              support_strength == best_support))
-      )
+      # Collapse consecutive identical (f_unc, score_unc)
+      n_u <- length(unc_idx)
+      diff_prev <- if (n_u > 1L) {
+        c(TRUE, f_unc[-1L] != f_unc[-n_u] | score_unc[-1L] != score_unc[-n_u])
+      } else {
+        TRUE
+      }
+      f_sub <- f_unc[diff_prev]
+      sc_sub <- score_unc[diff_prev]
+
+      ord_sc <- order(sc_sub, method = "radix")
+      win_sc <- ord_sc[!duplicated(f_sub[ord_sc])]
+      best_sc_lut <- integer(n_u_f)
+      best_sc_lut[f_sub[win_sc]] <- sc_sub[win_sc]
+
+      keep[unc_idx] <- keep[unc_idx] & (score_unc == best_sc_lut[f_unc])
+    }
   }
 
-  dropped <- out |>
-    tidytable::filter(!keep)
-  if (nrow(dropped) > 0L) {
-    dropped_n <- dropped |>
-      tidytable::distinct(feature_id, adduct) |>
-      nrow()
-    dropped_features <- dropped |>
-      tidytable::distinct(feature_id) |>
-      nrow()
-    kept_features <- out |>
-      tidytable::filter(keep) |>
-      tidytable::distinct(feature_id) |>
-      nrow()
-    dropped_all_features <- max(
-      0L,
-      nrow(tidytable::distinct(annotations, feature_id)) - kept_features
+  n_dropped_rows <- sum(!keep)
+  n_kept_features <- sum(tabulate(f_id[keep], nbins = n_u_f) > 0L)
+  n_dropped_features <- if (n_dropped_rows > 0L) {
+    sum(tabulate(f_id[!keep], nbins = n_u_f) > 0L)
+  } else {
+    0L
+  }
+
+  if (n_dropped_rows > 0L) {
+    drop_idx <- which(!keep)
+    dropped_n <- nrow(
+      tidytable::tidytable(
+        feature_id = f_col[drop_idx],
+        adduct = annotations$adduct[drop_idx]
+      ) |>
+        tidytable::distinct()
     )
+    dropped_all_features <- max(0L, n_u_f - n_kept_features)
     log_info(
       paste0(
         "Conflict-resolution filter removed %d annotation row(s) with states ",
@@ -2641,43 +2745,25 @@ enforce_non_conflicting_annotation_states <- function(
     )
     log_info(
       "Conflict-resolution pruning touched %d feature(s) and removed all annotations from %d feature(s).",
-      dropped_features,
+      n_dropped_features,
       dropped_all_features
     )
   }
 
-  out <- out |>
-    tidytable::filter(keep) |>
-    tidytable::select(
-      -adduct_state_key,
-      -assigned_state_key,
-      -keep,
-      -tidyselect::any_of(c(
-        "support_class_rank",
-        "support_strength",
-        "feature_is_unconstrained",
-        "best_rank",
-        "best_support"
-      ))
-    )
+  out <- if (n_dropped_rows > 0L) {
+    keep_idx <- which(keep)
+    tidytable::as_tidytable(lapply(as.list(annotations), `[`, keep_idx))
+  } else {
+    tidytable::as_tidytable(annotations)
+  }
 
   attr(out, "coverage_audit") <- list(
-    n_input = nrow(annotations),
+    n_input = n_in,
     n_kept = nrow(out),
-    n_dropped = nrow(dropped),
-    n_input_features = annotations |>
-      tidytable::distinct(feature_id) |>
-      nrow(),
-    n_kept_features = out |>
-      tidytable::distinct(feature_id) |>
-      nrow(),
-    n_dropped_features = if (nrow(dropped) > 0L) {
-      dropped |>
-        tidytable::distinct(feature_id) |>
-        nrow()
-    } else {
-      0L
-    }
+    n_dropped = n_dropped_rows,
+    n_input_features = n_u_f,
+    n_kept_features = n_kept_features,
+    n_dropped_features = n_dropped_features
   )
   out
 }
