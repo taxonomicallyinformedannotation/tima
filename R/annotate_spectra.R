@@ -1457,19 +1457,24 @@ finalize_results <- function(
   n_qadd <- max(1L, length(u_qadd))
   n_libs <- max(1L, length(u_libs))
   n_sm <- max(1L, length(u_sm))
-  if (
-    as.numeric(length(u_fids)) *
-      as.numeric(n_qadd) *
-      as.numeric(n_libs) *
-      as.numeric(n_sm) <
-      4.5e15
-  ) {
-    grp_key <- (((as.numeric(fid_id[ord] - 1L) * n_qadd + (qadd_id[ord] - 1L)) *
+  prod_key <- as.double(length(u_fids)) *
+    as.double(n_qadd) *
+    as.double(n_libs) *
+    as.double(n_sm)
+  if (prod_key < .Machine$integer.max) {
+    grp_key <- (((fid_id[ord] - 1L) * n_qadd + (qadd_id[ord] - 1L)) *
+      n_libs +
+      (lib_id[ord] - 1L)) *
+      n_sm +
+      sm_id[ord]
+    keep_ord <- ord[!duplicated(grp_key)]
+  } else if (prod_key < 4.5e15) {
+    grp_key <- (((as.double(fid_id[ord] - 1L) * n_qadd + (qadd_id[ord] - 1L)) *
       n_libs +
       (lib_id[ord] - 1L)) *
       n_sm) +
       sm_id[ord]
-    keep_ord <- ord[!duplicated(grp_key)]
+    keep_ord <- ord[fastmatch::fmatch(grp_key, grp_key) == seq_along(grp_key)]
   } else {
     grp_df <- data.frame(
       f = fid_id[ord],

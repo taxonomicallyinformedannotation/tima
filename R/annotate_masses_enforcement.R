@@ -587,14 +587,17 @@ enforce_annotation_edge_adduct_agreement <- function(
           annotations$adduct[idx_ef],
           sm_add
         )]
-        e_pairs <- unique(paste(e_f, e_k, sep = "\r"))
-        row_pairs <- paste(
-          annotations$feature_id[idx_ef],
-          row_sk_ef,
-          sep = "\r"
-        )
-        edge_supported_vec[idx_ef] <- !is.na(row_sk_ef) &
-          !is.na(fastmatch::fmatch(row_pairs, e_pairs))
+        u_sk <- unique(c(e_k, row_sk_ef[!is.na(row_sk_ef)]))
+        n_sk <- max(1L, length(u_sk))
+        ef_id <- fastmatch::fmatch(e_f, supp_feats)
+        ek_id <- fastmatch::fmatch(e_k, u_sk)
+        e_pair_int <- unique((ef_id - 1L) * n_sk + ek_id)
+
+        rf_id <- fastmatch::fmatch(annotations$feature_id[idx_ef], supp_feats)
+        rk_id <- fastmatch::fmatch(row_sk_ef, u_sk)
+        r_pair_int <- (rf_id - 1L) * n_sk + rk_id
+        edge_supported_vec[idx_ef] <- !is.na(rk_id) &
+          !is.na(fastmatch::fmatch(r_pair_int, e_pair_int))
         # Recompute feature_has_edge_support strictly from rows that matched edge_supported
         # in case a feature in supp_feats had zero matching annotation rows
         supp_feats_in_ann <- unique(annotations$feature_id[edge_supported_vec])

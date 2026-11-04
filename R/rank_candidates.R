@@ -41,12 +41,22 @@ rank_candidates <- function(df) {
   }
 
   n <- nrow(df)
-  score_final <- suppressWarnings(as.numeric(df[[score_col]]))
+  raw_sf <- df[[score_col]]
+  score_final <- if (is.numeric(raw_sf)) {
+    as.double(raw_sf)
+  } else {
+    suppressWarnings(as.numeric(raw_sf))
+  }
   score_final <- pmax(score_final, 0)
   score_final[!is.finite(score_final)] <- NA_real_
 
   score_initial <- if ("candidate_score_pseudo_initial" %in% names(df)) {
-    suppressWarnings(as.numeric(df[["candidate_score_pseudo_initial"]]))
+    raw_si <- df[["candidate_score_pseudo_initial"]]
+    if (is.numeric(raw_si)) {
+      as.double(raw_si)
+    } else {
+      suppressWarnings(as.numeric(raw_si))
+    }
   } else {
     rep.int(NA_real_, n)
   }
@@ -60,25 +70,42 @@ rank_candidates <- function(df) {
   iks <- df$candidate_structure_inchikey_connectivity_layer
   u_fids <- unique(fids)
   u_iks <- unique(iks)
-  fid_id <- fastmatch::fmatch(fids, u_fids)
-  ik_id <- fastmatch::fmatch(iks, u_iks)
+  fid_id <- if (anyNA(u_fids)) {
+    match(fids, u_fids)
+  } else {
+    fastmatch::fmatch(fids, u_fids)
+  }
+  ik_id <- if (anyNA(u_iks)) {
+    match(iks, u_iks)
+  } else {
+    fastmatch::fmatch(iks, u_iks)
+  }
 
   row_id <- seq_len(n)
   ord_dedup <- order(-score_final, row_id, na.last = TRUE, method = "radix")
-  n_iks <- max(1L, length(u_iks))
-  if (as.numeric(length(u_fids)) * as.numeric(n_iks) < 4.5e15) {
-    pair_key <- as.numeric(fid_id[ord_dedup] - 1L) * n_iks + ik_id[ord_dedup]
-    keep_rows <- sort(ord_dedup[!duplicated(pair_key)])
+  n_iks <- length(u_iks)
+  pair_key <- if (as.double(length(u_fids)) * n_iks < .Machine$integer.max) {
+    (fid_id[ord_dedup] - 1L) * n_iks + ik_id[ord_dedup]
   } else {
-    pair_df <- data.frame(f = fid_id[ord_dedup], k = ik_id[ord_dedup])
-    keep_rows <- sort(ord_dedup[!duplicated(pair_df)])
+    n_iks_stride <- if (bitwAnd(n_iks, 1023L) == 0L) n_iks + 1L else n_iks
+    as.double(fid_id[ord_dedup] - 1L) * n_iks_stride + ik_id[ord_dedup]
   }
+  not_dup_pk <- !duplicated(pair_key)
 
-  df <- tidytable::as_tidytable(df[keep_rows, , drop = FALSE])
-  fid_keep <- fid_id[keep_rows]
-  sf_keep <- score_final[keep_rows]
-  si_keep <- score_initial[keep_rows]
-  n_keep <- length(keep_rows)
+  if (all(not_dup_pk)) {
+    df <- tidytable::as_tidytable(df)
+    fid_keep <- fid_id
+    sf_keep <- score_final
+    si_keep <- score_initial
+    n_keep <- n
+  } else {
+    keep_rows <- sort(ord_dedup[not_dup_pk])
+    df <- tidytable::as_tidytable(df[keep_rows, , drop = FALSE])
+    fid_keep <- fid_id[keep_rows]
+    sf_keep <- score_final[keep_rows]
+    si_keep <- score_initial[keep_rows]
+    n_keep <- length(keep_rows)
+  }
 
   .fast_min_rank_desc <- function(grp_id, val, n_rows) {
     valid <- !is.na(val)
@@ -97,14 +124,17 @@ rank_candidates <- function(df) {
       out[v_idx[ord]] <- 1L
       return(out)
     }
+    seq_m <- seq_len(m)
     new_g <- c(TRUE, g_o[-1L] != g_o[-m])
-    g_start <- cummax(ifelse(new_g, seq_len(m), 1L))
-    pos_in_g <- seq_len(m) - g_start + 1L
+    g_idx <- integer(m)
+    g_idx[new_g] <- seq_m[new_g]
+    g_start <- cummax(g_idx)
+
     new_v <- new_g | c(TRUE, v_o[-1L] != v_o[-m])
-    rk <- cummax(ifelse(new_v, pos_in_g, 1L))
-    # Because rk can decrease across groups if we use global cummax, reset per group:
-    # Actually: global tie-start index is `tie_start <- cummax(ifelse(new_v, seq_len(m), 1L))`!
-    tie_start <- cummax(ifelse(new_v, seq_len(m), 1L))
+    v_tie_idx <- integer(m)
+    v_tie_idx[new_v] <- seq_m[new_v]
+    tie_start <- cummax(v_tie_idx)
+
     out[v_idx[ord]] <- tie_start - g_start + 1L
     out
   }

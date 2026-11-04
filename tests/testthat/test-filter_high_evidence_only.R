@@ -548,3 +548,50 @@ test_that("filter_high_evidence_only with all optional filters combined (OR logi
   expect_setequal(res$feature_id, c("F1", "F2", "F3", "F5"))
   expect_equal(nrow(res), 4L)
 })
+
+test_that("filter_high_evidence_only retains promoted MS1 candidates only when anchor passes", {
+  df <- tidytable::tidytable(
+    feature_id = c(
+      "ANCHOR_PASS",
+      "ANCHOR_FAIL",
+      "MS1_GOOD_ANCHOR",
+      "MS1_BAD_ANCHOR"
+    ),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "IK_A",
+      "IK_B",
+      "IK_A",
+      "IK_B"
+    ),
+    score_biological = c(0.95, 0.2, 0.2, 0.2),
+    candidate_score_pseudo_initial = c(0.95, 0.2, NA_real_, NA_real_),
+    score_weighted_chemo = c(0.95, 0.2, 0.2, 0.2),
+    rank_final = c(1L, 1L, 1L, 1L),
+    cluster_consensus_group_id = c("G1", "G2", "G1", "G2"),
+    cluster_consensus_promoted_from_anchor = c(FALSE, FALSE, TRUE, TRUE),
+    cluster_consensus_anchor_feature_id = c(
+      "ANCHOR_PASS",
+      "ANCHOR_FAIL",
+      "ANCHOR_PASS",
+      "ANCHOR_FAIL"
+    ),
+    cluster_consensus_anchor_inchikey_connectivity_layer = c(
+      "IK_A",
+      "IK_B",
+      "IK_A",
+      "IK_B"
+    )
+  )
+
+  res <- filter_high_evidence_only(
+    df,
+    score_bio_min = 0.85,
+    score_ini_min = 0.90,
+    score_final_min = 0.75,
+    confidence_sirius_min = NULL,
+    similarity_spectral_min = NULL,
+    matched_peaks_min = NULL
+  )
+
+  expect_setequal(res$feature_id, c("ANCHOR_PASS", "MS1_GOOD_ANCHOR"))
+})

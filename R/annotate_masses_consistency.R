@@ -152,70 +152,89 @@ compute_feature_adduct_support <- function(df_add, covariance_edges = NULL) {
     ))
   }
 
-  # Combine both directions efficiently
-  src_direction <- df_add |>
-    tidytable::transmute(
-      feature_id,
-      adduct,
-      neighbor = feature_id_dest
-    )
+  f_vec <- c(df_add$feature_id, df_add$feature_id_dest)
+  a_vec <- c(df_add$adduct, df_add$adduct_dest)
+  nb_vec <- c(df_add$feature_id_dest, df_add$feature_id)
 
-  # `neighbor` first: transmute() evaluates in order, so after
-  # `feature_id = feature_id_dest` the feature would count itself
-  dest_direction <- df_add |>
-    tidytable::transmute(
-      neighbor = feature_id,
-      feature_id = feature_id_dest,
-      adduct = adduct_dest
-    )
+  u_f <- unique(f_vec)
+  u_a <- unique(a_vec)
+  n_f <- length(u_f)
+  n_a <- length(u_a)
 
-  neighbors <- tidytable::bind_rows(src_direction, dest_direction) |>
-    tidytable::distinct(feature_id, adduct, neighbor)
+  f_id <- if (anyNA(u_f)) match(f_vec, u_f) else fastmatch::fmatch(f_vec, u_f)
+  nb_id <- if (anyNA(u_f)) {
+    match(nb_vec, u_f)
+  } else {
+    fastmatch::fmatch(nb_vec, u_f)
+  }
+  a_id <- if (anyNA(u_a)) match(a_vec, u_a) else fastmatch::fmatch(a_vec, u_a)
+
+  fa_id <- (f_id - 1L) * n_a + a_id
+  if (as.double(n_f) * n_a * n_f < .Machine$integer.max) {
+    fan_key <- (fa_id - 1L) * n_f + nb_id
+    keep_fan <- !duplicated(fan_key)
+  } else {
+    fan_key <- as.double(fa_id - 1L) * n_f + nb_id
+    keep_fan <- fastmatch::fmatch(fan_key, fan_key) == seq_along(fan_key)
+  }
+
+  fa_u <- fa_id[keep_fan]
+  f_u <- f_id[keep_fan]
+  a_u <- a_id[keep_fan]
+  nb_u <- nb_id[keep_fan]
+
+  u_fa_pos <- which(!duplicated(fa_u))
+  u_fa_keys <- fa_u[u_fa_pos]
+  fa_grp <- fastmatch::fmatch(fa_u, u_fa_keys)
+  n_groups <- length(u_fa_pos)
+  base_counts <- tabulate(fa_grp, nbins = n_groups)
 
   if (is.null(covariance_edges) || nrow(covariance_edges) == 0L) {
-    # Single grouped count operation
-    return(
-      neighbors |>
-        tidytable::count(feature_id, adduct, name = "adduct_support") |>
-        tidytable::mutate(adduct_support = as.integer(adduct_support))
-    )
+    return(tidytable::tidytable(
+      feature_id = u_f[f_u[u_fa_pos]],
+      adduct = u_a[a_u[u_fa_pos]],
+      adduct_support = base_counts
+    ))
   }
 
-  # Covariance pairs are unordered; pre-filter covariance_edges to features in
-  # `neighbors` so we don't paste/hash tens of thousands of unrelated pairs.
-  u_feat <- unique(c(neighbors$feature_id, neighbors$neighbor))
-  cov_keep <- !is.na(fastmatch::fmatch(covariance_edges$feature_id, u_feat)) &
-    !is.na(fastmatch::fmatch(covariance_edges$feature_id_dest, u_feat))
-  if (!any(cov_keep)) {
-    return(
-      neighbors |>
-        tidytable::count(feature_id, adduct, name = "adduct_support") |>
-        tidytable::mutate(adduct_support = as.integer(adduct_support))
-    )
+  # Covariance pairs are unordered; map covariance endpoints to u_f integer IDs
+  c1 <- fastmatch::fmatch(covariance_edges$feature_id, u_f)
+  c2 <- fastmatch::fmatch(covariance_edges$feature_id_dest, u_f)
+  cov_keep <- which(!is.na(c1) & !is.na(c2))
+  if (length(cov_keep) == 0L) {
+    return(tidytable::tidytable(
+      feature_id = u_f[f_u[u_fa_pos]],
+      adduct = u_a[a_u[u_fa_pos]],
+      adduct_support = base_counts
+    ))
   }
 
-  .pair_key <- function(a, b) {
-    a <- as.character(a)
-    b <- as.character(b)
-    paste(pmin(a, b), pmax(a, b), sep = "\r")
-  }
-  cov_sub <- covariance_edges[which(cov_keep), , drop = FALSE]
-  covarying <- unique(.pair_key(
-    cov_sub$feature_id,
-    cov_sub$feature_id_dest
-  ))
+  c1_k <- c1[cov_keep]
+  c2_k <- c2[cov_keep]
+  lo_c <- pmin.int(c1_k, c2_k)
+  hi_c <- pmax.int(c1_k, c2_k)
+  lo_n <- pmin.int(f_u, nb_u)
+  hi_n <- pmax.int(f_u, nb_u)
 
-  neighbors |>
-    tidytable::mutate(
-      .weight = 1L +
-        as.integer(
-          !is.na(fastmatch::fmatch(.pair_key(feature_id, neighbor), covarying))
-        )
-    ) |>
-    tidytable::summarize(
-      adduct_support = as.integer(sum(.weight)),
-      .by = c(feature_id, adduct)
-    )
+  if (as.double(n_f) * n_f < .Machine$integer.max) {
+    cov_keys <- unique((lo_c - 1L) * n_f + hi_c)
+    nb_keys <- (lo_n - 1L) * n_f + hi_n
+  } else {
+    cov_keys <- unique(as.double(lo_c - 1L) * n_f + hi_c)
+    nb_keys <- as.double(lo_n - 1L) * n_f + hi_n
+  }
+  is_cov <- !is.na(fastmatch::fmatch(nb_keys, cov_keys))
+  cov_bonus <- if (any(is_cov)) {
+    tabulate(fa_grp[is_cov], nbins = n_groups)
+  } else {
+    0L
+  }
+
+  tidytable::tidytable(
+    feature_id = u_f[f_u[u_fa_pos]],
+    adduct = u_a[a_u[u_fa_pos]],
+    adduct_support = as.integer(base_counts + cov_bonus)
+  )
 }
 
 #' Apply optional support-based adduct consistency filtering.
@@ -231,96 +250,96 @@ apply_adduct_consistency_filter <- function(
   if (nrow(df_add) == 0L) {
     return(df_add)
   }
-  pair_hyp <- df_add |>
-    tidytable::count(feature_id, feature_id_dest, name = "pair_hypotheses")
-  feature_degree <- tidytable::bind_rows(
-    df_add |>
-      tidytable::transmute(feature_id, neighbor = feature_id_dest),
-    df_add |>
-      tidytable::transmute(feature_id = feature_id_dest, neighbor = feature_id)
-  ) |>
-    tidytable::distinct(feature_id, neighbor) |>
-    tidytable::count(feature_id, name = "feature_degree")
-  support <- compute_feature_adduct_support(df_add)
-  support_src <- support |>
-    tidytable::rename(src_support = adduct_support)
-  support_dest <- support |>
-    tidytable::rename(
-      feature_id_dest = feature_id,
-      adduct_dest = adduct,
-      dest_support = adduct_support
-    )
-  degree_src <- feature_degree |>
-    tidytable::rename(src_degree = feature_degree)
-  degree_dest <- feature_degree |>
-    tidytable::rename(
-      feature_id_dest = feature_id,
-      dest_degree = feature_degree
-    )
-  scored <- df_add |>
-    tidytable::left_join(
-      pair_hyp,
-      by = c("feature_id", "feature_id_dest")
-    ) |>
-    tidytable::left_join(
-      support_src,
-      by = c("feature_id", "adduct")
-    ) |>
-    tidytable::left_join(
-      support_dest,
-      by = c("feature_id_dest", "adduct_dest")
-    ) |>
-    tidytable::left_join(
-      degree_src,
-      by = "feature_id"
-    ) |>
-    tidytable::left_join(
-      degree_dest,
-      by = "feature_id_dest"
-    ) |>
-    tidytable::mutate(
-      pair_hypotheses = tidytable::coalesce(
-        as.integer(pair_hypotheses),
-        1L
-      ),
-      src_support = tidytable::coalesce(
-        as.integer(src_support),
-        0L
-      ),
-      dest_support = tidytable::coalesce(
-        as.integer(dest_support),
-        0L
-      ),
-      src_degree = tidytable::coalesce(
-        as.integer(src_degree),
-        0L
-      ),
-      dest_degree = tidytable::coalesce(
-        as.integer(dest_degree),
-        0L
-      )
-    )
-  if (mode == "strict") {
-    return(
-      scored |>
-        tidytable::filter(src_support >= support_minimum) |>
-        tidytable::filter(dest_support >= support_minimum) |>
-        tidytable::select(feature_id, adduct, adduct_dest, feature_id_dest) |>
-        tidytable::distinct()
-    )
+
+  u_f <- unique(c(df_add$feature_id, df_add$feature_id_dest))
+  u_a <- unique(c(df_add$adduct, df_add$adduct_dest))
+  n_f <- length(u_f)
+  n_a <- length(u_a)
+
+  f1 <- if (anyNA(u_f)) {
+    match(df_add$feature_id, u_f)
+  } else {
+    fastmatch::fmatch(df_add$feature_id, u_f)
   }
-  scored |>
-    tidytable::mutate(
-      need_check = pair_hypotheses > 1L |
-        src_degree >= degree_minimum |
-        dest_degree >= degree_minimum
-    ) |>
-    tidytable::filter(
-      !need_check |
-        src_support >= support_minimum |
-        dest_support >= support_minimum
-    ) |>
-    tidytable::select(feature_id, adduct, adduct_dest, feature_id_dest) |>
+  f2 <- if (anyNA(u_f)) {
+    match(df_add$feature_id_dest, u_f)
+  } else {
+    fastmatch::fmatch(df_add$feature_id_dest, u_f)
+  }
+  a1 <- if (anyNA(u_a)) {
+    match(df_add$adduct, u_a)
+  } else {
+    fastmatch::fmatch(df_add$adduct, u_a)
+  }
+  a2 <- if (anyNA(u_a)) {
+    match(df_add$adduct_dest, u_a)
+  } else {
+    fastmatch::fmatch(df_add$adduct_dest, u_a)
+  }
+
+  # Pair hypotheses count per (feature_id, feature_id_dest)
+  if (as.double(n_f) * n_f < .Machine$integer.max) {
+    pair_k <- (f1 - 1L) * n_f + f2
+  } else {
+    pair_k <- as.double(f1 - 1L) * n_f + f2
+  }
+  u_pk <- unique(pair_k)
+  pk_id <- fastmatch::fmatch(pair_k, u_pk)
+  pair_hypotheses <- tabulate(pk_id, nbins = length(u_pk))[pk_id]
+
+  # Feature degree (distinct undirected neighbors)
+  nb_f <- c(f1, f2)
+  nb_n <- c(f2, f1)
+  if (as.double(n_f) * n_f < .Machine$integer.max) {
+    nb_k <- (nb_f - 1L) * n_f + nb_n
+    not_dup_nb <- !duplicated(nb_k)
+  } else {
+    nb_k <- as.double(nb_f - 1L) * n_f + nb_n
+    not_dup_nb <- fastmatch::fmatch(nb_k, nb_k) == seq_along(nb_k)
+  }
+  deg_lut <- tabulate(nb_f[not_dup_nb], nbins = n_f)
+  src_degree <- deg_lut[f1]
+  dest_degree <- deg_lut[f2]
+
+  # Support per (feature, adduct)
+  nb_a <- c(a1, a2)
+  fa_all <- (nb_f - 1L) * n_a + nb_a
+  if (as.double(n_f) * n_a * n_f < .Machine$integer.max) {
+    fan_k <- (fa_all - 1L) * n_f + nb_n
+    not_dup_fan <- !duplicated(fan_k)
+  } else {
+    fan_k <- as.double(fa_all - 1L) * n_f + nb_n
+    not_dup_fan <- fastmatch::fmatch(fan_k, fan_k) == seq_along(fan_k)
+  }
+  fa_u <- fa_all[not_dup_fan]
+  u_fa <- unique(fa_u)
+  fa_supp_lut <- tabulate(
+    fastmatch::fmatch(fa_u, u_fa),
+    nbins = length(u_fa)
+  )
+  src_support <- fa_supp_lut[fastmatch::fmatch((f1 - 1L) * n_a + a1, u_fa)]
+  src_support[is.na(src_support)] <- 0L
+  dest_support <- fa_supp_lut[fastmatch::fmatch((f2 - 1L) * n_a + a2, u_fa)]
+  dest_support[is.na(dest_support)] <- 0L
+
+  keep <- if (mode == "strict") {
+    src_support >= support_minimum & dest_support >= support_minimum
+  } else {
+    need_check <- pair_hypotheses > 1L |
+      src_degree >= degree_minimum |
+      dest_degree >= degree_minimum
+    !need_check |
+      src_support >= support_minimum |
+      dest_support >= support_minimum
+  }
+
+  idx_keep <- which(keep)
+  tidytable::tidytable(
+    feature_id = df_add$feature_id[idx_keep],
+    adduct = df_add$adduct[idx_keep],
+    adduct_dest = df_add$adduct_dest[idx_keep],
+    feature_id_dest = df_add$feature_id_dest[idx_keep]
+  ) |>
     tidytable::distinct()
 }
 
@@ -331,202 +350,179 @@ enforce_graph_adduct_consistency <- function(df_add) {
     return(df_add)
   }
   support <- compute_feature_adduct_support(df_add)
-  state_map <- build_adduct_state_key_map(unique(c(
-    df_add$adduct,
-    df_add$adduct_dest
-  )))
-  # Prepare lookup tables to consolidate joins
-  support_src <- support |> tidytable::rename(src_support = adduct_support)
-  support_dest <- support |>
-    tidytable::rename(
-      feature_id_dest = feature_id,
-      adduct_dest = adduct,
-      dest_support = adduct_support
-    )
-  state_adduct <- state_map |> tidytable::rename(adduct_state_key = state_key)
-  state_dest <- state_map |>
-    tidytable::rename(
-      adduct_dest = adduct,
-      adduct_dest_state_key = state_key
-    )
+  u_add <- unique(c(
+    as.character(df_add$adduct),
+    as.character(df_add$adduct_dest)
+  ))
+  state_map <- build_adduct_state_key_map(u_add)
 
-  # Consolidate all joins and subsequent mutate into single pipeline
-  scored <- df_add |>
-    tidytable::left_join(support_src, by = c("feature_id", "adduct")) |>
-    tidytable::left_join(
-      support_dest,
-      by = c("feature_id_dest", "adduct_dest")
-    ) |>
-    tidytable::mutate(
-      src_support = tidytable::if_else(
-        is.na(src_support),
-        0L,
-        as.integer(src_support)
-      ),
-      dest_support = tidytable::if_else(
-        is.na(dest_support),
-        0L,
-        as.integer(dest_support)
-      ),
-      edge_score = src_support + dest_support,
-      edge_complexity = nchar(adduct) + nchar(adduct_dest)
-    ) |>
-    tidytable::left_join(state_adduct, by = "adduct") |>
-    tidytable::left_join(state_dest, by = "adduct_dest") |>
-    tidytable::mutate(
-      adduct_state_key = tidytable::coalesce(adduct_state_key, adduct),
-      adduct_dest_state_key = tidytable::coalesce(
-        adduct_dest_state_key,
-        adduct_dest
-      )
-    )
+  f1_chr <- as.character(df_add$feature_id)
+  f2_chr <- as.character(df_add$feature_id_dest)
+  a1_chr <- as.character(df_add$adduct)
+  a2_chr <- as.character(df_add$adduct_dest)
+
+  u_f <- unique(c(f1_chr, f2_chr))
+  n_f <- length(u_f)
+  n_a <- length(u_add)
+
+  f1_id <- fastmatch::fmatch(f1_chr, u_f)
+  f2_id <- fastmatch::fmatch(f2_chr, u_f)
+  a1_id <- fastmatch::fmatch(a1_chr, u_add)
+  a2_id <- fastmatch::fmatch(a2_chr, u_add)
+
+  sf_id <- fastmatch::fmatch(as.character(support$feature_id), u_f)
+  sa_id <- fastmatch::fmatch(as.character(support$adduct), u_add)
+  s_key <- (sf_id - 1L) * n_a + sa_id
+  src_support <- support$adduct_support[fastmatch::fmatch(
+    (f1_id - 1L) * n_a + a1_id,
+    s_key
+  )]
+  src_support[is.na(src_support)] <- 0L
+  dest_support <- support$adduct_support[fastmatch::fmatch(
+    (f2_id - 1L) * n_a + a2_id,
+    s_key
+  )]
+  dest_support[is.na(dest_support)] <- 0L
+
+  edge_score <- src_support + dest_support
+  u_add_nchar <- nchar(u_add)
+  edge_complexity <- u_add_nchar[a1_id] + u_add_nchar[a2_id]
+
+  u_add_state <- tidytable::coalesce(
+    state_map$state_key[fastmatch::fmatch(u_add, state_map$adduct)],
+    u_add
+  )
+  u_states <- unique(u_add_state)
+  u_state_nchar <- nchar(u_states)
+  n_s <- length(u_states)
+
+  s1_id <- fastmatch::fmatch(u_add_state[a1_id], u_states)
+  s2_id <- fastmatch::fmatch(u_add_state[a2_id], u_states)
 
   g <- igraph::graph_from_data_frame(
-    d = scored[, c("feature_id", "feature_id_dest"), drop = FALSE],
+    d = data.frame(
+      feature_id = f1_chr,
+      feature_id_dest = f2_chr,
+      stringsAsFactors = FALSE
+    ),
     directed = FALSE
   )
   comp_membership <- igraph::components(g)$membership
 
   # Compute node candidates, priors, and initial assignments globally ONCE
-  # instead of running 9 tidytable pipelines per connected component.
-  node_data <- tidytable::bind_rows(
-    scored |>
-      tidytable::transmute(
-        feature = as.character(feature_id),
-        state_key = as.character(adduct_state_key),
-        edge_score = edge_score
-      ),
-    scored |>
-      tidytable::transmute(
-        feature = as.character(feature_id_dest),
-        state_key = as.character(adduct_dest_state_key),
-        edge_score = edge_score
-      )
-  )
-  node_priors <- node_data |>
-    tidytable::summarize(prior = sum(edge_score), .by = c(feature, state_key))
+  # using integer node/state IDs instead of character joins/pastes.
+  nd_f <- c(f1_id, f2_id)
+  nd_s <- c(s1_id, s2_id)
+  nd_sc <- c(edge_score, edge_score)
+  fs_key <- (nd_f - 1L) * n_s + nd_s
+  u_fs_pos <- which(!duplicated(fs_key))
+  u_fs_keys <- fs_key[u_fs_pos]
+  fs_grp <- fastmatch::fmatch(fs_key, u_fs_keys)
 
-  assignments <- node_priors |>
-    tidytable::mutate(.key_len = nchar(state_key)) |>
-    tidytable::arrange(feature, tidytable::desc(prior), .key_len) |>
-    tidytable::distinct(feature, .keep_all = TRUE)
-  assign_map <- stats::setNames(assignments$state_key, assignments$feature)
+  np_f_id <- nd_f[u_fs_pos]
+  np_s_id <- nd_s[u_fs_pos]
+  np_prior <- as.numeric(rowsum.default(nd_sc, fs_grp, reorder = FALSE))
+
+  # Sort by feature character string (matching tidytable::arrange(feature, desc(prior), .key_len))
+  ord_init <- order(
+    u_f[np_f_id],
+    -np_prior,
+    u_state_nchar[np_s_id],
+    method = "radix"
+  )
+  win_init <- ord_init[!duplicated(np_f_id[ord_init])]
+  assign_state_id <- integer(n_f)
+  assign_state_id[np_f_id[win_init]] <- np_s_id[win_init]
 
   # Only components containing at least one node with >1 candidate state_key
   # can ever change during iterative coordinate ascent.
-  ambig_features <- unique(
-    node_priors$feature[duplicated(node_priors$feature)]
-  )
-  if (length(ambig_features) > 0L) {
-    ambig_comps <- unique(comp_membership[ambig_features])
-    edge_comp_id <- comp_membership[as.character(scored$feature_id)]
+  is_ambig_f <- tabulate(np_f_id, nbins = n_f) > 1L
+  ambig_f_ids <- which(is_ambig_f)
+  if (length(ambig_f_ids) > 0L) {
+    node_comp_id <- as.integer(comp_membership[u_f])
+    ambig_comps <- unique(node_comp_id[ambig_f_ids])
+    edge_comp_id <- node_comp_id[f1_id]
     in_ambig_comp <- which(!is.na(fastmatch::fmatch(edge_comp_id, ambig_comps)))
 
     if (length(in_ambig_comp) > 0L) {
-      sub_all <- as.data.frame(
-        scored[in_ambig_comp, ],
-        stringsAsFactors = FALSE,
-        check.names = FALSE
+      comp_edge_groups <- split(in_ambig_comp, edge_comp_id[in_ambig_comp])
+      in_ambig_np <- which(is_ambig_f[np_f_id])
+      cand_states_split <- split(np_s_id[in_ambig_np], np_f_id[in_ambig_np])
+      prior_term_split <- split(
+        0.01 * np_prior[in_ambig_np],
+        np_f_id[in_ambig_np]
       )
-      sub_by_comp <- split(
-        sub_all,
-        edge_comp_id[in_ambig_comp]
-      )
-      np_ambig <- node_priors[
-        !is.na(fastmatch::fmatch(
-          comp_membership[node_priors$feature],
-          ambig_comps
-        )),
-      ]
-      candidate_lookup <- split(np_ambig$state_key, np_ambig$feature)
-      prior_lookup <- stats::setNames(
-        np_ambig$prior,
-        paste(np_ambig$feature, np_ambig$state_key, sep = "\u001f")
-      )
+      cand_list <- vector("list", n_f)
+      prior_list <- vector("list", n_f)
+      ambig_node_keys <- as.integer(names(cand_states_split))
+      cand_list[ambig_node_keys] <- cand_states_split
+      prior_list[ambig_node_keys] <- prior_term_split
 
-      for (ci in seq_along(sub_by_comp)) {
-        sub_df <- sub_by_comp[[ci]]
-        if (nrow(sub_df) == 0L) {
+      for (ci in seq_along(comp_edge_groups)) {
+        e_idx <- comp_edge_groups[[ci]]
+        if (length(e_idx) == 0L) {
           next
         }
-        comp_nodes <- unique(c(
-          as.character(sub_df$feature_id),
-          as.character(sub_df$feature_id_dest)
-        ))
-        multi_nodes <- comp_nodes[
-          lengths(candidate_lookup[comp_nodes]) > 1L
-        ]
+        e_f1 <- f1_id[e_idx]
+        e_f2 <- f2_id[e_idx]
+        e_s1 <- s1_id[e_idx]
+        e_s2 <- s2_id[e_idx]
+        e_sc <- edge_score[e_idx]
+
+        comp_nodes <- unique(c(e_f1, e_f2))
+        multi_nodes <- comp_nodes[is_ambig_f[comp_nodes]]
         if (length(multi_nodes) == 0L) {
           next
         }
 
-        src_idx <- split(seq_len(nrow(sub_df)), sub_df$feature_id)
-        dest_idx <- split(seq_len(nrow(sub_df)), sub_df$feature_id_dest)
-        max_iter <- 20L
-        prev_sub_map <- NULL
-        unchanged_count <- 0L
+        m_chr <- as.character(multi_nodes)
+        src_split <- split(seq_along(e_idx), e_f1)[m_chr]
+        dst_split <- split(seq_along(e_idx), e_f2)[m_chr]
+        n_multi <- length(multi_nodes)
 
-        for (iter in seq_len(max_iter)) {
-          cur_sub_map <- assign_map[comp_nodes]
-          if (identical(prev_sub_map, cur_sub_map)) {
-            unchanged_count <- unchanged_count + 1L
-            if (unchanged_count >= 2L) break
-          } else {
-            unchanged_count <- 0L
-          }
-          prev_sub_map <- cur_sub_map
-
+        for (iter in seq_len(20L)) {
           changed <- FALSE
-          for (f in multi_nodes) {
-            candidates_f <- candidate_lookup[[f]]
-            cand_scores <- rep(0, length(candidates_f))
-            s_i <- src_idx[[f]]
-            d_i <- dest_idx[[f]]
+          for (mi in seq_len(n_multi)) {
+            f <- multi_nodes[[mi]]
+            cands_f <- cand_list[[f]]
+            cand_scores <- prior_list[[f]]
+            s_i <- src_split[[mi]]
+            d_i <- dst_split[[mi]]
 
             if (length(s_i) > 0L) {
-              src_rows <- sub_df[s_i, , drop = FALSE]
-              assigned_dest_state <- unname(assign_map[as.character(
-                src_rows$feature_id_dest
-              )])
-              for (k in seq_along(candidates_f)) {
-                cand <- candidates_f[[k]]
-                src_mask <- src_rows$adduct_state_key == cand &
-                  src_rows$adduct_dest_state_key == assigned_dest_state
-                cand_scores[[k]] <- cand_scores[[k]] +
-                  sum(src_rows$edge_score[src_mask], na.rm = TRUE)
+              active_s <- e_s2[s_i] == assign_state_id[e_f2[s_i]]
+              if (any(active_s)) {
+                s_i_act <- s_i[active_s]
+                s1_act <- e_s1[s_i_act]
+                sc_act <- e_sc[s_i_act]
+                for (k in seq_along(cands_f)) {
+                  cand_scores[[k]] <- cand_scores[[k]] +
+                    sum(sc_act[s1_act == cands_f[[k]]])
+                }
               }
             }
 
             if (length(d_i) > 0L) {
-              dest_rows <- sub_df[d_i, , drop = FALSE]
-              assigned_src_state <- unname(assign_map[as.character(
-                dest_rows$feature_id
-              )])
-              for (k in seq_along(candidates_f)) {
-                cand <- candidates_f[[k]]
-                dest_mask <- dest_rows$adduct_dest_state_key == cand &
-                  dest_rows$adduct_state_key == assigned_src_state
-                cand_scores[[k]] <- cand_scores[[k]] +
-                  sum(dest_rows$edge_score[dest_mask], na.rm = TRUE)
-              }
-            }
-
-            for (k in seq_along(candidates_f)) {
-              cand <- candidates_f[[k]]
-              prior_val <- prior_lookup[[paste(f, cand, sep = "\u001f")]]
-              if (!is.null(prior_val) && length(prior_val) > 0L) {
-                cand_scores[[k]] <- cand_scores[[k]] + (0.01 * prior_val[[1L]])
+              active_d <- e_s1[d_i] == assign_state_id[e_f1[d_i]]
+              if (any(active_d)) {
+                d_i_act <- d_i[active_d]
+                s2_act <- e_s2[d_i_act]
+                sc_act <- e_sc[d_i_act]
+                for (k in seq_along(cands_f)) {
+                  cand_scores[[k]] <- cand_scores[[k]] +
+                    sum(sc_act[s2_act == cands_f[[k]]])
+                }
               }
             }
 
             best_idx <- which(cand_scores == max(cand_scores))
             if (length(best_idx) > 1L) {
-              lens <- nchar(candidates_f[best_idx])
+              lens <- u_state_nchar[cands_f[best_idx]]
               best_idx <- best_idx[which.min(lens)]
             }
-            best_cand <- candidates_f[[best_idx[[1L]]]]
-            if (!identical(assign_map[[f]], best_cand)) {
-              assign_map[[f]] <- best_cand
+            best_cand <- cands_f[[best_idx[[1L]]]]
+            if (assign_state_id[[f]] != best_cand) {
+              assign_state_id[[f]] <- best_cand
               changed <- TRUE
             }
           }
@@ -536,12 +532,18 @@ enforce_graph_adduct_consistency <- function(df_add) {
     }
   }
 
-  kept_all <- scored |>
-    tidytable::filter(
-      adduct_state_key == unname(assign_map[as.character(feature_id)]) &
-        adduct_dest_state_key ==
-          unname(assign_map[as.character(feature_id_dest)])
-    ) |>
+  scored <- tidytable::tidytable(
+    feature_id = df_add$feature_id,
+    adduct = df_add$adduct,
+    adduct_dest = df_add$adduct_dest,
+    feature_id_dest = df_add$feature_id_dest,
+    edge_score = edge_score,
+    edge_complexity = edge_complexity
+  )
+
+  keep_state <- (s1_id == assign_state_id[f1_id]) &
+    (s2_id == assign_state_id[f2_id])
+  kept_all <- scored[which(keep_state), ] |>
     tidytable::arrange(
       feature_id,
       feature_id_dest,
@@ -699,32 +701,47 @@ calculate_net_mod_mass_from_text <- function(adduct) {
 #' Join couples with neutral losses using binary search
 #' @keywords internal
 join_couples_with_neutral_losses <- function(df_couples_diff, neutral_losses) {
-  cd_src <- tidytable::as_tidytable(df_couples_diff)[,
-    .(
-      src_feature_id = feature_id,
-      src_feature_id_dest = feature_id_dest,
-      delta_min,
-      delta_max
-    )
-  ]
-  nl_win <- tidytable::as_tidytable(neutral_losses)[
-    !is.na(loss),
-    .(loss, loss_mass = mass, loss_mass_keep = mass)
-  ]
-  # Sort neutral losses by mass for binary search
-  nl_win <- nl_win[order(loss_mass)]
-  loss_masses <- nl_win$loss_mass
+  if (nrow(df_couples_diff) == 0L || nrow(neutral_losses) == 0L) {
+    return(tidytable::tidytable(
+      feature_id = character(),
+      loss = character(),
+      mass = numeric(),
+      feature_id_dest = character()
+    ))
+  }
+  nl_keep <- which(!is.na(neutral_losses$loss))
+  if (length(nl_keep) == 0L) {
+    return(tidytable::tidytable(
+      feature_id = character(),
+      loss = character(),
+      mass = numeric(),
+      feature_id_dest = character()
+    ))
+  }
+  nl_loss <- neutral_losses$loss[nl_keep]
+  nl_mass <- neutral_losses$mass[nl_keep]
+  ord_nl <- order(nl_mass)
+  loss_sorted <- nl_loss[ord_nl]
+  mass_sorted <- nl_mass[ord_nl]
+  n_nl <- length(mass_sorted)
 
   # compute all indices at once using vectorized operations
-  lo_idx <- findInterval(cd_src$delta_min, loss_masses, left.open = TRUE) + 1L
-  hi_idx <- findInterval(cd_src$delta_max, loss_masses, left.open = FALSE)
-  lo_idx <- pmax(1L, lo_idx)
-  hi_idx <- pmin(nrow(nl_win), hi_idx)
+  lo_idx <- findInterval(
+    df_couples_diff$delta_min,
+    mass_sorted,
+    left.open = TRUE
+  ) +
+    1L
+  hi_idx <- findInterval(
+    df_couples_diff$delta_max,
+    mass_sorted,
+    left.open = FALSE
+  )
+  lo_idx <- pmax.int(1L, lo_idx)
+  hi_idx <- pmin.int(n_nl, hi_idx)
 
   # Identify rows with valid ranges (lo_idx <= hi_idx)
-  valid <- lo_idx <= hi_idx
-  valid_idx <- which(valid)
-
+  valid_idx <- which(lo_idx <= hi_idx)
   if (length(valid_idx) == 0L) {
     return(tidytable::tidytable(
       feature_id = character(),
@@ -735,36 +752,16 @@ join_couples_with_neutral_losses <- function(df_couples_diff, neutral_losses) {
   }
 
   match_sizes <- hi_idx[valid_idx] - lo_idx[valid_idx] + 1L
-  total_matches <- sum(match_sizes)
-
-  out_feature_id <- character(total_matches)
-  out_loss <- character(total_matches)
-  out_mass <- numeric(total_matches)
-  out_feature_id_dest <- character(total_matches)
-
-  pos <- 1L
-  for (j in seq_along(valid_idx)) {
-    i <- valid_idx[j]
-    lo <- lo_idx[i]
-    hi <- hi_idx[i]
-    n_match <- hi - lo + 1L
-    rng <- pos:(pos + n_match - 1L)
-
-    out_feature_id[rng] <- rep(cd_src$src_feature_id[i], n_match)
-    out_loss[rng] <- nl_win$loss[lo:hi]
-    out_mass[rng] <- nl_win$loss_mass_keep[lo:hi]
-    out_feature_id_dest[rng] <- rep(cd_src$src_feature_id_dest[i], n_match)
-    pos <- pos + n_match
-  }
+  src_exp <- rep.int(valid_idx, match_sizes)
+  nl_exp <- sequence(match_sizes, from = lo_idx[valid_idx])
 
   tidytable::tidytable(
-    feature_id = out_feature_id,
-    loss = out_loss,
-    mass = out_mass,
-    feature_id_dest = out_feature_id_dest
+    feature_id = df_couples_diff$feature_id[src_exp],
+    loss = loss_sorted[nl_exp],
+    mass = mass_sorted[nl_exp],
+    feature_id_dest = df_couples_diff$feature_id_dest[src_exp]
   ) |>
-    unique() |>
-    tidytable::as_tidytable()
+    tidytable::distinct()
 }
 
 #' Join multi-adduct candidates with add/loss inferred masses using binary search instead of cartesian join.
@@ -772,40 +769,28 @@ join_couples_with_neutral_losses <- function(df_couples_diff, neutral_losses) {
 #' @include parse_adduct.R
 #' @include calculate_mass_of_m.R
 join_multi_with_addlossed <- function(df_multi, df_addlossed_rdy) {
-  multi_src <- tidytable::as_tidytable(df_multi)[,
-    .(
-      feature_id,
-      adduct,
-      rt,
-      mz,
-      rt_min,
-      rt_max,
-      mass_min,
-      mass_max
-    )
-  ]
-  addloss_win <- tidytable::as_tidytable(df_addlossed_rdy)[,
-    .(
-      rt_obs = rt,
-      mass_obs = mass,
-      rt_obs_keep = rt,
-      mass_obs_keep = mass
-    )
-  ]
+  if (nrow(df_multi) == 0L || nrow(df_addlossed_rdy) == 0L) {
+    return(tidytable::tidytable(
+      feature_id = character(),
+      rt = numeric(),
+      mz = numeric(),
+      adduct = character(),
+      mass = numeric()
+    ))
+  }
 
-  # Sort by rt for binary search
-  addloss_win <- addloss_win[order(rt_obs)]
-  rt_obs <- addloss_win$rt_obs
+  ord_al <- order(df_addlossed_rdy$rt)
+  rt_obs <- df_addlossed_rdy$rt[ord_al]
+  mass_obs <- df_addlossed_rdy$mass[ord_al]
+  n_al <- length(rt_obs)
 
-  lo_idx <- findInterval(multi_src$rt_min, rt_obs, left.open = TRUE) + 1L
-  hi_idx <- findInterval(multi_src$rt_max, rt_obs, left.open = FALSE)
-  lo_idx <- pmax(1L, lo_idx)
-  hi_idx <- pmin(nrow(addloss_win), hi_idx)
+  lo_idx <- findInterval(df_multi$rt_min, rt_obs, left.open = TRUE) + 1L
+  hi_idx <- findInterval(df_multi$rt_max, rt_obs, left.open = FALSE)
+  lo_idx <- pmax.int(1L, lo_idx)
+  hi_idx <- pmin.int(n_al, hi_idx)
 
   # Identify rows with valid RT ranges
-  valid_rt <- lo_idx <= hi_idx
-  valid_idx <- which(valid_rt)
-
+  valid_idx <- which(lo_idx <= hi_idx)
   if (length(valid_idx) == 0L) {
     return(tidytable::tidytable(
       feature_id = character(),
@@ -816,46 +801,67 @@ join_multi_with_addlossed <- function(df_multi, df_addlossed_rdy) {
     ))
   }
 
-  # Build result using vectorized expansion
-  result_list <- vector("list", length(valid_idx))
-  filled <- 0L
+  match_sizes <- hi_idx[valid_idx] - lo_idx[valid_idx] + 1L
+  mass_min_v <- df_multi$mass_min
+  mass_max_v <- df_multi$mass_max
+  total_pairs <- sum(as.double(match_sizes))
 
-  for (j in seq_along(valid_idx)) {
-    i <- valid_idx[j]
-    lo <- lo_idx[i]
-    hi <- hi_idx[i]
-    mass_min_i <- multi_src$mass_min[i]
-    mass_max_i <- multi_src$mass_max[i]
-
-    # Filter by mass range
-    cand <- addloss_win[lo:hi]
-    ok <- which(cand$mass_obs >= mass_min_i & cand$mass_obs <= mass_max_i)
+  if (total_pairs <= 5000000) {
+    src_exp <- rep.int(valid_idx, match_sizes)
+    al_exp <- sequence(match_sizes, from = lo_idx[valid_idx])
+    m_obs <- mass_obs[al_exp]
+    ok <- which(m_obs >= mass_min_v[src_exp] & m_obs <= mass_max_v[src_exp])
     if (length(ok) == 0L) {
-      next
+      return(tidytable::tidytable(
+        feature_id = character(),
+        rt = numeric(),
+        mz = numeric(),
+        adduct = character(),
+        mass = numeric()
+      ))
     }
-
-    filled <- filled + 1L
-    n_match <- length(ok)
-    result_list[[filled]] <- tidytable::tidytable(
-      feature_id = rep(multi_src$feature_id[i], n_match),
-      rt = rep(multi_src$rt[i], n_match),
-      mz = rep(multi_src$mz[i], n_match),
-      adduct = rep(multi_src$adduct[i], n_match),
-      mass = cand$mass_obs_keep[ok]
-    )
+    src_hit <- src_exp[ok]
+    mass_hit <- m_obs[ok]
+  } else {
+    n_val <- length(valid_idx)
+    chunk_sz <- 4096L
+    n_chunks <- ceiling(n_val / chunk_sz)
+    src_chunks <- vector("list", n_chunks)
+    mass_chunks <- vector("list", n_chunks)
+    filled <- 0L
+    for (ch in seq_len(n_chunks)) {
+      rng <- ((ch - 1L) * chunk_sz + 1L):min(n_val, ch * chunk_sz)
+      v_ch <- valid_idx[rng]
+      ms_ch <- match_sizes[rng]
+      s_exp <- rep.int(v_ch, ms_ch)
+      a_exp <- sequence(ms_ch, from = lo_idx[v_ch])
+      m_obs <- mass_obs[a_exp]
+      ok <- which(m_obs >= mass_min_v[s_exp] & m_obs <= mass_max_v[s_exp])
+      if (length(ok) > 0L) {
+        filled <- filled + 1L
+        src_chunks[[filled]] <- s_exp[ok]
+        mass_chunks[[filled]] <- m_obs[ok]
+      }
+    }
+    if (filled == 0L) {
+      return(tidytable::tidytable(
+        feature_id = character(),
+        rt = numeric(),
+        mz = numeric(),
+        adduct = character(),
+        mass = numeric()
+      ))
+    }
+    src_hit <- unlist(src_chunks[seq_len(filled)], use.names = FALSE)
+    mass_hit <- unlist(mass_chunks[seq_len(filled)], use.names = FALSE)
   }
 
-  if (filled == 0L) {
-    return(tidytable::tidytable(
-      feature_id = character(),
-      rt = numeric(),
-      mz = numeric(),
-      adduct = character(),
-      mass = numeric()
-    ))
-  }
-
-  tidytable::bind_rows(result_list[seq_len(filled)]) |>
-    unique() |>
-    tidytable::as_tidytable()
+  tidytable::tidytable(
+    feature_id = df_multi$feature_id[src_hit],
+    rt = df_multi$rt[src_hit],
+    mz = df_multi$mz[src_hit],
+    adduct = df_multi$adduct[src_hit],
+    mass = mass_hit
+  ) |>
+    tidytable::distinct()
 }

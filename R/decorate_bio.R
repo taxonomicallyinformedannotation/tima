@@ -149,37 +149,59 @@ decorate_bio <- function(
   # This replaces 10 separate filter+distinct operations with a single
   # O(N log N) sort + O(1) lookups per level, scaling to millions of rows.
 
-  # Pre-sort by score descending (NA scores go last)
   ik <- annot_table_wei_bio$candidate_structure_inchikey_connectivity_layer
-  score <- annot_table_wei_bio$score_biological
-  ord <- order(score, decreasing = TRUE, na.last = TRUE)
-  score_sorted <- score[ord]
-  ik_sorted <- ik[ord]
+  score <- as.numeric(annot_table_wei_bio$score_biological)
+  valid_sc <- which(!is.na(score))
 
-  # For unique structure counting: mark first occurrence of each inchikey
-  # in the sorted order. cumsum of this gives cumulative unique count.
-  first_occurrence <- !duplicated(ik_sorted, incomparables = FALSE)
-  cum_unique <- cumsum(first_occurrence)
-
-  count_stats_at_level <- function(min_score, df) {
-    if (nrow(df) == 0L) {
-      return(c(n_candidates = 0L, n_unique_structures = 0L))
+  if (length(valid_sc) == 0L) {
+    count_stats_at_level <- function(min_score, df) {
+      c(n_candidates = 0L, n_unique_structures = 0L)
     }
-
-    if (is.na(min_score)) {
-      return(c(n_candidates = 0L, n_unique_structures = 0L))
-    }
-
-    # Count non-NA scores >= min_score
-    n_candidates <- sum(!is.na(score_sorted) & score_sorted >= min_score)
-
-    n_unique <- if (n_candidates == 0L) {
-      0L
+  } else {
+    sc_v <- score[valid_sc]
+    ik_v <- ik[valid_sc]
+    u_ik <- unique(ik_v)
+    ik_id <- if (anyNA(u_ik)) {
+      match(ik_v, u_ik)
     } else {
-      cum_unique[n_candidates]
+      fastmatch::fmatch(ik_v, u_ik)
     }
+    u_sc <- sort(unique(sc_v))
 
-    c(n_candidates = n_candidates, n_unique_structures = n_unique)
+    if (length(u_sc) <= 64L) {
+      sc_id <- fastmatch::fmatch(sc_v, u_sc)
+      sc_counts <- tabulate(sc_id, nbins = length(u_sc))
+      max_sc_id_ik <- integer(length(u_ik))
+      for (k in seq_along(u_sc)) {
+        max_sc_id_ik[ik_id[sc_id == k]] <- k
+      }
+      u_ik_counts_by_sc_id <- tabulate(max_sc_id_ik, nbins = length(u_sc))
+
+      count_stats_at_level <- function(min_score, df) {
+        if (nrow(df) == 0L || is.na(min_score)) {
+          return(c(n_candidates = 0L, n_unique_structures = 0L))
+        }
+        keep_sc <- u_sc >= min_score
+        c(
+          n_candidates = as.integer(sum(sc_counts[keep_sc])),
+          n_unique_structures = as.integer(sum(u_ik_counts_by_sc_id[keep_sc]))
+        )
+      }
+    } else {
+      ord <- order(sc_v, decreasing = TRUE, method = "radix")
+      score_sorted <- sc_v[ord]
+      first_occurrence <- !duplicated(ik_id[ord])
+      cum_unique <- cumsum(first_occurrence)
+
+      count_stats_at_level <- function(min_score, df) {
+        if (nrow(df) == 0L || is.na(min_score)) {
+          return(c(n_candidates = 0L, n_unique_structures = 0L))
+        }
+        n_candidates <- sum(score_sorted >= min_score)
+        n_unique <- if (n_candidates == 0L) 0L else cum_unique[n_candidates]
+        c(n_candidates = n_candidates, n_unique_structures = n_unique)
+      }
+    }
   }
 
   # Calculate Counts for Each Taxonomic Level ----

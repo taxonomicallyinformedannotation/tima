@@ -189,20 +189,9 @@ filter_high_evidence_only <- function(
   # filtering.
   # Explicitly convert to numeric to prevent character comparison issues.
 
-  rt_err_vec <- if ("candidate_structure_error_rt" %in% names(df)) {
-    as.numeric(df[["candidate_structure_error_rt"]])
-  } else {
-    rep(NA_real_, nrow(df))
-  }
-
-  df_work <- df |>
-    tidytable::mutate(
-      .row_id = tidytable::row_number(),
-      .score_bio = as.numeric(.data[["score_biological"]]),
-      .score_ini = as.numeric(.data[["candidate_score_pseudo_initial"]]),
-      .score_final = as.numeric(.data[["score_weighted_chemo"]]),
-      .rt_err_min = rt_err_vec
-    )
+  n_before <- nrow(df)
+  df_src <- tidytable::as_tidytable(df)
+  rm(df)
 
   # If a rank-1 row was promoted via cluster consensus, let it inherit the
   # anchor's evidence-bearing fields before any high-evidence filtering is
@@ -215,279 +204,187 @@ filter_high_evidence_only <- function(
       "cluster_consensus_anchor_feature_id",
       "rank_final"
     ) %in%
-      names(df_work)
+      names(df_src)
   )
+  prom_idx <- integer(0L)
   if (has_consensus_cols) {
-    inherit_cols <- intersect(
-      c(
-        "score_biological",
-        "candidate_score_pseudo_initial",
-        "score_weighted_chemo",
-        "candidate_structure_error_rt",
-        "candidate_score_sirius_confidence",
-        "candidate_similarity",
-        "candidate_score_similarity",
-        "candidate_score_similarity_forward",
-        "candidate_score_similarity_reverse",
-        "candidate_count_similarity_peaks_matched",
-        "candidate_adduct_origin",
-        "candidate_annotation_level",
-        "candidate_evidence_tier",
-        "adduct_support",
-        "annotation_note"
-      ),
-      names(df_work)
+    grp_col <- df_src$cluster_consensus_group_id
+    prom_col <- df_src$cluster_consensus_promoted_from_anchor
+    rk_col <- df_src$rank_final
+    prom_idx <- which(
+      !is.na(grp_col) &
+        !is.na(prom_col) &
+        prom_col &
+        !is.na(rk_col) &
+        rk_col == 1L
     )
-
-    if (length(inherit_cols) > 0L) {
-      anchor_lookup <- df_work |>
-        tidytable::filter(
-          !is.na(cluster_consensus_group_id),
-          rank_final == 1L,
-          feature_id == cluster_consensus_anchor_feature_id
-        ) |>
-        tidytable::distinct(cluster_consensus_group_id, .keep_all = TRUE) |>
-        tidytable::select(
-          cluster_consensus_group_id,
-          tidyselect::any_of(inherit_cols)
-        )
-
-      if (nrow(anchor_lookup) > 0L) {
-        anchor_lookup <- anchor_lookup |>
-          tidytable::rename_with(
-            ~ paste0(".anchor_", .x),
-            .cols = tidyselect::all_of(inherit_cols)
-          )
-
-        df_work <- df_work |>
-          tidytable::left_join(
-            anchor_lookup,
-            by = "cluster_consensus_group_id"
-          ) |>
-          tidytable::mutate(
-            .promoted_rank1 = !is.na(cluster_consensus_group_id) &
-              cluster_consensus_promoted_from_anchor %in% TRUE &
-              rank_final == 1L
-          )
-
-        for (col in inherit_cols) {
-          anchor_col <- paste0(".anchor_", col)
-          if (anchor_col %in% names(df_work)) {
-            df_work[[col]] <- tidytable::if_else(
-              df_work$.promoted_rank1,
-              tidytable::coalesce(df_work[[anchor_col]], df_work[[col]]),
-              df_work[[col]]
-            )
+    if (length(prom_idx) > 0L) {
+      inherit_cols <- intersect(
+        c(
+          "score_biological",
+          "candidate_score_pseudo_initial",
+          "score_weighted_chemo",
+          "candidate_structure_error_rt",
+          "candidate_score_sirius_confidence",
+          "candidate_similarity",
+          "candidate_score_similarity",
+          "candidate_score_similarity_forward",
+          "candidate_score_similarity_reverse",
+          "candidate_count_similarity_peaks_matched",
+          "candidate_adduct_origin",
+          "candidate_annotation_level",
+          "candidate_evidence_tier",
+          "adduct_support",
+          "annotation_note"
+        ),
+        names(df_src)
+      )
+      anchor_idx <- which(
+        !is.na(grp_col) &
+          !is.na(rk_col) &
+          rk_col == 1L &
+          df_src$feature_id == df_src$cluster_consensus_anchor_feature_id
+      )
+      if (length(inherit_cols) > 0L && length(anchor_idx) > 0L) {
+        anchor_u_idx <- anchor_idx[!duplicated(grp_col[anchor_idx])]
+        m_anc <- fastmatch::fmatch(grp_col[prom_idx], grp_col[anchor_u_idx])
+        has_anc <- which(!is.na(m_anc))
+        if (length(has_anc) > 0L) {
+          df_src <- data.table::copy(df_src)
+          p_sub <- prom_idx[has_anc]
+          a_sub <- anchor_u_idx[m_anc[has_anc]]
+          for (col in inherit_cols) {
+            cur_v <- df_src[[col]]
+            anc_v <- cur_v[a_sub]
+            use_anc <- !is.na(anc_v)
+            if (any(use_anc)) {
+              cur_v[p_sub[use_anc]] <- anc_v[use_anc]
+              data.table::set(df_src, j = col, value = cur_v)
+            }
           }
         }
       }
     }
   }
 
-  # Derive the working score columns after inheritance, so that promoted
-  # rows are filtered on the anchor's evidence
-  df_work <- df_work |>
-    tidytable::mutate(
-      .score_bio = as.numeric(.data[["score_biological"]]),
-      .score_ini = as.numeric(.data[["candidate_score_pseudo_initial"]]),
-      .score_final = as.numeric(.data[["score_weighted_chemo"]])
-    )
-  if ("candidate_structure_error_rt" %in% names(df_work)) {
-    df_work$.rt_err_min <- as.numeric(df_work$candidate_structure_error_rt)
+  .num_col <- function(col_name) {
+    if (!col_name %in% names(df_src)) {
+      return(NULL)
+    }
+    x <- df_src[[col_name]]
+    if (is.numeric(x)) x else .as_numeric_dedup(x)
   }
 
-  n_before <- nrow(df_work)
-
   # Core filtering ----
-
   # At least one of the three score thresholds must be satisfied
-  # NA values for initial score indicate MS1-only hits (no MS2 spectrum) and
-  # don't block other scores
-  # Score = 0 is invalid/missing data and is filtered out
+  score_bio <- .num_col("score_biological")
+  score_ini <- .num_col("candidate_score_pseudo_initial")
+  score_fin <- .num_col("score_weighted_chemo")
 
-  df_filtered <- df_work |>
-    tidytable::filter(
-      (.score_bio >= score_bio_min) |
-        (!is.na(.score_ini) & .score_ini > 0 & .score_ini >= score_ini_min) |
-        (.score_final >= score_final_min)
-    )
+  keep <- logical(n_before)
+  if (!is.null(score_bio)) {
+    keep <- keep | (!is.na(score_bio) & score_bio >= score_bio_min)
+  }
+  if (!is.null(score_ini)) {
+    keep <- keep |
+      (!is.na(score_ini) & score_ini > 0 & score_ini >= score_ini_min)
+  }
+  if (!is.null(score_fin)) {
+    keep <- keep | (!is.na(score_fin) & score_fin >= score_final_min)
+  }
 
   # RT error filter (minutes). Allow NA (unknown) values
-  if ("candidate_structure_error_rt" %in% names(df_filtered)) {
-    df_filtered <- df_filtered |>
-      tidytable::filter(
-        is.na(.rt_err_min) |
-          abs(
-            .rt_err_min |>
-              as.numeric()
-          ) <=
-            error_rt_max
-      )
+  rt_err <- .num_col("candidate_structure_error_rt")
+  if (!is.null(rt_err)) {
+    keep <- keep & (is.na(rt_err) | abs(rt_err) <= error_rt_max)
   }
 
   # SIRIUS confidence and spectral similarity filtering
-  # ALWAYS filter out spectral similarity = 0 (invalid MS2 data) if column
-  # exists
-  if ("candidate_similarity" %in% names(df_filtered)) {
-    df_filtered <- df_filtered |>
-      tidytable::filter(
-        is.na(.data[["candidate_similarity"]]) |
-          as.numeric(.data[["candidate_similarity"]]) > 0
-      )
+  # ALWAYS filter out spectral similarity = 0 (invalid MS2 data) if column exists
+  csim <- .num_col("candidate_similarity")
+  if (!is.null(csim)) {
+    keep <- keep & (is.na(csim) | csim > 0)
   }
 
   # Apply threshold filters with OR logic if set
   # NA values are allowed (no SIRIUS/spectral data available)
   has_sirius <- !is.null(confidence_sirius_min) &&
-    "candidate_score_sirius_confidence" %in% names(df_filtered)
-  has_spectral <- !is.null(similarity_spectral_min) &&
-    "candidate_score_pseudo_initial" %in% names(df_filtered)
+    "candidate_score_sirius_confidence" %in% names(df_src)
+  has_spectral <- !is.null(similarity_spectral_min) && !is.null(score_ini)
 
   if (has_sirius && has_spectral) {
-    # Both filters available: use OR logic
-    df_filtered <- df_filtered |>
-      tidytable::filter(
-        # Pass if SIRIUS is valid AND meets threshold
-        (!is.na(.data[["candidate_score_sirius_confidence"]]) &
-          as.numeric(.data[["candidate_score_sirius_confidence"]]) >=
-            confidence_sirius_min) |
-          # OR spectral is valid (not NA, already filtered >0) AND meets
-          # threshold
-          (!is.na(.data[["candidate_score_pseudo_initial"]]) &
-            as.numeric(.data[["candidate_score_pseudo_initial"]]) >=
-              similarity_spectral_min) |
-          # OR spectral is valid (not NA, already filtered >0) AND meets
-          # threshold (forward)
-          (!is.na(.data[["candidate_score_similarity_forward"]]) &
-            as.numeric(.data[["candidate_score_similarity_forward"]]) >=
-              2 * similarity_spectral_min) |
-          # OR spectral is valid (not NA, already filtered >0) AND meets
-          # threshold (reverse)
-          (!is.na(.data[["candidate_score_similarity_reverse"]]) &
-            as.numeric(.data[["candidate_score_similarity_reverse"]]) >=
-              2 * similarity_spectral_min) |
-          # OR both are NA (no MS2 data at all)
-          (is.na(.data[["candidate_score_sirius_confidence"]]) &
-            is.na(.data[["candidate_score_pseudo_initial"]]))
-      )
+    sir_v <- .num_col("candidate_score_sirius_confidence")
+    fwd_v <- .num_col("candidate_score_similarity_forward")
+    rev_v <- .num_col("candidate_score_similarity_reverse")
+    pass_or <- (!is.na(sir_v) & sir_v >= confidence_sirius_min) |
+      (!is.na(score_ini) & score_ini >= similarity_spectral_min) |
+      (is.na(sir_v) & is.na(score_ini))
+    if (!is.null(fwd_v)) {
+      pass_or <- pass_or |
+        (!is.na(fwd_v) & fwd_v >= 2 * similarity_spectral_min)
+    }
+    if (!is.null(rev_v)) {
+      pass_or <- pass_or |
+        (!is.na(rev_v) & rev_v >= 2 * similarity_spectral_min)
+    }
+    keep <- keep & pass_or
   } else if (has_sirius) {
-    # Only SIRIUS filter
-    df_filtered <- df_filtered |>
-      tidytable::filter(
-        is.na(.data[["candidate_score_sirius_confidence"]]) |
-          as.numeric(.data[["candidate_score_sirius_confidence"]]) >=
-            confidence_sirius_min
-      )
+    sir_v <- .num_col("candidate_score_sirius_confidence")
+    keep <- keep & (is.na(sir_v) | sir_v >= confidence_sirius_min)
   } else if (has_spectral) {
-    # Only spectral filter (already filtered >0 above)
-    df_filtered <- df_filtered |>
-      tidytable::filter(
-        is.na(.data[["candidate_score_pseudo_initial"]]) |
-          as.numeric(.data[["candidate_score_pseudo_initial"]]) >=
-            similarity_spectral_min
-      )
+    keep <- keep & (is.na(score_ini) | score_ini >= similarity_spectral_min)
   }
 
   # Matched peaks filtering
-  # ALWAYS filter out 0 matched peaks (invalid data - no peaks matched)
-  # NA values (missing peak count data) are allowed to pass
-  if ("candidate_count_similarity_peaks_matched" %in% names(df_filtered)) {
-    df_filtered <- df_filtered |>
-      tidytable::filter(
-        is.na(.data[["candidate_count_similarity_peaks_matched"]]) |
-          as.numeric(.data[["candidate_count_similarity_peaks_matched"]]) > 0
-      )
-  }
-
-  # Apply matched peaks threshold if provided
-  if (
-    !is.null(matched_peaks_min) &&
-      "candidate_count_similarity_peaks_matched" %in% names(df_filtered)
-  ) {
-    df_filtered <- df_filtered |>
-      tidytable::filter(
-        is.na(.data[["candidate_count_similarity_peaks_matched"]]) |
-          as.numeric(.data[["candidate_count_similarity_peaks_matched"]]) >=
-            matched_peaks_min
-      )
-  }
-
-  # Enforce parent-following semantics for cluster-consensus-promoted children.
-  # Promoted rank-1 rows inherit the high-evidence pass/fail of their anchor.
-  has_consensus_cols <- all(
-    c(
-      "cluster_consensus_promoted_from_anchor",
-      "cluster_consensus_group_id",
-      "cluster_consensus_anchor_feature_id",
-      "rank_final"
-    ) %in%
-      names(df_work)
-  )
-  if (has_consensus_cols) {
-    promoted_rank1 <- df_work |>
-      tidytable::filter(
-        !is.na(cluster_consensus_group_id),
-        cluster_consensus_promoted_from_anchor %in% TRUE,
-        rank_final == 1L
-      ) |>
-      tidytable::select(.row_id, cluster_consensus_group_id)
-
-    if (nrow(promoted_rank1) > 0L) {
-      anchor_rank1 <- df_work |>
-        tidytable::filter(
-          !is.na(cluster_consensus_group_id),
-          feature_id == cluster_consensus_anchor_feature_id,
-          rank_final == 1L
-        ) |>
-        tidytable::distinct(cluster_consensus_group_id, .row_id)
-
-      anchor_pass <- anchor_rank1 |>
-        tidytable::mutate(
-          .anchor_pass = .row_id %in% df_filtered$.row_id
-        ) |>
-        tidytable::summarize(
-          .anchor_pass = any(.anchor_pass),
-          .by = cluster_consensus_group_id
-        )
-
-      promoted_rank1 <- promoted_rank1 |>
-        tidytable::left_join(anchor_pass, by = "cluster_consensus_group_id") |>
-        tidytable::mutate(
-          .anchor_pass = tidytable::coalesce(.anchor_pass, FALSE)
-        )
-
-      # Combine filter + pull operations into single pass
-      keep_mask <- promoted_rank1$.anchor_pass
-      keep_child_row_ids <- promoted_rank1$.row_id[keep_mask]
-      drop_child_row_ids <- promoted_rank1$.row_id[!keep_mask]
-
-      df_filtered <- df_filtered |>
-        tidytable::filter(!(.row_id %in% drop_child_row_ids))
-
-      add_back <- df_work |>
-        tidytable::filter(.row_id %in% keep_child_row_ids) |>
-        tidytable::anti_join(
-          df_filtered |> tidytable::select(.row_id),
-          by = ".row_id"
-        )
-
-      if (nrow(add_back) > 0L) {
-        df_filtered <- tidytable::bind_rows(df_filtered, add_back)
-      }
-      rm(promoted_rank1, anchor_rank1, anchor_pass, add_back)
+  pks_v <- .num_col("candidate_count_similarity_peaks_matched")
+  if (!is.null(pks_v)) {
+    if (!is.null(matched_peaks_min)) {
+      keep <- keep & (is.na(pks_v) | (pks_v > 0 & pks_v >= matched_peaks_min))
+    } else {
+      keep <- keep & (is.na(pks_v) | pks_v > 0)
     }
   }
-  rm(df_work)
 
-  # Drop helper columns
-  df_filtered <- df_filtered |>
-    tidytable::select(
-      -tidyselect::any_of(".row_id"),
-      -tidyselect::any_of(".promoted_rank1"),
-      -tidyselect::starts_with(match = ".anchor_"),
-      -tidyselect::starts_with(match = ".score_"),
-      -tidyselect::starts_with(match = ".rt_err_")
+  keep_idx <- which(keep)
+
+  # Enforce parent-following semantics for cluster-consensus-promoted children.
+  if (length(prom_idx) > 0L) {
+    grp_col <- df_src$cluster_consensus_group_id
+    rk_col <- df_src$rank_final
+    anchor_all_idx <- which(
+      !is.na(grp_col) &
+        !is.na(rk_col) &
+        rk_col == 1L &
+        df_src$feature_id == df_src$cluster_consensus_anchor_feature_id
     )
+    passing_groups <- if (length(anchor_all_idx) > 0L) {
+      unique(grp_col[anchor_all_idx[keep[anchor_all_idx]]])
+    } else {
+      character(0L)
+    }
+    prom_pass <- !is.na(fastmatch::fmatch(grp_col[prom_idx], passing_groups))
+    keep_child_row_ids <- prom_idx[prom_pass]
+    drop_child_row_ids <- prom_idx[!prom_pass]
+
+    if (length(drop_child_row_ids) > 0L) {
+      keep_idx <- keep_idx[is.na(fastmatch::fmatch(
+        keep_idx,
+        drop_child_row_ids
+      ))]
+    }
+    if (length(keep_child_row_ids) > 0L) {
+      add_back_ids <- keep_child_row_ids[is.na(fastmatch::fmatch(
+        keep_child_row_ids,
+        keep_idx
+      ))]
+      if (length(add_back_ids) > 0L) {
+        keep_idx <- c(keep_idx, add_back_ids)
+      }
+    }
+  }
+
+  df_filtered <- df_src[keep_idx, ]
+  rm(df_src)
 
   n_after <- nrow(df_filtered)
   n_removed <- n_before - n_after

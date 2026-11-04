@@ -459,3 +459,80 @@ test_that("weight_chemo combines ClassyFire and NPClassifier scores", {
   # Combined: 0.1
   expect_equal(res$score_chemical[4], 0.1)
 })
+
+test_that("weight_chemo matches $-delimited multi-token predictions without substring false positives", {
+  annot <- tidytable::tidytable(
+    feature_id = c("F1", "F1", "F1"),
+    candidate_structure_inchikey_connectivity_layer = c("IK1", "IK2", "IK3"),
+    score_biological = c(0.5, 0.5, 0.5),
+    candidate_score_pseudo_initial = c(0.5, 0.5, 0.5),
+    feature_pred_tax_cla_01kin_val = rep("Organic compounds", 3),
+    feature_pred_tax_cla_02sup_val = rep(
+      "Phenylpropanoids and polyketides$Alkaloids and derivatives",
+      3
+    ),
+    feature_pred_tax_cla_03cla_val = rep("Flavonoids$Isoflavonoids", 3),
+    feature_pred_tax_cla_04dirpar_val = rep("Flavones", 3),
+    feature_pred_tax_npc_01pat_val = rep("Shikimates and Phenylpropanoids", 3),
+    feature_pred_tax_npc_02sup_val = rep("Flavonoids", 3),
+    feature_pred_tax_npc_03cla_val = rep("Flavones$Flavonols", 3),
+    candidate_structure_tax_cla_01kin = rep("Organic compounds", 3),
+    candidate_structure_tax_cla_02sup = c(
+      "Alkaloids and derivatives",
+      "Alkaloids",
+      "Phenylpropanoids and polyketides"
+    ),
+    candidate_structure_tax_cla_03cla = c(
+      "Isoflavonoids",
+      "Flavon",
+      "Flavonoids"
+    ),
+    candidate_structure_tax_cla_04dirpar = c("Other", "Other", "Flavones"),
+    candidate_structure_tax_npc_01pat = rep("Other", 3),
+    candidate_structure_tax_npc_02sup = rep("Other", 3),
+    candidate_structure_tax_npc_03cla = c("Flavonols", "Flavone", "Other"),
+    feature_pred_tax_cla_01kin_score = NA_real_,
+    feature_pred_tax_cla_02sup_score = NA_real_,
+    feature_pred_tax_cla_03cla_score = NA_real_,
+    feature_pred_tax_cla_04dirpar_score = NA_real_,
+    feature_pred_tax_npc_01pat_score = NA_real_,
+    feature_pred_tax_npc_02sup_score = NA_real_,
+    feature_pred_tax_npc_03cla_score = NA_real_
+  )
+
+  res <- weight_chemo(
+    annot_table_wei_bio_clean = annot,
+    weight_spectral = 0,
+    weight_biological = 0,
+    weight_chemical = 1,
+    score_chemical_cla_kingdom = 0.1,
+    score_chemical_cla_superclass = 0.2,
+    score_chemical_cla_class = 0.3,
+    score_chemical_cla_parent = 0.4,
+    score_chemical_npc_pathway = 0.15,
+    score_chemical_npc_superclass = 0.25,
+    score_chemical_npc_class = 0.35
+  )
+
+  # IK1 matches second $-token in cla_02sup (0.2), cla_03cla (0.3), and first $-token in npc_03cla (0.35) -> max is 0.35
+  expect_equal(
+    res$score_chemical[
+      res$candidate_structure_inchikey_connectivity_layer == "IK1"
+    ],
+    0.35
+  )
+  # IK2 has substring tokens ("Alkaloids", "Flavon", "Flavone") that must NOT match full $-tokens; only kingdom (0.1) matches
+  expect_equal(
+    res$score_chemical[
+      res$candidate_structure_inchikey_connectivity_layer == "IK2"
+    ],
+    0.1
+  )
+  # IK3 matches all 4 ClassyFire levels -> 0.4
+  expect_equal(
+    res$score_chemical[
+      res$candidate_structure_inchikey_connectivity_layer == "IK3"
+    ],
+    0.4
+  )
+})

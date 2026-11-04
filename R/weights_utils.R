@@ -45,27 +45,34 @@ compute_weighted_components <- function(..., weights) {
     )
   }
 
+  lens <- lengths(values)
+  n <- if (length(lens) > 0L) max(lens) else 0L
   weight_sum <- sum(weights)
-  if (weight_sum <= 0) {
-    n <- length(values[[1L]])
+  if (weight_sum <= 0 || n == 0L) {
     return(list(
       score = rep(NA_real_, n),
       coverage = rep(NA_real_, n)
     ))
   }
 
-  # do.call(cbind, values) on a list of vectors already returns a matrix,
-  # so the extra as.matrix() below was a redundant full-copy — removed
-  values_matrix <- do.call(cbind, values)
+  # Accumulate weighted sum directly without allocating an N x K matrix
+  score <- numeric(n)
+  for (k in seq_along(values)) {
+    w <- weights[[k]]
+    if (w != 0) {
+      v <- values[[k]]
+      if (length(v) != n) {
+        v <- rep_len(v, n)
+      }
+      if (anyNA(v)) {
+        v[is.na(v)] <- 0
+      }
+      score <- score + v * w
+    }
+  }
+  score <- score / weight_sum
+  coverage <- rep(NA_real_, n)
 
-  # Convert NA to 0 before calculation
-  values_matrix[is.na(values_matrix)] <- 0
-
-  # Simple weighted sum divided by total weight
-  score <- as.numeric(values_matrix %*% weights) / weight_sum
-  coverage <- rep(NA_real_, length(score))
-
-  rm(values, weight_sum, values_matrix, weights)
   list(score = score, coverage = coverage)
 }
 

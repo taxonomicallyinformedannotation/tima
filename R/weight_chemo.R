@@ -275,31 +275,60 @@ weight_chemo <- function(
   for (lvl in chemo_levels) {
     cand_vals <- annot_table_wei_chemo[[lvl$cand]]
     fval <- annot_table_wei_chemo[[lvl$fval]]
-    valid_idx <- which(
-      !is.na(cand_vals) &
-        cand_vals != "notClassified" &
-        !is.na(fval)
-    )
     col_out <- rep(NA_real_, n_annotations)
-    if (length(valid_idx) > 0L) {
-      c_sub <- cand_vals[valid_idx]
-      f_sub <- fval[valid_idx]
-      pair_k <- paste(c_sub, f_sub, sep = "\r")
-      u_pos <- which(!duplicated(pair_k))
-      u_match <- stri_detect_token(str = f_sub[u_pos], pattern = c_sub[u_pos])
-      if (any(u_match)) {
-        w_val <- as.numeric(lvl$weight)
-        hit <- u_match[fastmatch::fmatch(pair_k, pair_k[u_pos])]
-        hit_idx <- valid_idx[hit]
-        col_out[hit_idx] <- w_val
-        if (w_val > 0) {
-          score_chem_max[hit_idx] <- pmax(score_chem_max[hit_idx], w_val)
+    if (!is.null(cand_vals) && !is.null(fval)) {
+      u_f <- unique(fval)
+      u_f <- u_f[!is.na(u_f)]
+      u_c <- unique(cand_vals)
+      u_c <- u_c[!is.na(u_c) & u_c != "notClassified"]
+      n_uf <- length(u_f)
+      n_uc <- length(u_c)
+      if (n_uf > 0L && n_uc > 0L) {
+        parts <- strsplit(u_f, "$", fixed = TRUE)
+        lens <- lengths(parts)
+        toks <- trimws(unlist(parts, use.names = FALSE))
+        tok_c_id <- fastmatch::fmatch(toks, u_c)
+        ok_tok <- which(!is.na(tok_c_id))
+        if (length(ok_tok) > 0L) {
+          tok_f_id <- rep.int(seq_len(n_uf), lens)[ok_tok]
+          tok_c_id <- tok_c_id[ok_tok]
+          f_id <- fastmatch::fmatch(fval, u_f)
+          c_id <- fastmatch::fmatch(cand_vals, u_c)
+          valid_idx <- which(!is.na(f_id) & !is.na(c_id))
+          if (length(valid_idx) > 0L) {
+            c_sub_id <- c_id[valid_idx]
+            f_sub_id <- f_id[valid_idx]
+            if (as.double(n_uc) * n_uf <= 5e7) {
+              match_lut <- logical(n_uc * n_uf)
+              match_lut[(tok_c_id - 1L) * n_uf + tok_f_id] <- TRUE
+              hit <- match_lut[(c_sub_id - 1L) * n_uf + f_sub_id]
+            } else {
+              hit_keys <- unique(as.double(tok_c_id - 1L) * n_uf + tok_f_id)
+              pair_k <- as.double(c_sub_id - 1L) * n_uf + f_sub_id
+              hit <- !is.na(fastmatch::fmatch(pair_k, hit_keys))
+            }
+            if (any(hit)) {
+              w_val <- as.numeric(lvl$weight)
+              hit_idx <- valid_idx[hit]
+              col_out[hit_idx] <- w_val
+              if (w_val > 0) {
+                score_chem_max[hit_idx] <- pmax.int(
+                  score_chem_max[hit_idx],
+                  w_val
+                )
+              }
+            }
+          }
         }
       }
     }
-    annot_table_wei_chemo[[lvl$out]] <- col_out
+    data.table::set(annot_table_wei_chemo, j = lvl$out, value = col_out)
   }
-  annot_table_wei_chemo$score_chemical <- score_chem_max
+  data.table::set(
+    annot_table_wei_chemo,
+    j = "score_chemical",
+    value = score_chem_max
+  )
   rm(chemo_levels, score_chem_max)
 
   weighted_chemo <- compute_weighted_components(
@@ -308,7 +337,11 @@ weight_chemo <- function(
     annot_table_wei_chemo$candidate_score_pseudo_initial,
     weights = c(weight_chemical, weight_biological, weight_spectral)
   )
-  annot_table_wei_chemo$score_weighted_chemo <- weighted_chemo$score
+  data.table::set(
+    annot_table_wei_chemo,
+    j = "score_weighted_chemo",
+    value = weighted_chemo$score
+  )
 
   log_complete(ctx, n_weighted = nrow(annot_table_wei_chemo))
 

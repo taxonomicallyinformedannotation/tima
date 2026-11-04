@@ -1,3 +1,26 @@
+.has_unique_feature_ik <- function(df) {
+  n <- nrow(df)
+  if (n <= 1L) {
+    return(TRUE)
+  }
+  f <- df$feature_id
+  k <- df$candidate_structure_inchikey_connectivity_layer
+  if (anyNA(f) || anyNA(k)) {
+    return(FALSE)
+  }
+  u_f <- unique(f)
+  u_k <- unique(k)
+  f_id <- fastmatch::fmatch(f, u_f)
+  k_id <- fastmatch::fmatch(k, u_k)
+  n_k <- length(u_k)
+  if (as.double(length(u_f)) * n_k < .Machine$integer.max) {
+    anyDuplicated((f_id - 1L) * n_k + k_id) == 0L
+  } else {
+    pk <- as.double(f_id - 1L) * n_k + k_id
+    all(fastmatch::fmatch(pk, pk) == seq_along(pk))
+  }
+}
+
 #' @title Extract narrow biological score table
 #'
 #' @description Extracts only the narrow scoring columns from the full
@@ -100,14 +123,7 @@ combine_weighted_scores <- function(
       score_bio_table$candidate_structure_inchikey_connectivity_layer,
       score_chemo_table$candidate_structure_inchikey_connectivity_layer
     ) &&
-    !anyNA(score_bio_table$feature_id) &&
-    !anyNA(score_bio_table$candidate_structure_inchikey_connectivity_layer) &&
-    !anyDuplicated(
-      score_bio_table[,
-        c("feature_id", "candidate_structure_inchikey_connectivity_layer"),
-        drop = FALSE
-      ]
-    )
+    .has_unique_feature_ik(score_bio_table)
 
   if (aligned) {
     score_final <- compute_weighted_sum(
@@ -210,14 +226,7 @@ expand_combined_scores_for_filtering <- function(
       wide_bio_table$candidate_structure_inchikey_connectivity_layer,
       combined_scores$candidate_structure_inchikey_connectivity_layer
     ) &&
-    !anyNA(wide_bio_table$feature_id) &&
-    !anyNA(wide_bio_table$candidate_structure_inchikey_connectivity_layer) &&
-    !anyDuplicated(
-      wide_bio_table[,
-        c("feature_id", "candidate_structure_inchikey_connectivity_layer"),
-        drop = FALSE
-      ]
-    )
+    .has_unique_feature_ik(wide_bio_table)
 
   if (aligned) {
     result <- data.table::copy(select_clean_chemo_working_columns(
