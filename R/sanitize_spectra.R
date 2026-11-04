@@ -226,6 +226,17 @@ sanitize_spectra <- function(
   min_fragments
 }
 
+.fast_median_no_na <- function(x) {
+  n <- length(x)
+  half <- (n + 1L) %/% 2L
+  if (n %% 2L == 1L) {
+    sort.int(x, partial = half)[half]
+  } else {
+    s <- sort.int(x, partial = c(half, half + 1L))
+    0.5 * (s[half] + s[half + 1L])
+  }
+}
+
 .compute_dynamic_thresholds <- function(peaks_data) {
   vapply(
     peaks_data,
@@ -234,12 +245,14 @@ sanitize_spectra <- function(
         return(0)
       }
       intensities <- peak_matrix[, 2L]
-      intensities <- intensities[!is.nan(intensities)]
-      if (length(intensities) == 0L) {
-        return(0)
+      if (anyNA(intensities)) {
+        intensities <- intensities[!is.nan(intensities) & !is.na(intensities)]
+        if (length(intensities) == 0L) {
+          return(0)
+        }
       }
-      med_intensity <- median(intensities, na.rm = TRUE)
-      mad_intensity <- median(abs(intensities - med_intensity), na.rm = TRUE)
+      med_intensity <- .fast_median_no_na(intensities)
+      mad_intensity <- .fast_median_no_na(abs(intensities - med_intensity))
       if (!is.na(mad_intensity) && mad_intensity > 0) {
         return(max(0, med_intensity - 2 * mad_intensity))
       }
@@ -251,7 +264,7 @@ sanitize_spectra <- function(
 }
 
 .strip_nan_peak_rows <- function(peak_matrix) {
-  if (is.null(peak_matrix) || nrow(peak_matrix) == 0L) {
+  if (is.null(peak_matrix) || nrow(peak_matrix) == 0L || !anyNA(peak_matrix)) {
     return(peak_matrix)
   }
   has_nan <- is.nan(peak_matrix[, 1]) | is.nan(peak_matrix[, 2])
@@ -339,4 +352,4 @@ sanitize_spectra <- function(
   spectra[n_peaks >= min_fragments]
 }
 
-.has_nan_values <- function(x) any(is.nan(x))
+.has_nan_values <- function(x) anyNA(x) && any(is.nan(x))

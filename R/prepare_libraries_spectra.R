@@ -62,32 +62,34 @@ harmonize_spectra_polarity <- function(
     col_sp = col_sp,
     col_sy = col_sy
   )
-  df_list <- lapply(
+  if (length(harmonized_list) == 0L) {
+    return(NULL)
+  }
+  prep_list <- lapply(
     X = harmonized_list,
     FUN = function(x) {
-      df <- x |>
-        tidytable::rename(precursor_mz = precursorMz) |>
-        data.frame(check.names = FALSE)
-      for (.col in intersect(c("mz", "intensity"), names(df))) {
-        if (!is.list(df[[.col]])) {
-          df[[.col]] <- as.list(df[[.col]])
+      lst <- as.list(x)
+      nms <- names(lst)
+      nms[nms == "precursorMz"] <- "precursor_mz"
+      names(lst) <- nms
+      for (.col in intersect(c("mz", "intensity"), nms)) {
+        if (!is.list(lst[[.col]])) {
+          lst[[.col]] <- as.list(lst[[.col]])
         }
       }
-      df
+      lst
     }
   )
-  all_cols <- unique(unlist(lapply(df_list, names), use.names = FALSE))
-  df_list <- lapply(df_list, function(df) {
-    missing_cols <- setdiff(all_cols, names(df))
-    for (col in missing_cols) {
-      df[[col]] <- rep(NA, nrow(df))
-    }
-    df[, all_cols, drop = FALSE]
-  })
-  res <- do.call(rbind, df_list)
-  if (!is.null(res)) {
-    rownames(res) <- NULL
+  rm(harmonized_list)
+  dt <- if (length(prep_list) == 1L) {
+    tidytable::as_tidytable(prep_list[[1L]])
+  } else {
+    data.table::rbindlist(prep_list, use.names = TRUE, fill = TRUE)
   }
+  rm(prep_list)
+  res <- as.list(dt)
+  attr(res, "row.names") <- .set_row_names(nrow(dt))
+  class(res) <- "data.frame"
   res
 }
 

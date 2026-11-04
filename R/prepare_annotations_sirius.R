@@ -203,11 +203,19 @@ prepare_annotations_sirius <-
     max_analog_abs_mz_error = max_analog_abs_mz_error
   )
 
-  table <- merged_structures |>
-    tidytable::mutate(
-      candidate_structure_tax_cla_chemontid = NA_character_,
-      candidate_structure_tax_cla_01kin = NA_character_
-    )
+  table <- tidytable::as_tidytable(merged_structures)
+  rm(merged_structures)
+  n_m <- nrow(table)
+  data.table::set(
+    table,
+    j = "candidate_structure_tax_cla_chemontid",
+    value = rep.int(NA_character_, n_m)
+  )
+  data.table::set(
+    table,
+    j = "candidate_structure_tax_cla_01kin",
+    value = rep.int(NA_character_, n_m)
+  )
 
   log_debug("Selecting annotation columns and integrating metadata")
   select_annotations_columns(
@@ -233,15 +241,24 @@ prepare_annotations_sirius <-
   structures_prepared_summary <- summaries |>
     select_sirius_columns_structures(sirius_version = sirius_version)
 
-  structures_prepared_main <- tables$structures |>
-    tidytable::mutate(
-      feature_id = switch(
-        sirius_version,
-        "5" = harmonize_names_sirius(id),
-        "6" = mappingFeatureId
-      )
-    ) |>
-    select_sirius_columns_structures(sirius_version = sirius_version)
+  main_df <- tidytable::as_tidytable(as.list(tables$structures))
+  if (
+    nrow(main_df) > 0L || any(c("id", "mappingFeatureId") %in% names(main_df))
+  ) {
+    fid_main <- switch(
+      sirius_version,
+      "5" = harmonize_names_sirius(main_df[["id"]]),
+      "6" = main_df[["mappingFeatureId"]]
+    )
+    if (!is.null(fid_main)) {
+      data.table::set(main_df, j = "feature_id", value = fid_main)
+    }
+  }
+  structures_prepared_main <- select_sirius_columns_structures(
+    main_df,
+    sirius_version = sirius_version
+  )
+  rm(main_df)
 
   structures_prepared <- tidytable::bind_rows(
     structures_prepared_summary,
@@ -253,9 +270,19 @@ prepare_annotations_sirius <-
       "candidate_formula"
     ))
 
-  denovo_prepared <- tables$denovo |>
-    tidytable::mutate(feature_id = mappingFeatureId) |>
-    select_sirius_columns_structures(sirius_version = sirius_version)
+  denovo_df <- tidytable::as_tidytable(as.list(tables$denovo))
+  if ("mappingFeatureId" %in% names(denovo_df)) {
+    data.table::set(
+      denovo_df,
+      j = "feature_id",
+      value = denovo_df[["mappingFeatureId"]]
+    )
+  }
+  denovo_prepared <- select_sirius_columns_structures(
+    denovo_df,
+    sirius_version = sirius_version
+  )
+  rm(denovo_df)
 
   spectral_prepared <- tables$spectral |>
     select_sirius_columns_spectral(sirius_version = sirius_version)

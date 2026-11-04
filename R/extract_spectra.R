@@ -111,22 +111,22 @@ extract_spectra <- function(object) {
     names(spectra)[m_pos] <- target_names
   }
 
-  spectra <- tidytable::as_tidytable(spectra)
-
   # Extract Peak Data ----
   peaks_data <- object@backend@peaksData
 
   # Extract m/z values (first column of peak matrices)
-  spectra$mz <- lapply(
+  spectra[["mz"]] <- lapply(
     X = peaks_data,
     FUN = .extract_mz_values
   )
 
   # Extract intensity values (second column of peak matrices)
-  spectra$intensity <- lapply(
+  spectra[["intensity"]] <- lapply(
     X = peaks_data,
     FUN = .extract_intensity_values
   )
+
+  spectra <- tidytable::as_tidytable(spectra)
 
   log_debug("Extracted %d spectra", nrow(spectra))
 

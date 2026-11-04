@@ -409,3 +409,24 @@ test_that(".clean_noise_peak_matrix removes low-intensity values repeated > 5 ti
   kept <- .clean_noise_peak_matrix(pm_keep)
   expect_equal(nrow(kept), 11L)
 })
+
+test_that(".fast_median_no_na, .compute_dynamic_thresholds, and .has_nan_values match base semantics", {
+  expect_equal(.fast_median_no_na(c(5, 1, 9)), stats::median(c(5, 1, 9)))
+  expect_equal(.fast_median_no_na(c(8, 2, 4, 6)), stats::median(c(8, 2, 4, 6)))
+
+  pm_const <- cbind(mz = c(100, 200, 300), intensity = c(50, 50, 50))
+  pm_all_nan <- cbind(mz = c(100, 200), intensity = c(NaN, NaN))
+  pm_mixed <- cbind(mz = c(100, 200, 300, 400), intensity = c(10, NaN, 20, 40))
+  th <- .compute_dynamic_thresholds(list(NULL, pm_const, pm_all_nan, pm_mixed))
+  expect_equal(th[[1L]], 0)
+  expect_equal(th[[2L]], 50)
+  expect_equal(th[[3L]], 0)
+  expect_true(th[[4L]] >= 0)
+
+  expect_false(.has_nan_values(pm_const))
+  expect_false(.has_nan_values(cbind(
+    mz = c(100, NA_real_),
+    intensity = c(1, 2)
+  )))
+  expect_true(.has_nan_values(pm_mixed))
+})

@@ -58,44 +58,35 @@ select_sirius_columns_canopus <- function(df, sirius_version) {
 
   df <- .normalize_sirius_aliases(df)
 
-  df <- df |>
-    tidytable::mutate(
-      feature_id = switch(
-        as.character(sirius_version),
-        "5" = harmonize_names_sirius(id),
-        "6" = mappingFeatureId
-      )
-    ) |>
-    tidytable::select(
-      tidyselect::any_of(
-        x = c(
-          "feature_id",
-          "candidate_adduct" = "adduct",
-          "candidate_structure_molecular_formula" = "molecularFormula",
-          "feature_pred_tax_npc_01pat_val" = "NPC.pathway",
-          "feature_pred_tax_npc_01pat_score" = "NPC.pathway.Probability",
-          "feature_pred_tax_npc_02sup_val" = "NPC.superclass",
-          "feature_pred_tax_npc_02sup_score" = "NPC.superclass.Probability",
-          "feature_pred_tax_npc_03cla_val" = "NPC.class",
-          "feature_pred_tax_npc_03cla_score" = "NPC.class.Probability",
-          # "feature_pred_tax_cla_01kin_val" = "ClassyFire.TODO",
-          # "feature_pred_tax_cla_01kin_score" = "ClassyFire.TODO.Probability",
-          "feature_pred_tax_cla_02sup_val" = "ClassyFire.superclass",
-          "feature_pred_tax_cla_02sup_score" = "ClassyFire.superclass.probability",
-          "feature_pred_tax_cla_03cla_val" = "ClassyFire.class",
-          "feature_pred_tax_cla_03cla_score" = "ClassyFire.class.Probability",
-          # "feature_pred_tax_cla_04sub_val" = "ClassyFire.subclass",
-          # "feature_pred_tax_cla_04sub_score"
-          # ="ClassyFire.subclass.Probability",
-          # "feature_pred_tax_cla_05lev_val" = "ClassyFire.level.5",
-          # "feature_pred_tax_cla_05lev_score"
-          # ="ClassyFire.level.5.Probability",
-          "feature_pred_tax_cla_04dirpar_val" = "ClassyFire.most.specific.class",
-          "feature_pred_tax_cla_04dirpar_score" = "ClassyFire.most.specific.class.Probability"
-        )
-      )
-    ) |>
-    tidytable::distinct()
+  fid_val <- switch(
+    as.character(sirius_version),
+    "5" = harmonize_names_sirius(df[["id"]]),
+    "6" = df[["mappingFeatureId"]]
+  )
+  col_map <- c(
+    "candidate_adduct" = "adduct",
+    "candidate_structure_molecular_formula" = "molecularFormula",
+    "feature_pred_tax_npc_01pat_val" = "NPC.pathway",
+    "feature_pred_tax_npc_01pat_score" = "NPC.pathway.Probability",
+    "feature_pred_tax_npc_02sup_val" = "NPC.superclass",
+    "feature_pred_tax_npc_02sup_score" = "NPC.superclass.Probability",
+    "feature_pred_tax_npc_03cla_val" = "NPC.class",
+    "feature_pred_tax_npc_03cla_score" = "NPC.class.Probability",
+    "feature_pred_tax_cla_02sup_val" = "ClassyFire.superclass",
+    "feature_pred_tax_cla_02sup_score" = "ClassyFire.superclass.probability",
+    "feature_pred_tax_cla_03cla_val" = "ClassyFire.class",
+    "feature_pred_tax_cla_03cla_score" = "ClassyFire.class.Probability",
+    "feature_pred_tax_cla_04dirpar_val" = "ClassyFire.most.specific.class",
+    "feature_pred_tax_cla_04dirpar_score" = "ClassyFire.most.specific.class.Probability"
+  )
+  nms <- names(df)
+  keep_map <- col_map[unname(col_map) %in% nms]
+  out_list <- c(list(feature_id = fid_val), as.list(df)[unname(keep_map)])
+  names(out_list) <- c("feature_id", names(keep_map))
+  df <- .fast_distinct_with_key_guard(
+    tidytable::as_tidytable(out_list),
+    names(out_list)
+  )
   # Normalize SIRIUS adduct spacing (e.g., "[M + H]+" -> "[M+H]+")
   if ("candidate_adduct" %in% names(df)) {
     data.table::set(
@@ -134,47 +125,41 @@ select_sirius_columns_formulas <- function(df, sirius_version) {
   } else {
     rep(NA_real_, nrow(df))
   }
+  fid_val <- switch(
+    as.character(sirius_version),
+    "5" = harmonize_names_sirius(df[["id"]]),
+    "6" = df[["mappingFeatureId"]]
+  )
+  ## exact_mass is recomputed from SMILES via process_smiles() downstream.
+  ## Keep only mass error for scoring.
+  err_mz <- as.numeric(df[["ionMass"]]) * mass_error_ppm * 1E-6
 
-  df <- df |>
-    tidytable::mutate(
-      feature_id = switch(
-        as.character(sirius_version),
-        "5" = harmonize_names_sirius(id),
-        "6" = mappingFeatureId
-      )
-    ) |>
-    tidytable::mutate(
-      ## exact_mass is recomputed from SMILES via process_smiles() downstream.
-      ## Keep only mass error for scoring.
-      candidate_structure_error_mz = as.numeric(ionMass) *
-        mass_error_ppm *
-        1E-6
-    ) |>
-    tidytable::select(
-      tidyselect::any_of(
-        x = c(
-          "feature_id",
-          "candidate_adduct" = "adduct",
-          "candidate_structure_molecular_formula" = "molecularFormula",
-          "candidate_structure_error_mz",
-          "candidate_score_sirius_zodiac" = "ZodiacScore",
-          "candidate_score_sirius_sirius" = "SiriusScore",
-          "candidate_score_sirius_tree" = "TreeScore",
-          "candidate_score_sirius_isotope" = "IsotopeScore",
-          "candidate_score_sirius_intensity" = "explainedIntensity",
-          "candidate_count_sirius_peaks_explained" = "numExplainedPeaks"
-        )
-      )
-    )
-  # Normalize SIRIUS adduct spacing (e.g., "[M + H]+" -> "[M+H]+")
-  if ("candidate_adduct" %in% names(df)) {
-    data.table::set(
-      df,
-      j = "candidate_adduct",
-      value = .fast_strip_whitespace(df[["candidate_adduct"]])
-    )
+  nms <- names(df)
+  out_list <- list(feature_id = fid_val)
+  if ("adduct" %in% nms) {
+    out_list[["candidate_adduct"]] <- .fast_strip_whitespace(df[["adduct"]])
   }
-  df
+  if ("molecularFormula" %in% nms) {
+    out_list[["candidate_structure_molecular_formula"]] <- df[[
+      "molecularFormula"
+    ]]
+  }
+  out_list[["candidate_structure_error_mz"]] <- err_mz
+  tail_map <- c(
+    "candidate_score_sirius_zodiac" = "ZodiacScore",
+    "candidate_score_sirius_sirius" = "SiriusScore",
+    "candidate_score_sirius_tree" = "TreeScore",
+    "candidate_score_sirius_isotope" = "IsotopeScore",
+    "candidate_score_sirius_intensity" = "explainedIntensity",
+    "candidate_count_sirius_peaks_explained" = "numExplainedPeaks"
+  )
+  keep_tail <- tail_map[unname(tail_map) %in% nms]
+  if (length(keep_tail) > 0L) {
+    tail_list <- as.list(df)[unname(keep_tail)]
+    names(tail_list) <- names(keep_tail)
+    out_list <- c(out_list, tail_list)
+  }
+  tidytable::as_tidytable(out_list)
 }
 
 #' @title Select SIRIUS structure columns
@@ -202,34 +187,31 @@ select_sirius_columns_structures <- function(df, sirius_version) {
     "5" = "ConfidenceScore",
     "6" = "ConfidenceScoreApproximate"
   )
-  df <- df |>
-    tidytable::select(
-      tidyselect::any_of(
-        x = c(
-          "feature_id",
-          "candidate_adduct" = "adduct",
-          "candidate_structure_name" = "name",
-          ## SMILES is the single source of truth for structure
-          ## identity.  All structural identifiers (InChIKey, formula,
-          ## mass, xlogp) are strictly recomputed from SMILES via
-          ## process_smiles() downstream.
-          "candidate_structure_smiles_no_stereo" = "smiles",
-          ## molecularFormula is kept as a SIRIUS join key (to connect
-          ## structure candidates with formula-level scores and CANOPUS).
-          ## It will be overwritten by the RDKit-derived formula in
-          ## recompute_structure_fields_from_smiles() downstream.
-          "candidate_structure_molecular_formula" = "molecularFormula",
-          # ISSUE see #147
-          "candidate_score_sirius_confidence" = conf_col,
-          "candidate_score_sirius_csi" = "CSI.FingerIDScore",
-          # tidytable version
-          # "candidate_score_sirius_csi" = "CSI:FingerIDScore",
-          "candidate_score_sirius_msnovelist" = "ModelScore"
-        )
-      )
-    )
+  col_map <- c(
+    "feature_id" = "feature_id",
+    "candidate_adduct" = "adduct",
+    "candidate_structure_name" = "name",
+    ## SMILES is the single source of truth for structure
+    ## identity.  All structural identifiers (InChIKey, formula,
+    ## mass, xlogp) are strictly recomputed from SMILES via
+    ## process_smiles() downstream.
+    "candidate_structure_smiles_no_stereo" = "smiles",
+    ## molecularFormula is kept as a SIRIUS join key (to connect
+    ## structure candidates with formula-level scores and CANOPUS).
+    ## It will be overwritten by the RDKit-derived formula in
+    ## recompute_structure_fields_from_smiles() downstream.
+    "candidate_structure_molecular_formula" = "molecularFormula",
+    # ISSUE see #147
+    "candidate_score_sirius_confidence" = conf_col,
+    "candidate_score_sirius_csi" = "CSI.FingerIDScore",
+    "candidate_score_sirius_msnovelist" = "ModelScore"
+  )
+  nms <- names(df)
+  keep_map <- col_map[unname(col_map) %in% nms]
+  out_list <- as.list(df)[unname(keep_map)]
+  names(out_list) <- names(keep_map)
   df <- .fast_distinct_with_key_guard(
-    df,
+    tidytable::as_tidytable(out_list),
     c("feature_id", "candidate_structure_smiles_no_stereo", "candidate_adduct")
   )
   n_rows <- nrow(df)
@@ -238,6 +220,7 @@ select_sirius_columns_structures <- function(df, sirius_version) {
     j = "candidate_library",
     value = rep.int("SIRIUS", n_rows)
   )
+  na_chr <- rep.int(NA_character_, n_rows)
   for (tax_col in c(
     "candidate_structure_tax_npc_01pat",
     "candidate_structure_tax_npc_02sup",
@@ -248,7 +231,7 @@ select_sirius_columns_structures <- function(df, sirius_version) {
     "candidate_structure_tax_cla_03cla",
     "candidate_structure_tax_cla_04dirpar"
   )) {
-    data.table::set(df, j = tax_col, value = rep.int(NA_character_, n_rows))
+    data.table::set(df, j = tax_col, value = na_chr)
   }
   # Normalize SIRIUS adduct spacing (e.g., "[M + H]+" -> "[M+H]+")
   if ("candidate_adduct" %in% names(df)) {
