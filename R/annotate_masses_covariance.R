@@ -276,7 +276,7 @@ compute_intensity_covariance_edges <- function(
       # Benjamini-Hochberg over every test performed (positive or not), so the
       # threshold controls the false discovery rate of the retained edges
       tidytable::mutate(
-        p_value = stats::p.adjust(p_value_raw, method = "BH")
+        p_value = stats::p.adjust(.data$p_value_raw, method = "BH")
       )
   }
 
@@ -289,15 +289,15 @@ compute_intensity_covariance_edges <- function(
       correlation > 0 & p_value < correlation_p_threshold
     ) |>
     tidytable::mutate(source = "intensity_covariance") |>
-    tidytable::select(
-      feature_id,
-      feature_id_dest,
-      correlation,
-      p_value,
-      p_value_raw,
-      n_samples,
-      source
-    )
+    tidytable::select(tidyselect::all_of(c(
+      "feature_id",
+      "feature_id_dest",
+      "correlation",
+      "p_value",
+      "p_value_raw",
+      "n_samples",
+      "source"
+    )))
 
   r_summary <- if (nrow(result) > 0L) {
     sprintf(

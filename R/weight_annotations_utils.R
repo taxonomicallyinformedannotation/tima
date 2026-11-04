@@ -738,7 +738,9 @@ rearrange_annotations <- function(
         as.list(annotation_table)[t1_cols]
       )
     } else {
-      annotation_table_merged <- data.table::copy(annotation_table[, ..t1_cols])
+      annotation_table_merged <- data.table::copy(
+        tidytable::as_tidytable(as.list(annotation_table)[t1_cols])
+      )
     }
     if ("candidate_score_similarity" %in% names(annotation_table_merged)) {
       data.table::set(
@@ -791,7 +793,11 @@ rearrange_annotations <- function(
       rm(keep1_mask)
     } else {
       rm(ids_dc)
-      keep1_idx <- ord1[!duplicated(annotation_table[ord1, ..dedup_cols])]
+      dedup_sub <- tidytable::as_tidytable(
+        as.list(annotation_table)[dedup_cols]
+      )[ord1, ]
+      keep1_idx <- ord1[!duplicated(dedup_sub)]
+      rm(dedup_sub)
     }
     rm(ord1)
 
@@ -829,7 +835,9 @@ rearrange_annotations <- function(
         rm(merged_list)
       }
     } else {
-      annotation_table_merged <- annotation_table[keep1_idx, ..t1_cols]
+      annotation_table_merged <- tidytable::as_tidytable(
+        as.list(annotation_table)[t1_cols]
+      )[keep1_idx, ]
       if ("candidate_score_similarity" %in% names(annotation_table_merged)) {
         data.table::set(
           annotation_table_merged,

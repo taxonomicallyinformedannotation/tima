@@ -427,12 +427,14 @@ weight_bio <- function(
     f_id <- if (anyNA(u_f)) match(f_col, u_f) else fastmatch::fmatch(f_col, u_f)
     first_f <- which(!duplicated(f_id))
     .fast_distinct_with_key_guard(
-      annotation_table_taxed[first_f, ..samp_cols],
+      tidytable::as_tidytable(as.list(annotation_table_taxed)[samp_cols])[
+        first_f,
+      ],
       "sample_organism_name"
     )
   } else {
     .fast_distinct_with_key_guard(
-      annotation_table_taxed[, ..samp_cols],
+      tidytable::as_tidytable(as.list(annotation_table_taxed)[samp_cols]),
       "sample_organism_name"
     )
   }

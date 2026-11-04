@@ -131,7 +131,9 @@ clean_bio <- function(
       annotations_distinct$feature_id,
       pred_fids
     ))
-    df2 <- annotations_distinct[keep_no_pred, ..non_pred_cols]
+    df2 <- tidytable::as_tidytable(
+      as.list(annotations_distinct)[non_pred_cols]
+    )[keep_no_pred, ]
   } else {
     df1 <- NULL
     df2 <- if (length(pred_tax_cols) > 0L) {

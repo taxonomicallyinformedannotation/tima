@@ -206,7 +206,7 @@ prepare_features_edges <- function(
   # Extract entropy information from spectral edges
   if (length(entropy_columns) > 0L) {
     features_entropy <- .fast_distinct_with_key_guard(
-      edges_ms2[, ..entropy_columns],
+      tidytable::as_tidytable(as.list(edges_ms2)[entropy_columns]),
       name_source
     )
   } else {

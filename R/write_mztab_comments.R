@@ -428,35 +428,37 @@
   }
   u_lib <- unique(lib_chr)
   u_trimmed <- trimws(u_lib)
-  u_out <- tidytable::case_when(
+  u_out <- ifelse(
     # Pass through values already in Param format.
-    grepl("^\\[.*,.*,.*,.*\\]$", u_trimmed) ~ u_trimmed,
+    grepl("^\\[.*,.*,.*,.*\\]$", u_trimmed),
+    u_trimmed,
+    tidytable::case_when(
+      # SIRIUS – in-silico molecular-formula / fragmentation scoring.
+      # No single PSI-MS accession covers the full SIRIUS pipeline.
+      grepl("sirius", u_lib, ignore.case = TRUE) ~
+        "[, , SIRIUS in-silico structure elucidation, ]",
 
-    # SIRIUS – in-silico molecular-formula / fragmentation scoring.
-    # No single PSI-MS accession covers the full SIRIUS pipeline.
-    grepl("sirius", u_lib, ignore.case = TRUE) ~
-      "[, , SIRIUS in-silico structure elucidation, ]",
+      # GNPS spectral networking / library.
+      grepl("gnps", u_lib, ignore.case = TRUE) ~
+        "[, , GNPS spectral library matching, ]",
 
-    # GNPS spectral networking / library.
-    grepl("gnps", u_lib, ignore.case = TRUE) ~
-      "[, , GNPS spectral library matching, ]",
+      # MZmine or other spectral-library tools embedded via mzTab.
+      grepl("mzmine|mztab", u_lib, ignore.case = TRUE) ~
+        "[, , spectral library matching, ]",
 
-    # MZmine or other spectral-library tools embedded via mzTab.
-    grepl("mzmine|mztab", u_lib, ignore.case = TRUE) ~
-      "[, , spectral library matching, ]",
+      # Generic MS/MS spectral library.
+      grepl("spectral|library|ms2|msms", u_lib, ignore.case = TRUE) ~
+        "[, , spectral library matching, ]",
 
-    # Generic MS/MS spectral library.
-    grepl("spectral|library|ms2|msms", u_lib, ignore.case = TRUE) ~
-      "[, , spectral library matching, ]",
+      # MS1 exact-mass database search (no fragmentation evidence).
+      grepl("ms1|exact.mass", u_lib, ignore.case = TRUE) ~
+        "[, , exact mass database search, ]",
 
-    # MS1 exact-mass database search (no fragmentation evidence).
-    grepl("ms1|exact.mass", u_lib, ignore.case = TRUE) ~
-      "[, , exact mass database search, ]",
-
-    # Unknown / other: embed raw library name as a user parameter.
-    is.na(u_lib) | u_lib %in% c("", "null", "NULL", "NA") ~
-      "[, , unknown identification method, ]",
-    TRUE ~ paste0("[, , ", u_trimmed, ", ]")
+      # Unknown / other: embed raw library name as a user parameter.
+      is.na(u_lib) | u_lib %in% c("", "null", "NULL", "NA") ~
+        "[, , unknown identification method, ]",
+      TRUE ~ paste0("[, , ", u_trimmed, ", ]")
+    )
   )
   u_out[fastmatch::fmatch(lib_chr, u_lib)]
 }

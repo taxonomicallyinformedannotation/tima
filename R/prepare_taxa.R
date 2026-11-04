@@ -504,7 +504,7 @@ prepare_taxa <- function(
       )
       meta_cols_keep <- unique(c(name_filename, colname))
       meta_distinct <- .fast_distinct_with_key_guard(
-        metadata_table[, ..meta_cols_keep],
+        tidytable::as_tidytable(as.list(metadata_table)[meta_cols_keep]),
         meta_cols_keep
       )
       meta_selected <- meta_distinct |>
@@ -523,7 +523,7 @@ prepare_taxa <- function(
       rm(meta_distinct, meta_selected)
 
       feat_distinct <- .fast_distinct_with_key_guard(
-        feature_table_0[, ..feat_cols_keep],
+        tidytable::as_tidytable(as.list(feature_table_0)[feat_cols_keep]),
         feat_cols_keep
       )
       if (

@@ -135,7 +135,6 @@ stri_match_first_regex <- function(str, pattern) {
   out
 }
 
-# jarl-ignore unused_function: used by the Shiny app (inst/app_server.R)
 stri_split_fixed <- function(str, pattern) {
   strsplit(str, split = pattern, fixed = TRUE)
 }

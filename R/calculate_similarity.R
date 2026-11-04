@@ -185,5 +185,5 @@ calculate_similarity <- function(
       c(0.0, 0, 0.0, 0.0)
     }
   )
-  return(if (return_matched_peaks) result else result[1L])
+  if (return_matched_peaks) result else result[1L]
 }

@@ -390,7 +390,6 @@ prepare_features_tables <- function(
   core_cols <- c(name_features, name_rt, name_mz, name_adduct)
   intensity_cols <- setdiff(colnames(tbl), core_cols)
   if (length(intensity_cols) == 0L) {
-    empty_cols <- c("feature_id", "sample")
     empty_tbl <- data.frame(
       feature_id = character(0),
       sample = character(0),

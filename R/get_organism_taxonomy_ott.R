@@ -149,7 +149,7 @@
   out <- tidytable::bind_rows(list_df)
   out$ott_id <- as.integer(out$ott_id)
   if (nrow(out) > 1L) {
-    out <- out[nrow(out):1L, ]
+    out <- out[rev(seq_len(nrow(out))), ]
   }
   out
 }
@@ -418,13 +418,16 @@ get_organism_taxonomy_ott <- function(
 
     # Attach each genus match to the organisms it was retried for
     retry_linked <- failed_organisms |>
-      tidytable::select(search_string, genus_string) |>
+      tidytable::select(tidyselect::all_of(c(
+        "search_string",
+        "genus_string"
+      ))) |>
       tidytable::inner_join(
         retry_matches |>
           tidytable::rename(genus_string = search_string),
         by = "genus_string"
       ) |>
-      tidytable::select(-genus_string)
+      tidytable::select(-tidyselect::all_of("genus_string"))
 
     # Combine original and retry results
     new_ott_id <- tidytable::bind_rows(successful_ott_ids, retry_ott_ids) |>

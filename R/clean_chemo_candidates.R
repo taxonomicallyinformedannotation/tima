@@ -1019,12 +1019,12 @@ build_mini_taxonomy_table <- function(
     names(df_percentile),
     value = TRUE
   )
+  df_pred_sub <- tidytable::as_tidytable(as.list(df_percentile)[pred_cols])
   df_pred_tax <- if (nrow(df_percentile) > 10000L) {
     first_f_idx <- which(!duplicated(fid_id))
-    df_percentile[first_f_idx, ..pred_cols]
+    df_pred_sub[first_f_idx, ]
   } else {
-    df_percentile[, ..pred_cols] |>
-      tidytable::distinct()
+    tidytable::distinct(df_pred_sub)
   }
 
   label_cla_pred_u <- rep(NA_character_, n_u)
@@ -1129,7 +1129,7 @@ build_mini_results_table <- function(
   xrefs_table = NULL
 ) {
   ft_cols <- intersect(c("feature_id", "rt", "mz"), names(features_table))
-  ft_base <- features_table[, ..ft_cols]
+  ft_base <- tidytable::as_tidytable(as.list(features_table)[ft_cols])
   if (anyDuplicated(ft_base$feature_id) > 0L) {
     ft_base <- tidytable::distinct(ft_base)
   }

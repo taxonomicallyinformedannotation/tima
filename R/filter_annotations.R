@@ -589,7 +589,9 @@ filter_ms1_redundancy <- function(
       n_quality > 0L &&
       length(join_cols) > 0L
   ) {
-    spectral_keys <- annotations_tables_spectral[qual_idx, ..join_cols] |>
+    spectral_keys <- tidytable::as_tidytable(
+      as.list(annotations_tables_spectral)[join_cols]
+    )[qual_idx, ] |>
       tidytable::distinct()
     ms1_tbl <- tidytable::anti_join(
       ms1_tbl,
