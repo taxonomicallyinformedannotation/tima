@@ -354,3 +354,211 @@ test_that(".filter_top_intensity_samples preserves tie-breaking and handles >16 
   expect_equal(res_large$sample[1], "samp_01")
   expect_equal(res_large$sample[19], "samp_20")
 })
+
+test_that("internal validation helpers enforce exact parameter contracts and boundaries", {
+  # .validate_column_name_param rejects non-char, length != 1, NA, and empty string
+  for (bad_val in list(123, c("a", "b"), NA_character_, "")) {
+    expect_error(
+      .validate_column_name_param(bad_val, "name_mz"),
+      regexp = "`name_mz` must be a single non-empty character string",
+      class = "tima_validation_error"
+    )
+  }
+  expect_no_error(.validate_column_name_param("row m/z", "name_mz"))
+
+  # .validate_prepare_features_inputs candidates validation
+  tmp_f <- withr::local_tempfile(fileext = ".csv")
+  writeLines("id,mz\n1,100.0", tmp_f)
+
+  for (bad_cand in list("five", c(1, 2), NA_real_)) {
+    expect_error(
+      .validate_prepare_features_inputs(
+        features = tmp_f,
+        output = "out.tsv",
+        candidates = bad_cand,
+        name_adduct = "adduct",
+        name_features = "id",
+        name_rt = "rt",
+        name_mz = "mz"
+      ),
+      regexp = "candidates must be a single numeric value or NULL",
+      class = "tima_validation_error"
+    )
+  }
+
+  # Boundary 1 and 100 succeed; NULL succeeds
+  for (ok_cand in list(NULL, 1L, 100L)) {
+    expect_no_error(
+      .validate_prepare_features_inputs(
+        features = tmp_f,
+        output = "out.tsv",
+        candidates = ok_cand,
+        name_adduct = "adduct",
+        name_features = "id",
+        name_rt = "rt",
+        name_mz = "mz"
+      )
+    )
+  }
+})
+
+test_that(".select_intensity_columns, .standardize_column_names, and .resolve_feature_column_names handle edge cases", {
+  # 1. Numeric-like column detection boundary (4/5 = 0.8 >= 0.8 kept, 3/5 = 0.6 < 0.8 dropped, all-NA dropped)
+  tbl_numlike <- tidytable::tidytable(
+    id = as.character(1:5),
+    mz = rep("100.0", 5),
+    col_80 = c("10", "20", "30", "40", "bad"),
+    col_60 = c("10", "20", "30", "bad1", "bad2"),
+    col_na = c(NA_character_, "", NA_character_, "", NA_character_)
+  )
+  sel_num <- .select_intensity_columns(tbl_numlike, "id", "rt", "mz", "adduct")
+  expect_identical(colnames(sel_num), c("id", "mz", "col_80"))
+
+  # 2. No standard and no numeric-like columns -> keeps only core_present
+  tbl_nonum <- tidytable::tidytable(
+    id = c("1", "2"),
+    mz = c("100", "200"),
+    notes = c("alpha", "beta")
+  )
+  sel_nonum <- .select_intensity_columns(tbl_nonum, "id", "rt", "mz", "adduct")
+  expect_identical(colnames(sel_nonum), c("id", "mz"))
+
+  # 3. .standardize_column_names deduplicates colliding clean names keeping first
+  tbl_dup <- tidytable::tidytable(
+    id = 1:2,
+    `datafile:S1:area` = c(100, 200),
+    `quant_S1` = c(10, 20),
+    `quant_S2` = c(30, 40)
+  )
+  std_dup <- .standardize_column_names(tbl_dup)
+  expect_identical(colnames(std_dup), c("id", "S1", "S2"))
+  expect_identical(std_dup$S1, c(100, 200))
+
+  # 4. .resolve_feature_column_names aborts when required column and aliases are missing
+  tbl_missing_req <- tidytable::tidytable(foo = 1:2, bar = 3:4)
+  expect_error(
+    .resolve_feature_column_names(
+      tbl_missing_req,
+      name_features = "row ID",
+      name_rt = "row retention time",
+      name_mz = "row m/z",
+      name_adduct = "adduct"
+    ),
+    regexp = "Required column 'row ID' is missing",
+    class = "tima_validation_error"
+  )
+})
+
+test_that(".filter_top_intensity_samples handles zero intensity columns, >16 all-zero fast path, and duplicate feature_id fallback path", {
+  # 1. Zero intensity columns (only core columns present)
+  tbl_core_only <- tidytable::tidytable(
+    feature_id = c("1", "2"),
+    rt = c(1.0, 2.0),
+    mz = c(100.0, 200.0),
+    adduct = c("[M+H]+", "[M+Na]+")
+  )
+  res_no_int <- .filter_top_intensity_samples(
+    tbl_core_only,
+    candidates = 2L,
+    name_features = "feature_id",
+    name_rt = "rt",
+    name_mz = "mz",
+    name_adduct = "adduct"
+  )
+  expect_identical(nrow(res_no_int), 0L)
+  expect_identical(
+    names(res_no_int),
+    c("feature_id", "sample", "rt", "mz", "adduct")
+  )
+
+  # 2. >16 candidates with all-zero/NA intensities in fast matrix path
+  n_samp <- 18L
+  zero_wide <- data.frame(
+    feature_id = c("1", "2"),
+    rt = c(1.0, 2.0),
+    mz = c(100.0, 200.0),
+    adduct = c("[M+H]+", "[M+Na]+"),
+    stringsAsFactors = FALSE
+  )
+  for (i in seq_len(n_samp)) {
+    zero_wide[[sprintf("s_%02d", i)]] <- c(0, NA_real_)
+  }
+  res_zero_18 <- .filter_top_intensity_samples(
+    zero_wide,
+    candidates = 18L,
+    name_features = "feature_id",
+    name_rt = "rt",
+    name_mz = "mz",
+    name_adduct = "adduct"
+  )
+  expect_identical(nrow(res_zero_18), 0L)
+  expect_identical(
+    names(res_zero_18),
+    c("feature_id", "sample", "rt", "mz", "adduct")
+  )
+
+  # 3. Fallback long-table path when feature_ids contain duplicates (numeric & non-numeric)
+  tbl_dup_num <- data.frame(
+    feature_id = c("10", "2", "2"),
+    rt = c(1.0, 2.0, 2.1),
+    mz = c(100.0, 200.0, 200.1),
+    adduct = c("[M+H]+", "[M+Na]+", "[M+K]+"),
+    s1 = c(50, 100, 10),
+    s2 = c(80, 20, 300),
+    stringsAsFactors = FALSE
+  )
+  res_dup_num <- .filter_top_intensity_samples(
+    tbl_dup_num,
+    candidates = 1L,
+    name_features = "feature_id",
+    name_rt = "rt",
+    name_mz = "mz",
+    name_adduct = "adduct"
+  )
+  expect_identical(res_dup_num$feature_id, c("2", "10"))
+  expect_identical(res_dup_num$sample, c("s2", "s2"))
+  expect_identical(res_dup_num$intensity, c(300, 80))
+
+  tbl_dup_chr <- data.frame(
+    feature_id = c("feat_b", "feat_a", "feat_a"),
+    rt = c(1.0, 2.0, 2.1),
+    mz = c(100.0, 200.0, 200.1),
+    adduct = c("[M+H]+", "[M+Na]+", "[M+K]+"),
+    s1 = c(50, 100, 10),
+    s2 = c(80, 20, 300),
+    stringsAsFactors = FALSE
+  )
+  res_dup_chr <- .filter_top_intensity_samples(
+    tbl_dup_chr,
+    candidates = 1L,
+    name_features = "feature_id",
+    name_rt = "rt",
+    name_mz = "mz",
+    name_adduct = "adduct"
+  )
+  expect_identical(res_dup_chr$feature_id, c("feat_a", "feat_b"))
+  expect_identical(res_dup_chr$intensity, c(300, 80))
+
+  # 4. Fallback long-table path with all-zero intensities
+  tbl_dup_zero <- data.frame(
+    feature_id = c("1", "1"),
+    rt = c(1.0, 1.0),
+    mz = c(100.0, 100.0),
+    adduct = c("[M+H]+", "[M+H]+"),
+    s1 = c(0, NA_real_),
+    stringsAsFactors = FALSE
+  )
+  res_dup_zero <- .filter_top_intensity_samples(
+    tbl_dup_zero,
+    candidates = 1L,
+    name_features = "feature_id",
+    name_rt = "rt",
+    name_mz = "mz",
+    name_adduct = "adduct"
+  )
+  expect_identical(nrow(res_dup_zero), 0L)
+  expect_identical(
+    names(res_dup_zero),
+    c("feature_id", "sample", "rt", "mz", "adduct")
+  )
+})
