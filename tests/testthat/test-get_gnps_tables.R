@@ -336,6 +336,20 @@ test_that("create_fake_gnps_files writes exact schemas, handles metadata normali
   ann_fb <- utils::read.delim(res_fb[["annotations"]], check.names = FALSE)
   expect_identical(nrow(ann_fb), 0L)
   expect_identical(colnames(ann_fb)[1], "#Scan#")
+
+  # Empty path_features and path_spectra skip placeholder creation without warning
+  expect_no_warning(
+    res_no_fs <- create_fake_gnps_files(
+      filename = "no_fs",
+      path_features = "",
+      path_metadata = meta_path,
+      path_spectra = "",
+      path_interim_a = dir_a,
+      path_interim_f = dir_f
+    )
+  )
+  expect_identical(res_no_fs[["features"]], "")
+  expect_identical(res_no_fs[["spectra"]], "")
 })
 
 test_that("get_gnps_tables constructs exact URLs and paths for fbmn and classical workflows offline", {

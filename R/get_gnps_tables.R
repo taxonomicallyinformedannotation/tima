@@ -107,9 +107,10 @@ create_fake_gnps_files <- function(
     # Write a minimal valid MGF block
     mgf_stub <- c("BEGIN IONS", "TITLE=placeholder", "END IONS")
     writeLines(mgf_stub, con = path_spectra)
+    rm(mgf_stub)
   }
 
-  rm(fake_annotations, fake_components, fake_edges, fake_metadata, mgf_stub)
+  rm(fake_annotations, fake_components, fake_edges, fake_metadata)
 
   c(
     "features" = path_features,
