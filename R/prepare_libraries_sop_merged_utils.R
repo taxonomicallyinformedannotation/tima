@@ -129,6 +129,7 @@ complete_organism_taxonomy <- function(table_keys, table_org_tax_ott) {
     fastmatch::fmatch(u_orgs, table_org_tax_ott$organism_name, nomatch = 0L) ==
       0L
   ]
+  attr(table_org_tax_ott$organism_name, ".match.hash") <- NULL
   if (length(missing_orgs) == 0L) {
     return(table_org_tax_ott)
   }

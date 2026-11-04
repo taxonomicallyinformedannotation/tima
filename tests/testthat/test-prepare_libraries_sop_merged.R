@@ -1412,3 +1412,123 @@ test_that("11_targets_libraries seed cache targets do not track mutable files wi
     expect_false(grepl('format\\s*=\\s*"file"', m))
   }
 })
+
+test_that(".normalize_and_write_cache normalizes columns, replaces notClassified, writes tsv/gz, and handles write errors", {
+  tmp_dir <- withr::local_tempdir()
+  raw_cache <- tidytable::tidytable(
+    structure_smiles = c("C", "CC", "C"),
+    structure_tax_npc_01pat = c("Alkaloids", "notClassified", "Alkaloids"),
+    num_col = factor(c("notClassified", "Terpenoids", "notClassified")),
+    extra_col = c("drop1", "drop2", "drop3")
+  )
+  expected_cols <- c("structure_smiles", "structure_tax_npc_01pat", "num_col")
+
+  # 1. Plain TSV output
+  tsv_path <- file.path(tmp_dir, "norm_cache.tsv")
+  ok_tsv <- .normalize_and_write_cache(
+    cache_data = raw_cache,
+    cache_path = tsv_path,
+    expected_cols = expected_cols,
+    taxonomy_name = "NPClassifier"
+  )
+  expect_true(ok_tsv)
+  read_back <- tidytable::fread(tsv_path, na.strings = "")
+  expect_identical(nrow(read_back), 2L)
+  expect_identical(colnames(read_back), expected_cols)
+  expect_identical(read_back$structure_smiles, c("C", "CC"))
+  expect_identical(
+    read_back$structure_tax_npc_01pat,
+    c("Alkaloids", NA_character_)
+  )
+  expect_identical(read_back$num_col, c(NA_character_, "Terpenoids"))
+
+  # 2. Gzipped TSV.gz output
+  gz_path <- file.path(tmp_dir, "norm_cache.tsv.gz")
+  ok_gz <- .normalize_and_write_cache(
+    cache_data = raw_cache,
+    cache_path = gz_path,
+    expected_cols = expected_cols,
+    taxonomy_name = "NPClassifier"
+  )
+  expect_true(ok_gz)
+  read_gz <- tidytable::fread(gz_path, na.strings = "")
+  expect_identical(nrow(read_gz), 2L)
+
+  # 3. Error fallback returns FALSE without throwing
+  bad_path <- file.path(tmp_dir, "nonexistent_subdir", "fail.tsv")
+  ok_err <- .normalize_and_write_cache(
+    cache_data = raw_cache,
+    cache_path = bad_path,
+    expected_cols = expected_cols,
+    taxonomy_name = "NPClassifier"
+  )
+  expect_false(ok_err)
+
+  # 4. enrich_taxonomy_from_cache triggers .normalize_and_write_cache when supplement is NULL but needs_disk_norm is TRUE
+  csv_cache_path <- file.path(tmp_dir, "dirty_cache.tsv")
+  writeLines(
+    c(
+      "structure_smiles,structure_tax_npc_01pat",
+      "C,notClassified"
+    ),
+    csv_cache_path
+  )
+  tax_tbl <- tidytable::tidytable(
+    structure_smiles = "C",
+    structure_tax_npc_01pat = "Alkaloids"
+  )
+  res_enr <- enrich_taxonomy_from_cache(
+    taxonomy_table = tax_tbl,
+    cache_path = csv_cache_path,
+    key_col = "structure_smiles",
+    all_keys = "C",
+    taxonomy_name = "NPClassifier"
+  )
+  expect_identical(res_enr$structure_tax_npc_01pat, "Alkaloids")
+  norm_lines <- readLines(csv_cache_path)
+  expect_true(grepl("\t", norm_lines[[1]], fixed = TRUE))
+  expect_false(any(grepl("notClassified", norm_lines, fixed = TRUE)))
+})
+
+test_that("complete_organism_taxonomy handles all-NA keys and enriches missing organisms with type coercion", {
+  tax_init <- tidytable::tidytable(
+    organism_name = "Gentiana lutea",
+    organism_taxonomy_ottid = "100",
+    flag_col = "TRUE",
+    list_col = "a"
+  )
+
+  # 1. All-NA organism_name returns table_org_tax_ott unchanged
+  keys_na <- tidytable::tidytable(
+    organism_name = c(NA_character_, NA_character_)
+  )
+  expect_identical(complete_organism_taxonomy(keys_na, tax_init), tax_init)
+
+  # 2. Missing organism triggers get_organism_taxonomy_ott and coerces numeric/list/logical cols to character
+  keys_missing <- tidytable::tidytable(
+    organism_name = c("Gentiana lutea", "Arabidopsis thaliana", NA_character_)
+  )
+  local_mocked_bindings(
+    get_organism_taxonomy_ott = function(df, retry = FALSE) {
+      expect_identical(df$organism, "Arabidopsis thaliana")
+      expect_false(retry)
+      data.frame(
+        organism_name = "Arabidopsis thaliana",
+        organism_taxonomy_ottid = 200L,
+        flag_col = FALSE,
+        list_col = I(list("b")),
+        stringsAsFactors = FALSE
+      )
+    }
+  )
+
+  res <- complete_organism_taxonomy(keys_missing, tax_init)
+  expect_identical(nrow(res), 2L)
+  expect_identical(
+    res$organism_name,
+    c("Gentiana lutea", "Arabidopsis thaliana")
+  )
+  expect_identical(res$organism_taxonomy_ottid, c("100", "200"))
+  expect_identical(res$flag_col, c("TRUE", "FALSE"))
+  expect_identical(res$list_col, c("a", "b"))
+})
