@@ -53,7 +53,7 @@ jobs:
           # future::plan(future::multicore)
           install.packages(".", repos = NULL, type = "source")
           install.packages(c("altdoc", "pkgload"))
-          pkgload::load_all()
+          gc()
           altdoc::render_docs(parallel = FALSE, freeze = FALSE, verbose = TRUE)
         shell: Rscript {0}
       - name: Deploy to GitHub pages 🚀

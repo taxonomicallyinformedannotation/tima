@@ -1357,3 +1357,58 @@ test_that("apply_taxonomic_filter matches organisms without expanding non-matchi
   expect_equal(nrow(out), 1L)
   expect_equal(out$organism_name, "Rosa canina")
 })
+
+test_that("enrich_taxonomy_from_cache skips disk rewrite when cache is already normalized and complete", {
+  tmpdir <- tempfile()
+  dir.create(tmpdir, recursive = TRUE)
+  on.exit(unlink(tmpdir, recursive = TRUE))
+
+  taxonomy <- tidytable::tidytable(
+    structure_smiles = "C",
+    structure_tax_npc_01pat = "PathA",
+    structure_tax_npc_02sup = "SuperA",
+    structure_tax_npc_03cla = "ClassA"
+  )
+  cache <- tidytable::tidytable(
+    structure_smiles = c("C", "CC"),
+    structure_tax_npc_01pat = c("PathA", "PathB"),
+    structure_tax_npc_02sup = c("SuperA", "SuperB"),
+    structure_tax_npc_03cla = c("ClassA", "ClassB")
+  )
+  cache_path <- file.path(tmpdir, "npc_cache.tsv")
+  tidytable::fwrite(cache, cache_path, sep = "\t")
+  old_time <- as.POSIXct("2020-01-01 00:00:00", tz = "UTC")
+  Sys.setFileTime(cache_path, old_time)
+
+  res1 <- enrich_taxonomy_from_cache(
+    taxonomy_table = taxonomy,
+    cache_path = cache_path,
+    key_col = "structure_smiles",
+    all_keys = c("C", "CC"),
+    taxonomy_name = "NPClassifier"
+  )
+  expect_equal(nrow(res1), 2L)
+  expect_equal(as.numeric(file.mtime(cache_path)), as.numeric(old_time))
+})
+
+test_that("11_targets_libraries seed cache targets do not track mutable files with format = 'file'", {
+  src <- readLines(
+    system.file("targets/11_targets_libraries.R", package = "tima"),
+    warn = FALSE
+  )
+  txt <- paste(src, collapse = "\n")
+  for (tname in c(
+    "lib_sop_mer_str_pro",
+    "lib_sop_mer_npc_cache",
+    "lib_sop_mer_cla_cache"
+  )) {
+    pat <- paste0(
+      "name\\s*=\\s*",
+      tname,
+      "[\\s\\S]*?\\n\\s*\\)"
+    )
+    m <- regmatches(txt, regexpr(pat, txt, perl = TRUE))
+    expect_length(m, 1L)
+    expect_false(grepl('format\\s*=\\s*"file"', m))
+  }
+})

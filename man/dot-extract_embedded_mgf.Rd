@@ -4,7 +4,7 @@
 \alias{.extract_embedded_mgf}
 \title{Extract embedded masster-style COM MGF spectra from mzTab-M file}
 \usage{
-.extract_embedded_mgf(input, features, id_col)
+.extract_embedded_mgf(input, features, id_col, lines = NULL)
 }
 \value{
 Character vector of MGF lines, or NULL if no embedded spectra found.

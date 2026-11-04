@@ -4,7 +4,12 @@
 \alias{load_structure_organism_pairs}
 \title{Load Structure-Organism Pairs}
 \usage{
-load_structure_organism_pairs(library, str_stereo, org_tax_ott)
+load_structure_organism_pairs(
+  library,
+  str_stereo,
+  org_tax_ott,
+  needed_structures = NULL
+)
 }
 \arguments{
 \item{library}{\link{character} Character, path to main library file (required).}
@@ -14,6 +19,10 @@ load_structure_organism_pairs(library, str_stereo, org_tax_ott)
 
 \item{org_tax_ott}{\link{character} Character, path to organism taxonomy file
 (optional; NULL allowed).}
+
+\item{needed_structures}{\link{character} Optional character vector of candidate
+structure connectivity layers (\code{structure_inchikey_connectivity_layer})
+to filter structure-organism pairs during loading.}
 }
 \value{
 Data frame with structure-organism pairs, including any joined

@@ -550,7 +550,34 @@ export_library_tables <- function(
     }
   }
 
+  attr(cache_data, ".needs_disk_normalization") <- isTRUE(looks_headerless) ||
+    !identical(sep, "\t")
   cache_data
+}
+
+.cache_needs_disk_normalization <- function(
+  cache_data,
+  expected_cols,
+  had_col_rename = FALSE,
+  had_chemontid_norm = FALSE
+) {
+  if (
+    isTRUE(attr(cache_data, ".needs_disk_normalization")) ||
+      isTRUE(had_col_rename) ||
+      isTRUE(had_chemontid_norm)
+  ) {
+    return(TRUE)
+  }
+  if (!identical(names(cache_data), expected_cols)) {
+    return(TRUE)
+  }
+  for (col in expected_cols) {
+    x <- cache_data[[col]]
+    if (is.character(x) && any(!is.na(x) & x == "notClassified")) {
+      return(TRUE)
+    }
+  }
+  FALSE
 }
 
 # Helper function: Write back enriched taxonomy to cache
@@ -560,13 +587,37 @@ export_library_tables <- function(
   expected_cols,
   col_mapping,
   taxonomy_name,
-  existing_cache = NULL
+  existing_cache = NULL,
+  taxonomy_table = NULL,
+  key_col = NULL,
+  needs_disk_norm = TRUE
 ) {
   tryCatch(
     {
-      cache_to_write <- enriched |>
-        tidytable::select(tidyselect::all_of(expected_cols)) |>
-        tidytable::distinct()
+      # When existing_cache is already normalized on disk and taxonomy_table
+      # contributes no keys absent from existing_cache, skip rewriting disk
+      if (
+        !is.null(existing_cache) &&
+          !isTRUE(needs_disk_norm) &&
+          !is.null(key_col) &&
+          key_col %in% names(existing_cache)
+      ) {
+        if (
+          is.null(taxonomy_table) ||
+            nrow(taxonomy_table) == 0L ||
+            !key_col %in% names(taxonomy_table)
+        ) {
+          return(invisible(FALSE))
+        }
+        tax_keys <- taxonomy_table[[key_col]]
+        tax_keys <- tax_keys[!is.na(tax_keys)]
+        if (
+          length(tax_keys) == 0L ||
+            !anyNA(fastmatch::fmatch(tax_keys, existing_cache[[key_col]]))
+        ) {
+          return(invisible(FALSE))
+        }
+      }
 
       # Reuse in-memory cache when provided; otherwise read from disk
       if (is.null(existing_cache)) {
@@ -593,11 +644,32 @@ export_library_tables <- function(
             existing_cache[[col]] <- NA_character_
           }
         }
-        existing_cache <- existing_cache |>
-          tidytable::select(tidyselect::all_of(expected_cols))
+        existing_cache <- tidytable::as_tidytable(
+          as.list(existing_cache)[expected_cols]
+        )
       }
 
-      combined_cache <- tidytable::bind_rows(existing_cache, cache_to_write)
+      # Only rows from taxonomy_table can be new relative to existing_cache
+      # (cache_supplement was extracted from existing_cache itself)
+      source_for_new <- taxonomy_table %||% enriched
+      cache_to_write <- if (
+        !is.null(source_for_new) && nrow(source_for_new) > 0L
+      ) {
+        for (col in expected_cols) {
+          if (!col %in% names(source_for_new)) {
+            source_for_new[[col]] <- NA_character_
+          }
+        }
+        tidytable::as_tidytable(as.list(source_for_new)[expected_cols])
+      } else {
+        tidytable::tidytable()
+      }
+
+      combined_cache <- if (nrow(cache_to_write) > 0L) {
+        tidytable::bind_rows(existing_cache, cache_to_write)
+      } else {
+        existing_cache
+      }
       for (col in names(combined_cache)) {
         x <- combined_cache[[col]]
         if (!is.character(x)) {
@@ -615,7 +687,13 @@ export_library_tables <- function(
           }
         }
       }
-      combined_cache <- tidytable::distinct(combined_cache)
+      combined_cache <- if (
+        !is.null(key_col) && key_col %in% names(combined_cache)
+      ) {
+        .fast_distinct_with_key_guard(combined_cache, key_col)
+      } else {
+        tidytable::distinct(combined_cache)
+      }
 
       create_dir(export = cache_path)
       compress_method <- if (grepl("\\.gz$", cache_path, ignore.case = TRUE)) {
@@ -637,6 +715,7 @@ export_library_tables <- function(
         nrow(combined_cache),
         cache_path
       )
+      invisible(TRUE)
     },
     error = function(e) {
       log_warn(
@@ -644,6 +723,7 @@ export_library_tables <- function(
         taxonomy_name,
         conditionMessage(e)
       )
+      invisible(FALSE)
     }
   )
 }
@@ -730,9 +810,11 @@ enrich_taxonomy_from_cache <- function(
   }
 
   # Apply column mapping if provided
+  raw_cache_names <- names(cache_data)
   if (!is.null(col_mapping)) {
     cache_data <- .apply_col_mapping(cache_data, col_mapping)
   }
+  had_col_rename <- !identical(names(cache_data), raw_cache_names)
 
   # Verify key column exists in cache BEFORE touching the cache file on disk
   if (!key_col %in% names(cache_data)) {
@@ -746,12 +828,20 @@ enrich_taxonomy_from_cache <- function(
   }
 
   # Normalize chemontid values
+  old_chemontid <- if ("structure_tax_cla_chemontid" %in% names(cache_data)) {
+    cache_data[["structure_tax_cla_chemontid"]]
+  } else {
+    NULL
+  }
   chemontid_normalized <- .normalize_chemontid_in_tables(
     cache_data,
     taxonomy_table
   )
   cache_data <- chemontid_normalized$cache_data
   taxonomy_table <- chemontid_normalized$taxonomy_table
+  had_chemontid_norm <- !is.null(old_chemontid) &&
+    !identical(old_chemontid, cache_data[["structure_tax_cla_chemontid"]])
+  rm(old_chemontid)
 
   # Determine expected columns
   expected_cols <- if (!is.null(taxonomy_table) && ncol(taxonomy_table) > 0) {
@@ -759,6 +849,13 @@ enrich_taxonomy_from_cache <- function(
   } else {
     names(cache_data)
   }
+
+  needs_disk_norm <- .cache_needs_disk_normalization(
+    cache_data = cache_data,
+    expected_cols = expected_cols,
+    had_col_rename = had_col_rename,
+    had_chemontid_norm = had_chemontid_norm
+  )
 
   # Get existing keys
   existing_keys <- .get_existing_keys(taxonomy_table, key_col)
@@ -774,19 +871,37 @@ enrich_taxonomy_from_cache <- function(
   )
 
   if (is.null(cache_supplement)) {
-    # Normalize cache file on disk when no supplement is needed
-    .normalize_and_write_cache(
-      cache_data,
-      cache_path,
-      expected_cols,
-      taxonomy_name
-    )
+    if (needs_disk_norm) {
+      # Normalize cache file on disk when format/columns needed normalization
+      .normalize_and_write_cache(
+        cache_data,
+        cache_path,
+        expected_cols,
+        taxonomy_name
+      )
+    } else if (
+      !is.null(taxonomy_table) &&
+        nrow(taxonomy_table) > 0L &&
+        key_col %in% names(taxonomy_table)
+    ) {
+      .write_enriched_taxonomy_to_cache(
+        enriched = taxonomy_table,
+        cache_path = cache_path,
+        expected_cols = expected_cols,
+        col_mapping = col_mapping,
+        taxonomy_name = taxonomy_name,
+        existing_cache = cache_data,
+        taxonomy_table = taxonomy_table,
+        key_col = key_col,
+        needs_disk_norm = FALSE
+      )
+    }
     return(taxonomy_table)
   }
 
   # Combine enriched taxonomy
   enriched <- tidytable::bind_rows(taxonomy_table, cache_supplement) |>
-    tidytable::distinct()
+    .fast_distinct_with_key_guard(key_col)
 
   n_added <- nrow(enriched) - nrow(taxonomy_table)
   log_info(
@@ -803,7 +918,10 @@ enrich_taxonomy_from_cache <- function(
     expected_cols = expected_cols,
     col_mapping = col_mapping,
     taxonomy_name = taxonomy_name,
-    existing_cache = cache_data
+    existing_cache = cache_data,
+    taxonomy_table = taxonomy_table,
+    key_col = key_col,
+    needs_disk_norm = needs_disk_norm
   )
 
   enriched

@@ -392,16 +392,6 @@ weight_annotations <- function(
 
   edges_table <- load_edges_table(edges, candidates_neighbors)
 
-  structure_organism_pairs_table <- load_structure_organism_pairs(
-    library,
-    str_stereo,
-    org_tax_ott
-  )
-  log_debug(
-    "Loaded %d structure-organism pairs",
-    nrow(structure_organism_pairs_table)
-  )
-
   canopus_table <- safe_fread(
     file = canopus,
     file_type = "CANOPUS classifications",
@@ -426,7 +416,7 @@ weight_annotations <- function(
     tidytable::tidytable()
   } else {
     .fast_distinct_with_key_guard(
-      annotation_table[, ..feat_cols],
+      tidytable::as_tidytable(as.list(annotation_table)[feat_cols]),
       "feature_id"
     )
   }
@@ -441,7 +431,8 @@ weight_annotations <- function(
     annotation_table,
     formula_table,
     canopus_table,
-    edges_table
+    edges_table,
+    consume_input = TRUE
   )
   annotation_table <- select_weight_annotations_working_columns(
     annotation_table
@@ -496,6 +487,28 @@ weight_annotations <- function(
   )
 
   rm(annotation_table)
+
+  needed_structures <- if (
+    "candidate_structure_inchikey_connectivity_layer" %in%
+      names(annotation_table_taxed)
+  ) {
+    unique(
+      annotation_table_taxed$candidate_structure_inchikey_connectivity_layer
+    )
+  } else {
+    NULL
+  }
+  structure_organism_pairs_table <- load_structure_organism_pairs(
+    library,
+    str_stereo,
+    org_tax_ott,
+    needed_structures = needed_structures
+  )
+  rm(needed_structures)
+  log_debug(
+    "Loaded %d structure-organism pairs",
+    nrow(structure_organism_pairs_table)
+  )
 
   # Perform taxonomically informed scoring
   annot_table_wei_bio <- weight_bio(

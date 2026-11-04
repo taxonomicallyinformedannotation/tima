@@ -8,7 +8,8 @@ rearrange_annotations(
   annotation_table,
   formula_table,
   canopus_table,
-  edges_table
+  edges_table,
+  consume_input = FALSE
 )
 }
 \arguments{

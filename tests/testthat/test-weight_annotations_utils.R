@@ -533,3 +533,89 @@ test_that("log_annotation_stats returns invisibly NULL without error", {
   )
   expect_invisible(log_annotation_stats(df))
 })
+
+test_that("load_structure_organism_pairs filters to needed_structures before joining taxonomy", {
+  lib_df <- data.frame(
+    structure_inchikey = c(
+      "AAAAAAAAAAAAAA-UHFFFAOYSA-N",
+      "BBBBBBBBBBBBBB-UHFFFAOYSA-N"
+    ),
+    organism_name = c("Org-A", "Org-B"),
+    stringsAsFactors = FALSE
+  )
+  stereo_df <- data.frame(
+    structure_inchikey = c(
+      "AAAAAAAAAAAAAA-UHFFFAOYSA-N",
+      "BBBBBBBBBBBBBB-UHFFFAOYSA-N"
+    ),
+    structure_inchikey_connectivity_layer = c(
+      "AAAAAAAAAAAAAA",
+      "BBBBBBBBBBBBBB"
+    ),
+    stringsAsFactors = FALSE
+  )
+  tax_df <- data.frame(
+    organism_name = c("Org-A", "Org-B"),
+    organism_taxonomy_ottid = c("1", "2"),
+    organism_taxonomy_01domain = c("Eukaryota", "Bacteria"),
+    stringsAsFactors = FALSE
+  )
+  lib <- make_tsv(lib_df)
+  stereo <- make_tsv(stereo_df)
+  tax <- make_tsv(tax_df)
+  on.exit(unlink(c(lib, stereo, tax)))
+
+  res <- load_structure_organism_pairs(
+    lib,
+    str_stereo = stereo,
+    org_tax_ott = tax,
+    needed_structures = "AAAAAAAAAAAAAA"
+  )
+  expect_equal(nrow(res), 1L)
+  expect_equal(res$structure_inchikey_connectivity_layer, "AAAAAAAAAAAAAA")
+  expect_equal(res$organism_taxonomy_01domain, "Eukaryota")
+})
+
+test_that("rearrange_annotations handles 3-column dedup_cols and consume_input = TRUE", {
+  ann <- tidytable::tidytable(
+    feature_id = c("F1", "F1", "F1", "F2"),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "IK1",
+      "IK1",
+      "IK1",
+      "IK2"
+    ),
+    candidate_structure_inchikey_no_stereo = c(
+      "IK1-NS1",
+      "IK1-NS1",
+      "IK1-NS2",
+      "IK2-NS1"
+    ),
+    candidate_score_similarity = c("0.60", "0.95", "0.70", "0.80"),
+    candidate_score_sirius_csi = c(NA_character_, "-10", NA_character_, "-5")
+  )
+  ann_copy <- data.table::copy(ann)
+  res1 <- rearrange_annotations(
+    annotation_table = ann,
+    formula_table = tidytable::tidytable(),
+    canopus_table = tidytable::tidytable(),
+    edges_table = tidytable::tidytable(),
+    consume_input = FALSE
+  )
+  res2 <- rearrange_annotations(
+    annotation_table = ann_copy,
+    formula_table = tidytable::tidytable(),
+    canopus_table = tidytable::tidytable(),
+    edges_table = tidytable::tidytable(),
+    consume_input = TRUE
+  )
+  expect_equal(res1, res2)
+  expect_equal(nrow(res1), 3L)
+  expect_equal(
+    res1$candidate_score_similarity[
+      res1$feature_id == "F1" &
+        res1$candidate_structure_inchikey_no_stereo == "IK1-NS1"
+    ],
+    0.95
+  )
+})

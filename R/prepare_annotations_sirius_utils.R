@@ -326,7 +326,43 @@ create_empty_sirius_annotations <- function() {
     return(df[!dup_fwd, ])
   }
   if (sum(dup_fwd) * 4L >= n) {
-    return(tidytable::distinct(df))
+    first_idx <- which(!dup_fwd)
+    if (n_keys == 1L) {
+      ck_id <- id1
+    } else {
+      u_ck <- comp_key[first_idx]
+      ck_id <- if (anyNA(u_ck)) {
+        match(comp_key, u_ck)
+      } else {
+        fastmatch::fmatch(comp_key, u_ck)
+      }
+    }
+    ref_idx <- first_idx[ck_id]
+    non_keys <- setdiff(names(df), present_keys)
+    bad_row <- logical(n)
+    for (col in non_keys) {
+      v <- df[[col]]
+      v_ref <- v[ref_idx]
+      diff_c <- (is.na(v) != is.na(v_ref)) | (!is.na(v) & v != v_ref)
+      if (any(diff_c)) {
+        bad_row <- bad_row | diff_c
+      }
+    }
+    if (!any(bad_row)) {
+      return(df[first_idx, ])
+    }
+    bad_key_ids <- unique(ck_id[bad_row])
+    if (length(bad_key_ids) * 4L >= length(first_idx)) {
+      return(tidytable::distinct(df))
+    }
+    is_bad <- !is.na(fastmatch::fmatch(ck_id, bad_key_ids))
+    bad_idx <- which(is_bad)
+    good_first <- first_idx[is.na(
+      fastmatch::fmatch(seq_along(first_idx), bad_key_ids)
+    )]
+    keep_bad <- bad_idx[!duplicated(df[bad_idx, ])]
+    keep_all <- sort.int(c(good_first, keep_bad), method = "radix")
+    return(df[keep_all, ])
   }
   is_dup_key <- dup_fwd | duplicated(comp_key, fromLast = TRUE)
   dup_idx <- which(is_dup_key)

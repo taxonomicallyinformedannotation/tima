@@ -209,18 +209,32 @@ validate_weight_annotations_inputs <- function(
 load_annotation_tables <- function(annotations, ms1_only) {
   log_debug("Loading %d annotation file(s)", length(annotations))
   annotation_table <- tryCatch(
-    Map(
-      function(x, y) {
-        .safe_fread_selected_columns(
-          file = x,
-          file_type = paste0("annotation file ", y),
-          selector = select_weight_annotations_working_columns
-        )
-      },
-      annotations,
-      seq_along(annotations)
-    ) |>
-      tidytable::bind_rows(),
+    if (length(annotations) == 1L) {
+      .safe_fread_selected_columns(
+        file = annotations[[1L]],
+        file_type = "annotation file 1",
+        selector = select_weight_annotations_working_columns
+      )
+    } else {
+      tbl_list <- Map(
+        function(x, y) {
+          .safe_fread_selected_columns(
+            file = x,
+            file_type = paste0("annotation file ", y),
+            selector = select_weight_annotations_working_columns
+          )
+        },
+        annotations,
+        seq_along(annotations)
+      )
+      res <- tidytable::as_tidytable(data.table::rbindlist(
+        tbl_list,
+        use.names = TRUE,
+        fill = TRUE
+      ))
+      rm(tbl_list)
+      res
+    },
     error = function(e) {
       cli::cli_abort(
         c(
@@ -235,55 +249,30 @@ load_annotation_tables <- function(annotations, ms1_only) {
 
   if (ms1_only) {
     n_before <- nrow(annotation_table)
-    has_sirius_confidence <- "candidate_score_sirius_confidence" %in%
-      names(annotation_table)
-    has_similarity <- "candidate_score_similarity" %in% names(annotation_table)
-    has_sirius_csi <- "candidate_score_sirius_csi" %in% names(annotation_table)
-
-    if (has_sirius_confidence) {
-      if (has_similarity && has_sirius_csi) {
-        annotation_table <- annotation_table |>
-          tidytable::filter(
-            is.na(candidate_score_similarity) &
-              is.na(candidate_score_sirius_csi) &
-              (is.na(candidate_score_sirius_confidence) |
-                as.numeric(candidate_score_sirius_confidence) == 0)
-          )
-      } else if (has_similarity) {
-        annotation_table <- annotation_table |>
-          tidytable::filter(
-            is.na(candidate_score_similarity) &
-              (is.na(candidate_score_sirius_confidence) |
-                as.numeric(candidate_score_sirius_confidence) == 0)
-          )
-      } else if (has_sirius_csi) {
-        annotation_table <- annotation_table |>
-          tidytable::filter(
-            is.na(candidate_score_sirius_csi) &
-              (is.na(candidate_score_sirius_confidence) |
-                as.numeric(candidate_score_sirius_confidence) == 0)
-          )
-      } else {
-        annotation_table <- annotation_table |>
-          tidytable::filter(
-            is.na(candidate_score_sirius_confidence) |
-              as.numeric(candidate_score_sirius_confidence) == 0
-          )
-      }
+    nms_ann <- names(annotation_table)
+    keep_mask <- rep(TRUE, n_before)
+    if ("candidate_score_similarity" %in% nms_ann) {
+      keep_mask <- keep_mask &
+        is.na(annotation_table$candidate_score_similarity)
+    }
+    if ("candidate_score_sirius_csi" %in% nms_ann) {
+      keep_mask <- keep_mask &
+        is.na(annotation_table$candidate_score_sirius_csi)
+    }
+    if ("candidate_score_sirius_confidence" %in% nms_ann) {
+      conf_num <- .as_numeric_dedup(
+        annotation_table$candidate_score_sirius_confidence
+      )
+      keep_mask <- keep_mask & (is.na(conf_num) | conf_num == 0)
+      rm(conf_num)
+    }
+    if (!all(keep_mask)) {
+      keep_idx <- which(keep_mask)
+      rm(keep_mask)
+      annotation_table <- annotation_table[keep_idx, ]
+      rm(keep_idx)
     } else {
-      if (has_similarity && has_sirius_csi) {
-        annotation_table <- annotation_table |>
-          tidytable::filter(
-            is.na(candidate_score_similarity) &
-              is.na(candidate_score_sirius_csi)
-          )
-      } else if (has_similarity) {
-        annotation_table <- annotation_table |>
-          tidytable::filter(is.na(candidate_score_similarity))
-      } else if (has_sirius_csi) {
-        annotation_table <- annotation_table |>
-          tidytable::filter(is.na(candidate_score_sirius_csi))
-      }
+      rm(keep_mask)
     }
 
     log_debug(
@@ -312,11 +301,19 @@ load_annotation_tables <- function(annotations, ms1_only) {
 #'     (optional; NULL allowed).
 #' @param org_tax_ott [character] Character, path to organism taxonomy file
 #'     (optional; NULL allowed).
+#' @param needed_structures [character] Optional character vector of candidate
+#'     structure connectivity layers (`structure_inchikey_connectivity_layer`)
+#'     to filter structure-organism pairs during loading.
 #'
 #' @return Data frame with structure-organism pairs, including any joined
 #'     metadata.
 #' @keywords internal
-load_structure_organism_pairs <- function(library, str_stereo, org_tax_ott) {
+load_structure_organism_pairs <- function(
+  library,
+  str_stereo,
+  org_tax_ott,
+  needed_structures = NULL
+) {
   log_debug("Loading library from: %s", library)
   library_table <- tryCatch(
     .safe_fread_selected_columns(
@@ -336,6 +333,10 @@ load_structure_organism_pairs <- function(library, str_stereo, org_tax_ott) {
     }
   )
 
+  if (!is.null(needed_structures)) {
+    needed_structures <- unique(needed_structures[!is.na(needed_structures)])
+  }
+
   supp_files <- list(str_stereo, org_tax_ott)
   supp_names <- c("stereochemistry", "organism taxonomy")
   supp_tables <- Map(
@@ -353,10 +354,39 @@ load_structure_organism_pairs <- function(library, str_stereo, org_tax_ott) {
     supp_names
   )
 
+  if (
+    length(needed_structures) > 0L &&
+      nrow(supp_tables[[1L]]) > 0L &&
+      "structure_inchikey_connectivity_layer" %in% names(supp_tables[[1L]])
+  ) {
+    keep_st <- which(
+      !is.na(fastmatch::fmatch(
+        supp_tables[[1L]]$structure_inchikey_connectivity_layer,
+        needed_structures
+      ))
+    )
+    supp_tables[[1L]] <- supp_tables[[1L]][keep_st, ]
+  }
+
   joined <- tidytable::as_tidytable(library_table)
   rm(library_table)
-  for (tbl in supp_tables) {
+  for (i in seq_along(supp_tables)) {
+    tbl <- supp_tables[[i]]
+    supp_tables[[i]] <- tidytable::tidytable()
     if (nrow(tbl) == 0L) {
+      if (
+        i == 1L &&
+          length(needed_structures) > 0L &&
+          "structure_inchikey_connectivity_layer" %in% names(joined)
+      ) {
+        keep_j <- which(
+          !is.na(fastmatch::fmatch(
+            joined$structure_inchikey_connectivity_layer,
+            needed_structures
+          ))
+        )
+        joined <- joined[keep_j, ]
+      }
       next
     }
     by_cols <- intersect(names(joined), names(tbl))
@@ -390,6 +420,21 @@ load_structure_organism_pairs <- function(library, str_stereo, org_tax_ott) {
       }
     } else if (length(by_cols) > 0L) {
       joined <- tidytable::left_join(x = joined, y = tbl, by = by_cols)
+    }
+    rm(tbl)
+
+    if (
+      i == 1L &&
+        length(needed_structures) > 0L &&
+        "structure_inchikey_connectivity_layer" %in% names(joined)
+    ) {
+      keep_j <- which(
+        !is.na(fastmatch::fmatch(
+          joined$structure_inchikey_connectivity_layer,
+          needed_structures
+        ))
+      )
+      joined <- joined[keep_j, ]
     }
   }
   rm(supp_tables)
@@ -593,9 +638,11 @@ rearrange_annotations <- function(
   annotation_table,
   formula_table,
   canopus_table,
-  edges_table
+  edges_table,
+  consume_input = FALSE
 ) {
   model <- columns_model()
+  ann_names <- names(annotation_table)
 
   # Table 1: deduplicated annotations (all sources, spectra + structure cols)
   t1_cols <- intersect(
@@ -605,10 +652,56 @@ rearrange_annotations <- function(
       model$candidates_spectra_columns,
       model$candidates_structures_columns
     ),
-    names(annotation_table)
+    ann_names
   )
+
+  # Pre-extract SIRIUS structure-level rows BEFORE consuming/subsetting
+  # annotation_table so we do not need to retain the full input table in memory
+  t2_cols <- intersect(
+    c(
+      "feature_id",
+      "candidate_structure_inchikey_connectivity_layer",
+      model$candidates_sirius_str_columns
+    ),
+    ann_names
+  )
+  sirius_new_cols <- setdiff(t2_cols, t1_cols)
+  csi_idx <- if ("candidate_score_sirius_csi" %in% ann_names) {
+    which(!is.na(annotation_table$candidate_score_sirius_csi))
+  } else {
+    integer(0L)
+  }
+  sirius_protos <- vector("list", length(sirius_new_cols))
+  names(sirius_protos) <- sirius_new_cols
+  for (col in sirius_new_cols) {
+    sirius_protos[[col]] <- annotation_table[[col]][NA_integer_]
+  }
+  sirius_sub <- NULL
+  if (
+    length(csi_idx) > 0L &&
+      length(sirius_new_cols) > 0L &&
+      all(
+        c(
+          "feature_id",
+          "candidate_structure_inchikey_connectivity_layer"
+        ) %in%
+          t1_cols
+      )
+  ) {
+    sirius_keep_cols <- unique(c(
+      "feature_id",
+      "candidate_structure_inchikey_connectivity_layer",
+      sirius_new_cols
+    ))
+    sirius_sub <- vector("list", length(sirius_keep_cols))
+    names(sirius_sub) <- sirius_keep_cols
+    for (col in sirius_keep_cols) {
+      sirius_sub[[col]] <- annotation_table[[col]][csi_idx]
+    }
+  }
+
   n_in <- nrow(annotation_table)
-  sim_num <- if ("candidate_score_similarity" %in% names(annotation_table)) {
+  sim_num <- if ("candidate_score_similarity" %in% ann_names) {
     .as_numeric_dedup(annotation_table$candidate_score_similarity)
   } else {
     rep(NA_real_, n_in)
@@ -622,9 +715,31 @@ rearrange_annotations <- function(
     ),
     t1_cols
   )
+  if (
+    length(dedup_cols) == 3L &&
+      identical(
+        annotation_table$candidate_structure_inchikey_no_stereo,
+        annotation_table$candidate_structure_inchikey_connectivity_layer
+      )
+  ) {
+    dedup_cols <- c(
+      "feature_id",
+      "candidate_structure_inchikey_connectivity_layer"
+    )
+  }
 
   if (n_in <= 1L || length(dedup_cols) == 0L) {
-    annotation_table_merged <- data.table::copy(annotation_table[, ..t1_cols])
+    if (isTRUE(consume_input) && data.table::is.data.table(annotation_table)) {
+      drop_cols <- setdiff(names(annotation_table), t1_cols)
+      if (length(drop_cols) > 0L) {
+        data.table::set(annotation_table, j = drop_cols, value = NULL)
+      }
+      annotation_table_merged <- tidytable::as_tidytable(
+        as.list(annotation_table)[t1_cols]
+      )
+    } else {
+      annotation_table_merged <- data.table::copy(annotation_table[, ..t1_cols])
+    }
     if ("candidate_score_similarity" %in% names(annotation_table_merged)) {
       data.table::set(
         annotation_table_merged,
@@ -634,57 +749,94 @@ rearrange_annotations <- function(
     }
   } else {
     ord1 <- order(-sim_num, na.last = TRUE, method = "radix")
-    if (
-      length(dedup_cols) == 2L &&
-        all(
-          c(
-            "feature_id",
-            "candidate_structure_inchikey_connectivity_layer"
-          ) %in%
-            dedup_cols
-        )
-    ) {
-      f_col <- annotation_table$feature_id[ord1]
-      ik_col <- annotation_table$candidate_structure_inchikey_connectivity_layer[
-        ord1
-      ]
-      u_f <- unique(f_col)
-      u_ik <- unique(ik_col)
-      f_id <- if (anyNA(u_f)) {
-        match(f_col, u_f)
+    n_dc <- length(dedup_cols)
+    ids_dc <- vector("list", n_dc)
+    bases_dc <- numeric(n_dc)
+    for (i in seq_len(n_dc)) {
+      dc_v <- annotation_table[[dedup_cols[[i]]]]
+      u_dc <- unique(dc_v)
+      id_i <- if (anyNA(u_dc)) {
+        match(dc_v, u_dc)
       } else {
-        fastmatch::fmatch(f_col, u_f)
+        fastmatch::fmatch(dc_v, u_dc)
       }
-      ik_id <- if (anyNA(u_ik)) {
-        match(ik_col, u_ik)
-      } else {
-        fastmatch::fmatch(ik_col, u_ik)
+      ids_dc[[i]] <- id_i[ord1]
+      bases_dc[[i]] <- as.double(max(1L, length(u_dc)))
+      rm(dc_v, u_dc, id_i)
+    }
+    total_combos <- prod(bases_dc)
+    if (total_combos < .Machine$integer.max) {
+      k1 <- ids_dc[[1L]]
+      if (n_dc >= 2L) {
+        for (i in 2:n_dc) {
+          bi <- as.integer(bases_dc[[i]])
+          k1 <- (k1 - 1L) * bi + ids_dc[[i]]
+        }
       }
-      n_ik <- max(1L, length(u_ik))
-      use_int <- as.double(length(u_f)) * n_ik < .Machine$integer.max
-      k1 <- if (use_int) {
-        (f_id - 1L) * n_ik + ik_id
-      } else {
-        as.double(f_id - 1L) * n_ik + ik_id
-      }
-      keep1_mask <- if (use_int) {
-        !duplicated(k1)
-      } else {
-        fastmatch::fmatch(k1, k1) == seq_along(k1)
-      }
+      keep1_mask <- !duplicated(k1)
+      rm(k1, ids_dc)
       keep1_idx <- ord1[keep1_mask]
-      rm(f_col, ik_col, u_f, u_ik, f_id, ik_id, k1, keep1_mask)
+      rm(keep1_mask)
+    } else if (total_combos < 4503599627370496) {
+      k1 <- as.double(ids_dc[[1L]])
+      if (n_dc >= 2L) {
+        for (i in 2:n_dc) {
+          bi <- bases_dc[[i]]
+          k1 <- (k1 - 1) * bi + ids_dc[[i]]
+        }
+      }
+      keep1_mask <- fastmatch::fmatch(k1, k1) == seq_along(k1)
+      rm(k1, ids_dc)
+      keep1_idx <- ord1[keep1_mask]
+      rm(keep1_mask)
     } else {
+      rm(ids_dc)
       keep1_idx <- ord1[!duplicated(annotation_table[ord1, ..dedup_cols])]
     }
     rm(ord1)
-    annotation_table_merged <- annotation_table[keep1_idx, ..t1_cols]
-    if ("candidate_score_similarity" %in% names(annotation_table_merged)) {
-      data.table::set(
-        annotation_table_merged,
-        j = "candidate_score_similarity",
-        value = sim_num[keep1_idx]
-      )
+
+    if (isTRUE(consume_input) && data.table::is.data.table(annotation_table)) {
+      drop_cols <- setdiff(names(annotation_table), t1_cols)
+      if (length(drop_cols) > 0L) {
+        data.table::set(annotation_table, j = drop_cols, value = NULL)
+      }
+      if (identical(keep1_idx, seq_len(n_in))) {
+        annotation_table_merged <- tidytable::as_tidytable(
+          as.list(annotation_table)[t1_cols]
+        )
+        if ("candidate_score_similarity" %in% names(annotation_table_merged)) {
+          data.table::set(
+            annotation_table_merged,
+            j = "candidate_score_similarity",
+            value = sim_num
+          )
+        }
+      } else {
+        merged_list <- vector("list", length(t1_cols))
+        names(merged_list) <- t1_cols
+        for (col in t1_cols) {
+          if (col == "candidate_score_similarity") {
+            data.table::set(annotation_table, j = col, value = NULL)
+            merged_list[[col]] <- sim_num[keep1_idx]
+          } else {
+            col_v <- annotation_table[[col]]
+            data.table::set(annotation_table, j = col, value = NULL)
+            merged_list[[col]] <- col_v[keep1_idx]
+            rm(col_v)
+          }
+        }
+        annotation_table_merged <- tidytable::as_tidytable(merged_list)
+        rm(merged_list)
+      }
+    } else {
+      annotation_table_merged <- annotation_table[keep1_idx, ..t1_cols]
+      if ("candidate_score_similarity" %in% names(annotation_table_merged)) {
+        data.table::set(
+          annotation_table_merged,
+          j = "candidate_score_similarity",
+          value = sim_num[keep1_idx]
+        )
+      }
     }
     rm(keep1_idx)
   }
@@ -693,50 +845,23 @@ rearrange_annotations <- function(
   # Step 1: Merge SIRIUS structure-level scores into deduplicated annotations
   # by (feature_id, candidate_structure_inchikey_connectivity_layer) without
   # copying the entire multi-million-row annotation table via full_join.
-  t2_cols <- intersect(
-    c(
-      "feature_id",
-      "candidate_structure_inchikey_connectivity_layer",
-      model$candidates_sirius_str_columns
-    ),
-    names(annotation_table)
-  )
-  csi_idx <- if ("candidate_score_sirius_csi" %in% names(annotation_table)) {
-    which(!is.na(annotation_table$candidate_score_sirius_csi))
-  } else {
-    integer(0L)
-  }
-  sirius_new_cols <- setdiff(t2_cols, names(annotation_table_merged))
-
   if (length(csi_idx) == 0L) {
     n_rows <- nrow(annotation_table_merged)
     for (col in sirius_new_cols) {
       val <- if (col == "candidate_score_sirius_csi") {
         rep.int(NA_real_, n_rows)
       } else {
-        rep.int(annotation_table[[col]][NA_integer_], n_rows)
+        rep.int(sirius_protos[[col]], n_rows)
       }
       data.table::set(annotation_table_merged, j = col, value = val)
     }
-  } else if (
-    length(sirius_new_cols) > 0L &&
-      all(
-        c(
-          "feature_id",
-          "candidate_structure_inchikey_connectivity_layer"
-        ) %in%
-          names(annotation_table_merged)
-      )
-  ) {
-    csi_num <- .as_numeric_dedup(
-      annotation_table$candidate_score_sirius_csi[csi_idx]
-    )
+  } else if (!is.null(sirius_sub)) {
+    csi_num <- .as_numeric_dedup(sirius_sub[["candidate_score_sirius_csi"]])
     rel_ord2 <- order(-csi_num, na.last = TRUE, method = "radix")
-    ord2 <- csi_idx[rel_ord2]
-    f2 <- annotation_table$feature_id[ord2]
-    ik2 <- annotation_table$candidate_structure_inchikey_connectivity_layer[
-      ord2
-    ]
+    f2 <- sirius_sub[["feature_id"]][rel_ord2]
+    ik2 <- sirius_sub[[
+      "candidate_structure_inchikey_connectivity_layer"
+    ]][rel_ord2]
     u_f2 <- unique(f2)
     u_ik2 <- unique(ik2)
     f2_id <- if (anyNA(u_f2)) {
@@ -761,7 +886,7 @@ rearrange_annotations <- function(
     } else {
       fastmatch::fmatch(k2, k2) == seq_along(k2)
     }
-    keep2_idx <- ord2[keep2_mask]
+    keep2_rel <- rel_ord2[keep2_mask]
     k2_u <- k2[keep2_mask]
 
     m_f <- if (anyNA(u_f2)) {
@@ -790,16 +915,17 @@ rearrange_annotations <- function(
       }
       m_pos[both_ok] <- fastmatch::fmatch(k_m, k2_u)
     }
-    csi_u <- csi_num[rel_ord2][keep2_mask]
+    csi_u <- csi_num[keep2_rel]
     for (col in sirius_new_cols) {
       val <- if (col == "candidate_score_sirius_csi") {
         csi_u[m_pos]
       } else {
-        annotation_table[[col]][keep2_idx][m_pos]
+        sirius_sub[[col]][keep2_rel][m_pos]
       }
       data.table::set(annotation_table_merged, j = col, value = val)
     }
   }
+  rm(sirius_sub, sirius_protos)
 
   # Step 2: Add formula-level SIRIUS scores.
   # left_join (not full_join) so that formula entries without a matching

@@ -708,8 +708,7 @@ targets_section_libraries <- function() {
               url = paths$urls$examples$structures_processed,
               export = par_pre_lib_sop_mer$files$libraries$sop$merged$structures$processed
             )
-          },
-          format = "file"
+          }
         ),
         tar_target(
           name = lib_sop_mer_npc_cache,
@@ -720,8 +719,7 @@ targets_section_libraries <- function() {
                 "n"
               ]]
             )
-          },
-          format = "file"
+          }
         ),
         tar_target(
           name = lib_sop_mer_cla_cache,
@@ -732,12 +730,29 @@ targets_section_libraries <- function() {
                 "c"
               ]]
             )
-          },
-          format = "file"
+          }
         ),
         tar_target(
           name = lib_sop_mer,
           command = {
+            if (!file.exists(lib_sop_mer_str_pro)) {
+              get_file(
+                url = paths$urls$examples$structures_processed,
+                export = lib_sop_mer_str_pro
+              )
+            }
+            if (!file.exists(lib_sop_mer_npc_cache)) {
+              get_file(
+                url = paths$urls$examples$npclassifier_cache,
+                export = lib_sop_mer_npc_cache
+              )
+            }
+            if (!file.exists(lib_sop_mer_cla_cache)) {
+              get_file(
+                url = paths$urls$examples$classyfire_cache,
+                export = lib_sop_mer_cla_cache
+              )
+            }
             prepare_libraries_sop_merged(
               files = c(
                 lib_sop_big_pre,
