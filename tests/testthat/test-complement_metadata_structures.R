@@ -832,3 +832,28 @@ test_that(".build_name_lookup_from_stereo resolves multi-row stereoisomer groups
   expect_true(is.na(res_by_key[["IK_MULTI_CONF-N"]]$.lk_tag))
   expect_true(is.na(res_by_key[["IK_MULTI_CONF-N"]]$.lk_xlogp))
 })
+
+test_that(".normalize_enrichment_text handles sentinels and preserves valid n/e strings", {
+  raw_vals <- c(
+    "  NA  ",
+    "n/a",
+    "NULL",
+    "NotClassified",
+    "empty",
+    "  ",
+    "",
+    "NormalName",
+    "naringenin",
+    "epicatechin"
+  )
+  norm_vals <- .normalize_enrichment_text(raw_vals)
+  expect_equal(
+    norm_vals,
+    c(
+      rep(NA_character_, 7L),
+      "NormalName",
+      "naringenin",
+      "epicatechin"
+    )
+  )
+})

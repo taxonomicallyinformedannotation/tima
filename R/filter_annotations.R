@@ -105,20 +105,28 @@ filter_annotations <- function(
     log_debug("RT tolerance: %.2f minutes", tolerance_rt)
   }
 
+  feat_hdr <- names(safe_fread(
+    file = features,
+    file_type = "features table",
+    required_cols = "feature_id",
+    nrows = 0L
+  ))
+  has_rt <- "rt" %in% feat_hdr
+  distinct_cols <- intersect(
+    c("feature_id", if (has_rt) "rt", "mz"),
+    feat_hdr
+  )
   features_table <- safe_fread(
     file = features,
     file_type = "features table",
     required_cols = "feature_id",
+    select = distinct_cols,
     colClasses = "character",
     na.strings = c("", "NA")
   )
-
-  has_rt <- "rt" %in% names(features_table)
-  distinct_cols <- c("feature_id", if (has_rt) "rt", "mz")
-  distinct_cols <- intersect(distinct_cols, names(features_table))
-  features_table <- features_table |>
-    tidytable::distinct(feature_id, .keep_all = TRUE) |>
-    tidytable::select(tidyselect::all_of(distinct_cols))
+  if (anyDuplicated(features_table$feature_id) > 0L) {
+    features_table <- features_table[!duplicated(features_table$feature_id), ]
+  }
 
   n_features <- nrow(features_table)
   log_info(
@@ -271,13 +279,12 @@ filter_annotations <- function(
   rm(features_annotated_table_1)
 
   ## in case some features had a single filtered annotation
-  missing_feature_ids <- setdiff(
-    features_table$feature_id,
-    features_annotated_table_2$feature_id
-  )
-  if (length(missing_feature_ids) > 0L) {
-    unannotated <- features_table |>
-      tidytable::filter(feature_id %in% missing_feature_ids)
+  u_ann_f <- unique(features_annotated_table_2$feature_id)
+  missing_idx <- which(is.na(
+    fastmatch::fmatch(features_table$feature_id, u_ann_f)
+  ))
+  if (length(missing_idx) > 0L) {
+    unannotated <- features_table[missing_idx, ]
     final_table <- tidytable::bind_rows(
       features_annotated_table_2,
       unannotated

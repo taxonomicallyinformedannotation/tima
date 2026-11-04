@@ -578,9 +578,84 @@ annotate_masses <- function(
   if (nrow(pairs) == 0L) {
     return(invisible(NULL))
   }
-  bins <- pairs[, .N, by = .(bin = cut(delta, breaks = 100000L))] |>
-    tidytable::arrange(tidytable::desc(N)) |>
-    tidytable::slice_head(n = 16L)
+  x <- pairs$delta
+  nb <- 100000L
+  rx <- range(x, na.rm = TRUE)
+  if (!all(is.finite(rx))) {
+    bins <- pairs[, .N, by = .(bin = cut(delta, breaks = nb))] |>
+      tidytable::arrange(tidytable::desc(N)) |>
+      tidytable::slice_head(n = 16L)
+  } else {
+    dx <- rx[2L] - rx[1L]
+    if (dx == 0) {
+      dx <- abs(rx[1L])
+      breaks <- seq.int(
+        rx[1L] - if (dx == 0) 0.001 else dx / 1000,
+        rx[2L] + if (dx == 0) 0.001 else dx / 1000,
+        length.out = nb + 1L
+      )
+    } else {
+      breaks <- seq.int(rx[1L], rx[2L], length.out = nb + 1L)
+      breaks[c(1L, nb + 1L)] <- c(rx[1L] - dx * 0.001, rx[2L] + dx * 0.001)
+    }
+    codes <- .bincode(x, breaks = breaks, right = TRUE, include.lowest = FALSE)
+    counts <- tabulate(codes, nbins = nb)
+    nz <- which(counts > 0L)
+    if (length(nz) == 0L) {
+      return(invisible(NULL))
+    }
+    cand <- if (length(nz) > 16L) {
+      thresh <- sort(counts[nz], partial = length(nz) - 15L)[length(nz) - 15L]
+      which(counts >= thresh)
+    } else {
+      nz
+    }
+    first_pos <- match(cand, codes)
+    ord <- cand[order(-counts[cand], first_pos)]
+    top_idx <- ord[seq_len(min(16L, length(ord)))]
+
+    step <- (breaks[nb] - breaks[2L]) / (nb - 2L)
+    p10 <- 10^(floor(log10(max(step, abs(rx[1L])))):ceiling(log10(max(
+      step,
+      abs(rx[2L])
+    ))))
+    idx_lo <- as.integer(ceiling((p10 - rx[1L]) / step)) + 1L
+    idx_hi <- as.integer(floor((p10 - rx[1L]) / step))
+    probe_lo <- unique(c(
+      1L,
+      2L,
+      nb - 1L,
+      nb,
+      as.integer(seq.int(1L, nb, length.out = 64L)),
+      idx_lo[idx_lo >= 1L & idx_lo <= nb],
+      idx_hi[idx_hi >= 1L & idx_hi <= nb],
+      top_idx
+    ))
+    for (dig in 3L:12L) {
+      ch_lo_p <- formatC(0 + breaks[probe_lo], digits = dig, width = 1L)
+      ch_hi_p <- formatC(0 + breaks[probe_lo + 1L], digits = dig, width = 1L)
+      if (all(ch_lo_p != ch_hi_p)) {
+        break
+      }
+    }
+    nt <- length(top_idx)
+    ch_top <- formatC(
+      0 + breaks[c(top_idx, top_idx + 1L)],
+      digits = dig,
+      width = 1L
+    )
+    top_labels <- paste0(
+      "(",
+      ch_top[seq_len(nt)],
+      ",",
+      ch_top[nt + seq_len(nt)],
+      "]"
+    )
+    bins <- tidytable::tidytable(
+      bin = top_labels,
+      N = counts[top_idx]
+    )
+  }
   bins <- add_percentage_column(bins, count_col = "N", out_col = "Pct")
   log_info(
     "Here are the top 16 observed m/z differences inside the RT windows:"
@@ -2830,13 +2905,16 @@ enforce_non_conflicting_annotation_states <- function(
 
   if (n_dropped_rows > 0L) {
     drop_idx <- which(!keep)
-    dropped_n <- nrow(
-      tidytable::tidytable(
-        feature_id = f_col[drop_idx],
-        adduct = annotations$adduct[drop_idx]
-      ) |>
-        tidytable::distinct()
-    )
+    add_drop <- annotations$adduct[drop_idx]
+    u_add_drop <- unique(add_drop)
+    add_drop_id <- if (anyNA(u_add_drop)) {
+      match(add_drop, u_add_drop)
+    } else {
+      fastmatch::fmatch(add_drop, u_add_drop)
+    }
+    n_u_add_drop <- length(u_add_drop)
+    pair_key <- as.double(f_id[drop_idx] - 1L) * n_u_add_drop + add_drop_id
+    dropped_n <- length(unique(pair_key))
     dropped_all_features <- max(0L, n_u_f - n_kept_features)
     log_info(
       paste0(

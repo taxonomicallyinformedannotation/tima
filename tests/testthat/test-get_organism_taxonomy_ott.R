@@ -451,3 +451,23 @@ test_that("get_organism_taxonomy_ott keeps its columns when nothing matches", {
 
   expect_equal(names(result), names(.empty_organism_taxonomy_table()))
 })
+
+test_that("get_organism_taxonomy_ott deduplicates repeated organism names before querying", {
+  calls <- local_fake_ott_api()
+
+  result <- get_organism_taxonomy_ott(
+    df = data.frame(
+      organism = c(
+        "Gentiana lutea",
+        "Gentiana   lutea",
+        "  Gentiana lutea  ",
+        "Homo sapiens",
+        "Homo sapiens"
+      )
+    )
+  )
+
+  expect_length(calls$tnrs, 1L)
+  expect_equal(calls$tnrs[[1L]]$names, c("gentiana lutea", "homo sapiens"))
+  expect_equal(nrow(result), 3L)
+})

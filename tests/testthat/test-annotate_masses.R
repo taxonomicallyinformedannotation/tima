@@ -1892,3 +1892,13 @@ test_that("filter_modifier_edges_by_assigned_adducts keeps edges when endpoint a
   expect_equal(nrow(out$cluster_edges), 1L)
   expect_equal(nrow(out$loss_edges), 1L)
 })
+
+test_that(".log_top_pair_deltas handles empty, single-value, and standard delta pairs", {
+  expect_null(.log_top_pair_deltas(data.table::data.table(delta = numeric(0))))
+  expect_null(.log_top_pair_deltas(data.table::data.table(
+    delta = rep(18.0106, 5L)
+  )))
+  expect_null(.log_top_pair_deltas(data.table::data.table(
+    delta = c(14.0156, 18.0106, 18.0106, 27.9949, 44.0262)
+  )))
+})

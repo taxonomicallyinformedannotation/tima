@@ -79,21 +79,15 @@ complement_metadata_structures <- function(
 
   # Filter stereo to keys present in this annotation batch.
   sf <- refs$stereo_full
-  keep_stereo <- (length(keys$inchikey) > 0L &
-    fastmatch::fmatch(
-      sf$structure_inchikey_connectivity_layer,
-      keys$inchikey,
-      nomatch = 0L
-    ) >
-      0L) |
-    (length(keys$smiles) > 0L &
-      fastmatch::fmatch(
-        sf$structure_smiles_no_stereo,
-        keys$smiles,
-        nomatch = 0L
-      ) >
-        0L)
-  idx_keep <- which(keep_stereo)
+  rows_cl <- .query_csr_index(refs$cl_csr, keys$inchikey)
+  rows_sm <- .query_csr_index(refs$sm_csr, keys$smiles)
+  idx_keep <- if (length(rows_cl) == 0L) {
+    if (length(rows_sm) > 1L) sort(unique(rows_sm)) else rows_sm
+  } else if (length(rows_sm) == 0L) {
+    if (length(rows_cl) > 1L) sort(unique(rows_cl)) else rows_cl
+  } else {
+    sort(unique(c(rows_cl, rows_sm)))
+  }
   log_debug("Stereo loaded: %d rows after filtering", length(idx_keep))
 
   ik_keep <- sf$structure_inchikey[idx_keep]
@@ -142,10 +136,7 @@ complement_metadata_structures <- function(
   )
 
   # Load metadata (formula + mass only, keyed by inchikey_no_stereo)
-  if (
-    !"structure_inchikey_no_stereo" %in%
-      attr(refs$met_full, "selected_cols")
-  ) {
+  if (!"structure_inchikey_no_stereo" %in% refs$met_selected_cols) {
     log_warn(
       paste(
         "structure metadata has no structure keys;",
@@ -310,8 +301,9 @@ complement_metadata_structures <- function(
       file = str_met,
       file_type = "structure metadata",
       selected_cols = met_cols
-    ) |>
-      .ensure_columns(cols = met_cols)
+    )
+    met_selected_cols <- attr(met_full, "selected_cols")
+    met_full <- .ensure_columns(met_full, cols = met_cols)
 
     tax_cla_full <- safe_fread(
       file = str_tax_cla,
@@ -320,12 +312,7 @@ complement_metadata_structures <- function(
       colClasses = "character",
       select = .schema_classyfire_cols()
     ) |>
-      .ensure_columns(cols = .schema_classyfire_cols()) |>
-      tidytable::mutate(
-        structure_tax_cla_chemontid = normalize_chemontid(
-          structure_tax_cla_chemontid
-        )
-      )
+      .ensure_columns(cols = .schema_classyfire_cols())
 
     tax_npc_full <- safe_fread(
       file = str_tax_npc,
@@ -337,38 +324,54 @@ complement_metadata_structures <- function(
       .ensure_columns(cols = .schema_npc_cols())
 
     # Precompute expensive per-reference lookups once and memoize them.
-    met_lookup_full <- met_full |>
-      .ensure_columns(cols = met_cols) |>
-      tidytable::select(
-        candidate_structure_inchikey_no_stereo = structure_inchikey_no_stereo,
-        .lk_molecular_formula = structure_molecular_formula,
-        .lk_exact_mass = structure_exact_mass
-      ) |>
-      tidytable::filter(!is.na(candidate_structure_inchikey_no_stereo)) |>
-      tidytable::distinct(
-        candidate_structure_inchikey_no_stereo,
-        .keep_all = TRUE
-      )
+    keep_met <- which(
+      !is.na(met_full$structure_inchikey_no_stereo) &
+        !duplicated(met_full$structure_inchikey_no_stereo)
+    )
+    met_lookup_full <- tidytable::tidytable(
+      candidate_structure_inchikey_no_stereo = met_full$structure_inchikey_no_stereo[
+        keep_met
+      ],
+      .lk_molecular_formula = met_full$structure_molecular_formula[keep_met],
+      .lk_exact_mass = met_full$structure_exact_mass[keep_met]
+    )
+    rm(met_full, keep_met)
 
-    tax_cla_lookup_full <- tax_cla_full |>
-      tidytable::select(
-        candidate_structure_inchikey = structure_inchikey,
-        candidate_structure_tax_cla_chemontid_i = structure_tax_cla_chemontid,
-        candidate_structure_tax_cla_01kin_i = structure_tax_cla_01kin,
-        candidate_structure_tax_cla_02sup_i = structure_tax_cla_02sup,
-        candidate_structure_tax_cla_03cla_i = structure_tax_cla_03cla,
-        candidate_structure_tax_cla_04dirpar_i = structure_tax_cla_04dirpar
-      ) |>
-      tidytable::distinct(candidate_structure_inchikey, .keep_all = TRUE)
+    keep_cla <- which(!duplicated(tax_cla_full$structure_inchikey))
+    tax_cla_lookup_full <- tidytable::tidytable(
+      candidate_structure_inchikey = tax_cla_full$structure_inchikey[keep_cla],
+      candidate_structure_tax_cla_chemontid_i = normalize_chemontid(
+        tax_cla_full$structure_tax_cla_chemontid[keep_cla]
+      ),
+      candidate_structure_tax_cla_01kin_i = tax_cla_full$structure_tax_cla_01kin[
+        keep_cla
+      ],
+      candidate_structure_tax_cla_02sup_i = tax_cla_full$structure_tax_cla_02sup[
+        keep_cla
+      ],
+      candidate_structure_tax_cla_03cla_i = tax_cla_full$structure_tax_cla_03cla[
+        keep_cla
+      ],
+      candidate_structure_tax_cla_04dirpar_i = tax_cla_full$structure_tax_cla_04dirpar[
+        keep_cla
+      ]
+    )
+    rm(tax_cla_full, keep_cla)
 
-    tax_npc_lookup_full <- tax_npc_full |>
-      tidytable::select(
-        candidate_structure_smiles = structure_smiles,
-        candidate_structure_tax_npc_01pat_s = structure_tax_npc_01pat,
-        candidate_structure_tax_npc_02sup_s = structure_tax_npc_02sup,
-        candidate_structure_tax_npc_03cla_s = structure_tax_npc_03cla
-      ) |>
-      tidytable::distinct(candidate_structure_smiles, .keep_all = TRUE)
+    keep_npc <- which(!duplicated(tax_npc_full$structure_smiles))
+    tax_npc_lookup_full <- tidytable::tidytable(
+      candidate_structure_smiles = tax_npc_full$structure_smiles[keep_npc],
+      candidate_structure_tax_npc_01pat_s = tax_npc_full$structure_tax_npc_01pat[
+        keep_npc
+      ],
+      candidate_structure_tax_npc_02sup_s = tax_npc_full$structure_tax_npc_02sup[
+        keep_npc
+      ],
+      candidate_structure_tax_npc_03cla_s = tax_npc_full$structure_tax_npc_03cla[
+        keep_npc
+      ]
+    )
+    rm(tax_npc_full, keep_npc)
 
     # Validate stereo completeness at load time before caching.
     if (
@@ -387,6 +390,17 @@ complement_metadata_structures <- function(
     }
 
     nam_lookup_full <- .build_name_lookup_from_stereo(stereo_full)
+    stereo_full <- tidytable::tidytable(
+      structure_inchikey = stereo_full$structure_inchikey,
+      structure_smiles = stereo_full$structure_smiles,
+      structure_inchikey_connectivity_layer = stereo_full$structure_inchikey_connectivity_layer,
+      structure_inchikey_no_stereo = stereo_full$structure_inchikey_no_stereo,
+      structure_smiles_no_stereo = stereo_full$structure_smiles_no_stereo
+    )
+    cl_csr <- .build_csr_index(
+      stereo_full$structure_inchikey_connectivity_layer
+    )
+    sm_csr <- .build_csr_index(stereo_full$structure_smiles_no_stereo)
 
     # Pre-normalize all lookup columns once so repeated batches skip text normalization
     for (col in c(".lk_molecular_formula", ".lk_exact_mass")) {
@@ -420,11 +434,37 @@ complement_metadata_structures <- function(
       data.table::set(tax_npc_lookup_full, j = col, value = v)
     }
 
+    # Pre-warm fastmatch hash tables in the cached lookup tables
+    if (nrow(met_lookup_full) > 0L) {
+      invisible(fastmatch::fmatch(
+        "",
+        met_lookup_full$candidate_structure_inchikey_no_stereo
+      ))
+    }
+    if (nrow(nam_lookup_full) > 0L) {
+      invisible(fastmatch::fmatch(
+        "",
+        nam_lookup_full$candidate_structure_inchikey_no_stereo
+      ))
+    }
+    if (nrow(tax_cla_lookup_full) > 0L) {
+      invisible(fastmatch::fmatch(
+        "",
+        tax_cla_lookup_full$candidate_structure_inchikey
+      ))
+    }
+    if (nrow(tax_npc_lookup_full) > 0L) {
+      invisible(fastmatch::fmatch(
+        "",
+        tax_npc_lookup_full$candidate_structure_smiles
+      ))
+    }
+
     result <- list(
       stereo_full = stereo_full,
-      met_full = met_full,
-      tax_cla_full = tax_cla_full,
-      tax_npc_full = tax_npc_full,
+      cl_csr = cl_csr,
+      sm_csr = sm_csr,
+      met_selected_cols = met_selected_cols,
       met_lookup_full = met_lookup_full,
       nam_lookup_full = nam_lookup_full,
       tax_cla_lookup_full = tax_cla_lookup_full,
@@ -436,6 +476,65 @@ complement_metadata_structures <- function(
 
   list(load_refs = load_refs)
 })
+
+.build_csr_index <- function(vec) {
+  ok <- which(!is.na(vec))
+  if (length(ok) == 0L) {
+    return(list(
+      u_val = character(0),
+      starts = integer(0),
+      ends = integer(0),
+      rows = integer(0),
+      is_unique = TRUE
+    ))
+  }
+  v_ok <- vec[ok]
+  if (anyDuplicated(v_ok) == 0L) {
+    invisible(fastmatch::fmatch("", v_ok))
+    return(list(
+      u_val = v_ok,
+      rows = ok,
+      is_unique = TRUE
+    ))
+  }
+  ord <- order(v_ok, method = "radix")
+  v_s <- v_ok[ord]
+  r_s <- ok[ord]
+  n_s <- length(v_s)
+  new_g <- c(TRUE, v_s[-1L] != v_s[-n_s])
+  starts <- which(new_g)
+  ends <- c(starts[-1L] - 1L, n_s)
+  u_val <- v_s[starts]
+  invisible(fastmatch::fmatch("", u_val))
+  list(
+    u_val = u_val,
+    starts = starts,
+    ends = ends,
+    rows = r_s,
+    is_unique = FALSE
+  )
+}
+
+.query_csr_index <- function(csr, keys) {
+  if (length(keys) == 0L || length(csr$u_val) == 0L) {
+    return(integer(0))
+  }
+  m <- fastmatch::fmatch(keys, csr$u_val)
+  m <- m[!is.na(m)]
+  if (length(m) == 0L) {
+    return(integer(0))
+  }
+  if (csr$is_unique) {
+    return(csr$rows[m])
+  }
+  st <- csr$starts[m]
+  en <- csr$ends[m]
+  lens <- en - st + 1L
+  if (all(lens == 1L)) {
+    return(csr$rows[st])
+  }
+  csr$rows[sequence(lens, from = st)]
+}
 
 .extract_structure_keys <- function(df) {
   inchikey_cols <- c(
@@ -717,21 +816,41 @@ complement_metadata_structures <- function(
     )
   )
 
+  .slice_lk_col <- function(col_vec, idx, n_out) {
+    if (is.null(col_vec)) {
+      res <- rep.int(NA_character_, n_out)
+      attr(res, "normalized") <- TRUE
+      return(res)
+    }
+    res <- col_vec[idx]
+    if (isTRUE(attr(col_vec, "normalized"))) {
+      attr(res, "normalized") <- TRUE
+    }
+    res
+  }
+  n_sk <- nrow(lookup_tbl)
+  na_norm <- rep.int(NA_character_, n_sk)
+  attr(na_norm, "normalized") <- TRUE
+
   # Metabolite lookup (formula + exact mass) - keyed by inchikey_no_stereo
   if (nrow(met_lookup) > 0L) {
     idx <- fastmatch::fmatch(
       sk_ns_lookup,
       met_lookup$candidate_structure_inchikey_no_stereo
     )
-    lookup_tbl$.enr_candidate_structure_molecular_formula <- met_lookup$.lk_molecular_formula[
-      idx
-    ]
-    lookup_tbl$.enr_candidate_structure_exact_mass <- met_lookup$.lk_exact_mass[
-      idx
-    ]
+    lookup_tbl$.enr_candidate_structure_molecular_formula <- .slice_lk_col(
+      met_lookup$.lk_molecular_formula,
+      idx,
+      n_sk
+    )
+    lookup_tbl$.enr_candidate_structure_exact_mass <- .slice_lk_col(
+      met_lookup$.lk_exact_mass,
+      idx,
+      n_sk
+    )
   } else {
-    lookup_tbl$.enr_candidate_structure_molecular_formula <- NA_character_
-    lookup_tbl$.enr_candidate_structure_exact_mass <- NA_character_
+    lookup_tbl$.enr_candidate_structure_molecular_formula <- na_norm
+    lookup_tbl$.enr_candidate_structure_exact_mass <- na_norm
   }
 
   # Name/tag/xlogp lookup - keyed by inchikey_no_stereo
@@ -740,13 +859,25 @@ complement_metadata_structures <- function(
       sk_ns_lookup,
       nam_lookup$candidate_structure_inchikey_no_stereo
     )
-    lookup_tbl$.enr_candidate_structure_name <- nam_lookup$.lk_name[idx]
-    lookup_tbl$.enr_candidate_structure_tag <- nam_lookup$.lk_tag[idx]
-    lookup_tbl$.enr_candidate_structure_xlogp <- nam_lookup$.lk_xlogp[idx]
+    lookup_tbl$.enr_candidate_structure_name <- .slice_lk_col(
+      nam_lookup$.lk_name,
+      idx,
+      n_sk
+    )
+    lookup_tbl$.enr_candidate_structure_tag <- .slice_lk_col(
+      nam_lookup$.lk_tag,
+      idx,
+      n_sk
+    )
+    lookup_tbl$.enr_candidate_structure_xlogp <- .slice_lk_col(
+      nam_lookup$.lk_xlogp,
+      idx,
+      n_sk
+    )
   } else {
-    lookup_tbl$.enr_candidate_structure_name <- NA_character_
-    lookup_tbl$.enr_candidate_structure_tag <- NA_character_
-    lookup_tbl$.enr_candidate_structure_xlogp <- NA_character_
+    lookup_tbl$.enr_candidate_structure_name <- na_norm
+    lookup_tbl$.enr_candidate_structure_tag <- na_norm
+    lookup_tbl$.enr_candidate_structure_xlogp <- na_norm
   }
 
   # Stereo bridge - keyed by connectivity_layer
@@ -770,27 +901,37 @@ complement_metadata_structures <- function(
       lookup_tbl$.bridge_inchikey,
       tax_cla$candidate_structure_inchikey
     )
-    lookup_tbl$.enr_candidate_structure_tax_cla_chemontid <- tax_cla$candidate_structure_tax_cla_chemontid_i[
-      idx
-    ]
-    lookup_tbl$.enr_candidate_structure_tax_cla_01kin <- tax_cla$candidate_structure_tax_cla_01kin_i[
-      idx
-    ]
-    lookup_tbl$.enr_candidate_structure_tax_cla_02sup <- tax_cla$candidate_structure_tax_cla_02sup_i[
-      idx
-    ]
-    lookup_tbl$.enr_candidate_structure_tax_cla_03cla <- tax_cla$candidate_structure_tax_cla_03cla_i[
-      idx
-    ]
-    lookup_tbl$.enr_candidate_structure_tax_cla_04dirpar <- tax_cla$candidate_structure_tax_cla_04dirpar_i[
-      idx
-    ]
+    lookup_tbl$.enr_candidate_structure_tax_cla_chemontid <- .slice_lk_col(
+      tax_cla$candidate_structure_tax_cla_chemontid_i,
+      idx,
+      n_sk
+    )
+    lookup_tbl$.enr_candidate_structure_tax_cla_01kin <- .slice_lk_col(
+      tax_cla$candidate_structure_tax_cla_01kin_i,
+      idx,
+      n_sk
+    )
+    lookup_tbl$.enr_candidate_structure_tax_cla_02sup <- .slice_lk_col(
+      tax_cla$candidate_structure_tax_cla_02sup_i,
+      idx,
+      n_sk
+    )
+    lookup_tbl$.enr_candidate_structure_tax_cla_03cla <- .slice_lk_col(
+      tax_cla$candidate_structure_tax_cla_03cla_i,
+      idx,
+      n_sk
+    )
+    lookup_tbl$.enr_candidate_structure_tax_cla_04dirpar <- .slice_lk_col(
+      tax_cla$candidate_structure_tax_cla_04dirpar_i,
+      idx,
+      n_sk
+    )
   } else {
-    lookup_tbl$.enr_candidate_structure_tax_cla_chemontid <- NA_character_
-    lookup_tbl$.enr_candidate_structure_tax_cla_01kin <- NA_character_
-    lookup_tbl$.enr_candidate_structure_tax_cla_02sup <- NA_character_
-    lookup_tbl$.enr_candidate_structure_tax_cla_03cla <- NA_character_
-    lookup_tbl$.enr_candidate_structure_tax_cla_04dirpar <- NA_character_
+    lookup_tbl$.enr_candidate_structure_tax_cla_chemontid <- na_norm
+    lookup_tbl$.enr_candidate_structure_tax_cla_01kin <- na_norm
+    lookup_tbl$.enr_candidate_structure_tax_cla_02sup <- na_norm
+    lookup_tbl$.enr_candidate_structure_tax_cla_03cla <- na_norm
+    lookup_tbl$.enr_candidate_structure_tax_cla_04dirpar <- na_norm
   }
 
   # NPClassifier taxonomy - keyed by smiles (via .bridge_smiles)
@@ -799,19 +940,25 @@ complement_metadata_structures <- function(
       lookup_tbl$.bridge_smiles,
       tax_npc$candidate_structure_smiles
     )
-    lookup_tbl$.enr_candidate_structure_tax_npc_01pat <- tax_npc$candidate_structure_tax_npc_01pat_s[
-      idx
-    ]
-    lookup_tbl$.enr_candidate_structure_tax_npc_02sup <- tax_npc$candidate_structure_tax_npc_02sup_s[
-      idx
-    ]
-    lookup_tbl$.enr_candidate_structure_tax_npc_03cla <- tax_npc$candidate_structure_tax_npc_03cla_s[
-      idx
-    ]
+    lookup_tbl$.enr_candidate_structure_tax_npc_01pat <- .slice_lk_col(
+      tax_npc$candidate_structure_tax_npc_01pat_s,
+      idx,
+      n_sk
+    )
+    lookup_tbl$.enr_candidate_structure_tax_npc_02sup <- .slice_lk_col(
+      tax_npc$candidate_structure_tax_npc_02sup_s,
+      idx,
+      n_sk
+    )
+    lookup_tbl$.enr_candidate_structure_tax_npc_03cla <- .slice_lk_col(
+      tax_npc$candidate_structure_tax_npc_03cla_s,
+      idx,
+      n_sk
+    )
   } else {
-    lookup_tbl$.enr_candidate_structure_tax_npc_01pat <- NA_character_
-    lookup_tbl$.enr_candidate_structure_tax_npc_02sup <- NA_character_
-    lookup_tbl$.enr_candidate_structure_tax_npc_03cla <- NA_character_
+    lookup_tbl$.enr_candidate_structure_tax_npc_01pat <- na_norm
+    lookup_tbl$.enr_candidate_structure_tax_npc_02sup <- na_norm
+    lookup_tbl$.enr_candidate_structure_tax_npc_03cla <- na_norm
   }
 
   lookup_tbl
@@ -1292,11 +1439,30 @@ complement_metadata_structures <- function(
     }
   }
   vals <- as.character(x)
-  trimmed <- trimws(vals)
-  low <- tolower(trimmed)
-  invalid <- is.na(vals) |
-    !nzchar(trimmed) |
-    low %in% c("na", "n/a", "null", "notclassified", "empty")
-  vals[invalid] <- NA_character_
+  na_or_empty <- is.na(vals) | !nzchar(vals)
+  c1 <- substr(vals, 1L, 1L)
+  cand <- which(
+    !na_or_empty &
+      (c1 == " " |
+        c1 == "\t" |
+        c1 == "\r" |
+        c1 == "\n" |
+        c1 == "n" |
+        c1 == "N" |
+        c1 == "e" |
+        c1 == "E")
+  )
+  if (any(na_or_empty)) {
+    vals[na_or_empty] <- NA_character_
+  }
+  if (length(cand) > 0L) {
+    trimmed <- trimws(vals[cand])
+    low <- tolower(trimmed)
+    inv_cand <- !nzchar(trimmed) |
+      low %in% c("na", "n/a", "null", "notclassified", "empty")
+    if (any(inv_cand)) {
+      vals[cand[inv_cand]] <- NA_character_
+    }
+  }
   vals
 }

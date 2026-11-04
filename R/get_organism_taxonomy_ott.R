@@ -18,7 +18,8 @@
     # Split items into batches, removing NA values
     FUN = function(i) {
       end_idx <- min(i + batch_size - 1L, length(items))
-      items[i:end_idx][!is.na(items[i:end_idx])]
+      chunk <- items[i:end_idx]
+      chunk[!is.na(chunk)]
     }
   )
 }
@@ -270,32 +271,34 @@ get_organism_taxonomy_ott <- function(
     n_organisms
   )
 
-  # Clean and prepare organism names
-  organism_table <- df |>
-    tidytable::as_tidytable() |>
-    tidytable::mutate(organism = trimws(organism)) |>
+  # Clean and prepare organism names on unique values
+  u_org <- unique(df$organism)
+  u_org <- u_org[!is.na(u_org)]
+  if (length(u_org) > 0L) {
+    u_org <- trimws(as.character(u_org))
     # Remove hybrid indicators (x and ×)
-    tidytable::mutate(
-      organism = stri_replace_all_fixed(
-        str = organism,
-        pattern = " x ",
-        replacement = " ",
-        vectorize_all = FALSE
-      )
-    ) |>
-    tidytable::mutate(
-      organism = stri_replace_all_fixed(
-        str = organism,
-        pattern = "\u00D7 ",
-        replacement = "",
-        vectorize_all = FALSE
-      )
-    ) |>
-    tidytable::distinct() |>
-    tidytable::mutate(search_string = tolower(organism)) |>
-    tidytable::distinct(organism, search_string) |>
-    tidytable::select(canonical_name = organism, search_string) |>
-    tidytable::filter(!is.na(canonical_name))
+    u_org <- stri_replace_all_fixed(
+      str = u_org,
+      pattern = " x ",
+      replacement = " ",
+      vectorize_all = FALSE
+    )
+    u_org <- stri_replace_all_fixed(
+      str = u_org,
+      pattern = "\u00D7 ",
+      replacement = "",
+      vectorize_all = FALSE
+    )
+    u_org <- unique(u_org)
+    search_str <- tolower(u_org)
+  } else {
+    u_org <- character(0)
+    search_str <- character(0)
+  }
+  organism_table <- tidytable::tidytable(
+    canonical_name = u_org,
+    search_string = search_str
+  )
 
   organisms <- organism_table$canonical_name
   n_unique <- length(organisms)
