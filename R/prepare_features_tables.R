@@ -424,6 +424,166 @@ prepare_features_tables <- function(
     return(tidytable::tidytable())
   }
 
+  if (nrow(tbl_df) > 0L && anyDuplicated(feature_ids) == 0L) {
+    n_feat <- nrow(tbl_df)
+    n_samp <- length(intensity_cols)
+    num_list <- lapply(tbl_df[intensity_cols], function(col) {
+      if (is.double(col)) col else suppressWarnings(as.numeric(col))
+    })
+    num_mat <- matrix(
+      unlist(num_list, use.names = FALSE),
+      nrow = n_feat,
+      ncol = n_samp
+    )
+
+    samp_ord <- order(intensity_cols)
+    mat_t_sorted <- t(num_mat[, samp_ord, drop = FALSE])
+    intensity_all_list <- split(
+      as.vector(mat_t_sorted),
+      rep(seq_len(n_feat), each = n_samp)
+    )
+    names(intensity_all_list) <- NULL
+
+    work_mat <- num_mat
+    work_mat[is.na(work_mat) | work_mat <= 0] <- -Inf
+
+    if (max_keep <= 16L) {
+      row_idx_list <- vector("list", max_keep)
+      col_idx_list <- vector("list", max_keep)
+      val_list <- vector("list", max_keep)
+      rk_list <- vector("list", max_keep)
+      active_rows <- seq_len(n_feat)
+
+      for (k in seq_len(max_keep)) {
+        if (length(active_rows) == 0L) {
+          break
+        }
+        sub_m <- work_mat[active_rows, , drop = FALSE]
+        best_c <- max.col(sub_m, ties.method = "first")
+        lin_idx <- (best_c - 1L) * length(active_rows) + seq_along(active_rows)
+        best_v <- sub_m[lin_idx]
+        keep <- is.finite(best_v)
+        if (!any(keep)) {
+          break
+        }
+        kept_r <- active_rows[keep]
+        kept_c <- best_c[keep]
+        row_idx_list[[k]] <- kept_r
+        col_idx_list[[k]] <- kept_c
+        val_list[[k]] <- best_v[keep]
+        rk_list[[k]] <- rep.int(k, length(kept_r))
+        work_mat[(kept_c - 1L) * n_feat + kept_r] <- -Inf
+        active_rows <- kept_r
+      }
+
+      kept_r_all <- unlist(row_idx_list, use.names = FALSE)
+      if (length(kept_r_all) == 0L) {
+        empty_tbl <- data.frame(
+          feature_id = character(0),
+          sample = character(0),
+          stringsAsFactors = FALSE,
+          check.names = FALSE
+        )
+        if ("rt" %in% extra_cols) {
+          empty_tbl$rt <- vector("list", 0L)
+        }
+        if ("mz" %in% extra_cols) {
+          empty_tbl$mz <- vector("list", 0L)
+        }
+        if ("adduct" %in% extra_cols) {
+          empty_tbl$adduct <- vector("list", 0L)
+        }
+        return(empty_tbl)
+      }
+      kept_c_all <- unlist(col_idx_list, use.names = FALSE)
+      kept_v_all <- unlist(val_list, use.names = FALSE)
+      kept_rk_all <- unlist(rk_list, use.names = FALSE)
+    } else {
+      valid_pos <- which(is.finite(t(work_mat)))
+      if (length(valid_pos) == 0L) {
+        empty_tbl <- data.frame(
+          feature_id = character(0),
+          sample = character(0),
+          stringsAsFactors = FALSE,
+          check.names = FALSE
+        )
+        if ("rt" %in% extra_cols) {
+          empty_tbl$rt <- vector("list", 0L)
+        }
+        if ("mz" %in% extra_cols) {
+          empty_tbl$mz <- vector("list", 0L)
+        }
+        if ("adduct" %in% extra_cols) {
+          empty_tbl$adduct <- vector("list", 0L)
+        }
+        return(empty_tbl)
+      }
+      r_id <- (valid_pos - 1L) %/% n_samp + 1L
+      c_id <- (valid_pos - 1L) %% n_samp + 1L
+      v_val <- t(work_mat)[valid_pos]
+      ord_v <- order(r_id, -v_val, c_id, method = "radix")
+      r_id <- r_id[ord_v]
+      c_id <- c_id[ord_v]
+      v_val <- v_val[ord_v]
+      n_v <- length(r_id)
+      new_g <- if (n_v > 1L) c(TRUE, r_id[-1L] != r_id[-n_v]) else TRUE
+      rk <- seq_len(n_v) - cummax(ifelse(new_g, seq_len(n_v), 1L)) + 1L
+      keep_rk <- which(rk <= max_keep)
+      kept_r_all <- r_id[keep_rk]
+      kept_c_all <- c_id[keep_rk]
+      kept_v_all <- v_val[keep_rk]
+      kept_rk_all <- rk[keep_rk]
+    }
+
+    if (feature_order_is_numeric) {
+      ord_final <- order(
+        feature_order[kept_r_all],
+        feature_ids[kept_r_all],
+        kept_rk_all
+      )
+    } else {
+      ord_final <- order(feature_ids[kept_r_all], kept_rk_all)
+    }
+
+    kept_r_all <- kept_r_all[ord_final]
+    kept_c_all <- kept_c_all[ord_final]
+    kept_v_all <- kept_v_all[ord_final]
+
+    out <- data.frame(
+      feature_id = feature_ids[kept_r_all],
+      sample = intensity_cols[kept_c_all],
+      intensity = kept_v_all,
+      stringsAsFactors = FALSE,
+      check.names = FALSE
+    )
+    if ("rt" %in% extra_cols) {
+      out$rt <- tbl_df[[name_rt]][kept_r_all]
+    }
+    if ("mz" %in% extra_cols) {
+      out$mz <- tbl_df[[name_mz]][kept_r_all]
+    }
+    if ("adduct" %in% extra_cols) {
+      out$adduct <- tbl_df[[name_adduct]][kept_r_all]
+    }
+    out$intensity_all <- intensity_all_list[kept_r_all]
+
+    keep_cols <- intersect(
+      c(
+        "feature_id",
+        "rt",
+        "mz",
+        "adduct",
+        "sample",
+        "intensity",
+        "intensity_all"
+      ),
+      names(out)
+    )
+    out <- out[, keep_cols, drop = FALSE]
+    row.names(out) <- NULL
+    return(out)
+  }
+
   long_tbl <- tidytable::as_tidytable(tbl_df) |>
     tidytable::pivot_longer(
       cols = tidyselect::all_of(intensity_cols),

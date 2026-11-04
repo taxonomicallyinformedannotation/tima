@@ -297,3 +297,60 @@ test_that("prepare_features_tables handles empty file", {
     class = "tima_validation_error"
   )
 })
+
+test_that(".filter_top_intensity_samples preserves tie-breaking and handles >16 candidates", {
+  tbl <- data.frame(
+    feature_id = c("feat_b", "feat_a"),
+    rt = c(1.2, 0.8),
+    mz = c(200.1, 150.1),
+    s_z = c(100, 50),
+    s_a = c(100, 200),
+    s_m = c(0, 200),
+    stringsAsFactors = FALSE,
+    check.names = FALSE
+  )
+
+  res_small <- .filter_top_intensity_samples(
+    tbl = tbl,
+    candidates = 2L,
+    name_features = "feature_id",
+    name_rt = "rt",
+    name_mz = "mz",
+    name_adduct = "adduct"
+  )
+
+  expect_equal(res_small$feature_id, c("feat_a", "feat_a", "feat_b", "feat_b"))
+  # Ties broken by first column order (s_a before s_m for feat_a; s_z before s_a for feat_b)
+  expect_equal(res_small$sample, c("s_a", "s_m", "s_z", "s_a"))
+  expect_equal(res_small$intensity, c(200, 200, 100, 100))
+  # intensity_all sorted alphabetically by sample name: s_a, s_m, s_z
+  expect_equal(res_small$intensity_all[[1]], c(200, 200, 50))
+  expect_equal(res_small$intensity_all[[3]], c(100, 0, 100))
+
+  # Test > 16 candidates branch (radix sort path)
+  n_samp <- 20L
+  samp_cols <- sprintf("samp_%02d", seq_len(n_samp))
+  wide_df <- data.frame(
+    feature_id = c("10", "2"),
+    rt = c(1.0, 2.0),
+    mz = c(100.0, 200.0),
+    stringsAsFactors = FALSE
+  )
+  for (i in seq_len(n_samp)) {
+    wide_df[[samp_cols[i]]] <- c(i * 10, (n_samp - i + 1L) * 5)
+  }
+
+  res_large <- .filter_top_intensity_samples(
+    tbl = wide_df,
+    candidates = 18L,
+    name_features = "feature_id",
+    name_rt = "rt",
+    name_mz = "mz",
+    name_adduct = "adduct"
+  )
+  expect_equal(nrow(res_large), 36L)
+  # Numeric feature ordering puts "2" before "10"
+  expect_equal(unique(res_large$feature_id), c("2", "10"))
+  expect_equal(res_large$sample[1], "samp_01")
+  expect_equal(res_large$sample[19], "samp_20")
+})

@@ -129,18 +129,10 @@ create_edges <- function(
     )
   }
 
-  # Lazy sanitize-once state: avoid scanning/sanitizing all spectra upfront.
-  state <- new.env(parent = emptyenv())
-  state$frags <- frags
-  state$checked_sanitization <- rep(FALSE, nspecs)
-  state$sanitized_indices <- logical(nspecs)
-  if (isTRUE(assume_sanitized)) {
-    state$checked_sanitization <- rep(TRUE, nspecs)
-  }
-
-  ensure_spectrum_ready <- function(idx) {
-    if (!state$checked_sanitization[[idx]]) {
-      sp <- state$frags[[idx]]
+  sanitized_indices <- logical(nspecs)
+  if (!isTRUE(assume_sanitized) && nspecs >= 2L) {
+    for (idx in seq_len(nspecs)) {
+      sp <- frags[[idx]]
       if (
         is.matrix(sp) &&
           nrow(sp) >= 2L &&
@@ -150,16 +142,14 @@ create_edges <- function(
             ppm = ppm_tolerance
           )
       ) {
-        state$frags[[idx]] <- sanitize_spectrum_matrix(
+        frags[[idx]] <- sanitize_spectrum_matrix(
           sp,
           tolerance = ms2_tolerance,
           ppm = ppm_tolerance
         )
-        state$sanitized_indices[[idx]] <- TRUE
+        sanitized_indices[[idx]] <- TRUE
       }
-      state$checked_sanitization[[idx]] <- TRUE
     }
-    state$frags[[idx]]
   }
 
   # Calculate Pairwise Similarities ----
@@ -169,44 +159,30 @@ create_edges <- function(
 
   log_metadata(ctx, phase = "calculating", n_comparisons = n_comparisons)
 
-  # Score histogram bins (accumulated across all queries)
-  state$bin_counts <- integer(10L)
+  bin_counts <- integer(10L)
   use_gnps <- (method == "gnps")
-  state$progress_counter <- 0L
+  precs_num <- as.numeric(precs)
+  res_f <- vector("list", n_queries)
+  res_t <- vector("list", n_queries)
+  res_s <- vector("list", n_queries)
+  res_m <- vector("list", n_queries)
 
-  results <- lapply(seq_len(n_queries), function(i) {
-    state$progress_counter <- state$progress_counter + 1L
-    if (state$progress_counter %% 500L == 0L) {
-      log_info("Processed %d / %d queries", state$progress_counter, n_queries)
+  for (i in seq_len(n_queries)) {
+    if (i %% 500L == 0L) {
+      log_info("Processed %d / %d queries", i, n_queries)
     }
 
-    q_sp <- if (isTRUE(assume_sanitized)) {
-      state$frags[[i]]
-    } else {
-      ensure_spectrum_ready(i)
-    }
+    q_sp <- frags[[i]]
     q_pre <- precs[i]
     targets <- (i + 1L):nspecs
 
-    # Build list of target matrices and precursor vector (avoid function calls if already sanitized)
-    if (length(targets) > 0L) {
-      if (isTRUE(assume_sanitized)) {
-        y_list <- state$frags[targets]
-      } else {
-        y_list <- lapply(targets, function(j) ensure_spectrum_ready(j))
-      }
-    } else {
-      y_list <- list()
-    }
-    y_pre_vec <- precs[targets]
-
     if (use_gnps) {
-      if (length(y_list) > 0L) {
+      if (length(targets) > 0L) {
         res_mat <- gnps_chain_dp_batch_wrapper(
           x = q_sp,
           xPrecursorMz = q_pre,
-          y_list = y_list,
-          yPrecursorMz = as.numeric(y_pre_vec),
+          y_list = frags[targets],
+          yPrecursorMz = precs_num[targets],
           tolerance = ms2_tolerance,
           ppm = ppm_tolerance
         )
@@ -216,51 +192,16 @@ create_edges <- function(
 
       sc_vec <- res_mat[, 1]
       mp_vec <- as.integer(res_mat[, 2])
-
-      finite_sc <- is.finite(sc_vec)
-      if (any(finite_sc)) {
-        bins <- pmin(9L, pmax(0L, as.integer(sc_vec[finite_sc] * 10)))
-        state$bin_counts <- state$bin_counts + tabulate(bins + 1L, nbins = 10L)
-      }
-
-      keep <- rep(TRUE, length(targets))
-      if (!is.null(threshold)) {
-        keep <- keep & (sc_vec >= threshold)
-      }
-      if (!is.null(matched_peaks)) {
-        keep <- keep & (mp_vec >= matched_peaks)
-      }
-      keep[is.na(keep)] <- FALSE
-
-      if (any(keep)) {
-        tidytable::tidytable(
-          feature_id = i,
-          target_id = targets[keep],
-          score = sc_vec[keep],
-          matched_peaks = mp_vec[keep]
-        )
-      } else {
-        NULL
-      }
     } else {
-      # Fallback: original scalar path when not using GNPS C implementation.
-      # Still one C call per target (unavoidable -- calculate_similarity()
-      # is scalar), but collect into plain vectors first and build ONE
-      # tidytable per query instead of one per accepted pair.
       sc_vec <- numeric(length(targets))
       mp_vec <- integer(length(targets))
 
       for (k in seq_along(targets)) {
         j <- targets[k]
-        t_sp <- if (isTRUE(assume_sanitized)) {
-          frags[[j]]
-        } else {
-          ensure_spectrum_ready(j)
-        }
         res <- calculate_similarity(
           method = method,
           query_spectrum = q_sp,
-          target_spectrum = t_sp,
+          target_spectrum = frags[[j]],
           query_precursor = q_pre,
           target_precursor = precs[j],
           dalton = ms2_tolerance,
@@ -275,36 +216,32 @@ create_edges <- function(
           mp_vec[k] <- 0L
         }
       }
-
-      finite_sc <- is.finite(sc_vec)
-      if (any(finite_sc)) {
-        bins <- pmin(9L, pmax(0L, as.integer(sc_vec[finite_sc] * 10)))
-        state$bin_counts <- state$bin_counts + tabulate(bins + 1L, nbins = 10L)
-      }
-
-      keep <- rep(TRUE, length(targets))
-      if (!is.null(threshold)) {
-        keep <- keep & (sc_vec >= threshold)
-      }
-      if (!is.null(matched_peaks)) {
-        keep <- keep & (mp_vec >= matched_peaks)
-      }
-      keep[is.na(keep)] <- FALSE
-
-      if (any(keep)) {
-        tidytable::tidytable(
-          feature_id = i,
-          target_id = targets[keep],
-          score = sc_vec[keep],
-          matched_peaks = mp_vec[keep]
-        )
-      } else {
-        NULL
-      }
     }
-  })
 
-  sanitized_indices <- state$sanitized_indices
+    finite_sc <- is.finite(sc_vec)
+    if (any(finite_sc)) {
+      bins <- pmin(9L, pmax(0L, as.integer(sc_vec[finite_sc] * 10)))
+      bin_counts <- bin_counts + tabulate(bins + 1L, nbins = 10L)
+    }
+
+    keep <- rep(TRUE, length(targets))
+    if (!is.null(threshold)) {
+      keep <- keep & (sc_vec >= threshold)
+    }
+    if (!is.null(matched_peaks)) {
+      keep <- keep & (mp_vec >= matched_peaks)
+    }
+    keep[is.na(keep)] <- FALSE
+
+    if (any(keep)) {
+      t_kept <- targets[keep]
+      res_f[[i]] <- rep.int(i, length(t_kept))
+      res_t[[i]] <- t_kept
+      res_s[[i]] <- sc_vec[keep]
+      res_m[[i]] <- mp_vec[keep]
+    }
+  }
+
   if (any(sanitized_indices)) {
     log_warn(
       "Sanitized %d/%d spectra on-demand before edge scoring.",
@@ -326,20 +263,31 @@ create_edges <- function(
     "(0.8,0.9]",
     "(0.9,1]"
   )
-  bin_counts <- state$bin_counts
   names(bin_counts) <- bin_labels
   log_similarity_distribution_counts(
     counts = bin_counts,
     title = "Here is the distribution of edge similarity scores (0.1 bins):"
   )
 
-  # Combine all query results into one matrix, then to tidytable ----
-  results <- results[!vapply(results, is.null, FALSE, USE.NAMES = FALSE)]
-
-  if (length(results) > 0L) {
-    # results are now tidytable objects with named columns
-    result <- tidytable::bind_rows(results)
-    rm(results, bin_counts, bin_labels, sanitized_indices, nspecs, state)
+  # Combine all query results into one tidytable ----
+  f_vec <- unlist(res_f, use.names = FALSE)
+  if (length(f_vec) > 0L) {
+    result <- tidytable::tidytable(
+      feature_id = f_vec,
+      target_id = unlist(res_t, use.names = FALSE),
+      score = unlist(res_s, use.names = FALSE),
+      matched_peaks = unlist(res_m, use.names = FALSE)
+    )
+    rm(
+      res_f,
+      res_t,
+      res_s,
+      res_m,
+      bin_counts,
+      bin_labels,
+      sanitized_indices,
+      nspecs
+    )
     log_complete(
       ctx,
       n_edges = nrow(result),

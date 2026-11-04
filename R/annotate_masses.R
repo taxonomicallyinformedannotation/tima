@@ -1070,8 +1070,14 @@ filter_modifier_edges_by_assigned_adducts <- function(
   loss_edges,
   assigned_nodes
 ) {
-  assigned_nodes <- assigned_nodes |>
-    tidytable::distinct(feature_id, adduct)
+  if (nrow(assigned_nodes) > 0L) {
+    keep_an <- !duplicated(paste(
+      assigned_nodes$feature_id,
+      assigned_nodes$adduct,
+      sep = "\r"
+    ))
+    assigned_nodes <- assigned_nodes[which(keep_an), , drop = FALSE]
+  }
 
   state_map <- build_adduct_state_key_map(unique(c(
     assigned_nodes$adduct,
@@ -1080,7 +1086,8 @@ filter_modifier_edges_by_assigned_adducts <- function(
     loss_edges$adduct,
     loss_edges$adduct_dest
   )))
-  key_lookup <- stats::setNames(state_map$state_key, state_map$adduct)
+  map_adducts <- state_map$adduct
+  map_keys <- state_map$state_key
 
   filter_state_labeled_edges <- function(edges) {
     if (
@@ -1091,25 +1098,50 @@ filter_modifier_edges_by_assigned_adducts <- function(
       return(edges)
     }
 
-    assigned_keys <- assigned_nodes |>
-      tidytable::mutate(adduct_state_key = unname(key_lookup[adduct])) |>
-      tidytable::filter(!is.na(adduct_state_key)) |>
-      tidytable::distinct(feature_id, adduct_state_key)
+    an_keys <- map_keys[fastmatch::fmatch(assigned_nodes$adduct, map_adducts)]
+    valid_an <- which(!is.na(an_keys))
+    if (length(valid_an) == 0L) {
+      return(edges)
+    }
+    an_fids <- assigned_nodes$feature_id[valid_an]
+    an_keys <- an_keys[valid_an]
+    keep_ak <- !duplicated(paste(an_fids, an_keys, sep = "\r"))
+    an_fids <- an_fids[keep_ak]
+    an_keys <- an_keys[keep_ak]
 
-    # MEMORY OPT: Pre-compute both renamed versions once to avoid materializing
-    # assigned_keys twice in the join chain. Reduces intermediate copies by ~20%.
-    src_keys <- assigned_keys |>
-      tidytable::rename(src_assigned_key = adduct_state_key)
-    dest_keys <- assigned_keys |>
-      tidytable::select(
-        feature_id_dest = feature_id,
-        dest_assigned_key = adduct_state_key
-      )
+    if (anyDuplicated(an_fids) == 0L) {
+      e_src_key <- map_keys[fastmatch::fmatch(edges$adduct, map_adducts)]
+      e_dest_key <- map_keys[fastmatch::fmatch(edges$adduct_dest, map_adducts)]
+      src_assigned <- an_keys[fastmatch::fmatch(edges$feature_id, an_fids)]
+      dest_assigned <- an_keys[fastmatch::fmatch(
+        edges$feature_id_dest,
+        an_fids
+      )]
+      keep <- is.na(src_assigned) |
+        is.na(dest_assigned) |
+        (!is.na(e_src_key) &
+          !is.na(e_dest_key) &
+          e_src_key == src_assigned &
+          e_dest_key == dest_assigned)
+      return(edges[which(keep), , drop = FALSE])
+    }
+
+    src_keys <- tidytable::tidytable(
+      feature_id = an_fids,
+      src_assigned_key = an_keys
+    )
+    dest_keys <- tidytable::tidytable(
+      feature_id_dest = an_fids,
+      dest_assigned_key = an_keys
+    )
 
     edges |>
       tidytable::mutate(
-        adduct_state_key = unname(key_lookup[adduct]),
-        adduct_dest_state_key = unname(key_lookup[adduct_dest])
+        adduct_state_key = map_keys[fastmatch::fmatch(adduct, map_adducts)],
+        adduct_dest_state_key = map_keys[fastmatch::fmatch(
+          adduct_dest,
+          map_adducts
+        )]
       ) |>
       tidytable::left_join(src_keys, by = c("feature_id")) |>
       tidytable::left_join(dest_keys, by = c("feature_id_dest")) |>
@@ -1190,52 +1222,38 @@ filter_modifier_edges_by_assigned_adducts <- function(
     TRUE
   }
 
+  assigned_by_fid <- if (nrow(assigned_nodes) > 0L) {
+    split(assigned_nodes$adduct, assigned_nodes$feature_id)
+  } else {
+    list()
+  }
+  an_names <- names(assigned_by_fid)
+
   filter_edges <- function(edges, relation, modifier_col) {
     if (nrow(edges) == 0L || nrow(assigned_nodes) == 0L) {
       return(edges)
     }
 
-    # Build list-columns of assigned adducts per feature (faster than split lookups)
-    assigned_list <- assigned_nodes |>
-      tidytable::summarize(adducts = list(adduct), .by = feature_id)
-
-    edges_joined <- edges |>
-      tidytable::left_join(
-        assigned_list |> tidytable::rename(src_adducts = adducts),
-        by = "feature_id"
-      ) |>
-      tidytable::left_join(
-        assigned_list |>
-          tidytable::rename(
-            feature_id_dest = feature_id,
-            dest_adducts = adducts
-          ),
-        by = "feature_id_dest"
-      )
-
-    # Vectorized check using mapply; edge_supported_any_combo still called per-row
-    keep_flag <- mapply(
-      FUN = function(src_adducts, dest_adducts, modifier) {
-        if (
-          is.null(src_adducts) ||
-            is.null(dest_adducts) ||
-            length(src_adducts) == 0L ||
-            length(dest_adducts) == 0L
-        ) {
-          return(TRUE)
+    m_src <- fastmatch::fmatch(edges$feature_id, an_names)
+    m_dest <- fastmatch::fmatch(edges$feature_id_dest, an_names)
+    mods <- edges[[modifier_col]]
+    n_e <- nrow(edges)
+    keep_flag <- rep.int(TRUE, n_e)
+    chk_idx <- which(!is.na(m_src) & !is.na(m_dest))
+    if (length(chk_idx) > 0L) {
+      for (i in chk_idx) {
+        s_add <- assigned_by_fid[[m_src[[i]]]]
+        d_add <- assigned_by_fid[[m_dest[[i]]]]
+        if (length(s_add) > 0L && length(d_add) > 0L) {
+          keep_flag[[i]] <- edge_supported_any_combo(
+            src_adducts = s_add,
+            dest_adducts = d_add,
+            modifier = mods[[i]],
+            relation = relation
+          )
         }
-        edge_supported_any_combo(
-          src_adducts = src_adducts,
-          dest_adducts = dest_adducts,
-          modifier = modifier,
-          relation = relation
-        )
-      },
-      src_adducts = edges_joined$src_adducts,
-      dest_adducts = edges_joined$dest_adducts,
-      modifier = edges_joined[[modifier_col]],
-      USE.NAMES = FALSE
-    )
+      }
+    }
 
     edges[keep_flag, , drop = FALSE]
   }
@@ -2036,134 +2054,102 @@ resolve_competing_cluster_loss_edges_by_hypotheses <- function(
     all(c("adduct", "adduct_dest") %in% colnames(cluster_edges)) &&
       all(c("adduct", "adduct_dest") %in% colnames(loss_edges))
   ) {
-    hyp_scores <- node_hypotheses |>
-      tidytable::mutate(
-        candidate_adduct_origin = tidytable::coalesce(
-          candidate_adduct_origin,
-          "baseline"
-        ),
-        source = tidytable::coalesce(source, "baseline"),
-        adduct_support = tidytable::if_else(
-          is.na(adduct_support),
-          0L,
-          as.integer(adduct_support)
-        ),
-        .row_weight = score_modifier_hypothesis_row(
-          source = source,
-          candidate_adduct_origin = candidate_adduct_origin,
-          adduct_support = adduct_support
-        )
-      ) |>
-      tidytable::summarize(
-        .row_weight = max(.row_weight),
-        .by = c(feature_id, adduct)
-      )
+    nh_orig <- tidytable::coalesce(
+      node_hypotheses$candidate_adduct_origin,
+      "baseline"
+    )
+    nh_src <- tidytable::coalesce(node_hypotheses$source, "baseline")
+    nh_sup <- ifelse(
+      is.na(node_hypotheses$adduct_support),
+      0L,
+      as.integer(node_hypotheses$adduct_support)
+    )
+    nh_rw <- score_modifier_hypothesis_row(
+      source = nh_src,
+      candidate_adduct_origin = nh_orig,
+      adduct_support = nh_sup
+    )
+    u_f <- unique(c(
+      node_hypotheses$feature_id,
+      cluster_edges$feature_id,
+      cluster_edges$feature_id_dest,
+      loss_edges$feature_id,
+      loss_edges$feature_id_dest
+    ))
+    u_a <- unique(c(
+      node_hypotheses$adduct,
+      cluster_edges$adduct,
+      cluster_edges$adduct_dest,
+      loss_edges$adduct,
+      loss_edges$adduct_dest
+    ))
+    n_a <- length(u_a)
+    nh_f_id <- fastmatch::fmatch(node_hypotheses$feature_id, u_f)
+    nh_a_id <- fastmatch::fmatch(node_hypotheses$adduct, u_a)
+    nh_key <- as.double(nh_f_id - 1L) * n_a + nh_a_id
+    ord_nh <- order(-nh_rw, na.last = TRUE, method = "radix")
+    nh_key_ord <- nh_key[ord_nh]
+    keep_nh <- !duplicated(nh_key_ord)
+    u_nh_key <- nh_key_ord[keep_nh]
+    u_nh_rw <- nh_rw[ord_nh[keep_nh]]
 
-    score_edges <- function(edges, relation_col) {
-      if (nrow(edges) == 0L) {
-        return(edges |> tidytable::mutate(.edge_score = integer()))
-      }
-      edges |>
-        tidytable::left_join(
-          hyp_scores |>
-            tidytable::rename(src_score = .row_weight),
-          by = c("feature_id", "adduct")
-        ) |>
-        tidytable::left_join(
-          hyp_scores |>
-            tidytable::rename(
-              feature_id_dest = feature_id,
-              adduct_dest = adduct,
-              dest_score = .row_weight
-            ),
-          by = c("feature_id_dest", "adduct_dest")
-        ) |>
-        tidytable::mutate(
-          .modifier_key = normalize_modifier_formula_terms(.data[[
-            relation_col
-          ]]),
-          src_score = tidytable::coalesce(src_score, 0L),
-          dest_score = tidytable::coalesce(dest_score, 0L),
-          .edge_score = as.integer(src_score + dest_score)
-        )
+    score_edge_vec <- function(f_src_id, f_dest_id, a_src_id, a_dest_id) {
+      s_k <- as.double(f_src_id - 1L) * n_a + a_src_id
+      d_k <- as.double(f_dest_id - 1L) * n_a + a_dest_id
+      s_sc <- u_nh_rw[fastmatch::fmatch(s_k, u_nh_key)]
+      d_sc <- u_nh_rw[fastmatch::fmatch(d_k, u_nh_key)]
+      s_sc[is.na(s_sc)] <- 0L
+      d_sc[is.na(d_sc)] <- 0L
+      as.integer(s_sc + d_sc)
     }
 
-    cluster_scored <- score_edges(cluster_edges, "cluster")
-    loss_scored <- score_edges(loss_edges, "loss")
+    c_fs <- fastmatch::fmatch(cluster_edges$feature_id, u_f)
+    c_fd <- fastmatch::fmatch(cluster_edges$feature_id_dest, u_f)
+    c_as <- fastmatch::fmatch(cluster_edges$adduct, u_a)
+    c_ad <- fastmatch::fmatch(cluster_edges$adduct_dest, u_a)
 
-    decisions <- cluster_scored |>
-      tidytable::select(
-        feature_id,
-        feature_id_dest,
-        .modifier_key,
-        cluster_score = .edge_score
-      ) |>
-      tidytable::left_join(
-        loss_scored |>
-          tidytable::select(
-            feature_id,
-            feature_id_dest,
-            .modifier_key,
-            loss_score = .edge_score
-          ),
-        by = c("feature_id", "feature_id_dest", ".modifier_key")
-      ) |>
-      tidytable::mutate(
-        cluster_score = tidytable::coalesce(cluster_score, 0L),
-        loss_score = tidytable::coalesce(loss_score, 0L),
-        keep_cluster = cluster_score >= loss_score,
-        keep_loss = loss_score >= cluster_score
-      ) |>
-      tidytable::distinct(
-        feature_id,
-        feature_id_dest,
-        .modifier_key,
-        .keep_all = TRUE
-      )
+    l_fs <- fastmatch::fmatch(loss_edges$feature_id, u_f)
+    l_fd <- fastmatch::fmatch(loss_edges$feature_id_dest, u_f)
+    l_as <- fastmatch::fmatch(loss_edges$adduct, u_a)
+    l_ad <- fastmatch::fmatch(loss_edges$adduct_dest, u_a)
 
-    cluster_edges_kept <- cluster_scored |>
-      tidytable::left_join(
-        decisions |>
-          tidytable::select(
-            feature_id,
-            feature_id_dest,
-            .modifier_key,
-            keep_cluster
-          ),
-        by = c("feature_id", "feature_id_dest", ".modifier_key")
-      ) |>
-      tidytable::filter(tidytable::coalesce(keep_cluster, TRUE)) |>
-      tidytable::select(
-        -tidyselect::any_of(c(
-          "src_score",
-          "dest_score",
-          ".modifier_key",
-          ".edge_score",
-          "keep_cluster"
-        ))
-      )
+    c_edge_score <- score_edge_vec(c_fs, c_fd, c_as, c_ad)
+    l_edge_score <- score_edge_vec(l_fs, l_fd, l_as, l_ad)
+    c_mod_key <- normalize_modifier_formula_terms(cluster_edges$cluster)
+    l_mod_key <- normalize_modifier_formula_terms(loss_edges$loss)
 
-    loss_edges_kept <- loss_scored |>
-      tidytable::left_join(
-        decisions |>
-          tidytable::select(
-            feature_id,
-            feature_id_dest,
-            .modifier_key,
-            keep_loss
-          ),
-        by = c("feature_id", "feature_id_dest", ".modifier_key")
-      ) |>
-      tidytable::filter(tidytable::coalesce(keep_loss, TRUE)) |>
-      tidytable::select(
-        -tidyselect::any_of(c(
-          "src_score",
-          "dest_score",
-          ".modifier_key",
-          ".edge_score",
-          "keep_loss"
-        ))
-      )
+    u_m <- unique(c(c_mod_key, l_mod_key))
+    n_m <- length(u_m)
+    n_f <- length(u_f)
+    c_m_id <- fastmatch::fmatch(c_mod_key, u_m)
+    l_m_id <- fastmatch::fmatch(l_mod_key, u_m)
+
+    c_key <- (as.double(c_fs - 1L) * n_f + (c_fd - 1L)) * n_m + c_m_id
+    l_key <- (as.double(l_fs - 1L) * n_f + (l_fd - 1L)) * n_m + l_m_id
+
+    first_c <- !duplicated(c_key)
+    u_c_key <- c_key[first_c]
+    u_c_sc <- c_edge_score[first_c]
+
+    first_l <- !duplicated(l_key)
+    u_l_key <- l_key[first_l]
+    u_l_sc <- l_edge_score[first_l]
+
+    m_cl <- fastmatch::fmatch(u_c_key, u_l_key)
+    l_sc_for_c <- ifelse(is.na(m_cl), 0L, u_l_sc[m_cl])
+    u_keep_c <- u_c_sc >= l_sc_for_c
+    u_keep_l <- l_sc_for_c >= u_c_sc
+
+    m_c_all <- fastmatch::fmatch(c_key, u_c_key)
+    keep_c_rows <- u_keep_c[m_c_all]
+    keep_c_rows[is.na(keep_c_rows)] <- TRUE
+
+    m_l_all <- fastmatch::fmatch(l_key, u_c_key)
+    keep_l_rows <- u_keep_l[m_l_all]
+    keep_l_rows[is.na(keep_l_rows)] <- TRUE
+
+    cluster_edges_kept <- cluster_edges[which(keep_c_rows), , drop = FALSE]
+    loss_edges_kept <- loss_edges[which(keep_l_rows), , drop = FALSE]
 
     return(list(
       cluster_edges = cluster_edges_kept,

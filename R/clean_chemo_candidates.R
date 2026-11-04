@@ -1417,44 +1417,64 @@ build_mini_results_table <- function(
 #' @return df_ranked with cluster-consensus-enforced rankings
 #' @keywords internal
 enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
-  if (nrow(df_ranked) == 0L) {
+  n <- nrow(df_ranked)
+  if (n == 0L) {
     return(df_ranked)
   }
 
-  if (!"cluster_consensus_applied" %in% names(df_ranked)) {
-    df_ranked$cluster_consensus_applied <- FALSE
+  df_out <- data.table::copy(tidytable::as_tidytable(df_ranked))
+  if (!"cluster_consensus_applied" %in% names(df_out)) {
+    data.table::set(
+      df_out,
+      j = "cluster_consensus_applied",
+      value = rep.int(FALSE, n)
+    )
   }
-  if (!"cluster_consensus_promoted_from_anchor" %in% names(df_ranked)) {
-    df_ranked$cluster_consensus_promoted_from_anchor <- FALSE
+  if (!"cluster_consensus_promoted_from_anchor" %in% names(df_out)) {
+    data.table::set(
+      df_out,
+      j = "cluster_consensus_promoted_from_anchor",
+      value = rep.int(FALSE, n)
+    )
   }
-  if (!"cluster_consensus_group_id" %in% names(df_ranked)) {
-    df_ranked$cluster_consensus_group_id <- NA_character_
+  if (!"cluster_consensus_group_id" %in% names(df_out)) {
+    data.table::set(
+      df_out,
+      j = "cluster_consensus_group_id",
+      value = rep.int(NA_character_, n)
+    )
   }
-  if (!"cluster_consensus_anchor_feature_id" %in% names(df_ranked)) {
-    df_ranked$cluster_consensus_anchor_feature_id <- NA_character_
+  if (!"cluster_consensus_anchor_feature_id" %in% names(df_out)) {
+    data.table::set(
+      df_out,
+      j = "cluster_consensus_anchor_feature_id",
+      value = rep.int(NA_character_, n)
+    )
   }
-  if (!"cluster_consensus_anchor_inchikey" %in% names(df_ranked)) {
-    df_ranked$cluster_consensus_anchor_inchikey <- NA_character_
+  if (!"cluster_consensus_anchor_inchikey" %in% names(df_out)) {
+    data.table::set(
+      df_out,
+      j = "cluster_consensus_anchor_inchikey",
+      value = rep.int(NA_character_, n)
+    )
   }
-  if (!"annotation_note" %in% names(df_ranked)) {
-    df_ranked$annotation_note <- NA_character_
+  if (!"annotation_note" %in% names(df_out)) {
+    data.table::set(
+      df_out,
+      j = "annotation_note",
+      value = rep.int(NA_character_, n)
+    )
   }
 
-  df_ranked <- df_ranked |>
-    tidytable::mutate(.row_id = tidytable::row_number())
-  df_work <- select_clean_chemo_consensus_working_columns(df_ranked)
-  components_min <- components_table |>
-    tidytable::select(tidyselect::any_of(c("feature_id", "component_id"))) |>
-    tidytable::distinct(feature_id, .keep_all = TRUE)
-
-  # Check if required columns exist
-  has_component_col <- "component_id" %in% names(components_min)
+  df_work <- select_clean_chemo_consensus_working_columns(
+    df_out[0L, , drop = FALSE]
+  )
+  has_component_col <- "component_id" %in% names(components_table)
   has_rank_col <- "rank_final" %in% names(df_work)
   has_ik_col <- "candidate_structure_inchikey_connectivity_layer" %in%
     names(df_work)
   has_score_col <- "score_weighted_chemo" %in% names(df_work)
   has_exact_mass_col <- "candidate_structure_exact_mass" %in% names(df_work)
-  # mz/adduct fallback retained for legacy data that lacks exact_mass
   has_mz_col <- "mz" %in% names(df_work)
   has_adduct_col <- "candidate_adduct" %in% names(df_work)
   has_M_source <- has_exact_mass_col || (has_mz_col && has_adduct_col)
@@ -1489,51 +1509,30 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
         collapse = ", "
       )
     )
-    return(
-      df_ranked |>
-        tidytable::select(-tidyselect::any_of(".row_id"))
-    )
+    return(df_out)
   }
 
-  # Add component_id and neutral mass to ranked candidates
-  df_with_comp <- df_work |>
-    tidytable::left_join(
-      y = components_min,
-      by = "feature_id"
-    )
+  first_c <- !duplicated(components_table$feature_id)
+  comp_fids <- components_table$feature_id[first_c]
+  comp_ids <- components_table$component_id[first_c]
+  fids <- df_out$feature_id
+  row_comp <- comp_ids[fastmatch::fmatch(fids, comp_fids)]
 
-  has_similarity_col <- "candidate_score_similarity" %in% names(df_with_comp)
-  has_sirius_csi_col <- "candidate_score_sirius_csi" %in% names(df_with_comp)
-  has_sirius_conf_col <- "candidate_score_sirius_confidence" %in%
-    names(df_with_comp)
+  has_ms2 <- if ("candidate_score_similarity" %in% names(df_out)) {
+    !is.na(df_out$candidate_score_similarity)
+  } else {
+    rep.int(FALSE, n)
+  }
+  if ("candidate_score_sirius_csi" %in% names(df_out)) {
+    has_ms2 <- has_ms2 | !is.na(df_out$candidate_score_sirius_csi)
+  }
+  if ("candidate_score_sirius_confidence" %in% names(df_out)) {
+    conf <- suppressWarnings(.as_numeric_dedup(
+      df_out$candidate_score_sirius_confidence
+    ))
+    has_ms2 <- has_ms2 | (!is.na(conf) & conf > 0)
+  }
 
-  # Prefer anchors with direct MS2 evidence when available so consensus does
-  # not systematically promote MS1-only rows to rank 1.
-  df_with_comp <- df_with_comp |>
-    tidytable::mutate(
-      .has_ms2_evidence = (if (has_similarity_col) {
-        !is.na(candidate_score_similarity)
-      } else {
-        FALSE
-      }) |
-        (if (has_sirius_csi_col) {
-          !is.na(candidate_score_sirius_csi)
-        } else {
-          FALSE
-        }) |
-        (if (has_sirius_conf_col) {
-          !is.na(candidate_score_sirius_confidence) &
-            as.numeric(candidate_score_sirius_confidence) > 0
-        } else {
-          FALSE
-        })
-    )
-
-  # Compute neutral mass for grouping.
-  # Primary key: candidate_structure_exact_mass (formula-derived, adduct
-  # independent). Row-level fallback: invert mz+adduct when exact mass is
-  # missing, so partially populated exact-mass columns still propagate
-  # consensus.
   has_mz_adduct_fallback <- has_mz_col && has_adduct_col
   if (!has_exact_mass_col) {
     log_warn(paste0(
@@ -1544,30 +1543,21 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
   }
 
   cand_m_exact <- if (has_exact_mass_col) {
-    .as_numeric_dedup(df_with_comp$candidate_structure_exact_mass)
+    .as_numeric_dedup(df_out$candidate_structure_exact_mass)
   } else {
-    rep.int(NA_real_, nrow(df_with_comp))
+    rep.int(NA_real_, n)
   }
-  cand_m_mz <- rep.int(NA_real_, nrow(df_with_comp))
+  cand_m_mz <- rep.int(NA_real_, n)
   if (has_mz_adduct_fallback) {
     missing_exact <- which(is.na(cand_m_exact))
     if (length(missing_exact) > 0L) {
       cand_m_mz[missing_exact] <- compute_candidate_M(
-        df_with_comp$mz[missing_exact],
-        df_with_comp$candidate_adduct[missing_exact]
+        df_out$mz[missing_exact],
+        df_out$candidate_adduct[missing_exact]
       )
     }
   }
   cand_m <- tidytable::coalesce(cand_m_exact, cand_m_mz)
-  data.table::set(df_with_comp, j = ".candidate_M_exact", value = cand_m_exact)
-  data.table::set(df_with_comp, j = ".candidate_M_mz", value = cand_m_mz)
-  data.table::set(df_with_comp, j = ".candidate_M", value = cand_m)
-  data.table::set(
-    df_with_comp,
-    j = ".candidate_M_key",
-    value = round(cand_m, NEUTRAL_MASS_GROUP_DECIMALS)
-  )
-
   if (has_exact_mass_col && has_mz_adduct_fallback) {
     n_fallback_rows <- sum(is.na(cand_m_exact) & !is.na(cand_m_mz))
     if (n_fallback_rows > 0L) {
@@ -1577,342 +1567,194 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
       )
     }
   }
+  cand_m_key <- round(cand_m, NEUTRAL_MASS_GROUP_DECIMALS)
   rm(cand_m_exact, cand_m_mz, cand_m)
 
-  # For each (component_id, .candidate_M_key) group with rank_final == 1
-  # identify the anchor InChIKey from the best-scored feature using radix order
+  rks <- df_out$rank_final
+  iks <- df_out$candidate_structure_inchikey_connectivity_layer
   r1_idx <- which(
-    df_with_comp$rank_final == 1L &
-      !is.na(df_with_comp$component_id) &
-      !is.na(df_with_comp$.candidate_M_key) &
-      !is.na(df_with_comp$candidate_structure_inchikey_connectivity_layer)
+    rks == 1L &
+      !is.na(row_comp) &
+      !is.na(cand_m_key) &
+      !is.na(iks)
   )
-  if (length(r1_idx) > 0L) {
-    cand_r1 <- df_with_comp[r1_idx, , drop = FALSE]
-    ord_r1 <- order(
-      -as.integer(cand_r1$.has_ms2_evidence),
-      -as.numeric(cand_r1$score_weighted_chemo),
+  if (length(r1_idx) == 0L) {
+    log_debug("No cluster entity consensus groups to enforce")
+    return(df_out)
+  }
+
+  swc_r1 <- .as_numeric_dedup(df_out$score_weighted_chemo[r1_idx])
+  ord_r1 <- r1_idx[order(
+    -as.integer(has_ms2[r1_idx]),
+    -swc_r1,
+    na.last = TRUE,
+    method = "radix"
+  )]
+
+  u_comp <- unique(row_comp[ord_r1])
+  u_mkey <- unique(cand_m_key[ord_r1])
+  c_id <- fastmatch::fmatch(row_comp, u_comp)
+  m_id <- fastmatch::fmatch(cand_m_key, u_mkey)
+  n_m <- length(u_mkey)
+  cm_key <- (c_id - 1L) * n_m + m_id
+
+  cm_r1 <- cm_key[ord_r1]
+  anchor_rows <- ord_r1[!duplicated(cm_r1)]
+  anchor_cm <- cm_key[anchor_rows]
+  anchor_fid <- fids[anchor_rows]
+  anchor_ik <- iks[anchor_rows]
+  anchor_grp_id <- paste(
+    row_comp[anchor_rows],
+    sprintf("%.*f", NEUTRAL_MASS_GROUP_DECIMALS, cand_m_key[anchor_rows]),
+    sep = "::"
+  )
+
+  m_anc <- fastmatch::fmatch(cm_key, anchor_cm)
+  has_anchor_ik <- !is.na(m_anc) & !is.na(iks) & (iks == anchor_ik[m_anc])
+  if (!any(has_anchor_ik)) {
+    data.table::set(
+      df_out,
+      j = "cluster_consensus_applied",
+      value = rep.int(FALSE, n)
+    )
+    data.table::set(
+      df_out,
+      j = "cluster_consensus_promoted_from_anchor",
+      value = rep.int(FALSE, n)
+    )
+    return(df_out)
+  }
+
+  u_fids <- sort(unique(fids), na.last = TRUE)
+  fid_id <- fastmatch::fmatch(fids, u_fids)
+  n_anc <- length(anchor_rows)
+  fm_key <- as.double(fid_id - 1L) * n_anc + m_anc
+  active_fm <- unique(fm_key[which(has_anchor_ik)])
+  in_part <- !is.na(m_anc) & !is.na(fastmatch::fmatch(fm_key, active_fm))
+  idx_part <- which(in_part)
+
+  col_applied <- rep.int(FALSE, n)
+  col_promoted <- rep.int(FALSE, n)
+  col_grp_id <- as.character(df_out$cluster_consensus_group_id)
+  col_anc_fid <- as.character(df_out$cluster_consensus_anchor_feature_id)
+  col_anc_ik <- as.character(df_out$cluster_consensus_anchor_inchikey)
+  col_note <- as.character(df_out$annotation_note)
+  col_rk <- as.integer(rks)
+
+  m_anc_p <- m_anc[idx_part]
+  col_applied[idx_part] <- TRUE
+  col_anc_fid[idx_part] <- anchor_fid[m_anc_p]
+  col_anc_ik[idx_part] <- anchor_ik[m_anc_p]
+  na_grp_p <- is.na(col_grp_id[idx_part])
+  if (any(na_grp_p)) {
+    col_grp_id[idx_part[na_grp_p]] <- anchor_grp_id[m_anc_p[na_grp_p]]
+  }
+
+  fid_p <- fid_id[idx_part]
+  rk_p <- col_rk[idx_part]
+  has_anc_p <- has_anchor_ik[idx_part]
+  is_anc_feat_p <- fids[idx_part] == anchor_fid[m_anc_p]
+
+  reorder_fids_id <- unique(fid_p[rk_p == 1L & !has_ms2[idx_part] & !has_anc_p])
+  if (length(reorder_fids_id) > 0L) {
+    in_reord_p <- !is.na(fastmatch::fmatch(fid_p, reorder_fids_id))
+    idx_rp <- which(in_reord_p)
+    idx_nrp <- which(!in_reord_p)
+
+    mkey_rp <- cand_m_key[idx_part[idx_rp]]
+    ord_rp <- idx_rp[order(
+      fid_p[idx_rp],
+      mkey_rp,
+      -as.integer(has_anc_p[idx_rp]),
+      rk_p[idx_rp],
       na.last = TRUE,
       method = "radix"
-    )
-    cand_r1 <- cand_r1[ord_r1, , drop = FALSE]
-    keep_r1 <- !duplicated(paste(
-      cand_r1$component_id,
-      cand_r1$.candidate_M_key,
-      sep = "\r"
-    ))
-    cand_r1 <- cand_r1[which(keep_r1), , drop = FALSE]
-    anchor_lookup <- tidytable::tidytable(
-      component_id = cand_r1$component_id,
-      .candidate_M_key = cand_r1$.candidate_M_key,
-      .anchor_feature_id = cand_r1$feature_id,
-      .anchor_ik = cand_r1$candidate_structure_inchikey_connectivity_layer,
-      cluster_consensus_group_id = paste(
-        cand_r1$component_id,
-        sprintf(
-          "%.*f",
-          NEUTRAL_MASS_GROUP_DECIMALS,
-          cand_r1$.candidate_M_key
-        ),
-        sep = "::"
-      )
-    )
+    )]
+    fm_rp <- fm_key[idx_part[ord_rp]]
+    n_rp <- length(ord_rp)
+    new_g_rp <- if (n_rp > 1L) c(TRUE, fm_rp[-1L] != fm_rp[-n_rp]) else TRUE
+    seq_rp <- seq_len(n_rp) - cummax(ifelse(new_g_rp, seq_len(n_rp), 1L)) + 1L
+    rk_p[ord_rp] <- seq_rp
+
+    comb_p <- c(ord_rp, idx_nrp)
+    ord_p <- comb_p[order(
+      fid_p[comb_p],
+      rk_p[comb_p],
+      na.last = TRUE,
+      method = "radix"
+    )]
   } else {
-    anchor_lookup <- tidytable::tidytable()
+    ord_p <- seq_along(idx_part)
   }
 
-  n_anchor_groups <- nrow(anchor_lookup)
-
-  if (n_anchor_groups == 0L) {
-    log_debug("No cluster entity consensus groups to enforce")
-    return(
-      df_ranked |>
-        tidytable::select(-tidyselect::any_of(".row_id"))
-    )
+  idx_part_ord <- idx_part[ord_p]
+  rk_p_ord <- rk_p[ord_p]
+  col_rk[idx_part_ord] <- rk_p_ord
+  prom_p_ord <- has_anc_p[ord_p] & (rk_p_ord == 1L) & !is_anc_feat_p[ord_p]
+  col_promoted[idx_part_ord] <- prom_p_ord
+  if (any(prom_p_ord)) {
+    col_note[idx_part_ord[
+      prom_p_ord
+    ]] <- "Promoted to rank 1: cluster entity consensus (same M across component)"
   }
 
-  # Only materialize rows that actually match an anchor; the previous full
-  # left_join duplicated the whole candidate table.
-  df_anchor_candidates <- df_with_comp |>
-    tidytable::inner_join(
-      y = anchor_lookup,
-      by = c("component_id", ".candidate_M_key"),
-      .keep = "used"
-    ) |>
-    tidytable::mutate(
-      .has_anchor_ik = candidate_structure_inchikey_connectivity_layer ==
-        .anchor_ik,
-      .is_anchor_feature = feature_id == .anchor_feature_id
-    )
+  idx_unchanged <- which(!in_part)
+  all_idx <- c(idx_part_ord, idx_unchanged)
+  affected_fid_ids <- unique(fid_p)
+  in_aff <- !is.na(fastmatch::fmatch(fid_id[all_idx], affected_fid_ids))
+  aff_idx <- all_idx[in_aff]
+  unaff_idx <- all_idx[!in_aff]
 
-  features_with_anchor <- df_anchor_candidates |>
-    tidytable::filter(.has_anchor_ik) |>
-    tidytable::distinct(feature_id, component_id, .candidate_M_key)
-
-  if (nrow(features_with_anchor) > 0L) {
-    has_annotation_note <- "annotation_note" %in% names(df_anchor_candidates)
-    df_part_reorder <- df_anchor_candidates |>
-      tidytable::inner_join(
-        y = features_with_anchor,
-        by = c("feature_id", "component_id", ".candidate_M_key")
-      ) |>
-      tidytable::mutate(
-        cluster_consensus_anchor_feature_id = .anchor_feature_id,
-        cluster_consensus_anchor_inchikey = .anchor_ik,
-        cluster_consensus_applied = TRUE,
-        .existing_note = if (has_annotation_note) {
-          annotation_note
-        } else {
-          NA_character_
-        }
-      )
-
-    existing_group_id <- if (
-      "cluster_consensus_group_id" %in% names(df_part_reorder)
-    ) {
-      as.character(df_part_reorder$cluster_consensus_group_id)
-    } else {
-      rep(NA_character_, nrow(df_part_reorder))
-    }
-
-    df_part_reorder <- df_part_reorder |>
-      tidytable::mutate(
-        cluster_consensus_group_id = ifelse(
-          is.na(existing_group_id),
-          paste(
-            component_id,
-            sprintf(
-              "%.*f",
-              NEUTRAL_MASS_GROUP_DECIMALS,
-              .candidate_M_key
-            ),
-            sep = "::"
-          ),
-          existing_group_id
-        )
-      )
-
-    reorder_fids <- unique(
-      df_part_reorder$feature_id[
-        df_part_reorder$rank_final == 1L &
-          !df_part_reorder$.has_ms2_evidence &
-          df_part_reorder$candidate_structure_inchikey_connectivity_layer !=
-            df_part_reorder$.anchor_ik
-      ]
-    )
-
-    if (length(reorder_fids) > 0L) {
-      df_reordered <- df_part_reorder |>
-        tidytable::filter(
-          !is.na(fastmatch::fmatch(feature_id, reorder_fids))
-        ) |>
-        tidytable::arrange(
-          feature_id,
-          .candidate_M_key,
-          tidytable::desc(.has_anchor_ik),
-          rank_final
-        ) |>
-        tidytable::mutate(
-          rank_final = tidytable::row_number(),
-          .by = c(feature_id, component_id, .candidate_M_key)
-        )
-
-      df_not_reordered <- df_part_reorder |>
-        tidytable::filter(is.na(fastmatch::fmatch(feature_id, reorder_fids)))
-
-      df_part_reorder <- tidytable::bind_rows(df_reordered, df_not_reordered) |>
-        tidytable::arrange(feature_id, rank_final)
-    }
-
-    for (col in c(
-      "cluster_consensus_group_id",
-      "cluster_consensus_anchor_feature_id",
-      "cluster_consensus_anchor_inchikey",
-      "cluster_consensus_applied",
-      "cluster_consensus_promoted_from_anchor",
-      "annotation_note"
-    )) {
-      if (!col %in% names(df_part_reorder)) {
-        df_part_reorder[[col]] <- NA
-      }
-    }
-
-    df_part_reorder <- df_part_reorder |>
-      tidytable::mutate(
-        cluster_consensus_promoted_from_anchor = .has_anchor_ik &
-          rank_final == 1L &
-          !.is_anchor_feature,
-        annotation_note = tidytable::if_else(
-          condition = cluster_consensus_promoted_from_anchor,
-          true = "Promoted to rank 1: cluster entity consensus (same M across component)",
-          false = .existing_note
-        )
-      )
-
-    # Combine anchored rows with unchanged rows.
-    df_unchanged <- df_with_comp |>
-      tidytable::anti_join(
-        y = features_with_anchor,
-        by = c("feature_id", "component_id", ".candidate_M_key")
-      ) |>
-      tidytable::mutate(
-        cluster_consensus_applied = FALSE,
-        cluster_consensus_promoted_from_anchor = FALSE
-      ) |>
-      tidytable::select(
-        -tidyselect::all_of(c(
-          ".candidate_M",
-          ".candidate_M_exact",
-          ".candidate_M_mz",
-          ".candidate_M_key",
-          "component_id",
-          ".has_ms2_evidence"
-        ))
-      )
-
-    for (col in c(
-      "cluster_consensus_group_id",
-      "cluster_consensus_anchor_feature_id",
-      "cluster_consensus_anchor_inchikey",
-      "annotation_note"
-    )) {
-      if (!col %in% names(df_unchanged)) {
-        df_unchanged[[col]] <- NA
-      }
-    }
-
-    df_part_reorder <- df_part_reorder |>
-      tidytable::select(
-        -tidyselect::all_of(c(
-          ".candidate_M",
-          ".candidate_M_exact",
-          ".candidate_M_mz",
-          ".candidate_M_key",
-          ".has_anchor_ik",
-          ".is_anchor_feature",
-          ".anchor_ik",
-          ".anchor_feature_id",
-          ".existing_note",
-          ".has_ms2_evidence"
-        ))
-      )
-
-    affected_fids <- unique(df_part_reorder$feature_id)
-
-    df_result <- tidytable::bind_rows(df_part_reorder, df_unchanged)
-
-    if (length(affected_fids) > 0L) {
-      df_affected <- df_result |>
-        tidytable::filter(
-          !is.na(fastmatch::fmatch(feature_id, affected_fids))
-        ) |>
-        tidytable::arrange(
-          feature_id,
-          tidytable::desc(cluster_consensus_promoted_from_anchor),
-          rank_final
-        ) |>
-        tidytable::mutate(
-          rank_final = tidytable::row_number(),
-          .by = feature_id
-        )
-      df_unaffected <- df_result |>
-        tidytable::filter(is.na(fastmatch::fmatch(feature_id, affected_fids)))
-      df_result <- tidytable::bind_rows(df_affected, df_unaffected) |>
-        tidytable::arrange(feature_id, rank_final)
-    } else {
-      df_result <- df_result |>
-        tidytable::arrange(feature_id, rank_final)
-    }
-
-    log_info(
-      "Enforced cluster entity consensus for %d features (anchor InChIKey promoted to rank 1)",
-      tidytable::n_distinct(features_with_anchor$feature_id)
-    )
-    df_result <- df_result |>
-      tidytable::select(
-        tidyselect::any_of(c(
-          ".row_id",
-          "rank_final",
-          "annotation_note",
-          "cluster_consensus_applied",
-          "cluster_consensus_promoted_from_anchor",
-          "cluster_consensus_group_id",
-          "cluster_consensus_anchor_feature_id",
-          "cluster_consensus_anchor_inchikey"
-        ))
-      ) |>
-      tidytable::mutate(.order = tidytable::row_number())
-
-    df_updates <- df_result |>
-      tidytable::rename(
-        .updated_rank_final = rank_final,
-        .updated_annotation_note = annotation_note,
-        .updated_cluster_consensus_applied = cluster_consensus_applied,
-        .updated_cluster_consensus_promoted_from_anchor = cluster_consensus_promoted_from_anchor,
-        .updated_cluster_consensus_group_id = cluster_consensus_group_id,
-        .updated_cluster_consensus_anchor_feature_id = cluster_consensus_anchor_feature_id,
-        .updated_cluster_consensus_anchor_inchikey = cluster_consensus_anchor_inchikey
-      )
-
-    df_final <- df_ranked |>
-      tidytable::left_join(
-        y = df_updates,
-        by = ".row_id"
-      ) |>
-      tidytable::mutate(
-        rank_final = tidytable::coalesce(.updated_rank_final, rank_final),
-        annotation_note = tidytable::coalesce(
-          .updated_annotation_note,
-          annotation_note
-        ),
-        cluster_consensus_applied = tidytable::coalesce(
-          .updated_cluster_consensus_applied,
-          cluster_consensus_applied
-        ),
-        cluster_consensus_promoted_from_anchor = tidytable::coalesce(
-          .updated_cluster_consensus_promoted_from_anchor,
-          cluster_consensus_promoted_from_anchor
-        ),
-        cluster_consensus_group_id = tidytable::coalesce(
-          .updated_cluster_consensus_group_id,
-          cluster_consensus_group_id
-        ),
-        cluster_consensus_anchor_feature_id = tidytable::coalesce(
-          .updated_cluster_consensus_anchor_feature_id,
-          cluster_consensus_anchor_feature_id
-        ),
-        cluster_consensus_anchor_inchikey = tidytable::coalesce(
-          .updated_cluster_consensus_anchor_inchikey,
-          cluster_consensus_anchor_inchikey
-        )
-      ) |>
-      tidytable::arrange(.order) |>
-      tidytable::select(
-        -tidyselect::any_of(c(
-          ".row_id",
-          ".order",
-          ".updated_rank_final",
-          ".updated_annotation_note",
-          ".updated_cluster_consensus_applied",
-          ".updated_cluster_consensus_promoted_from_anchor",
-          ".updated_cluster_consensus_group_id",
-          ".updated_cluster_consensus_anchor_feature_id",
-          ".updated_cluster_consensus_anchor_inchikey"
-        ))
-      )
-
-    return(df_final)
+  if (length(aff_idx) > 0L) {
+    ord_aff <- aff_idx[order(
+      fid_id[aff_idx],
+      -as.integer(col_promoted[aff_idx]),
+      col_rk[aff_idx],
+      na.last = TRUE,
+      method = "radix"
+    )]
+    f_aff <- fid_id[ord_aff]
+    n_aff <- length(ord_aff)
+    new_g_aff <- if (n_aff > 1L) c(TRUE, f_aff[-1L] != f_aff[-n_aff]) else TRUE
+    col_rk[ord_aff] <- seq_len(n_aff) -
+      cummax(ifelse(new_g_aff, seq_len(n_aff), 1L)) +
+      1L
+    all_idx2 <- c(ord_aff, unaff_idx)
+  } else {
+    all_idx2 <- all_idx
   }
 
-  # No reordering needed; clean up temporary columns
-  df_ranked |>
-    tidytable::mutate(
-      cluster_consensus_applied = FALSE,
-      cluster_consensus_promoted_from_anchor = FALSE
-    ) |>
-    tidytable::select(
-      -tidyselect::any_of(c(
-        ".row_id"
-      ))
-    )
+  final_ord <- all_idx2[order(
+    fid_id[all_idx2],
+    col_rk[all_idx2],
+    na.last = TRUE,
+    method = "radix"
+  )]
+
+  log_info(
+    "Enforced cluster entity consensus for %d features (anchor InChIKey promoted to rank 1)",
+    length(affected_fid_ids)
+  )
+
+  data.table::set(df_out, j = "rank_final", value = col_rk)
+  data.table::set(df_out, j = "annotation_note", value = col_note)
+  data.table::set(df_out, j = "cluster_consensus_applied", value = col_applied)
+  data.table::set(
+    df_out,
+    j = "cluster_consensus_promoted_from_anchor",
+    value = col_promoted
+  )
+  data.table::set(df_out, j = "cluster_consensus_group_id", value = col_grp_id)
+  data.table::set(
+    df_out,
+    j = "cluster_consensus_anchor_feature_id",
+    value = col_anc_fid
+  )
+  data.table::set(
+    df_out,
+    j = "cluster_consensus_anchor_inchikey",
+    value = col_anc_ik
+  )
+
+  df_out[final_ord, , drop = FALSE]
 }
