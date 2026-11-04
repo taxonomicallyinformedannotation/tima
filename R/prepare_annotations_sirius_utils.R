@@ -275,7 +275,11 @@ create_empty_sirius_annotations <- function() {
     )
 }
 
-.fast_distinct_with_key_guard <- function(df, key_cols) {
+.fast_distinct_with_key_guard <- function(
+  df,
+  key_cols,
+  max_radix_space = 4503599627370496
+) {
   n <- nrow(df)
   if (n <= 1L) {
     return(df)
@@ -305,7 +309,7 @@ create_empty_sirius_annotations <- function() {
       ids[[i]] <- idi
       bi <- as.double(length(ui) + 1L)
       total_space <- total_space * bi
-      if (total_space < 4503599627370496) {
+      if (total_space < max_radix_space) {
         comp_key <- comp_key * bi + (idi - 1L)
       } else {
         use_paste <- TRUE
@@ -373,7 +377,7 @@ create_empty_sirius_annotations <- function() {
   df[-dup_idx[sub_dups], ]
 }
 
-.fast_match_rows <- function(x, y, by) {
+.fast_match_rows <- function(x, y, by, max_radix_space = 4503599627370496) {
   nx <- nrow(x)
   ny <- nrow(y)
   if (nx == 0L || ny == 0L || length(by) == 0L) {
@@ -435,7 +439,7 @@ create_empty_sirius_annotations <- function() {
 
   vx_idx <- which(valid_x)
   total_space <- prod(as.double(bases))
-  if (total_space < 4503599627370496) {
+  if (total_space < max_radix_space) {
     y_key <- as.double(y_ids[[1L]] - 1L)
     x_key <- as.double(x_ids[[1L]][vx_idx] - 1L)
     for (i in 2:length(by)) {

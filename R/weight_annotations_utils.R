@@ -615,6 +615,66 @@ log_annotation_stats <- function(annotation_table) {
   invisible(NULL)
 }
 
+.dedup_ordered_tuple_indices <- function(
+  annotation_table,
+  dedup_cols,
+  ord1,
+  bases_override = NULL
+) {
+  n_dc <- length(dedup_cols)
+  ids_dc <- vector("list", n_dc)
+  bases_dc <- numeric(n_dc)
+  for (i in seq_len(n_dc)) {
+    dc_v <- annotation_table[[dedup_cols[[i]]]]
+    u_dc <- unique(dc_v)
+    id_i <- if (anyNA(u_dc)) {
+      match(dc_v, u_dc)
+    } else {
+      fastmatch::fmatch(dc_v, u_dc)
+    }
+    ids_dc[[i]] <- id_i[ord1]
+    bases_dc[[i]] <- as.double(max(1L, length(u_dc)))
+    rm(dc_v, u_dc, id_i)
+  }
+  if (!is.null(bases_override)) {
+    bases_dc <- as.double(bases_override)
+  }
+  total_combos <- prod(bases_dc)
+  if (total_combos < .Machine$integer.max) {
+    k1 <- ids_dc[[1L]]
+    if (n_dc >= 2L) {
+      for (i in 2:n_dc) {
+        bi <- as.integer(bases_dc[[i]])
+        k1 <- (k1 - 1L) * bi + ids_dc[[i]]
+      }
+    }
+    keep1_mask <- !duplicated(k1)
+    rm(k1, ids_dc)
+    keep1_idx <- ord1[keep1_mask]
+    rm(keep1_mask)
+  } else if (total_combos < 4503599627370496) {
+    k1 <- as.double(ids_dc[[1L]])
+    if (n_dc >= 2L) {
+      for (i in 2:n_dc) {
+        bi <- bases_dc[[i]]
+        k1 <- (k1 - 1) * bi + ids_dc[[i]]
+      }
+    }
+    keep1_mask <- fastmatch::fmatch(k1, k1) == seq_along(k1)
+    rm(k1, ids_dc)
+    keep1_idx <- ord1[keep1_mask]
+    rm(keep1_mask)
+  } else {
+    rm(ids_dc)
+    dedup_sub <- tidytable::as_tidytable(
+      as.list(annotation_table)[dedup_cols]
+    )[ord1, ]
+    keep1_idx <- ord1[!duplicated(dedup_sub)]
+    rm(dedup_sub)
+  }
+  keep1_idx
+}
+
 #' Rearrange Annotation Tables
 #'
 #' @description Internal helper to reorganize and merge annotation tables.
@@ -751,54 +811,11 @@ rearrange_annotations <- function(
     }
   } else {
     ord1 <- order(-sim_num, na.last = TRUE, method = "radix")
-    n_dc <- length(dedup_cols)
-    ids_dc <- vector("list", n_dc)
-    bases_dc <- numeric(n_dc)
-    for (i in seq_len(n_dc)) {
-      dc_v <- annotation_table[[dedup_cols[[i]]]]
-      u_dc <- unique(dc_v)
-      id_i <- if (anyNA(u_dc)) {
-        match(dc_v, u_dc)
-      } else {
-        fastmatch::fmatch(dc_v, u_dc)
-      }
-      ids_dc[[i]] <- id_i[ord1]
-      bases_dc[[i]] <- as.double(max(1L, length(u_dc)))
-      rm(dc_v, u_dc, id_i)
-    }
-    total_combos <- prod(bases_dc)
-    if (total_combos < .Machine$integer.max) {
-      k1 <- ids_dc[[1L]]
-      if (n_dc >= 2L) {
-        for (i in 2:n_dc) {
-          bi <- as.integer(bases_dc[[i]])
-          k1 <- (k1 - 1L) * bi + ids_dc[[i]]
-        }
-      }
-      keep1_mask <- !duplicated(k1)
-      rm(k1, ids_dc)
-      keep1_idx <- ord1[keep1_mask]
-      rm(keep1_mask)
-    } else if (total_combos < 4503599627370496) {
-      k1 <- as.double(ids_dc[[1L]])
-      if (n_dc >= 2L) {
-        for (i in 2:n_dc) {
-          bi <- bases_dc[[i]]
-          k1 <- (k1 - 1) * bi + ids_dc[[i]]
-        }
-      }
-      keep1_mask <- fastmatch::fmatch(k1, k1) == seq_along(k1)
-      rm(k1, ids_dc)
-      keep1_idx <- ord1[keep1_mask]
-      rm(keep1_mask)
-    } else {
-      rm(ids_dc)
-      dedup_sub <- tidytable::as_tidytable(
-        as.list(annotation_table)[dedup_cols]
-      )[ord1, ]
-      keep1_idx <- ord1[!duplicated(dedup_sub)]
-      rm(dedup_sub)
-    }
+    keep1_idx <- .dedup_ordered_tuple_indices(
+      annotation_table = annotation_table,
+      dedup_cols = dedup_cols,
+      ord1 = ord1
+    )
     rm(ord1)
 
     if (isTRUE(consume_input) && data.table::is.data.table(annotation_table)) {
