@@ -464,6 +464,15 @@ count_candidates <- function(df_ranked, df_percentile) {
 #' @return Data frame with selected ClassyFire label and score
 #' @keywords internal
 compute_classyfire_taxonomy <- function(df_pred_tax, weights) {
+  n <- nrow(df_pred_tax)
+  if (n == 0L) {
+    return(tidytable::tidytable(
+      feature_id = character(0L),
+      label_classyfire_predicted = character(0L),
+      score_classyfire = numeric(0L)
+    ))
+  }
+
   # Normalize weight inputs: ensure numeric scalar defaults to 0 when NULL or non-numeric
   w_cla_kin <- if (!is.null(weights$w_cla_kin)) {
     as.numeric(weights$w_cla_kin)
@@ -486,68 +495,52 @@ compute_classyfire_taxonomy <- function(df_pred_tax, weights) {
     0
   }
 
-  df_pred_tax |>
-    tidytable::mutate(
-      cla_kin_valid = !is.na(feature_pred_tax_cla_01kin_val) &
-        feature_pred_tax_cla_01kin_val != "notClassified",
-      cla_sup_valid = !is.na(feature_pred_tax_cla_02sup_val) &
-        feature_pred_tax_cla_02sup_val != "notClassified",
-      cla_cla_valid = !is.na(feature_pred_tax_cla_03cla_val) &
-        feature_pred_tax_cla_03cla_val != "notClassified",
-      cla_par_valid = !is.na(feature_pred_tax_cla_04dirpar_val) &
-        feature_pred_tax_cla_04dirpar_val != "notClassified",
-      # Compute weighted score for each level
-      ws_kin = tidytable::if_else(
-        cla_kin_valid,
-        as.numeric(feature_pred_tax_cla_01kin_score) * w_cla_kin,
-        NA_real_
-      ),
-      ws_sup = tidytable::if_else(
-        cla_sup_valid,
-        as.numeric(feature_pred_tax_cla_02sup_score) * w_cla_sup,
-        NA_real_
-      ),
-      ws_cla = tidytable::if_else(
-        cla_cla_valid,
-        as.numeric(feature_pred_tax_cla_03cla_score) * w_cla_cla,
-        NA_real_
-      ),
-      ws_par = tidytable::if_else(
-        cla_par_valid,
-        as.numeric(feature_pred_tax_cla_04dirpar_score) * w_cla_par,
-        NA_real_
-      ),
-      # Find which level has max weighted score
-      max_ws = pmax(ws_kin, ws_sup, ws_cla, ws_par, na.rm = TRUE),
-      # Pick label and score from that level
-      label_classyfire_predicted = tidytable::case_when(
-        !is.na(ws_par) & ws_par == max_ws ~ feature_pred_tax_cla_04dirpar_val,
-        !is.na(ws_cla) & ws_cla == max_ws ~ feature_pred_tax_cla_03cla_val,
-        !is.na(ws_sup) & ws_sup == max_ws ~ feature_pred_tax_cla_02sup_val,
-        !is.na(ws_kin) & ws_kin == max_ws ~ feature_pred_tax_cla_01kin_val,
-        TRUE ~ NA_character_
-      ),
-      score_classyfire = tidytable::case_when(
-        !is.na(ws_par) & ws_par == max_ws ~
-          as.numeric(feature_pred_tax_cla_04dirpar_score),
-        !is.na(ws_cla) & ws_cla == max_ws ~
-          as.numeric(feature_pred_tax_cla_03cla_score),
-        !is.na(ws_sup) & ws_sup == max_ws ~
-          as.numeric(feature_pred_tax_cla_02sup_score),
-        !is.na(ws_kin) & ws_kin == max_ws ~
-          as.numeric(feature_pred_tax_cla_01kin_score),
-        TRUE ~ NA_real_
-      )
-    ) |>
-    tidytable::filter(
-      !is.na(label_classyfire_predicted),
-      label_classyfire_predicted != "notClassified"
-    ) |>
-    tidytable::select(
-      feature_id,
-      label_classyfire_predicted,
-      score_classyfire
-    ) |>
+  v_kin <- df_pred_tax$feature_pred_tax_cla_01kin_val
+  v_sup <- df_pred_tax$feature_pred_tax_cla_02sup_val
+  v_cla <- df_pred_tax$feature_pred_tax_cla_03cla_val
+  v_par <- df_pred_tax$feature_pred_tax_cla_04dirpar_val
+
+  s_kin <- .as_numeric_dedup(df_pred_tax$feature_pred_tax_cla_01kin_score)
+  s_sup <- .as_numeric_dedup(df_pred_tax$feature_pred_tax_cla_02sup_score)
+  s_cla <- .as_numeric_dedup(df_pred_tax$feature_pred_tax_cla_03cla_score)
+  s_par <- .as_numeric_dedup(df_pred_tax$feature_pred_tax_cla_04dirpar_score)
+
+  ws_kin <- s_kin * w_cla_kin
+  ws_kin[is.na(v_kin) | v_kin == "notClassified"] <- NA_real_
+  ws_sup <- s_sup * w_cla_sup
+  ws_sup[is.na(v_sup) | v_sup == "notClassified"] <- NA_real_
+  ws_cla <- s_cla * w_cla_cla
+  ws_cla[is.na(v_cla) | v_cla == "notClassified"] <- NA_real_
+  ws_par <- s_par * w_cla_par
+  ws_par[is.na(v_par) | v_par == "notClassified"] <- NA_real_
+
+  max_ws <- pmax(ws_kin, ws_sup, ws_cla, ws_par, na.rm = TRUE)
+
+  label <- rep(NA_character_, n)
+  score <- rep(NA_real_, n)
+
+  m_kin <- !is.na(ws_kin) & ws_kin == max_ws
+  label[m_kin] <- v_kin[m_kin]
+  score[m_kin] <- s_kin[m_kin]
+
+  m_sup <- !is.na(ws_sup) & ws_sup == max_ws
+  label[m_sup] <- v_sup[m_sup]
+  score[m_sup] <- s_sup[m_sup]
+
+  m_cla <- !is.na(ws_cla) & ws_cla == max_ws
+  label[m_cla] <- v_cla[m_cla]
+  score[m_cla] <- s_cla[m_cla]
+
+  m_par <- !is.na(ws_par) & ws_par == max_ws
+  label[m_par] <- v_par[m_par]
+  score[m_par] <- s_par[m_par]
+
+  keep <- !is.na(label) & label != "notClassified"
+  tidytable::tidytable(
+    feature_id = df_pred_tax$feature_id[keep],
+    label_classyfire_predicted = label[keep],
+    score_classyfire = score[keep]
+  ) |>
     tidytable::distinct()
 }
 
@@ -562,6 +555,15 @@ compute_classyfire_taxonomy <- function(df_pred_tax, weights) {
 #' @return Data frame with selected NPClassifier label and score
 #' @keywords internal
 compute_npclassifier_taxonomy <- function(df_pred_tax, weights) {
+  n <- nrow(df_pred_tax)
+  if (n == 0L) {
+    return(tidytable::tidytable(
+      feature_id = character(0L),
+      label_npclassifier_predicted = character(0L),
+      score_npclassifier = numeric(0L)
+    ))
+  }
+
   # Normalize weight inputs: ensure numeric scalar defaults to 0 when NULL or non-numeric
   w_npc_pat <- if (!is.null(weights$w_npc_pat)) {
     as.numeric(weights$w_npc_pat)
@@ -579,58 +581,44 @@ compute_npclassifier_taxonomy <- function(df_pred_tax, weights) {
     0
   }
 
-  df_pred_tax |>
-    tidytable::mutate(
-      npc_pat_valid = !is.na(feature_pred_tax_npc_01pat_val) &
-        feature_pred_tax_npc_01pat_val != "notClassified",
-      npc_sup_valid = !is.na(feature_pred_tax_npc_02sup_val) &
-        feature_pred_tax_npc_02sup_val != "notClassified",
-      npc_cla_valid = !is.na(feature_pred_tax_npc_03cla_val) &
-        feature_pred_tax_npc_03cla_val != "notClassified",
-      # Compute weighted score for each level
-      ws_pat = tidytable::if_else(
-        npc_pat_valid,
-        as.numeric(feature_pred_tax_npc_01pat_score) * w_npc_pat,
-        NA_real_
-      ),
-      ws_sup = tidytable::if_else(
-        npc_sup_valid,
-        as.numeric(feature_pred_tax_npc_02sup_score) * w_npc_sup,
-        NA_real_
-      ),
-      ws_cla = tidytable::if_else(
-        npc_cla_valid,
-        as.numeric(feature_pred_tax_npc_03cla_score) * w_npc_cla,
-        NA_real_
-      ),
-      # Find which level has max weighted score
-      max_ws = pmax(ws_pat, ws_sup, ws_cla, na.rm = TRUE),
-      # Pick label and score from that level
-      label_npclassifier_predicted = tidytable::case_when(
-        !is.na(ws_cla) & ws_cla == max_ws ~ feature_pred_tax_npc_03cla_val,
-        !is.na(ws_sup) & ws_sup == max_ws ~ feature_pred_tax_npc_02sup_val,
-        !is.na(ws_pat) & ws_pat == max_ws ~ feature_pred_tax_npc_01pat_val,
-        TRUE ~ NA_character_
-      ),
-      score_npclassifier = tidytable::case_when(
-        !is.na(ws_cla) & ws_cla == max_ws ~
-          as.numeric(feature_pred_tax_npc_03cla_score),
-        !is.na(ws_sup) & ws_sup == max_ws ~
-          as.numeric(feature_pred_tax_npc_02sup_score),
-        !is.na(ws_pat) & ws_pat == max_ws ~
-          as.numeric(feature_pred_tax_npc_01pat_score),
-        TRUE ~ NA_real_
-      )
-    ) |>
-    tidytable::filter(
-      !is.na(label_npclassifier_predicted),
-      label_npclassifier_predicted != "notClassified"
-    ) |>
-    tidytable::select(
-      feature_id,
-      label_npclassifier_predicted,
-      score_npclassifier
-    ) |>
+  v_pat <- df_pred_tax$feature_pred_tax_npc_01pat_val
+  v_sup <- df_pred_tax$feature_pred_tax_npc_02sup_val
+  v_cla <- df_pred_tax$feature_pred_tax_npc_03cla_val
+
+  s_pat <- .as_numeric_dedup(df_pred_tax$feature_pred_tax_npc_01pat_score)
+  s_sup <- .as_numeric_dedup(df_pred_tax$feature_pred_tax_npc_02sup_score)
+  s_cla <- .as_numeric_dedup(df_pred_tax$feature_pred_tax_npc_03cla_score)
+
+  ws_pat <- s_pat * w_npc_pat
+  ws_pat[is.na(v_pat) | v_pat == "notClassified"] <- NA_real_
+  ws_sup <- s_sup * w_npc_sup
+  ws_sup[is.na(v_sup) | v_sup == "notClassified"] <- NA_real_
+  ws_cla <- s_cla * w_npc_cla
+  ws_cla[is.na(v_cla) | v_cla == "notClassified"] <- NA_real_
+
+  max_ws <- pmax(ws_pat, ws_sup, ws_cla, na.rm = TRUE)
+
+  label <- rep(NA_character_, n)
+  score <- rep(NA_real_, n)
+
+  m_pat <- !is.na(ws_pat) & ws_pat == max_ws
+  label[m_pat] <- v_pat[m_pat]
+  score[m_pat] <- s_pat[m_pat]
+
+  m_sup <- !is.na(ws_sup) & ws_sup == max_ws
+  label[m_sup] <- v_sup[m_sup]
+  score[m_sup] <- s_sup[m_sup]
+
+  m_cla <- !is.na(ws_cla) & ws_cla == max_ws
+  label[m_cla] <- v_cla[m_cla]
+  score[m_cla] <- s_cla[m_cla]
+
+  keep <- !is.na(label) & label != "notClassified"
+  tidytable::tidytable(
+    feature_id = df_pred_tax$feature_id[keep],
+    label_npclassifier_predicted = label[keep],
+    score_npclassifier = score[keep]
+  ) |>
     tidytable::distinct()
 }
 

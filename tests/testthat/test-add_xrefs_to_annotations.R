@@ -369,3 +369,49 @@ test_that("add_xrefs_to_annotations matches on 14-char inchikey connectivity lay
     "Q123"
   )
 })
+
+test_that("add_xrefs_to_annotations deduplicates identical IDs and distinguishes partial vs absent xrefs", {
+  results_list <- list(
+    full = tidytable::tidytable(
+      feature_id = c("F1", "F2", "F3", "F4"),
+      candidate_structure_inchikey_connectivity_layer = c(
+        "ABCDEFGHIJKLMN-1",
+        "OPQRSTUVWXYZAB-1",
+        "ZZZZZZZZZZZZZZ-1",
+        NA_character_
+      )
+    ),
+    filtered = tidytable::tidytable(
+      feature_id = "F1",
+      candidate_structure_inchikey_connectivity_layer = "ABCDEFGHIJKLMN-1"
+    ),
+    mini = tidytable::tidytable(
+      feature_id = "F1",
+      candidate_structure_inchikey_connectivity_layer = "ABCDEFGHIJKLMN-1"
+    )
+  )
+
+  xrefs_data <- tidytable::tidytable(
+    inchikey = c(
+      "ABCDEFGHIJKLMN-UHFFFAOYSA-N",
+      "ABCDEFGHIJKLMN-SECONDSTEREO",
+      "ABCDEFGHIJKLMN-THIRDSTEREO",
+      "OPQRSTUVWXYZAB-UHFFFAOYSA-N"
+    ),
+    prefix = c("chebi", "chebi", "chebi", "wikidata"),
+    id = c("100", "100", "200", "Q999")
+  )
+  xrefs_file <- temp_test_path("xrefs_dedup_partial.tsv.gz")
+  export_output(x = xrefs_data, file = xrefs_file)
+
+  result <- add_xrefs_to_annotations(results_list, xrefs_file)
+
+  expect_identical(
+    result$full$candidate_structure_id_chebi,
+    c("100 $ 200", "", NA_character_, NA_character_)
+  )
+  expect_identical(
+    result$full$candidate_structure_id_wikidata,
+    c("", "Q999", NA_character_, NA_character_)
+  )
+})

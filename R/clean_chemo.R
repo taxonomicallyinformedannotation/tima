@@ -187,21 +187,28 @@ clean_chemo <- function(
 
   # Ensure feature-level `rt` and `mz` are present on every candidate row:
   # `sample_candidates_per_group` uses them for the cross-feature M + RT
-  # anchor. If upstream scoring dropped them, left-join from features_table.
-  .ft_cols <- intersect(c("feature_id", "rt", "mz"), names(features_table))
+  # anchor. If upstream scoring dropped them, attach from features_table.
   .missing_feature_cols <- setdiff(
     c("rt", "mz"),
     names(annot_table_wei_chemo)
   )
+  .missing_from_ft <- intersect(.missing_feature_cols, names(features_table))
   if (
-    length(.missing_feature_cols) > 0L && all(c("feature_id") %in% .ft_cols)
+    length(.missing_from_ft) > 0L && "feature_id" %in% names(features_table)
   ) {
-    annot_table_wei_chemo <- annot_table_wei_chemo |>
-      tidytable::left_join(
-        y = features_table |>
-          tidytable::select(tidyselect::any_of(.ft_cols)) |>
-          tidytable::distinct(feature_id, .keep_all = TRUE)
+    .ft_fids <- features_table$feature_id
+    .m_ft <- if (anyNA(.ft_fids)) {
+      match(annot_table_wei_chemo$feature_id, .ft_fids)
+    } else {
+      fastmatch::fmatch(annot_table_wei_chemo$feature_id, .ft_fids)
+    }
+    for (.col in .missing_from_ft) {
+      data.table::set(
+        annot_table_wei_chemo,
+        j = .col,
+        value = features_table[[.col]][.m_ft]
       )
+    }
   }
 
   # Core Filtering Pipeline ----
@@ -253,13 +260,7 @@ clean_chemo <- function(
   # to high-evidence candidates; `high_evidence` only governs the full tier
   df_filtered <- df_percentile |>
     filter_high_evidence_only(context = "filtered") |>
-    # tidytable::slice_head() ignores `order_by`; rank explicitly instead
-    tidytable::slice_min(
-      order_by = rank_final,
-      n = candidates_final,
-      with_ties = FALSE,
-      by = feature_id
-    )
+    .slice_top_n_by_feature(n_keep = candidates_final)
 
   df_filtered <- retain_promoted_rank1_in_filtered(
     df_filtered = df_filtered,
@@ -280,27 +281,8 @@ clean_chemo <- function(
       summarize = summarize,
       annotation_notes_lookup = annotation_notes_lookup
     ) |>
-    tidytable::left_join(y = results_candidates)
-
-  results_filtered <- .restore_annotation_notes(
-    results = results_filtered,
-    annotation_notes_lookup = annotation_notes_lookup
-  )
-
-  # Only set candidates_best if the inchikey column exists
-  if (
-    "candidate_structure_inchikey_connectivity_layer" %in%
-      names(results_filtered)
-  ) {
-    results_filtered <- results_filtered |>
-      tidytable::mutate(
-        candidates_best = tidytable::if_else(
-          is.na(candidate_structure_inchikey_connectivity_layer),
-          NA_integer_,
-          candidates_best
-        )
-      )
-  }
+    .attach_candidate_counts(results_candidates = results_candidates) |>
+    .restore_annotation_notes(annotation_notes_lookup = annotation_notes_lookup)
 
   # Tier 1: MINI - Extract from df_percentile BEFORE high-evidence filter
   # This ensures we get predicted taxonomy for features without inchikey
@@ -348,27 +330,9 @@ clean_chemo <- function(
       summarize = summarize,
       annotation_notes_lookup = annotation_notes_lookup
     ) |>
-    tidytable::left_join(y = results_candidates)
-  results_full <- .restore_annotation_notes(
-    results = results_full,
-    annotation_notes_lookup = annotation_notes_lookup
-  )
+    .attach_candidate_counts(results_candidates = results_candidates) |>
+    .restore_annotation_notes(annotation_notes_lookup = annotation_notes_lookup)
   rm(annot_table_wei_chemo, annotation_notes_lookup, results_candidates)
-
-  # Only set candidates_best if the inchikey column exists
-  if (
-    "candidate_structure_inchikey_connectivity_layer" %in%
-      names(results_full)
-  ) {
-    results_full <- results_full |>
-      tidytable::mutate(
-        candidates_best = tidytable::if_else(
-          is.na(candidate_structure_inchikey_connectivity_layer),
-          NA_integer_,
-          candidates_best
-        )
-      )
-  }
 
   rm(df_full, df_ranked, feature_consensus_table)
 
@@ -402,6 +366,53 @@ clean_chemo <- function(
   results_list
 }
 
+.slice_top_n_by_feature <- function(df, n_keep) {
+  n <- nrow(df)
+  if (n == 0L) {
+    return(df)
+  }
+  ord1 <- order(df$rank_final, na.last = TRUE, method = "radix")
+  fids_ord1 <- df$feature_id[ord1]
+  u_fids <- unique(fids_ord1)
+  fid_id <- if (anyNA(u_fids)) {
+    match(fids_ord1, u_fids)
+  } else {
+    fastmatch::fmatch(fids_ord1, u_fids)
+  }
+  ord2 <- order(fid_id, method = "radix")
+  g_sorted <- fid_id[ord2]
+  new_g <- if (n > 1L) c(TRUE, g_sorted[-1L] != g_sorted[-n]) else TRUE
+  pos_in_g <- seq_len(n) - cummax(ifelse(new_g, seq_len(n), 1L)) + 1L
+  keep_idx <- ord1[ord2[pos_in_g <= n_keep]]
+  df[keep_idx, , drop = FALSE]
+}
+
+.attach_candidate_counts <- function(results, results_candidates) {
+  res_list <- as.list(results)
+  if (nrow(results) == 0L) {
+    res_list[["candidates_evaluated"]] <- integer(0L)
+    res_list[["candidates_best"]] <- integer(0L)
+    return(tidytable::as_tidytable(res_list))
+  }
+  rc_fids <- results_candidates$feature_id
+  idx <- if (anyNA(rc_fids)) {
+    match(results$feature_id, rc_fids)
+  } else {
+    fastmatch::fmatch(results$feature_id, rc_fids)
+  }
+  c_eval <- results_candidates$candidates_evaluated[idx]
+  c_best <- results_candidates$candidates_best[idx]
+  if ("candidate_structure_inchikey_connectivity_layer" %in% names(results)) {
+    is_na_ik <- is.na(results$candidate_structure_inchikey_connectivity_layer)
+    if (any(is_na_ik)) {
+      c_best[is_na_ik] <- NA_integer_
+    }
+  }
+  res_list[["candidates_evaluated"]] <- c_eval
+  res_list[["candidates_best"]] <- c_best
+  tidytable::as_tidytable(res_list)
+}
+
 .restore_annotation_notes <- function(results, annotation_notes_lookup) {
   if (
     is.null(annotation_notes_lookup) ||
@@ -424,6 +435,56 @@ clean_chemo <- function(
   note_join_cols <- intersect(note_join_cols, names(results))
   if (length(note_join_cols) == 0L) {
     return(results)
+  }
+
+  notes_key_df <- as.data.frame(as.list(annotation_notes_lookup)[
+    note_join_cols
+  ])
+  if (anyDuplicated(notes_key_df) == 0L) {
+    n_res <- nrow(results)
+    cand_idx <- if ("feature_id" %in% note_join_cols) {
+      u_nf <- unique(annotation_notes_lookup$feature_id)
+      m_nf <- if (anyNA(u_nf)) {
+        match(results$feature_id, u_nf)
+      } else {
+        fastmatch::fmatch(results$feature_id, u_nf)
+      }
+      which(!is.na(m_nf))
+    } else {
+      seq_len(n_res)
+    }
+
+    note_col <- if ("annotation_note" %in% names(results)) {
+      results$annotation_note
+    } else {
+      rep(NA_character_, n_res)
+    }
+
+    if (length(cand_idx) > 0L) {
+      if (length(note_join_cols) == 1L) {
+        c1 <- note_join_cols[[1L]]
+        r_k <- results[[c1]][cand_idx]
+        n_k <- annotation_notes_lookup[[c1]]
+      } else {
+        r_cols <- lapply(note_join_cols, function(col) results[[col]][cand_idx])
+        n_cols <- lapply(
+          note_join_cols,
+          function(col) annotation_notes_lookup[[col]]
+        )
+        r_k <- do.call(paste, c(r_cols, list(sep = "\r")))
+        n_k <- do.call(paste, c(n_cols, list(sep = "\r")))
+      }
+      m_idx <- if (anyNA(n_k)) match(r_k, n_k) else fastmatch::fmatch(r_k, n_k)
+      matched_notes <- annotation_notes_lookup$annotation_note[m_idx]
+      cur_sub <- note_col[cand_idx]
+      fill_mask <- is.na(cur_sub) & !is.na(matched_notes)
+      if (any(fill_mask)) {
+        note_col[cand_idx[fill_mask]] <- matched_notes[fill_mask]
+      }
+    }
+    res_list <- as.list(results)
+    res_list[["annotation_note"]] <- note_col
+    return(tidytable::as_tidytable(res_list))
   }
 
   notes <- annotation_notes_lookup |>
@@ -468,21 +529,21 @@ retain_promoted_rank1_in_filtered <- function(
     return(df_filtered)
   }
 
-  promoted_features <- annotation_notes_lookup |>
-    tidytable::filter(
-      !is.na(annotation_note),
-      grepl("^Promoted to rank 1:", annotation_note)
-    ) |>
-    tidytable::distinct(feature_id)
+  notes_vec <- annotation_notes_lookup$annotation_note
+  is_prom <- !is.na(notes_vec) & startsWith(notes_vec, "Promoted to rank 1:")
+  if (!any(is_prom)) {
+    return(df_filtered)
+  }
 
-  if (nrow(promoted_features) == 0L) {
+  promoted_ids <- unique(annotation_notes_lookup$feature_id[is_prom])
+  promoted_ids <- promoted_ids[!is.na(promoted_ids)]
+  if (length(promoted_ids) == 0L) {
     return(df_filtered)
   }
 
   before_n <- nrow(df_filtered)
-  promoted_ids <- promoted_features$feature_id
-  keep <- !(df_filtered$feature_id %in% promoted_ids) |
-    df_filtered$rank_final == 1L
+  in_prom <- !is.na(fastmatch::fmatch(df_filtered$feature_id, promoted_ids))
+  keep <- !in_prom | df_filtered$rank_final == 1L
   out <- df_filtered[keep, , drop = FALSE]
 
   dropped_n <- before_n - nrow(out)

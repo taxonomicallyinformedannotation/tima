@@ -97,50 +97,88 @@ add_xrefs_to_annotations <- function(results_list, xrefs_file) {
   }
 
   # Restrict xrefs to only InChIKeys present in this result tier.
-  # Normalize to connectivity layer (first 14 chars) before matching.
-  df_key <- substr(df[[inchikey_col]], 1L, 14L)
-  inchikey_values <- unique(df_key)
-  inchikey_values <- inchikey_values[
-    !is.na(inchikey_values) & nzchar(inchikey_values)
-  ]
+  # Normalize to connectivity layer (first 14 chars) on unique values first.
+  raw_ik <- as.character(df[[inchikey_col]])
+  u_raw <- unique(raw_ik)
+  u_key <- substr(u_raw, 1L, 14L)
+  valid_u <- !is.na(u_key) & nzchar(u_key)
+  inchikey_values <- unique(u_key[valid_u])
 
   if (length(inchikey_values) == 0L) {
     return(df)
   }
 
-  xrefs_filtered <- xrefs |>
-    tidytable::mutate(inchikey = substr(inchikey, 1L, 14L)) |>
-    tidytable::filter(inchikey %in% inchikey_values)
+  xref_raw_ik <- as.character(xrefs$inchikey)
+  u_xref_raw <- unique(xref_raw_ik)
+  u_xref_key <- substr(u_xref_raw, 1L, 14L)
+  u_xref_match <- fastmatch::fmatch(u_xref_key, inchikey_values)
 
-  if (nrow(xrefs_filtered) == 0L) {
+  if (all(is.na(u_xref_match))) {
     return(df)
   }
 
-  # Pivot xrefs: one column per prefix (database)
-  xrefs_wide <- xrefs_filtered |>
-    tidytable::distinct(inchikey, prefix, id) |>
-    tidytable::pivot_wider(
-      id_cols = inchikey,
-      names_from = prefix,
-      values_from = id,
-      values_fn = list(id = function(x) {
-        # If multiple IDs per inchikey × prefix, collapse with " $ "
-        paste(unique(x), collapse = " $ ")
-      })
-    )
+  xref_row_u <- if (anyNA(u_xref_raw)) {
+    match(xref_raw_ik, u_xref_raw)
+  } else {
+    fastmatch::fmatch(xref_raw_ik, u_xref_raw)
+  }
+  keep_xref <- !is.na(u_xref_match[xref_row_u])
+  f_ik <- u_xref_key[xref_row_u[keep_xref]]
+  f_prefix <- as.character(xrefs$prefix[keep_xref])
+  f_id <- as.character(xrefs$id[keep_xref])
 
-  # Identify which prefix columns to add
-  # Filter: only add if not all values are NA (i.e., has some coverage)
-  columns_to_add <- setdiff(names(xrefs_wide), "inchikey")
-  non_empty_cols <- columns_to_add[
-    vapply(
-      columns_to_add,
-      function(col) {
-        !all(is.na(xrefs_wide[[col]]))
-      },
-      logical(1L)
-    )
-  ]
+  u_prefixes <- unique(f_prefix)
+  u_prefixes <- u_prefixes[!is.na(u_prefixes)]
+  u_f_ik <- unique(f_ik)
+  in_xrefs_u <- !is.na(fastmatch::fmatch(u_key, u_f_ik))
+
+  df_u_idx <- if (anyNA(u_raw)) {
+    match(raw_ik, u_raw)
+  } else {
+    fastmatch::fmatch(raw_ik, u_raw)
+  }
+
+  idx_by_prefix <- split(seq_along(f_prefix), f_prefix)
+  added_cols <- list()
+  non_empty_cols <- character(0L)
+
+  for (p in u_prefixes) {
+    p_idx <- idx_by_prefix[[p]]
+    p_ik <- f_ik[p_idx]
+    p_id <- f_id[p_idx]
+    if (anyDuplicated(p_ik) == 0L) {
+      u_p_ik <- p_ik
+      u_p_val <- p_id
+    } else {
+      u_p_ik <- unique(p_ik)
+      p_ik_id <- fastmatch::fmatch(p_ik, u_p_ik)
+      counts <- tabulate(p_ik_id, nbins = length(u_p_ik))
+      u_p_val <- character(length(u_p_ik))
+      single_mask <- counts == 1L
+      if (any(single_mask)) {
+        single_rows <- !duplicated(p_ik_id) & single_mask[p_ik_id]
+        u_p_val[p_ik_id[single_rows]] <- p_id[single_rows]
+      }
+      multi_ids <- which(counts > 1L)
+      if (length(multi_ids) > 0L) {
+        multi_rows <- which(counts[p_ik_id] > 1L)
+        sp <- split(p_id[multi_rows], p_ik_id[multi_rows])
+        u_p_val[as.integer(names(sp))] <- vapply(
+          sp,
+          function(x) paste(unique(x), collapse = " $ "),
+          character(1L),
+          USE.NAMES = FALSE
+        )
+      }
+    }
+    if (!all(is.na(u_p_val))) {
+      non_empty_cols <- c(non_empty_cols, p)
+      m_u <- fastmatch::fmatch(u_key, u_p_ik)
+      u_col <- u_p_val[m_u]
+      u_col[is.na(m_u) & in_xrefs_u] <- ""
+      added_cols[[paste0("candidate_structure_id_", p)]] <- u_col[df_u_idx]
+    }
+  }
 
   if (length(non_empty_cols) == 0L) {
     log_debug(
@@ -155,27 +193,6 @@ add_xrefs_to_annotations <- function(results_list, xrefs_file) {
     paste(non_empty_cols, collapse = ", ")
   )
 
-  # Prepare xref subset with standardized column names
-  xrefs_subset <- xrefs_wide |>
-    tidytable::select(inchikey, tidyselect::all_of(non_empty_cols)) |>
-    tidytable::rename_with(
-      ~ paste0("candidate_structure_id_", .x),
-      .cols = tidyselect::all_of(non_empty_cols)
-    )
-
-  # Join: left_join to preserve all annotation rows
-  # Join on connectivity-layer keys (first 14 chars)
-  xrefs_for_join <- xrefs_subset |>
-    tidytable::rename(inchikey_key = inchikey)
-
-  df_for_join <- df
-  df_for_join$inchikey_key <- substr(df_for_join[[inchikey_col]], 1L, 14L)
-
-  result_df <- df_for_join |>
-    tidytable::left_join(xrefs_for_join, by = "inchikey_key") |>
-    tidytable::select(-inchikey_key)
-
-  rm(xrefs_filtered, xrefs_wide, xrefs_subset, xrefs_for_join, df_for_join)
-
-  result_df
+  res_list <- c(as.list(df), added_cols)
+  tidytable::as_tidytable(res_list)
 }

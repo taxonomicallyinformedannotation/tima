@@ -1014,9 +1014,29 @@ build_mini_taxonomy_table <- function(
     u_trim[idx]
   }
 
+  coalesce_tax_labels <- function(cols) {
+    n_rows <- nrow(df_percentile)
+    out <- rep(NA_character_, n_rows)
+    rem <- seq_len(n_rows)
+    for (col in cols) {
+      if (length(rem) == 0L) {
+        break
+      }
+      vals <- normalize_tax_label_dedup(df_percentile[[col]][rem])
+      ok <- !is.na(vals)
+      if (any(ok)) {
+        out[rem[ok]] <- vals[ok]
+        rem <- rem[!ok]
+      }
+    }
+    out
+  }
+
   fids <- df_percentile$feature_id
   u_fids <- unique(fids)
-  fid_id <- if (anyNA(u_fids)) {
+  n_u <- length(u_fids)
+  has_na_ufid <- anyNA(u_fids)
+  fid_id <- if (has_na_ufid) {
     match(fids, u_fids)
   } else {
     fastmatch::fmatch(fids, u_fids)
@@ -1028,64 +1048,46 @@ build_mini_taxonomy_table <- function(
     df_percentile$candidate_structure_inchikey_connectivity_layer
   )
   fids_with_ik <- unique(fid_id[has_ik_row])
-  has_ik_u <- logical(length(u_fids))
+  has_ik_u <- logical(n_u)
   has_ik_u[fids_with_ik[!is.na(fids_with_ik)]] <- TRUE
-  df_has_ik <- tidytable::tidytable(
-    feature_id = u_fids,
-    has_inchikey = has_ik_u
-  )
 
-  label_cla_str <- tidytable::coalesce(
-    normalize_tax_label_dedup(
-      df_percentile$candidate_structure_tax_cla_04dirpar
-    ),
-    normalize_tax_label_dedup(df_percentile$candidate_structure_tax_cla_03cla),
-    normalize_tax_label_dedup(df_percentile$candidate_structure_tax_cla_02sup),
-    normalize_tax_label_dedup(df_percentile$candidate_structure_tax_cla_01kin)
-  )
-  label_npc_str <- tidytable::coalesce(
-    normalize_tax_label_dedup(df_percentile$candidate_structure_tax_npc_03cla),
-    normalize_tax_label_dedup(df_percentile$candidate_structure_tax_npc_02sup),
-    normalize_tax_label_dedup(df_percentile$candidate_structure_tax_npc_01pat)
-  )
+  label_cla_str <- coalesce_tax_labels(c(
+    "candidate_structure_tax_cla_04dirpar",
+    "candidate_structure_tax_cla_03cla",
+    "candidate_structure_tax_cla_02sup",
+    "candidate_structure_tax_cla_01kin"
+  ))
+  label_npc_str <- coalesce_tax_labels(c(
+    "candidate_structure_tax_npc_03cla",
+    "candidate_structure_tax_npc_02sup",
+    "candidate_structure_tax_npc_01pat"
+  ))
 
   # Best structure label per feature (highest score_weighted_chemo wins)
+  label_cla_str_u <- rep(NA_character_, n_u)
+  score_cla_str_u <- rep(NA_real_, n_u)
   idx_cla <- which(!is.na(label_cla_str))
   if (length(idx_cla) > 0L) {
     ord_cla <- idx_cla[
       order(-sc_chemo[idx_cla], na.last = TRUE, method = "radix")
     ]
     keep_cla <- ord_cla[!duplicated(fid_id[ord_cla])]
-    df_str_cla <- tidytable::tidytable(
-      feature_id = fids[keep_cla],
-      label_classyfire_str = label_cla_str[keep_cla],
-      score_cla_str = sc_chemo[keep_cla]
-    )
-  } else {
-    df_str_cla <- tidytable::tidytable(
-      feature_id = character(0),
-      label_classyfire_str = character(0),
-      score_cla_str = numeric(0)
-    )
+    u_idx_cla <- fid_id[keep_cla]
+    label_cla_str_u[u_idx_cla] <- label_cla_str[keep_cla]
+    score_cla_str_u[u_idx_cla] <- sc_chemo[keep_cla]
   }
 
+  label_npc_str_u <- rep(NA_character_, n_u)
+  score_npc_str_u <- rep(NA_real_, n_u)
   idx_npc <- which(!is.na(label_npc_str))
   if (length(idx_npc) > 0L) {
     ord_npc <- idx_npc[
       order(-sc_chemo[idx_npc], na.last = TRUE, method = "radix")
     ]
     keep_npc <- ord_npc[!duplicated(fid_id[ord_npc])]
-    df_str_npc <- tidytable::tidytable(
-      feature_id = fids[keep_npc],
-      label_npclassifier_str = label_npc_str[keep_npc],
-      score_npc_str = sc_chemo[keep_npc]
-    )
-  } else {
-    df_str_npc <- tidytable::tidytable(
-      feature_id = character(0),
-      label_npclassifier_str = character(0),
-      score_npc_str = numeric(0)
-    )
+    u_idx_npc <- fid_id[keep_npc]
+    label_npc_str_u[u_idx_npc] <- label_npc_str[keep_npc]
+    score_npc_str_u[u_idx_npc] <- sc_chemo[keep_npc]
   }
   rm(label_cla_str, label_npc_str, sc_chemo)
 
@@ -1102,14 +1104,11 @@ build_mini_taxonomy_table <- function(
     df_percentile[, ..pred_cols] |>
       tidytable::distinct()
   }
-  score_pred_cols <- grep("score", names(df_pred_tax), value = TRUE)
-  for (col in score_pred_cols) {
-    data.table::set(
-      df_pred_tax,
-      j = col,
-      value = .as_numeric_dedup(df_pred_tax[[col]])
-    )
-  }
+
+  label_cla_pred_u <- rep(NA_character_, n_u)
+  score_cla_pred_u <- rep(NA_real_, n_u)
+  label_npc_pred_u <- rep(NA_character_, n_u)
+  score_npc_pred_u <- rep(NA_real_, n_u)
 
   if (nrow(df_pred_tax) > 0L) {
     weights <- list(
@@ -1122,86 +1121,74 @@ build_mini_taxonomy_table <- function(
       w_npc_cla = score_chemical_npc_class
     )
 
-    df_pred_cla <- compute_classyfire_taxonomy(df_pred_tax, weights) |>
-      tidytable::arrange(tidytable::desc(score_classyfire)) |>
-      tidytable::distinct(feature_id, .keep_all = TRUE)
+    df_pred_cla <- compute_classyfire_taxonomy(df_pred_tax, weights)
+    if (nrow(df_pred_cla) > 0L) {
+      ord_pc <- order(
+        -df_pred_cla$score_classyfire,
+        na.last = TRUE,
+        method = "radix"
+      )
+      f_pc <- df_pred_cla$feature_id[ord_pc]
+      keep_pc <- ord_pc[!duplicated(f_pc)]
+      m_pc <- if (has_na_ufid) {
+        match(df_pred_cla$feature_id[keep_pc], u_fids)
+      } else {
+        fastmatch::fmatch(df_pred_cla$feature_id[keep_pc], u_fids)
+      }
+      label_cla_pred_u[m_pc] <- df_pred_cla$label_classyfire_predicted[keep_pc]
+      score_cla_pred_u[m_pc] <- df_pred_cla$score_classyfire[keep_pc]
+    }
 
-    df_pred_npc <- compute_npclassifier_taxonomy(df_pred_tax, weights) |>
-      tidytable::arrange(tidytable::desc(score_npclassifier)) |>
-      tidytable::distinct(feature_id, .keep_all = TRUE)
-  } else {
-    df_pred_cla <- tidytable::tidytable(
-      feature_id = character(0),
-      label_classyfire_predicted = character(0),
-      score_classyfire = numeric(0)
-    )
-    df_pred_npc <- tidytable::tidytable(
-      feature_id = character(0),
-      label_npclassifier_predicted = character(0),
-      score_npclassifier = numeric(0)
-    )
+    df_pred_npc <- compute_npclassifier_taxonomy(df_pred_tax, weights)
+    if (nrow(df_pred_npc) > 0L) {
+      ord_pn <- order(
+        -df_pred_npc$score_npclassifier,
+        na.last = TRUE,
+        method = "radix"
+      )
+      f_pn <- df_pred_npc$feature_id[ord_pn]
+      keep_pn <- ord_pn[!duplicated(f_pn)]
+      m_pn <- if (has_na_ufid) {
+        match(df_pred_npc$feature_id[keep_pn], u_fids)
+      } else {
+        fastmatch::fmatch(df_pred_npc$feature_id[keep_pn], u_fids)
+      }
+      label_npc_pred_u[
+        m_pn
+      ] <- df_pred_npc$label_npclassifier_predicted[keep_pn]
+      score_npc_pred_u[m_pn] <- df_pred_npc$score_npclassifier[keep_pn]
+    }
+    attr(u_fids, ".match.hash") <- NULL
   }
 
-  # pmax across both pools: structure label wins when its score_weighted_chemo
-  # >= prediction score, otherwise the predicted label wins.
-  # All tables are pre-filtered to 1 row per feature, so joining on feature_id only
-  # is safe and prevents unintended cartesian products from common columns
-  joined <- Reduce(
-    f = function(acc, tbl) {
-      tidytable::left_join(
-        x = acc,
-        y = tbl,
-        .join_by = tidyselect::any_of("feature_id"),
-        .keep = "used"
-      )
-    },
-    x = list(df_str_cla, df_str_npc, df_pred_cla, df_pred_npc),
-    init = df_has_ik
-  )
+  # Structure label wins when its score_weighted_chemo >= prediction score;
+  # otherwise the predicted label wins.
+  cla_str_wins <- !is.na(score_cla_str_u) &
+    !is.na(score_cla_pred_u) &
+    score_cla_str_u >= score_cla_pred_u
+  take_cla_pred <- !cla_str_wins & !is.na(score_cla_pred_u)
+  label_classyfire <- label_cla_str_u
+  label_classyfire[take_cla_pred] <- label_cla_pred_u[take_cla_pred]
+  score_classyfire <- rep(NA_real_, n_u)
+  score_classyfire[take_cla_pred] <- score_cla_pred_u[take_cla_pred]
 
-  joined |>
-    tidytable::mutate(
-      label_classyfire = tidytable::case_when(
-        !is.na(score_cla_str) &
-          !is.na(score_classyfire) &
-          score_cla_str >= score_classyfire ~ label_classyfire_str,
-        !is.na(score_classyfire) ~ label_classyfire_predicted,
-        !is.na(label_classyfire_str) ~ label_classyfire_str,
-        TRUE ~ NA_character_
-      ),
-      # No uncertainty score when label comes from a confirmed InChIKey structure
-      score_classyfire = tidytable::case_when(
-        !is.na(score_cla_str) &
-          !is.na(score_classyfire) &
-          score_cla_str >= score_classyfire ~ NA_real_,
-        !is.na(score_classyfire) ~ score_classyfire,
-        TRUE ~ NA_real_
-      ),
-      label_npclassifier = tidytable::case_when(
-        !is.na(score_npc_str) &
-          !is.na(score_npclassifier) &
-          score_npc_str >= score_npclassifier ~ label_npclassifier_str,
-        !is.na(score_npclassifier) ~ label_npclassifier_predicted,
-        !is.na(label_npclassifier_str) ~ label_npclassifier_str,
-        TRUE ~ NA_character_
-      ),
-      score_npclassifier = tidytable::case_when(
-        !is.na(score_npc_str) &
-          !is.na(score_npclassifier) &
-          score_npc_str >= score_npclassifier ~ NA_real_,
-        !is.na(score_npclassifier) ~ score_npclassifier,
-        TRUE ~ NA_real_
-      )
-    ) |>
-    tidytable::select(
-      feature_id,
-      has_inchikey,
-      label_classyfire,
-      label_npclassifier,
-      score_classyfire,
-      score_npclassifier
-    ) |>
-    tidytable::distinct()
+  npc_str_wins <- !is.na(score_npc_str_u) &
+    !is.na(score_npc_pred_u) &
+    score_npc_str_u >= score_npc_pred_u
+  take_npc_pred <- !npc_str_wins & !is.na(score_npc_pred_u)
+  label_npclassifier <- label_npc_str_u
+  label_npclassifier[take_npc_pred] <- label_npc_pred_u[take_npc_pred]
+  score_npclassifier <- rep(NA_real_, n_u)
+  score_npclassifier[take_npc_pred] <- score_npc_pred_u[take_npc_pred]
+
+  tidytable::tidytable(
+    feature_id = u_fids,
+    has_inchikey = has_ik_u,
+    label_classyfire = label_classyfire,
+    label_npclassifier = label_npclassifier,
+    score_classyfire = score_classyfire,
+    score_npclassifier = score_npclassifier
+  )
 }
 
 #' Build mini-tier result table
@@ -1219,22 +1206,31 @@ build_mini_results_table <- function(
   results_filtered,
   xrefs_table = NULL
 ) {
-  best_results <- results_filtered
-  if (nrow(best_results) > 0L && "feature_id" %in% names(best_results)) {
-    rank_num <- suppressWarnings(as.integer(best_results$rank_final))
-    score_final_num <- if ("score_final" %in% names(best_results)) {
-      -.as_numeric_dedup(best_results$score_final)
-    } else if ("score_weighted_chemo" %in% names(best_results)) {
-      -.as_numeric_dedup(best_results$score_weighted_chemo)
+  ft_cols <- intersect(c("feature_id", "rt", "mz"), names(features_table))
+  ft_base <- features_table[, ..ft_cols]
+  if (anyDuplicated(ft_base$feature_id) > 0L) {
+    ft_base <- tidytable::distinct(ft_base)
+  }
+  fids <- ft_base$feature_id
+  n <- length(fids)
+
+  if (
+    nrow(results_filtered) > 0L && "feature_id" %in% names(results_filtered)
+  ) {
+    rank_num <- suppressWarnings(as.integer(results_filtered$rank_final))
+    score_final_num <- if ("score_final" %in% names(results_filtered)) {
+      -.as_numeric_dedup(results_filtered$score_final)
+    } else if ("score_weighted_chemo" %in% names(results_filtered)) {
+      -.as_numeric_dedup(results_filtered$score_weighted_chemo)
     } else {
-      rep_len(0, nrow(best_results))
+      rep_len(0, nrow(results_filtered))
     }
-    initial_num <- if ("score_initial" %in% names(best_results)) {
-      -.as_numeric_dedup(best_results$score_initial)
-    } else if ("candidate_score_pseudo_initial" %in% names(best_results)) {
-      -.as_numeric_dedup(best_results$candidate_score_pseudo_initial)
+    initial_num <- if ("score_initial" %in% names(results_filtered)) {
+      -.as_numeric_dedup(results_filtered$score_initial)
+    } else if ("candidate_score_pseudo_initial" %in% names(results_filtered)) {
+      -.as_numeric_dedup(results_filtered$candidate_score_pseudo_initial)
     } else {
-      rep_len(0, nrow(best_results))
+      rep_len(0, nrow(results_filtered))
     }
 
     ord <- order(
@@ -1244,7 +1240,7 @@ build_mini_results_table <- function(
       na.last = TRUE,
       method = "radix"
     )
-    fids_ord <- best_results$feature_id[ord]
+    fids_ord <- results_filtered$feature_id[ord]
     u_fids_br <- unique(fids_ord)
     fid_id_ord <- if (anyNA(u_fids_br)) {
       match(fids_ord, u_fids_br)
@@ -1252,122 +1248,112 @@ build_mini_results_table <- function(
       fastmatch::fmatch(fids_ord, u_fids_br)
     }
     keep_br <- ord[!duplicated(fid_id_ord)]
-    best_results <- best_results[keep_br, , drop = FALSE]
+    br_fids <- results_filtered$feature_id[keep_br]
+    m_br_u <- if (anyNA(br_fids)) {
+      match(fids, br_fids)
+    } else {
+      fastmatch::fmatch(fids, br_fids)
+    }
+    row_br <- keep_br[m_br_u]
+  } else {
+    row_br <- rep(NA_integer_, n)
   }
 
-  results_mini <- Reduce(
-    f = function(acc, tbl) {
-      tidytable::left_join(
-        x = acc,
-        y = tbl,
-        # All tables are 1 row per feature (best_results distincted at line 1081),
-        # so joining on feature_id only prevents unintended cartesian products
-        .join_by = tidyselect::any_of("feature_id"),
-        .keep = "used"
-      )
-    },
-    x = list(
-      df_classes_mini,
-      best_results
-    ),
-    init = features_table
-  )
+  m_cls <- if (
+    nrow(df_classes_mini) > 0L && "feature_id" %in% names(df_classes_mini)
+  ) {
+    cls_fids <- df_classes_mini$feature_id
+    if (anyNA(cls_fids)) {
+      match(fids, cls_fids)
+    } else {
+      fastmatch::fmatch(fids, cls_fids)
+    }
+  } else {
+    rep(NA_integer_, n)
+  }
 
-  # Ensure all columns being renamed exist; some annotation sources (e.g.,
-  # empty SIRIUS annotations) may omit certain columns like
-  # candidate_structure_error_rt. tidytable::rename() errors on missing
-  # columns, so we add them as NA first.
-  for (col in c(
-    "candidate_structure_name",
-    "candidate_adduct",
-    "candidate_structure_smiles_no_stereo",
-    "candidate_structure_inchikey_connectivity_layer",
-    "candidate_library",
-    "candidate_structure_error_mz",
-    "candidate_structure_error_rt",
-    "candidate_structure_organism_occurrence_closest",
-    "score_weighted_chemo"
-  )) {
-    if (!col %in% names(results_mini)) {
-      results_mini[[col]] <- NA
+  get_cls_col <- function(col, default) {
+    if (col %in% names(df_classes_mini)) {
+      df_classes_mini[[col]][m_cls]
+    } else {
+      rep(default, n)
+    }
+  }
+  get_br_col <- function(col) {
+    if (col %in% names(results_filtered)) {
+      results_filtered[[col]][row_br]
+    } else {
+      rep(NA, n)
     }
   }
 
-  results_mini <- results_mini |>
-    tidytable::rename(
-      label_compound = candidate_structure_name,
-      adduct = candidate_adduct,
-      smiles_no_stereo = candidate_structure_smiles_no_stereo,
-      inchikey_connectivity_layer = candidate_structure_inchikey_connectivity_layer,
-      library = candidate_library,
-      error_mz = candidate_structure_error_mz,
-      error_rt = candidate_structure_error_rt,
-      organism_closest = candidate_structure_organism_occurrence_closest,
-      score = score_weighted_chemo
-    ) |>
-    tidytable::mutate(
-      candidates_evaluated = tidytable::if_else(
-        is.na(inchikey_connectivity_layer),
-        NA_integer_,
-        candidates_evaluated
-      ),
-      candidates_best = tidytable::if_else(
-        is.na(inchikey_connectivity_layer),
-        NA_integer_,
-        candidates_best
-      ),
-      .pred_denom = as.numeric(!is.na(score_classyfire)) +
-        as.numeric(!is.na(score_npclassifier)),
-      .pred_sum = tidytable::coalesce(score_classyfire, 0) +
-        tidytable::coalesce(score_npclassifier, 0),
-      .pred_avg = tidytable::if_else(
-        .pred_denom > 0,
-        .pred_sum / .pred_denom,
-        NA_real_
-      ),
-      score = tidytable::if_else(
-        is.na(inchikey_connectivity_layer),
-        .pred_avg,
-        score
-      )
-    ) |>
-    tidytable::select(
-      tidyselect::any_of(
-        x = c(
-          "feature_id",
-          "rt",
-          "mz",
-          "label_classyfire",
-          "label_npclassifier",
-          "label_compound",
-          "adduct",
-          "smiles_no_stereo",
-          "inchikey_connectivity_layer",
-          "library",
-          "error_mz",
-          "error_rt",
-          "organism_closest",
-          "tag" = "candidate_structure_tag",
-          "score",
-          "candidates_evaluated",
-          "candidates_best",
-          "note" = "annotation_note"
-        )
-      )
-    ) |>
-    tidytable::distinct() |>
-    tidytable::mutate(
-      label_classyfire = tidytable::if_else(
-        condition = !is.na(score),
-        true = label_classyfire,
-        false = NA_character_
-      ),
-      label_npclassifier = tidytable::if_else(
-        condition = !is.na(score),
-        true = label_npclassifier,
-        false = NA_character_
-      )
-    )
+  label_classyfire <- get_cls_col("label_classyfire", NA_character_)
+  label_npclassifier <- get_cls_col("label_npclassifier", NA_character_)
+  score_classyfire <- get_cls_col("score_classyfire", NA_real_)
+  score_npclassifier <- get_cls_col("score_npclassifier", NA_real_)
+
+  inchikey_connectivity_layer <- get_br_col(
+    "candidate_structure_inchikey_connectivity_layer"
+  )
+  na_ik <- is.na(inchikey_connectivity_layer)
+
+  score_raw <- get_br_col("score_weighted_chemo")
+  has_s_cla <- !is.na(score_classyfire)
+  has_s_npc <- !is.na(score_npclassifier)
+  pred_denom <- as.numeric(has_s_cla) + as.numeric(has_s_npc)
+  s_cla0 <- score_classyfire
+  s_cla0[!has_s_cla] <- 0
+  s_npc0 <- score_npclassifier
+  s_npc0[!has_s_npc] <- 0
+  pred_avg <- (s_cla0 + s_npc0) / pred_denom
+  pred_avg[pred_denom == 0] <- NA_real_
+
+  score <- as.numeric(score_raw)
+  score[na_ik] <- pred_avg[na_ik]
+
+  na_score <- is.na(score)
+  if (any(na_score)) {
+    label_classyfire[na_score] <- NA_character_
+    label_npclassifier[na_score] <- NA_character_
+  }
+
+  out_list <- as.list(ft_base)
+  out_list[["label_classyfire"]] <- label_classyfire
+  out_list[["label_npclassifier"]] <- label_npclassifier
+  out_list[["label_compound"]] <- get_br_col("candidate_structure_name")
+  out_list[["adduct"]] <- get_br_col("candidate_adduct")
+  out_list[["smiles_no_stereo"]] <- get_br_col(
+    "candidate_structure_smiles_no_stereo"
+  )
+  out_list[["inchikey_connectivity_layer"]] <- inchikey_connectivity_layer
+  out_list[["library"]] <- get_br_col("candidate_library")
+  out_list[["error_mz"]] <- get_br_col("candidate_structure_error_mz")
+  out_list[["error_rt"]] <- get_br_col("candidate_structure_error_rt")
+  out_list[["organism_closest"]] <- get_br_col(
+    "candidate_structure_organism_occurrence_closest"
+  )
+  if ("candidate_structure_tag" %in% names(results_filtered)) {
+    out_list[["tag"]] <- results_filtered[["candidate_structure_tag"]][row_br]
+  }
+  out_list[["score"]] <- score
+  if ("candidates_evaluated" %in% names(results_filtered)) {
+    ce <- results_filtered[["candidates_evaluated"]][row_br]
+    ce[na_ik] <- NA_integer_
+    out_list[["candidates_evaluated"]] <- ce
+  }
+  if ("candidates_best" %in% names(results_filtered)) {
+    cb <- results_filtered[["candidates_best"]][row_br]
+    cb[na_ik] <- NA_integer_
+    out_list[["candidates_best"]] <- cb
+  }
+  if ("annotation_note" %in% names(results_filtered)) {
+    out_list[["note"]] <- results_filtered[["annotation_note"]][row_br]
+  }
+
+  results_mini <- tidytable::as_tidytable(out_list)
+  if (anyDuplicated(fids) > 0L) {
+    results_mini <- tidytable::distinct(results_mini)
+  }
 
   if (!is.null(xrefs_table) && nrow(xrefs_table) > 0L) {
     results_mini <- results_mini |>

@@ -534,3 +534,75 @@ test_that("compute_candidate_M returns NA vector when inputs are unusable", {
   expect_length(out, 3L)
   expect_true(all(is.na(out)))
 })
+
+test_that("compute_classyfire_taxonomy and compute_npclassifier_taxonomy break ties toward most specific level", {
+  df_cla <- tidytable::tidytable(
+    feature_id = c("F_par", "F_cla", "F_sup"),
+    feature_pred_tax_cla_01kin_val = c("Kin", "Kin", "Kin"),
+    feature_pred_tax_cla_01kin_score = c(0.8, 0.8, 0.8),
+    feature_pred_tax_cla_02sup_val = c("Sup", "Sup", "Sup"),
+    feature_pred_tax_cla_02sup_score = c(0.8, 0.8, 0.8),
+    feature_pred_tax_cla_03cla_val = c("Cla", "Cla", "notClassified"),
+    feature_pred_tax_cla_03cla_score = c(0.8, 0.8, 0.9),
+    feature_pred_tax_cla_04dirpar_val = c(
+      "Par",
+      "notClassified",
+      NA_character_
+    ),
+    feature_pred_tax_cla_04dirpar_score = c(0.8, 0.9, 0.9)
+  )
+  w_cla <- list(w_cla_kin = 1, w_cla_sup = 1, w_cla_cla = 1, w_cla_par = 1)
+  out_cla <- compute_classyfire_taxonomy(df_cla, w_cla)
+  expect_identical(out_cla$label_classyfire_predicted, c("Par", "Cla", "Sup"))
+  expect_equal(out_cla$score_classyfire, c(0.8, 0.8, 0.8))
+
+  df_npc <- tidytable::tidytable(
+    feature_id = c("F_cla", "F_sup"),
+    feature_pred_tax_npc_01pat_val = c("Pat", "Pat"),
+    feature_pred_tax_npc_01pat_score = c(0.7, 0.7),
+    feature_pred_tax_npc_02sup_val = c("Sup", "Sup"),
+    feature_pred_tax_npc_02sup_score = c(0.7, 0.7),
+    feature_pred_tax_npc_03cla_val = c("Cla", "notClassified"),
+    feature_pred_tax_npc_03cla_score = c(0.7, 0.9)
+  )
+  w_npc <- list(w_npc_pat = 1, w_npc_sup = 1, w_npc_cla = 1)
+  out_npc <- compute_npclassifier_taxonomy(df_npc, w_npc)
+  expect_identical(out_npc$label_npclassifier_predicted, c("Cla", "Sup"))
+  expect_equal(out_npc$score_npclassifier, c(0.7, 0.7))
+
+  expect_equal(nrow(compute_classyfire_taxonomy(df_cla[0, ], w_cla)), 0L)
+  expect_equal(nrow(compute_npclassifier_taxonomy(df_npc[0, ], w_npc)), 0L)
+})
+
+test_that("build_mini_taxonomy_table prefers structure label on score equality and clears uncertainty score", {
+  df_perc <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    score_weighted_chemo = c(0.80, 0.70),
+    candidate_structure_inchikey_connectivity_layer = c("IK1", NA_character_),
+    candidate_structure_tax_cla_04dirpar = c(NA_character_, NA_character_),
+    candidate_structure_tax_cla_03cla = c("StrClass1", "StrClass2"),
+    candidate_structure_tax_npc_03cla = c("StrNpc1", NA_character_),
+    feature_pred_tax_cla_03cla_val = c("PredClass1", "PredClass2"),
+    feature_pred_tax_cla_03cla_score = c(0.80, 0.75),
+    feature_pred_tax_npc_03cla_val = c("PredNpc1", "PredNpc2"),
+    feature_pred_tax_npc_03cla_score = c(0.85, 0.60)
+  )
+  out <- build_mini_taxonomy_table(
+    df_percentile = df_perc,
+    score_chemical_cla_kingdom = 1,
+    score_chemical_cla_superclass = 1,
+    score_chemical_cla_class = 1,
+    score_chemical_cla_parent = 1,
+    score_chemical_npc_pathway = 1,
+    score_chemical_npc_superclass = 1,
+    score_chemical_npc_class = 1
+  )
+  expect_identical(out$has_inchikey, c(TRUE, FALSE))
+  # F1: cla structure score (0.80) == pred score (0.80) -> structure wins, score_classyfire is NA
+  # F2: cla structure score (0.70) < pred score (0.75) -> prediction wins, score_classyfire is 0.75
+  expect_identical(out$label_classyfire, c("StrClass1", "PredClass2"))
+  expect_equal(out$score_classyfire, c(NA_real_, 0.75))
+  # F1: npc structure score (0.80) < pred score (0.85) -> prediction wins
+  expect_identical(out$label_npclassifier, c("PredNpc1", "PredNpc2"))
+  expect_equal(out$score_npclassifier, c(0.85, 0.60))
+})
