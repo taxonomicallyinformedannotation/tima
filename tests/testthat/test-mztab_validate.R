@@ -312,3 +312,28 @@ test_that("validate_mztab_tables non-strict mode warns on missing SME columns", 
 
   expect_no_error(validate_mztab_tables(tabs, strict = FALSE))
 })
+
+test_that("mztab reference integrity validates single-ref SMF ambiguity code and comma refs", {
+  fn <- get(".mztab_validate_reference_integrity", envir = asNamespace("tima"))
+  miss <- get(".mztab_missing_ref_ids", envir = asNamespace("tima"))
+
+  expect_identical(
+    miss(c("1, 2", " 3|4 ", "null", "NA", ""), c("1", "2", "3")),
+    "4"
+  )
+
+  tabs_bad_single <- list(
+    sml = tidytable::tidytable(),
+    smf = tidytable::tidytable(
+      SMF_ID = "1",
+      SME_ID_REFS = "10",
+      SME_ID_REF_ambiguity_code = "1"
+    ),
+    sme = tidytable::tidytable(SME_ID = "10")
+  )
+  expect_error(
+    fn(tabs_bad_single, strict = TRUE),
+    regexp = "SME_ID_REF_ambiguity_code",
+    class = "tima_validation_error"
+  )
+})

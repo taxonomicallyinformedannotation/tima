@@ -2050,3 +2050,32 @@ test_that("mztab helpers deduplicate SML tuples, compute ambiguity codes, and pr
     c("1", "2", "3", "null")
   )
 })
+
+test_that(".mztab_expand_summarized and .mztab_refresh_smf_sml_refs handle mixed multi-value columns", {
+  df <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    feature_mz = c(100.1, 200.2),
+    candidate_structure_name = c("A|B", "C"),
+    candidate_adduct = c("[M+H]+", "[M+Na]+"),
+    rank_final = factor(c("1|2", "1")),
+    score_final = c("0.9|0.8", "0.7")
+  )
+  exp_df <- .mztab_expand_summarized(df)
+  expect_equal(nrow(exp_df), 3L)
+  expect_identical(exp_df$candidate_structure_name, c("A", "B", "C"))
+  expect_identical(
+    exp_df$candidate_adduct,
+    c("[M+H]+", NA_character_, "[M+Na]+")
+  )
+
+  smf <- tidytable::tidytable(
+    SMF_ID = c("1", "2", "3"),
+    SML_ID_REFS = rep("null", 3L)
+  )
+  sml <- tidytable::tidytable(
+    SML_ID = c("10", "11", "11", "12"),
+    SMF_ID_REFS = c("1|2", "1", "1", "3")
+  )
+  smf_out <- .mztab_refresh_smf_sml_refs(smf, sml)
+  expect_identical(smf_out$SML_ID_REFS, c("10|11", "10", "12"))
+})

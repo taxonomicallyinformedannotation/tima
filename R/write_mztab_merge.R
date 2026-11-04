@@ -452,13 +452,46 @@
         mm_u <- v_m[multi_mask]
         mm_sml <- v_sml[multi_mask]
         u_mm <- unique(mm_u)
-        grp <- split(mm_sml, factor(mm_u, levels = u_mm))
-        lookup_refs[u_mm] <- vapply(
-          grp,
-          function(ids) paste(unique(ids), collapse = "|"),
-          character(1L),
-          USE.NAMES = FALSE
-        )
+        if (is.unsorted(mm_u)) {
+          ord_mm <- order(fastmatch::fmatch(mm_u, u_mm), method = "radix")
+          mm_u <- mm_u[ord_mm]
+          mm_sml <- mm_sml[ord_mm]
+        }
+        if (anyDuplicated(mm_sml) > 0L) {
+          u_s <- unique(mm_sml)
+          s_id <- fastmatch::fmatch(mm_sml, u_s)
+          n_u_s <- length(u_s)
+          use_int_s <- as.double(n_u) * n_u_s < .Machine$integer.max
+          s_key <- if (use_int_s) {
+            (mm_u - 1L) * n_u_s + s_id
+          } else {
+            as.double(mm_u - 1L) * n_u_s + s_id
+          }
+          keep_s <- if (use_int_s) {
+            !duplicated(s_key)
+          } else {
+            fastmatch::fmatch(s_key, s_key) == seq_along(s_key)
+          }
+          mm_u <- mm_u[keep_s]
+          mm_sml <- mm_sml[keep_s]
+        }
+        n_mm_all <- tabulate(mm_u, nbins = n_u)
+        n_m <- length(mm_sml)
+        new_fm <- if (n_m > 1L) c(TRUE, mm_u[-1L] != mm_u[-n_m]) else TRUE
+        idx1_m <- which(new_fm)
+        u_fid_m <- mm_u[idx1_m]
+        grp_len_m <- n_mm_all[u_fid_m]
+        for (L in sort(unique(grp_len_m))) {
+          f_pos <- which(grp_len_m == L)
+          f_ids_L <- u_fid_m[f_pos]
+          if (L == 1L) {
+            lookup_refs[f_ids_L] <- mm_sml[idx1_m[f_pos]]
+          } else {
+            starts <- idx1_m[f_pos]
+            cols_L <- lapply(0L:(L - 1L), function(off) mm_sml[starts + off])
+            lookup_refs[f_ids_L] <- do.call(paste, c(cols_L, list(sep = "|")))
+          }
+        }
       }
     }
   }
@@ -482,8 +515,8 @@
   smf_df <- as.data.frame(smf, stringsAsFactors = FALSE, check.names = FALSE)
   sme_df <- as.data.frame(sme, stringsAsFactors = FALSE, check.names = FALSE)
 
-  smf_df$SME_ID_REFS <- rep("null", nrow(smf_df))
-  smf_df$SME_ID_REF_ambiguity_code <- rep("null", nrow(smf_df))
+  smf_df$SME_ID_REFS <- rep.int("null", nrow(smf_df))
+  smf_df$SME_ID_REF_ambiguity_code <- rep.int("null", nrow(smf_df))
 
   smf_feature_ids <- as.character(smf_df$feature_id)
   smf_feature_ids[
@@ -522,8 +555,8 @@
     is.na(sme_ids_clean) | !nzchar(sme_ids_clean) | sme_ids_clean == "null"
   ] <- NA_character_
 
-  lookup_refs <- rep("null", n_u)
-  lookup_amb <- rep("null", n_u)
+  lookup_refs <- rep.int("null", n_u)
+  lookup_amb <- rep.int("null", n_u)
 
   single_fids <- which(counts == 1L)
   if (length(single_fids) > 0L) {
@@ -537,8 +570,11 @@
     multi_mask <- counts[fid_id] > 1L
     m_pos <- which(multi_mask)
     m_fid <- fid_id[m_pos]
-    u_m_fid <- unique(m_fid)
-    m_groups <- split(m_pos, factor(m_fid, levels = u_m_fid))
+    if (is.unsorted(m_fid)) {
+      ord_m <- order(m_fid, method = "radix")
+      m_pos <- m_pos[ord_m]
+      m_fid <- m_fid[ord_m]
+    }
 
     db_clean <- as.character(sme_df$database_identifier[valid_sme_idx])
     db_clean[
@@ -549,39 +585,106 @@
       is.na(method_clean) | !nzchar(method_clean) | method_clean == "null"
     ] <- NA_character_
 
-    m_refs_out <- character(length(u_m_fid))
-    m_amb_out <- character(length(u_m_fid))
-
-    for (k in seq_along(m_groups)) {
-      idx <- m_groups[[k]]
-      refs <- unique(sme_ids_clean[idx])
-      refs <- refs[!is.na(refs)]
-      if (length(refs) == 0L) {
-        m_refs_out[[k]] <- "null"
-        m_amb_out[[k]] <- "null"
+    # Count distinct non-NA database_identifier per feature_id
+    n_db_all <- integer(n_u)
+    m_db <- db_clean[m_pos]
+    ok_db <- which(!is.na(m_db))
+    if (length(ok_db) > 0L) {
+      db_sub <- m_db[ok_db]
+      fid_db <- m_fid[ok_db]
+      u_db <- unique(db_sub)
+      db_id <- fastmatch::fmatch(db_sub, u_db)
+      n_u_db <- length(u_db)
+      use_int_db <- as.double(n_u) * n_u_db < .Machine$integer.max
+      db_key <- if (use_int_db) {
+        (fid_db - 1L) * n_u_db + db_id
       } else {
-        m_refs_out[[k]] <- paste(refs, collapse = "|")
-        if (length(refs) <= 1L) {
-          m_amb_out[[k]] <- "null"
+        as.double(fid_db - 1L) * n_u_db + db_id
+      }
+      keep_db <- if (use_int_db) {
+        !duplicated(db_key)
+      } else {
+        fastmatch::fmatch(db_key, db_key) == seq_along(db_key)
+      }
+      n_db_all <- tabulate(fid_db[keep_db], nbins = n_u)
+    }
+
+    # Count distinct non-NA identification_method per feature_id
+    n_mt_all <- integer(n_u)
+    m_mt <- method_clean[m_pos]
+    ok_mt <- which(!is.na(m_mt))
+    if (length(ok_mt) > 0L) {
+      mt_sub <- m_mt[ok_mt]
+      fid_mt <- m_fid[ok_mt]
+      u_mt <- unique(mt_sub)
+      mt_id <- fastmatch::fmatch(mt_sub, u_mt)
+      n_u_mt <- length(u_mt)
+      use_int_mt <- as.double(n_u) * n_u_mt < .Machine$integer.max
+      mt_key <- if (use_int_mt) {
+        (fid_mt - 1L) * n_u_mt + mt_id
+      } else {
+        as.double(fid_mt - 1L) * n_u_mt + mt_id
+      }
+      keep_mt <- if (use_int_mt) {
+        !duplicated(mt_key)
+      } else {
+        fastmatch::fmatch(mt_key, mt_key) == seq_along(mt_key)
+      }
+      n_mt_all <- tabulate(fid_mt[keep_mt], nbins = n_u)
+    }
+
+    # Collapse distinct non-NA SME_IDs per feature_id
+    m_refs <- sme_ids_clean[m_pos]
+    ok_r <- which(!is.na(m_refs))
+    if (length(ok_r) > 0L) {
+      r_sub <- m_refs[ok_r]
+      fid_r <- m_fid[ok_r]
+      if (anyDuplicated(r_sub) > 0L) {
+        u_r <- unique(r_sub)
+        r_id <- fastmatch::fmatch(r_sub, u_r)
+        n_u_r <- length(u_r)
+        use_int_r <- as.double(n_u) * n_u_r < .Machine$integer.max
+        r_key <- if (use_int_r) {
+          (fid_r - 1L) * n_u_r + r_id
         } else {
-          db_vals <- unique(db_clean[idx])
-          n_db <- sum(!is.na(db_vals))
-          method_vals <- unique(method_clean[idx])
-          n_method <- sum(!is.na(method_vals))
-          m_amb_out[[k]] <- if (n_db > 1L && n_method > 1L) {
-            "3"
-          } else if (n_db > 1L) {
-            "1"
-          } else if (n_method > 1L) {
-            "2"
-          } else {
-            "1"
-          }
+          as.double(fid_r - 1L) * n_u_r + r_id
+        }
+        keep_r <- if (use_int_r) {
+          !duplicated(r_key)
+        } else {
+          fastmatch::fmatch(r_key, r_key) == seq_along(r_key)
+        }
+        r_sub <- r_sub[keep_r]
+        fid_r <- fid_r[keep_r]
+      }
+      n_r_all <- tabulate(fid_r, nbins = n_u)
+      n_m_r <- length(r_sub)
+      new_fr <- if (n_m_r > 1L) c(TRUE, fid_r[-1L] != fid_r[-n_m_r]) else TRUE
+      idx1_r <- which(new_fr)
+      u_fid_r <- fid_r[idx1_r]
+      grp_len_r <- n_r_all[u_fid_r]
+      for (L in sort(unique(grp_len_r))) {
+        f_pos <- which(grp_len_r == L)
+        f_ids_L <- u_fid_r[f_pos]
+        if (L == 1L) {
+          lookup_refs[f_ids_L] <- r_sub[idx1_r[f_pos]]
+        } else {
+          starts <- idx1_r[f_pos]
+          cols_L <- lapply(0L:(L - 1L), function(off) r_sub[starts + off])
+          lookup_refs[f_ids_L] <- do.call(paste, c(cols_L, list(sep = "|")))
         }
       }
+
+      gt1_fids <- u_fid_r[grp_len_r > 1L]
+      if (length(gt1_fids) > 0L) {
+        nd <- n_db_all[gt1_fids]
+        nm <- n_mt_all[gt1_fids]
+        amb_gt1 <- rep.int("1", length(gt1_fids))
+        amb_gt1[nd <= 1L & nm > 1L] <- "2"
+        amb_gt1[nd > 1L & nm > 1L] <- "3"
+        lookup_amb[gt1_fids] <- amb_gt1
+      }
     }
-    lookup_refs[u_m_fid] <- m_refs_out
-    lookup_amb[u_m_fid] <- m_amb_out
   }
 
   pos_hit <- matched_positions[has_lookup]

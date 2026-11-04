@@ -160,21 +160,40 @@ NULL
   if (length(ref_values) == 0L || length(known_ids) == 0L) {
     return(character(0))
   }
-  split_refs <- unlist(
-    strsplit(as.character(ref_values), "[|,]", perl = TRUE),
-    use.names = FALSE
-  )
-  split_refs <- trimws(split_refs)
+  u_refs <- unique(as.character(ref_values))
+  u_refs <- u_refs[
+    !is.na(u_refs) & nzchar(u_refs) & u_refs != "null" & u_refs != "NA"
+  ]
+  if (length(u_refs) == 0L) {
+    return(character(0))
+  }
+  has_delim <- grepl("[|,]", u_refs, perl = TRUE)
+  split_refs <- if (any(has_delim)) {
+    c(
+      u_refs[!has_delim],
+      unlist(
+        strsplit(u_refs[has_delim], "[|,]", perl = TRUE),
+        use.names = FALSE
+      )
+    )
+  } else {
+    u_refs
+  }
+  split_refs <- unique(trimws(split_refs))
   split_refs <- split_refs[
     nzchar(split_refs) &
       split_refs != "null" &
       split_refs != "NA" &
       !is.na(split_refs)
   ]
+  if (length(split_refs) == 0L) {
+    return(character(0))
+  }
 
-  known <- trimws(as.character(known_ids))
-  known <- known[nzchar(known) & known != "null" & !is.na(known)]
-  setdiff(unique(split_refs), unique(known))
+  u_known <- unique(as.character(known_ids))
+  u_known <- trimws(u_known[!is.na(u_known)])
+  u_known <- u_known[nzchar(u_known) & u_known != "null"]
+  split_refs[is.na(fastmatch::fmatch(split_refs, u_known))]
 }
 
 #' @keywords internal
@@ -249,47 +268,42 @@ NULL
     }
   }
 
-  if (
-    nrow(sml) > 0L &&
-      all(
-        c(
-          "database_identifier",
-          "chemical_formula",
-          "smiles",
-          "inchi",
-          "chemical_name",
-          "uri",
-          "adduct_ions"
-        ) %in%
-          names(sml)
-      )
-  ) {
-    aligned_cols <- c(
-      "database_identifier",
-      "chemical_formula",
-      "smiles",
-      "inchi",
-      "chemical_name",
-      "uri",
-      "adduct_ions"
-    )
+  aligned_cols <- c(
+    "database_identifier",
+    "chemical_formula",
+    "smiles",
+    "inchi",
+    "chemical_name",
+    "uri",
+    "adduct_ions"
+  )
+  if (nrow(sml) > 0L && all(aligned_cols %in% names(sml))) {
+    n_sml_rows <- nrow(sml)
+    count_pipe_parts <- function(v) {
+      v_chr <- if (is.character(v)) v else as.character(v)
+      out <- rep.int(1L, n_sml_rows)
+      has_p <- which(!is.na(v_chr) & grepl("|", v_chr, fixed = TRUE))
+      if (length(has_p) > 0L) {
+        v_sub <- v_chr[has_p]
+        u_sub <- unique(v_sub)
+        u_lens <- lengths(strsplit(u_sub, "|", fixed = TRUE))
+        u_lens[u_lens < 1L] <- 1L
+        out[has_p] <- u_lens[fastmatch::fmatch(v_sub, u_sub)]
+      }
+      out
+    }
 
-    bad_rows <- which(vapply(
-      X = seq_len(nrow(sml)),
-      FUN = function(i) {
-        n_parts <- vapply(
-          X = aligned_cols,
-          FUN = function(col) {
-            length(.mztab_split_pipe_values(sml[[col]][[i]]))
-          },
-          FUN.VALUE = integer(1L)
-        )
-        max(n_parts) > 1L && length(unique(n_parts)) > 1L
-      },
-      FUN.VALUE = logical(1L)
-    ))
+    p1 <- count_pipe_parts(sml[[aligned_cols[[1L]]]])
+    has_mismatch <- FALSE
+    for (j in 2L:length(aligned_cols)) {
+      pj <- count_pipe_parts(sml[[aligned_cols[[j]]]])
+      if (any(pj != p1)) {
+        has_mismatch <- TRUE
+        break
+      }
+    }
 
-    if (length(bad_rows) > 0L) {
+    if (has_mismatch) {
       msg <- paste0(
         "Invalid SML multi-candidate ambiguity alignment: ",
         "pipe-separated identifier fields must be cardinality-aligned"
@@ -315,26 +329,38 @@ NULL
   ) {
     refs <- as.character(smf$SME_ID_REFS)
     amb <- as.character(smf$SME_ID_REF_ambiguity_code)
-    n_refs <- vapply(
-      refs,
-      function(one) {
-        if (is.na(one) || !nzchar(one) || one == "null") {
-          return(0L)
-        }
-        rr <- strsplit(one, "[|,]", perl = TRUE)[[1L]]
-        rr <- trimws(rr)
-        rr <- rr[nzchar(rr) & rr != "null"]
-        length(unique(rr))
-      },
-      FUN.VALUE = integer(1L)
-    )
+    n_refs <- integer(length(refs))
+    valid_r <- which(!is.na(refs) & nzchar(refs) & refs != "null")
+    if (length(valid_r) > 0L) {
+      r_sub <- refs[valid_r]
+      u_r <- unique(r_sub)
+      u_n <- integer(length(u_r))
+      has_d <- grepl("[|,]", u_r, perl = TRUE)
+      if (!all(has_d)) {
+        tr_nd <- trimws(u_r[!has_d])
+        u_n[!has_d] <- as.integer(nzchar(tr_nd) & tr_nd != "null")
+      }
+      if (any(has_d)) {
+        sp_d <- strsplit(u_r[has_d], "[|,]", perl = TRUE)
+        u_n[has_d] <- vapply(
+          sp_d,
+          function(rr) {
+            rr <- trimws(rr)
+            rr <- rr[nzchar(rr) & rr != "null"]
+            length(unique(rr))
+          },
+          integer(1L)
+        )
+      }
+      n_refs[valid_r] <- u_n[fastmatch::fmatch(r_sub, u_r)]
+    }
 
-    bad_multi <- which(n_refs > 1L & !(amb %in% c("1", "2", "3")))
-    bad_single <- which(
+    bad_multi <- any(n_refs > 1L & !(amb %in% c("1", "2", "3")))
+    bad_single <- any(
       n_refs <= 1L & !(is.na(amb) | amb == "null" | amb == "NA" | !nzchar(amb))
     )
 
-    if (length(bad_multi) > 0L || length(bad_single) > 0L) {
+    if (bad_multi || bad_single) {
       msg <- paste0(
         "Invalid SME_ID_REF_ambiguity_code semantics in SMF: ",
         "multi-ref rows must use 1/2/3; single/no-ref rows must be null"

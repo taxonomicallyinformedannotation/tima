@@ -5,27 +5,36 @@
 .mztab_expand_summarized <- function(results) {
   # Heuristic: if any candidate/rank/score column contains "|", the table was
   # written with summarize = TRUE. Expand to long form.
-  multi_cols <- colnames(results)[grepl(
+  multi_cols <- grep(
     "^candidate|^rank|^score",
     colnames(results),
-    perl = TRUE
-  )]
-  multi_cols <- intersect(multi_cols, colnames(results))
+    perl = TRUE,
+    value = TRUE
+  )
+  if (length(multi_cols) == 0L || nrow(results) == 0L) {
+    return(results)
+  }
 
-  # Check if any cell contains pipe separator
-  has_multivalue <- length(multi_cols) > 0L &&
-    any(
-      vapply(
-        X = multi_cols,
-        FUN = function(col) {
-          any(
-            grepl("|", as.character(results[[col]]), fixed = TRUE),
-            na.rm = TRUE
-          )
-        },
-        FUN.VALUE = logical(1L)
-      )
-    )
+  # Short-circuit check: skip numeric/integer/logical columns and stop on first hit
+  has_multivalue <- FALSE
+  for (col in multi_cols) {
+    v <- results[[col]]
+    if (is.numeric(v) || is.logical(v)) {
+      next
+    }
+    if (is.factor(v)) {
+      if (any(grepl("|", levels(v), fixed = TRUE))) {
+        has_multivalue <- TRUE
+        break
+      }
+      next
+    }
+    v_chr <- if (is.character(v)) v else as.character(v)
+    if (any(grepl("|", v_chr, fixed = TRUE), na.rm = TRUE)) {
+      has_multivalue <- TRUE
+      break
+    }
+  }
   if (!has_multivalue) {
     return(results)
   }
@@ -40,26 +49,45 @@
   id_cols <- setdiff(colnames(results), multi_cols)
   n_rows <- nrow(results)
 
-  # Split each multi-valued column once (C-backed strsplit)
-  split_values <- lapply(multi_cols, function(col) {
-    values <- as.character(results[[col]])
-    parts <- strsplit(values, "|", fixed = TRUE)
-    parts[is.na(values) | !nzchar(values)] <- list(NA_character_)
-    parts
-  })
+  split_values <- vector("list", length(multi_cols))
+  lengths_list <- vector("list", length(multi_cols))
+  for (k in seq_along(multi_cols)) {
+    v <- results[[multi_cols[[k]]]]
+    values <- if (is.character(v)) v else as.character(v)
+    bad_v <- is.na(values) | !nzchar(values)
+    if (any(bad_v)) {
+      values[bad_v] <- NA_character_
+    }
+    has_pipe <- !bad_v & grepl("|", values, fixed = TRUE)
+    if (!any(has_pipe)) {
+      split_values[[k]] <- values
+      lengths_list[[k]] <- rep.int(1L, n_rows)
+    } else {
+      parts <- as.list(values)
+      p_idx <- which(has_pipe)
+      sp_p <- strsplit(values[p_idx], "|", fixed = TRUE)
+      parts[p_idx] <- sp_p
+      lens <- rep.int(1L, n_rows)
+      lens[p_idx] <- lengths(sp_p)
+      split_values[[k]] <- parts
+      lengths_list[[k]] <- lens
+    }
+  }
 
   # Compute number of output rows per input row (elementwise max across cols)
-  lengths_list <- lapply(split_values, lengths)
-  if (length(lengths_list) == 0L) {
-    return(results)
-  } else if (length(lengths_list) == 1L) {
-    n_vals_per_row <- pmax(unlist(lengths_list), 1L)
+  n_vals_per_row <- if (length(lengths_list) == 1L) {
+    pmax(lengths_list[[1L]], 1L)
   } else {
-    n_vals_per_row <- do.call(pmax, c(lengths_list, list(1L)))
+    do.call(pmax, c(lengths_list, list(1L)))
   }
   n_vals_per_row[n_vals_per_row < 1L] <- 1L
 
   row_idx <- rep.int(seq_len(n_rows), n_vals_per_row)
+  first_in_row <- if (length(row_idx) > 1L) {
+    c(TRUE, row_idx[-1L] != row_idx[-length(row_idx)])
+  } else {
+    rep.int(TRUE, length(row_idx))
+  }
 
   out <- vector("list", length(id_cols) + length(multi_cols))
   names(out) <- c(id_cols, multi_cols)
@@ -73,38 +101,25 @@
   for (col_idx in seq_along(multi_cols)) {
     parts <- split_values[[col_idx]]
     col_lens <- lengths_list[[col_idx]]
-    mismatch <- which(col_lens != n_vals_per_row)
-    if (length(mismatch) > 0L) {
-      for (i in mismatch) {
-        parts[[i]] <- parts[[i]][seq_len(n_vals_per_row[[i]])]
+    if (is.character(parts)) {
+      expanded <- parts[row_idx]
+      if (!all(first_in_row)) {
+        expanded[!first_in_row] <- NA_character_
       }
+      out[[multi_cols[[col_idx]]]] <- expanded
+    } else {
+      mismatch <- which(col_lens != n_vals_per_row)
+      if (length(mismatch) > 0L) {
+        for (i in mismatch) {
+          parts[[i]] <- parts[[i]][seq_len(n_vals_per_row[[i]])]
+        }
+      }
+      out[[multi_cols[[col_idx]]]] <- unlist(parts, use.names = FALSE)
     }
-    out[[multi_cols[[col_idx]]]] <- unlist(parts, use.names = FALSE)
   }
 
   out_df <- as.data.frame(out, stringsAsFactors = FALSE, check.names = FALSE)
   original_colnames <- colnames(results)
-  # Safe rm() — some variables are only defined conditionally; use
-  # intersect to avoid "object not found" warnings
-  rm(
-    list = intersect(
-      c(
-        "out",
-        "results",
-        "multi_cols",
-        "id_cols",
-        "split_values",
-        "lengths_list",
-        "n_vals_per_row",
-        "row_idx",
-        "col_idx",
-        "parts",
-        "col",
-        "n_rows"
-      ),
-      ls()
-    )
-  )
   out_df[, original_colnames, drop = FALSE]
 }
 
@@ -273,50 +288,49 @@
     )
   ))
 
-  has_annotation <- if (length(ann_signal_cols) == 0L) {
-    rep(FALSE, n_rows)
-  } else {
-    # Vectorized rowSums check instead of Reduce("|", lapply())
-    mat <- vapply(
-      ann_signal_cols,
-      function(col) {
-        x <- as.character(ann[[col]])
-        !(is.na(x) | x == "NA" | x == "null" | x == "NULL" | !nzchar(x))
-      },
-      logical(n_rows)
-    )
-    # vapply returns a matrix (n_rows × n_cols) when n_rows > 1, but a
-    # named vector (n_cols) when n_rows == 1. Ensure matrix shape.
-    if (!is.matrix(mat)) {
-      mat <- matrix(mat, nrow = n_rows, ncol = length(ann_signal_cols))
+  has_annotation <- logical(n_rows)
+  if (length(ann_signal_cols) > 0L) {
+    unmatched <- seq_len(n_rows)
+    empty_tokens <- c(NA_character_, "", "NA", "null", "NULL")
+    for (col in ann_signal_cols) {
+      x_sub <- ann[[col]][unmatched]
+      hit <- if (is.numeric(x_sub) || is.logical(x_sub)) {
+        !is.na(x_sub)
+      } else {
+        is.na(fastmatch::fmatch(as.character(x_sub), empty_tokens))
+      }
+      if (any(hit)) {
+        has_annotation[unmatched[hit]] <- TRUE
+        unmatched <- unmatched[!hit]
+        if (length(unmatched) == 0L) {
+          break
+        }
+      }
     }
-    rowSums(mat) > 0L
   }
 
   if (!any(has_annotation)) {
     return(.mztab_empty_sme())
   }
 
-  ann <- ann[has_annotation, , drop = FALSE]
+  if (!all(has_annotation)) {
+    ann <- ann[has_annotation, , drop = FALSE]
+  }
+  n_ann_rows <- nrow(ann)
 
-  id_lookup <- stats::setNames(
-    as.character(smf_table$SMF_ID),
-    smf_table$feature_id
-  )
-
-  .mztab_safe_scalar <- function(x, n = NULL) {
+  .mztab_safe_scalar <- function(x, n = n_ann_rows) {
     if (is.null(x) || length(x) == 0L) {
-      if (is.null(n)) {
-        n <- nrow(ann)
-      }
-      return(rep("null", n))
+      return(rep.int("null", n))
     }
 
-    x <- as.character(x)
-    if (!is.null(n) && length(x) != n) {
+    x <- if (is.character(x)) x else as.character(x)
+    if (length(x) != n) {
       x <- rep(x, length.out = n)
     }
-    x[is.na(x) | !nzchar(x)] <- "null"
+    bad <- is.na(x) | !nzchar(x)
+    if (any(bad)) {
+      x[bad] <- "null"
+    }
     x
   }
 
@@ -324,20 +338,43 @@
     "candidate_structure_exact_mass"
   ]])))
   adduct_raw <- .mztab_safe_scalar(ann[["candidate_adduct"]])
-  theo_mz <- rep("null", length(exact_mass_raw))
-  valid_idx <- !is.na(exact_mass_raw) &
-    exact_mass_raw > 0 &
-    adduct_raw != "null" &
-    nzchar(adduct_raw)
-  if (any(valid_idx)) {
-    theo_vals <- calculate_mz_from_mass_batch(
-      neutral_masses = exact_mass_raw[valid_idx],
-      adducts = adduct_raw[valid_idx]
+  theo_mz <- rep.int("null", n_ann_rows)
+  valid_idx <- which(
+    !is.na(exact_mass_raw) &
+      exact_mass_raw > 0 &
+      adduct_raw != "null" &
+      nzchar(adduct_raw)
+  )
+  if (length(valid_idx) > 0L) {
+    em_v <- exact_mass_raw[valid_idx]
+    ad_v <- adduct_raw[valid_idx]
+    u_em <- unique(em_v)
+    u_ad <- unique(ad_v)
+    em_id <- fastmatch::fmatch(em_v, u_em)
+    ad_id <- fastmatch::fmatch(ad_v, u_ad)
+    n_u_ad <- length(u_ad)
+    use_int_pair <- as.double(length(u_em)) * n_u_ad < .Machine$integer.max
+    pair_key <- if (use_int_pair) {
+      (em_id - 1L) * n_u_ad + ad_id
+    } else {
+      as.double(em_id - 1L) * n_u_ad + ad_id
+    }
+    first_p <- which(
+      if (use_int_pair) {
+        !duplicated(pair_key)
+      } else {
+        fastmatch::fmatch(pair_key, pair_key) == seq_along(pair_key)
+      }
     )
-    theo_vals[!is.finite(theo_vals)] <- NA_real_
-    theo_vals <- suppressWarnings(as.character(round(theo_vals, 6)))
-    theo_vals[is.na(theo_vals) | !nzchar(theo_vals)] <- "null"
-    theo_mz[valid_idx] <- theo_vals
+    u_keys <- pair_key[first_p]
+    u_theo <- calculate_mz_from_mass_batch(
+      neutral_masses = em_v[first_p],
+      adducts = ad_v[first_p]
+    )
+    u_theo[!is.finite(u_theo)] <- NA_real_
+    u_theo_chr <- suppressWarnings(as.character(round(u_theo, 6)))
+    u_theo_chr[is.na(u_theo_chr) | !nzchar(u_theo_chr)] <- "null"
+    theo_mz[valid_idx] <- u_theo_chr[fastmatch::fmatch(pair_key, u_keys)]
   }
 
   lib_col <- .mztab_safe_scalar(ann[["candidate_library"]])
@@ -346,18 +383,23 @@
   # (candidate_library == "TIMA MS1"); external spectral libraries are MS2.
   # Match the canonical label case-insensitively rather than a loose "ms1"
   # substring, which would misclassify e.g. a library named "MS1QuantDB".
-  ms_level_val <- ifelse(
-    grepl("tima ms1", lib_col, ignore.case = TRUE),
+  u_lib <- unique(lib_col)
+  u_ms_level <- ifelse(
+    grepl("tima ms1", u_lib, ignore.case = TRUE),
     "[MS, MS:1000579, MS1 spectrum, ]",
     "[MS, MS:1000580, MS2 spectrum, ]"
   )
+  ms_level_val <- u_ms_level[fastmatch::fmatch(lib_col, u_lib)]
 
   raw_spectra_ref <- .mztab_safe_scalar(ann[["candidate_spectrum_id"]])
-  spectra_ref_formatted <- ifelse(
-    raw_spectra_ref == "null" | is.na(raw_spectra_ref),
-    "null",
-    paste0("ms_run[1]:", raw_spectra_ref)
-  )
+  spectra_ref_formatted <- rep.int("null", n_ann_rows)
+  valid_sref <- which(raw_spectra_ref != "null" & !is.na(raw_spectra_ref))
+  if (length(valid_sref) > 0L) {
+    spectra_ref_formatted[valid_sref] <- paste0(
+      "ms_run[1]:",
+      raw_spectra_ref[valid_sref]
+    )
+  }
 
   inchikey_col <- .mztab_safe_scalar(ann[[
     "candidate_structure_inchikey_connectivity_layer"
@@ -381,11 +423,14 @@
   }
 
   feature_ids <- .mztab_safe_scalar(ann[["feature_id"]])
-  evidence_input_id <- id_lookup[feature_ids]
+  smf_fids <- as.character(smf_table$feature_id)
+  smf_ids <- as.character(smf_table$SMF_ID)
+  m_smf <- fastmatch::fmatch(feature_ids, smf_fids)
+  evidence_input_id <- smf_ids[m_smf]
   evidence_input_id[is.na(evidence_input_id)] <- "null"
 
   sme <- list(
-    SME_ID = seq_len(nrow(ann)),
+    SME_ID = seq_len(n_ann_rows),
     evidence_input_id = evidence_input_id,
     database_identifier = database_identifier_col,
     chemical_formula = .mztab_safe_scalar(ann[[
@@ -395,7 +440,7 @@
     inchi = .mztab_safe_scalar(ann[["candidate_structure_inchi"]]),
     chemical_name = .mztab_safe_scalar(ann[["candidate_structure_name"]]),
     uri = uri_col,
-    derivatized_form = rep("null", nrow(ann)),
+    derivatized_form = rep.int("null", n_ann_rows),
     adduct_ion = adduct_raw,
     exp_mass_to_charge = .mztab_safe_scalar(ann[["feature_mz"]]),
     charge = charge_from_adduct,
@@ -463,41 +508,6 @@
     }
   }
 
-  # Safe rm() — some variables are only defined conditionally; use
-  # intersect to avoid "object not found" warnings
-  rm(
-    list = intersect(
-      c(
-        "ann",
-        "ann_signal_cols",
-        "has_annotation",
-        "id_lookup",
-        "exact_mass_raw",
-        "adduct_raw",
-        "theo_mz",
-        "valid_idx",
-        "theo_vals",
-        "lib_col",
-        "charge_from_adduct",
-        "ms_level_val",
-        "raw_spectra_ref",
-        "spectra_ref_formatted",
-        "inchikey_col",
-        "uri_col",
-        "xref_resolved",
-        "database_identifier_col",
-        "feature_ids",
-        "evidence_input_id",
-        "consumed_cols",
-        "extra_cols",
-        "base_names",
-        "final_names",
-        "i"
-      ),
-      ls()
-    )
-  )
-
   tidytable::as_tidytable(sme)
 }
 
@@ -544,8 +554,11 @@
   )
 
   .mztab_norm_scalar <- function(x) {
-    x <- as.character(x)
-    x[is.na(x) | !nzchar(x)] <- "null"
+    x <- if (is.character(x)) x else as.character(x)
+    bad <- is.na(x) | !nzchar(x)
+    if (any(bad)) {
+      x[bad] <- "null"
+    }
     x
   }
 
@@ -576,7 +589,7 @@
   }
 
   # 1. Pre-compute theoretical_neutral_mass per feature_id in a single vectorized pass
-  theoretical_neutral_mass <- rep("null", n_fids)
+  theoretical_neutral_mass <- rep.int("null", n_fids)
   if (
     nrow(results_src) > 0L &&
       "feature_id" %in% colnames(results_src) &&
@@ -591,7 +604,7 @@
       if ("score_final" %in% colnames(results_src)) {
         rs <- suppressWarnings(as.numeric(results_src$score_final[valid_res]))
         rs[is.na(rs)] <- -Inf
-        ord_res <- order(res_fid_idx[valid_res], -rs)
+        ord_res <- order(res_fid_idx[valid_res], -rs, method = "radix")
         valid_res_sorted <- valid_res[ord_res]
         first_res <- valid_res_sorted[
           !duplicated(res_fid_idx[valid_res_sorted])
@@ -604,8 +617,10 @@
       )
       fin <- is.finite(em)
       if (any(fin)) {
+        u_em <- unique(em[fin])
+        u_em_chr <- as.character(round(u_em, 6))
         theoretical_neutral_mass[res_fid_idx[first_res[fin]]] <-
-          as.character(round(em[fin], 6))
+          u_em_chr[fastmatch::fmatch(em[fin], u_em)]
       }
     }
   }
@@ -642,11 +657,15 @@
     ord <- match(seq_len(n_fids), fid_idx)
     best_score <- score_raw[ord]
     best_score[!is.finite(best_score)] <- NA_real_
-    score_val <- ifelse(
-      is.na(best_score),
-      "null",
-      as.character(round(best_score, 6))
-    )
+    score_val <- rep.int("null", n_fids)
+    valid_bs <- which(!is.na(best_score))
+    if (length(valid_bs) > 0L) {
+      u_bs <- unique(best_score[valid_bs])
+      u_bs_chr <- as.character(round(u_bs, 6))
+      score_val[valid_bs] <- u_bs_chr[
+        fastmatch::fmatch(best_score[valid_bs], u_bs)
+      ]
+    }
     best_method <- method_vec[ord]
     reliability <- as.character(.mztab_score_to_reliability(
       best_score,
@@ -668,7 +687,7 @@
       theoretical_neutral_mass = theoretical_neutral_mass,
       adduct_ions = ad_vec[ord],
       reliability = reliability,
-      best_id_confidence_measure = rep("id_confidence_measure[1]", n_fids),
+      best_id_confidence_measure = rep.int("id_confidence_measure[1]", n_fids),
       best_id_evidence_value = score_val,
       stringsAsFactors = FALSE,
       check.names = FALSE
@@ -680,29 +699,32 @@
   rank_num[is.na(rank_num)] <- Inf
   score_num <- score_raw
   score_num[!is.finite(score_num)] <- -Inf
-  sme_num <- suppressWarnings(as.integer(sme_src$SME_ID))
+  sme_num <- if (is.integer(sme_src$SME_ID)) {
+    sme_src$SME_ID
+  } else {
+    suppressWarnings(as.integer(sme_src$SME_ID))
+  }
   sme_num[is.na(sme_num)] <- .Machine$integer.max
 
-  ord <- order(fid_idx, rank_num, -score_num, sme_num)
+  ord <- order(fid_idx, rank_num, -score_num, sme_num, method = "radix")
   fid_ord <- fid_idx[ord]
 
   # Deduplicate 7-column tuple only for features with > 1 SME row
   multi_row_mask <- counts[fid_ord] > 1L
   if (any(multi_row_mask)) {
     m_ord <- ord[multi_row_mask]
-    tuple_key <- paste(
-      fid_idx[m_ord],
-      db_vec[m_ord],
-      cf_vec[m_ord],
-      sm_vec[m_ord],
-      in_vec[m_ord],
-      cn_vec[m_ord],
-      ur_vec[m_ord],
-      ad_vec[m_ord],
-      sep = "||"
+    tuple_dt <- data.table::data.table(
+      fid = fid_idx[m_ord],
+      db = db_vec[m_ord],
+      cf = cf_vec[m_ord],
+      sm = sm_vec[m_ord],
+      inc = in_vec[m_ord],
+      cn = cn_vec[m_ord],
+      ur = ur_vec[m_ord],
+      ad = ad_vec[m_ord]
     )
-    keep_ord <- rep(TRUE, length(ord))
-    keep_ord[multi_row_mask] <- !duplicated(tuple_key)
+    keep_ord <- rep.int(TRUE, length(ord))
+    keep_ord[multi_row_mask] <- !duplicated(tuple_dt)
     ord <- ord[keep_ord]
     fid_ord <- fid_ord[keep_ord]
   }
@@ -713,11 +735,15 @@
 
   best_score <- score_raw[best_idx]
   best_score[!is.finite(best_score)] <- NA_real_
-  score_val <- ifelse(
-    is.na(best_score),
-    "null",
-    as.character(round(best_score, 6))
-  )
+  score_val <- rep.int("null", n_fids)
+  valid_bs <- which(!is.na(best_score))
+  if (length(valid_bs) > 0L) {
+    u_bs <- unique(best_score[valid_bs])
+    u_bs_chr <- as.character(round(u_bs, 6))
+    score_val[valid_bs] <- u_bs_chr[
+      fastmatch::fmatch(best_score[valid_bs], u_bs)
+    ]
+  }
   best_method <- method_vec[best_idx]
   reliability <- as.character(.mztab_score_to_reliability(
     best_score,
@@ -742,16 +768,36 @@
     multi_mask <- dedup_counts[fid_ord] > 1L
     m_ord <- ord[multi_mask]
     m_fid <- fid_ord[multi_mask]
-    u_m_fid <- unique(m_fid)
-    m_groups <- split(seq_along(m_ord), factor(m_fid, levels = u_m_fid))
+    n_m <- length(m_ord)
+    new_f <- if (n_m > 1L) c(TRUE, m_fid[-1L] != m_fid[-n_m]) else TRUE
+    idx1 <- which(new_f)
+    u_m_fid <- m_fid[idx1]
+    grp_len <- dedup_counts[u_m_fid]
+    u_lens <- sort(unique(grp_len))
+    len_buckets <- lapply(u_lens, function(L) {
+      f_pos <- which(grp_len == L)
+      list(
+        L = L,
+        f_pos = f_pos,
+        row_offsets = lapply(0L:(L - 1L), function(off) idx1[f_pos] + off)
+      )
+    })
 
     collapse_vec <- function(v) {
-      vapply(
-        m_groups,
-        function(g) paste(v[g], collapse = "|"),
-        character(1L),
-        USE.NAMES = FALSE
-      )
+      out_v <- character(length(u_m_fid))
+      u_v <- unique(v)
+      if (length(u_v) == 1L) {
+        val1 <- u_v[[1L]]
+        for (b in len_buckets) {
+          out_v[b$f_pos] <- paste(rep.int(val1, b$L), collapse = "|")
+        }
+        return(out_v)
+      }
+      for (b in len_buckets) {
+        cols_b <- lapply(b$row_offsets, function(idx) v[idx])
+        out_v[b$f_pos] <- do.call(paste, c(cols_b, list(sep = "|")))
+      }
+      out_v
     }
 
     out_db[u_m_fid] <- collapse_vec(db_vec[m_ord])
@@ -763,16 +809,47 @@
     out_ad[u_m_fid] <- collapse_vec(ad_vec[m_ord])
 
     m_sme_ids <- sme_id_vec[m_ord]
-    out_sme_refs[u_m_fid] <- vapply(
-      m_groups,
-      function(g) {
-        ids <- unique(m_sme_ids[g])
-        ids <- ids[ids != "null"]
-        if (length(ids) > 0L) paste(ids, collapse = "|") else "null"
-      },
-      character(1L),
-      USE.NAMES = FALSE
-    )
+    if (!any(m_sme_ids == "null") && !anyDuplicated(m_sme_ids)) {
+      out_sme_refs[u_m_fid] <- collapse_vec(m_sme_ids)
+    } else {
+      out_sme_refs[u_m_fid] <- "null"
+      ok_s <- which(m_sme_ids != "null")
+      if (length(ok_s) > 0L) {
+        s_fid <- m_fid[ok_s]
+        s_val <- m_sme_ids[ok_s]
+        u_sv <- unique(s_val)
+        sv_id <- fastmatch::fmatch(s_val, u_sv)
+        n_u_sv <- length(u_sv)
+        use_int_sv <- as.double(n_fids) * n_u_sv < .Machine$integer.max
+        sv_key <- if (use_int_sv) {
+          (s_fid - 1L) * n_u_sv + sv_id
+        } else {
+          as.double(s_fid - 1L) * n_u_sv + sv_id
+        }
+        keep_s <- if (use_int_sv) {
+          !duplicated(sv_key)
+        } else {
+          fastmatch::fmatch(sv_key, sv_key) == seq_along(sv_key)
+        }
+        s_fid <- s_fid[keep_s]
+        s_val <- s_val[keep_s]
+        n_s <- length(s_fid)
+        new_sf <- if (n_s > 1L) c(TRUE, s_fid[-1L] != s_fid[-n_s]) else TRUE
+        r_s <- seq_len(n_s) - cummax(ifelse(new_sf, seq_len(n_s), 0L)) + 1L
+        max_rs <- max(r_s)
+        idx1_s <- which(r_s == 1L)
+        u_sf <- s_fid[idx1_s]
+        acc_s <- s_val[idx1_s]
+        if (max_rs > 1L) {
+          for (k in 2L:max_rs) {
+            idx_k <- which(r_s == k)
+            pos_k <- fastmatch::fmatch(s_fid[idx_k], u_sf)
+            acc_s[pos_k] <- paste(acc_s[pos_k], s_val[idx_k], sep = "|")
+          }
+        }
+        out_sme_refs[u_sf] <- acc_s
+      }
+    }
   }
 
   data.frame(
@@ -788,7 +865,7 @@
     theoretical_neutral_mass = theoretical_neutral_mass,
     adduct_ions = out_ad,
     reliability = reliability,
-    best_id_confidence_measure = rep("id_confidence_measure[1]", n_fids),
+    best_id_confidence_measure = rep.int("id_confidence_measure[1]", n_fids),
     best_id_evidence_value = score_val,
     stringsAsFactors = FALSE,
     check.names = FALSE

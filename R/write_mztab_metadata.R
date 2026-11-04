@@ -434,7 +434,8 @@
 #' Write a single mzTab-M section (header + data rows)
 #' @keywords internal
 .mztab_write_section <- function(con, header_prefix, row_prefix, tbl) {
-  if (nrow(tbl) == 0L) {
+  n_rows <- nrow(tbl)
+  if (n_rows == 0L) {
     return(invisible(NULL))
   }
 
@@ -446,60 +447,36 @@
   writeLines(paste(header_vals, collapse = "\t"), con)
 
   # ── Data rows ──
-  tbl_df <- as.data.frame(tbl, stringsAsFactors = FALSE, check.names = FALSE)
   if (length(write_cols) == 0L) {
-    rows <- rep(row_prefix, nrow(tbl))
-  } else {
-    # Add missing columns in one step via cbind — avoids per-column
-    # data.frame copy growth (each tbl_df[[col]] <- … copies the frame)
-    missing_cols <- setdiff(write_cols, colnames(tbl_df))
-    if (length(missing_cols) > 0L) {
-      # Build per-column vectors of the right length, then add in one cbind
-      new_cols <- rep(list(rep("null", nrow(tbl_df))), length(missing_cols))
-      names(new_cols) <- missing_cols
-      tbl_df <- cbind(
-        tbl_df,
-        as.data.frame(
-          new_cols,
-          stringsAsFactors = FALSE,
-          check.names = FALSE
-        )
-      )
+    writeLines(rep.int(row_prefix, n_rows), con)
+    writeLines("", con)
+    return(invisible(NULL))
+  }
+
+  row_data <- lapply(write_cols, function(col) {
+    v <- tbl[[col]]
+    if (is.numeric(v)) {
+      na_v <- is.na(v)
+      v_chr <- as.character(v)
+      if (any(na_v)) {
+        v_chr[na_v] <- "null"
+      }
+      return(v_chr)
     }
+    v_chr <- if (is.character(v)) v else as.character(v)
+    bad <- is.na(v_chr) | !nzchar(v_chr)
+    if (any(bad)) {
+      v_chr[bad] <- "null"
+    }
+    # mzTab spec: tab/CR/LF would corrupt the tab-delimited row structure.
+    .mztab_escape(v_chr)
+  })
 
-    row_data <- lapply(write_cols, function(col) {
-      v <- tbl_df[[col]]
-      v <- as.character(v)
-      v[is.na(v) | !nzchar(v)] <- "null"
-      # mzTab spec: tab/CR/LF would corrupt the tab-delimited row structure.
-      .mztab_escape(v)
-    })
-
-    # Vectorized paste avoids full intermediate matrix + row-wise R loop
-    rows <- do.call(paste, c(row_data, list(sep = "\t")))
-  }
-
-  if (length(rows) > 0L) {
-    writeLines(paste(row_prefix, rows, sep = "\t"), con)
-  }
+  # Vectorized paste prepends row_prefix in a single pass
+  rows <- do.call(paste, c(list(row_prefix), row_data, list(sep = "\t")))
+  writeLines(rows, con)
   writeLines("", con)
-
-  rm(
-    list = intersect(
-      c(
-        "tbl_df",
-        "write_cols",
-        "header_vals",
-        "header_prefix",
-        "row_prefix",
-        "row_data",
-        "row_matrix",
-        "col",
-        "rows"
-      ),
-      ls()
-    )
-  )
+  invisible(NULL)
 }
 
 # ── Micro-helpers ─────────────────────────────────────────────────────────────
