@@ -22,3 +22,17 @@ test_that("stri_detect_token takes regex metacharacters literally", {
   expect_false(stri_detect_token(str = "ab", pattern = "a."))
   expect_false(stri_detect_token(str = NA_character_, pattern = "a"))
 })
+
+test_that("stri_detect_token handles empty inputs, scalar recycling, and whitespace", {
+  expect_equal(
+    stri_detect_token(str = character(0), pattern = "a"),
+    logical(0)
+  )
+  expect_equal(
+    stri_detect_token(
+      str = "  alpha  $  beta $ gamma ",
+      pattern = c("alpha", "beta", "gamma", "alp", NA_character_)
+    ),
+    c(TRUE, TRUE, TRUE, FALSE, FALSE)
+  )
+})

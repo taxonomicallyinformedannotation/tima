@@ -651,3 +651,52 @@ test_that("enforce_ms1_adduct_semantics tags neutral-mass rescue as m_delta_resc
   expect_equal(nrow(rescued), 1L)
   expect_identical(rescued$candidate_adduct_match_mode[[1L]], "m_delta_rescued")
 })
+
+test_that("enforce_ms1_adduct_semantics populates default rescue annotation_note and preserves existing note", {
+  m_ref <- 300
+  mz_ms1 <- calculate_mz_from_mass(m_ref, "[M+NH4]+")
+  mz_spec <- calculate_mz_from_mass(m_ref, "[M+H]+")
+
+  df <- tidytable::tidytable(
+    feature_id = c("F2", "F2", "F2"),
+    mz = c(mz_ms1, mz_spec, mz_spec),
+    candidate_library = c("TIMA MS1", "spectral", "spectral"),
+    candidate_adduct = c("[M+NH4]+", "[M+H]+", "[M+H]+"),
+    candidate_annotation_level = c("primary", NA, NA),
+    candidate_evidence_tier = c("supported_strong", NA, NA),
+    annotation_note = c(NA_character_, "prior_note", NA_character_)
+  )
+
+  out <- enforce_ms1_adduct_semantics(df)
+  rescued <- out |>
+    tidytable::filter(candidate_library == "spectral")
+
+  expect_equal(nrow(rescued), 2L)
+  expect_identical(rescued$annotation_note[[1L]], "prior_note")
+  expect_identical(
+    rescued$annotation_note[[2L]],
+    "Adduct differs from strong MS1 state; retained by neutral-mass delta consistency"
+  )
+})
+
+test_that("filter_ms1_redundancy handles NA connectivity layer consistently with anti_join", {
+  ms1_data <- tidytable::tidytable(
+    feature_id = c("F1", "F2", "F3"),
+    candidate_structure_inchikey_connectivity_layer = c(
+      NA_character_,
+      "B",
+      NA_character_
+    ),
+    candidate_library = c("ms1", "ms1", "ms1")
+  )
+  spectral_data <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    candidate_structure_inchikey_connectivity_layer = c(NA_character_, "B"),
+    candidate_library = c("spectral", "spectral"),
+    candidate_score_similarity = c("0.9", "0.9"),
+    candidate_count_similarity_peaks_matched = c("5", "5")
+  )
+  res <- filter_ms1_redundancy(list(ms1 = ms1_data, spectral = spectral_data))
+  ms1_kept <- res |> tidytable::filter(candidate_library == "ms1")
+  expect_equal(ms1_kept$feature_id, "F3")
+})

@@ -350,18 +350,119 @@ clean_collapse <- function(grouped_df, cols = NULL, separator = " $ ") {
 
   # Determine Columns to Process ----
   cols <- determine_columns_to_process(grouped_df, cols)
+  grp_vars <- tidytable::group_vars(grouped_df)
 
-  # Collapse and Clean ----
-  collapse_fn <- create_collapse_function(separator)
+  if (length(grp_vars) != 1L || nrow(grouped_df) == 0L) {
+    collapse_fn <- create_collapse_function(separator)
+    return(
+      grouped_df |>
+        tidytable::reframe(tidytable::across(
+          .cols = tidyselect::all_of(x = cols),
+          .fns = collapse_fn
+        )) |>
+        tidytable::ungroup() |>
+        convert_lists_to_characters() |>
+        clean_character_columns()
+    )
+  }
 
-  grouped_df |>
-    tidytable::reframe(tidytable::across(
-      .cols = tidyselect::all_of(x = cols),
-      .fns = collapse_fn
-    )) |>
-    tidytable::ungroup() |>
-    convert_lists_to_characters() |>
-    clean_character_columns()
+  g_name <- grp_vars[[1L]]
+  g_col <- grouped_df[[g_name]]
+  u_g <- unique(g_col)
+  g_id <- if (anyNA(u_g)) {
+    match(g_col, u_g)
+  } else {
+    fastmatch::fmatch(g_col, u_g)
+  }
+  attr(u_g, ".match.hash") <- NULL
+  n_g <- length(u_g)
+
+  if (g_name %in% cols) {
+    u_g_chr <- as.character(u_g)
+    u_g_chr <- trimws(u_g_chr)
+    u_g_chr[!nzchar(u_g_chr) | is.na(u_g)] <- NA_character_
+    out <- tidytable::tidytable(u_g_chr)
+  } else if (is.character(u_g)) {
+    u_g_clean <- trimws(u_g)
+    u_g_clean[!nzchar(u_g_clean)] <- NA_character_
+    out <- tidytable::tidytable(u_g_clean)
+  } else {
+    out <- tidytable::tidytable(u_g)
+  }
+  data.table::setnames(out, g_name)
+
+  cols_val <- setdiff(cols, g_name)
+  if (length(cols_val) == 0L) {
+    return(out)
+  }
+
+  counts_g <- tabulate(g_id, nbins = n_g)
+  all_single <- max(counts_g) <= 1L
+
+  collapse_one_col <- function(vals) {
+    res <- rep.int(NA_character_, n_g)
+    ok <- which(!is.na(vals))
+    if (length(ok) == 0L) {
+      return(res)
+    }
+    v_ok <- if (is.character(vals)) vals[ok] else as.character(vals[ok])
+    if (all_single) {
+      u_v <- unique(v_ok)
+      u_trim <- trimws(u_v)
+      u_trim[!nzchar(u_trim)] <- NA_character_
+      m_v <- fastmatch::fmatch(v_ok, u_v)
+      res[g_id[ok]] <- u_trim[m_v]
+      return(res)
+    }
+
+    g_ok <- g_id[ok]
+    u_v <- unique(v_ok)
+    v_id <- fastmatch::fmatch(v_ok, u_v)
+    n_v <- length(u_v)
+    use_int <- as.double(n_g) * n_v < .Machine$integer.max
+    gv_key <- if (use_int) {
+      (g_ok - 1L) * n_v + v_id
+    } else {
+      as.double(g_ok - 1L) * n_v + v_id
+    }
+    keep <- if (use_int) {
+      !duplicated(gv_key)
+    } else {
+      fastmatch::fmatch(gv_key, gv_key) == seq_along(gv_key)
+    }
+    g_ok <- g_ok[keep]
+    v_ok <- v_ok[keep]
+
+    if (is.unsorted(g_ok)) {
+      ord <- order(g_ok, method = "radix")
+      g_ok <- g_ok[ord]
+      v_ok <- v_ok[ord]
+    }
+    n_m <- length(g_ok)
+    new_g <- if (n_m > 1L) c(TRUE, g_ok[-1L] != g_ok[-n_m]) else TRUE
+    r_m <- seq_len(n_m) - cummax(ifelse(new_g, seq_len(n_m), 0L)) + 1L
+    max_r <- max(r_m)
+    idx1 <- which(r_m == 1L)
+    u_g_pres <- g_ok[idx1]
+    acc <- v_ok[idx1]
+    if (max_r > 1L) {
+      for (r in 2L:max_r) {
+        idx_r <- which(r_m == r)
+        pos <- fastmatch::fmatch(g_ok[idx_r], u_g_pres)
+        acc[pos] <- paste(acc[pos], v_ok[idx_r], sep = separator)
+      }
+    }
+    u_acc <- unique(acc)
+    u_trim <- trimws(u_acc)
+    u_trim[!nzchar(u_trim)] <- NA_character_
+    res[u_g_pres] <- u_trim[fastmatch::fmatch(acc, u_acc)]
+    res
+  }
+
+  for (col in cols_val) {
+    data.table::set(out, j = col, value = collapse_one_col(grouped_df[[col]]))
+  }
+  out
 }
 
 # Helper Functions ----
@@ -557,14 +658,26 @@ fake_sop_columns <- function() {
 #' # => c("CHEMONTID:0002011", "CHEMONTID:0002011", "CHEMONTID:0002011", NA)
 #' }
 normalize_chemontid <- function(x) {
-  x <- as.character(x)
+  x_chr <- if (is.character(x)) x else as.character(x)
+  if (length(x_chr) == 0L) {
+    return(character(0L))
+  }
+  u <- unique(x_chr)
+  idx <- if (anyNA(u)) {
+    match(x_chr, u)
+  } else {
+    fastmatch::fmatch(x_chr, u)
+  }
+  attr(u, ".match.hash") <- NULL
   # Strip "CHEMONTID:" or "CHEMONT:" prefix if present (case-insensitive)
-  stripped <- sub("^CHEMONT(ID)?:", "", x, ignore.case = TRUE)
+  stripped <- sub("^CHEMONT(ID)?:", "", u, ignore.case = TRUE)
   # Zero-pad the numeric part to 7 digits and add the canonical prefix
   is_numeric <- !is.na(stripped) & grepl("^[0-9]+$", stripped)
-  x[is_numeric] <- paste0(
-    "CHEMONTID:",
-    sprintf("%07d", as.integer(stripped[is_numeric]))
-  )
-  x
+  if (any(is_numeric)) {
+    u[is_numeric] <- paste0(
+      "CHEMONTID:",
+      sprintf("%07d", as.integer(stripped[is_numeric]))
+    )
+  }
+  u[idx]
 }

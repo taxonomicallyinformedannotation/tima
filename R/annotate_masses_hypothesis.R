@@ -1300,7 +1300,11 @@ dedupe_node_hypotheses <- function(node_hypotheses) {
 
   ord <- order(src_rank, -add_supp, method = "radix")
   pair_key_ord <- pair_key[ord]
-  is_dup <- duplicated(pair_key_ord)
+  is_dup <- if (use_int_key) {
+    duplicated(pair_key_ord)
+  } else {
+    fastmatch::fmatch(pair_key_ord, pair_key_ord) != seq_along(pair_key_ord)
+  }
 
   if (any(is_dup)) {
     kept_pos <- which(!is_dup)

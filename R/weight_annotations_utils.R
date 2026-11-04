@@ -502,9 +502,17 @@ log_annotation_stats <- function(annotation_table) {
 
     n_libs <- max(1L, length(u_libs))
     n_iks <- max(1L, length(u_iks))
-    combo_key <- ((as.numeric(fid_id - 1L) * n_libs + (lib_id - 1L)) * n_iks) +
-      ik_id
-    first_occ <- !duplicated(combo_key)
+    max_combos <- as.double(length(u_fids)) * n_libs * n_iks
+    if (max_combos < .Machine$integer.max) {
+      combo_key <- ((fid_id - 1L) * n_libs + (lib_id - 1L)) * n_iks + ik_id
+      first_occ <- !duplicated(combo_key)
+    } else {
+      combo_key <- ((as.numeric(fid_id - 1L) * n_libs + (lib_id - 1L)) *
+        n_iks) +
+        ik_id
+      first_occ <- fastmatch::fmatch(combo_key, combo_key) ==
+        seq_along(combo_key)
+    }
     lib_counts <- tabulate(lib_id[first_occ], nbins = length(u_libs))
     ord_l <- order(lib_counts, decreasing = TRUE)
     annotation_stats <- tidytable::tidytable(
@@ -560,79 +568,207 @@ rearrange_annotations <- function(
   model <- columns_model()
 
   # Table 1: deduplicated annotations (all sources, spectra + structure cols)
-  annotation_table_1 <- annotation_table |>
-    tidytable::select(tidyselect::any_of(
-      x = c(
-        model$features_columns,
-        model$candidates_calculated_columns,
-        model$candidates_spectra_columns,
-        model$candidates_structures_columns
-      )
-    )) |>
-    tidytable::mutate(
-      candidate_score_similarity = as.numeric(candidate_score_similarity)
-    ) |>
-    tidytable::arrange(tidytable::desc(x = candidate_score_similarity)) |>
-    tidytable::distinct(
-      tidyselect::any_of(c(
-        "feature_id",
-        "candidate_structure_inchikey_no_stereo",
-        "candidate_structure_inchikey_connectivity_layer"
-      )),
-      .keep_all = TRUE
-    )
+  t1_cols <- intersect(
+    c(
+      model$features_columns,
+      model$candidates_calculated_columns,
+      model$candidates_spectra_columns,
+      model$candidates_structures_columns
+    ),
+    names(annotation_table)
+  )
+  n_in <- nrow(annotation_table)
+  sim_num <- if ("candidate_score_similarity" %in% names(annotation_table)) {
+    .as_numeric_dedup(annotation_table$candidate_score_similarity)
+  } else {
+    rep(NA_real_, n_in)
+  }
 
-  # Table 2: SIRIUS CSI scores only (join keys + score columns).
-  # Selecting only the score columns (not all structure columns) prevents
+  dedup_cols <- intersect(
+    c(
+      "feature_id",
+      "candidate_structure_inchikey_no_stereo",
+      "candidate_structure_inchikey_connectivity_layer"
+    ),
+    t1_cols
+  )
 
-  # the full_join from using ~18 structure columns as implicit keys,
-  # which caused SIRIUS scores to fail to merge with spectral annotations
-  # whenever any structure detail (name, SMILES, taxonomy, ...) differed.
-  annotation_table_2 <- annotation_table |>
-    tidytable::select(
-      tidyselect::any_of(
-        x = c(
-          "feature_id",
-          "candidate_structure_inchikey_connectivity_layer",
-          model$candidates_sirius_str_columns
-        )
-      )
-    ) |>
-    tidytable::filter(!is.na(candidate_score_sirius_csi)) |>
-    tidytable::mutate(
-      candidate_score_sirius_csi = as.numeric(candidate_score_sirius_csi)
-    ) |>
-    tidytable::arrange(tidytable::desc(candidate_score_sirius_csi)) |>
-    tidytable::distinct(
-      feature_id,
-      candidate_structure_inchikey_connectivity_layer,
-      .keep_all = TRUE
-    )
-
-  # Step 1: Merge SIRIUS scores into deduplicated annotations.
-  # Using explicit keys ensures SIRIUS CSI scores are matched to
-  # spectral annotations for the same structure even when other
-  # structure columns (name, SMILES, taxonomy) differ between sources.
-  if (nrow(annotation_table_2) == 0L) {
-    annotation_table_merged <- data.table::copy(annotation_table_1)
-    sirius_new_cols <- setdiff(
-      names(annotation_table_2),
-      names(annotation_table_merged)
-    )
-    n_rows <- nrow(annotation_table_merged)
-    for (col in sirius_new_cols) {
+  if (n_in <= 1L || length(dedup_cols) == 0L) {
+    annotation_table_merged <- data.table::copy(annotation_table[, ..t1_cols])
+    if ("candidate_score_similarity" %in% names(annotation_table_merged)) {
       data.table::set(
         annotation_table_merged,
-        j = col,
-        value = rep.int(annotation_table_2[[col]][NA_integer_], n_rows)
+        j = "candidate_score_similarity",
+        value = sim_num
       )
     }
   } else {
-    annotation_table_merged <- tidytable::full_join(
-      annotation_table_1,
-      annotation_table_2,
-      by = c("feature_id", "candidate_structure_inchikey_connectivity_layer")
+    ord1 <- order(-sim_num, na.last = TRUE, method = "radix")
+    if (
+      length(dedup_cols) == 2L &&
+        all(
+          c(
+            "feature_id",
+            "candidate_structure_inchikey_connectivity_layer"
+          ) %in%
+            dedup_cols
+        )
+    ) {
+      f_col <- annotation_table$feature_id[ord1]
+      ik_col <- annotation_table$candidate_structure_inchikey_connectivity_layer[
+        ord1
+      ]
+      u_f <- unique(f_col)
+      u_ik <- unique(ik_col)
+      f_id <- if (anyNA(u_f)) {
+        match(f_col, u_f)
+      } else {
+        fastmatch::fmatch(f_col, u_f)
+      }
+      ik_id <- if (anyNA(u_ik)) {
+        match(ik_col, u_ik)
+      } else {
+        fastmatch::fmatch(ik_col, u_ik)
+      }
+      n_ik <- max(1L, length(u_ik))
+      use_int <- as.double(length(u_f)) * n_ik < .Machine$integer.max
+      k1 <- if (use_int) {
+        (f_id - 1L) * n_ik + ik_id
+      } else {
+        as.double(f_id - 1L) * n_ik + ik_id
+      }
+      keep1_mask <- if (use_int) {
+        !duplicated(k1)
+      } else {
+        fastmatch::fmatch(k1, k1) == seq_along(k1)
+      }
+      keep1_idx <- ord1[keep1_mask]
+      rm(f_col, ik_col, u_f, u_ik, f_id, ik_id, k1, keep1_mask)
+    } else {
+      keep1_idx <- ord1[!duplicated(annotation_table[ord1, ..dedup_cols])]
+    }
+    rm(ord1)
+    annotation_table_merged <- annotation_table[keep1_idx, ..t1_cols]
+    if ("candidate_score_similarity" %in% names(annotation_table_merged)) {
+      data.table::set(
+        annotation_table_merged,
+        j = "candidate_score_similarity",
+        value = sim_num[keep1_idx]
+      )
+    }
+    rm(keep1_idx)
+  }
+  rm(sim_num)
+
+  # Step 1: Merge SIRIUS structure-level scores into deduplicated annotations
+  # by (feature_id, candidate_structure_inchikey_connectivity_layer) without
+  # copying the entire multi-million-row annotation table via full_join.
+  t2_cols <- intersect(
+    c(
+      "feature_id",
+      "candidate_structure_inchikey_connectivity_layer",
+      model$candidates_sirius_str_columns
+    ),
+    names(annotation_table)
+  )
+  csi_idx <- if ("candidate_score_sirius_csi" %in% names(annotation_table)) {
+    which(!is.na(annotation_table$candidate_score_sirius_csi))
+  } else {
+    integer(0L)
+  }
+  sirius_new_cols <- setdiff(t2_cols, names(annotation_table_merged))
+
+  if (length(csi_idx) == 0L) {
+    n_rows <- nrow(annotation_table_merged)
+    for (col in sirius_new_cols) {
+      val <- if (col == "candidate_score_sirius_csi") {
+        rep.int(NA_real_, n_rows)
+      } else {
+        rep.int(annotation_table[[col]][NA_integer_], n_rows)
+      }
+      data.table::set(annotation_table_merged, j = col, value = val)
+    }
+  } else if (
+    length(sirius_new_cols) > 0L &&
+      all(
+        c(
+          "feature_id",
+          "candidate_structure_inchikey_connectivity_layer"
+        ) %in%
+          names(annotation_table_merged)
+      )
+  ) {
+    csi_num <- .as_numeric_dedup(
+      annotation_table$candidate_score_sirius_csi[csi_idx]
     )
+    rel_ord2 <- order(-csi_num, na.last = TRUE, method = "radix")
+    ord2 <- csi_idx[rel_ord2]
+    f2 <- annotation_table$feature_id[ord2]
+    ik2 <- annotation_table$candidate_structure_inchikey_connectivity_layer[
+      ord2
+    ]
+    u_f2 <- unique(f2)
+    u_ik2 <- unique(ik2)
+    f2_id <- if (anyNA(u_f2)) {
+      match(f2, u_f2)
+    } else {
+      fastmatch::fmatch(f2, u_f2)
+    }
+    ik2_id <- if (anyNA(u_ik2)) {
+      match(ik2, u_ik2)
+    } else {
+      fastmatch::fmatch(ik2, u_ik2)
+    }
+    n_ik2 <- max(1L, length(u_ik2))
+    use_int2 <- as.double(length(u_f2)) * n_ik2 < .Machine$integer.max
+    k2 <- if (use_int2) {
+      (f2_id - 1L) * n_ik2 + ik2_id
+    } else {
+      as.double(f2_id - 1L) * n_ik2 + ik2_id
+    }
+    keep2_mask <- if (use_int2) {
+      !duplicated(k2)
+    } else {
+      fastmatch::fmatch(k2, k2) == seq_along(k2)
+    }
+    keep2_idx <- ord2[keep2_mask]
+    k2_u <- k2[keep2_mask]
+
+    m_f <- if (anyNA(u_f2)) {
+      match(annotation_table_merged$feature_id, u_f2)
+    } else {
+      fastmatch::fmatch(annotation_table_merged$feature_id, u_f2)
+    }
+    m_ik <- if (anyNA(u_ik2)) {
+      match(
+        annotation_table_merged$candidate_structure_inchikey_connectivity_layer,
+        u_ik2
+      )
+    } else {
+      fastmatch::fmatch(
+        annotation_table_merged$candidate_structure_inchikey_connectivity_layer,
+        u_ik2
+      )
+    }
+    both_ok <- !is.na(m_f) & !is.na(m_ik)
+    m_pos <- rep.int(NA_integer_, nrow(annotation_table_merged))
+    if (any(both_ok)) {
+      k_m <- if (use_int2) {
+        (m_f[both_ok] - 1L) * n_ik2 + m_ik[both_ok]
+      } else {
+        as.double(m_f[both_ok] - 1L) * n_ik2 + m_ik[both_ok]
+      }
+      m_pos[both_ok] <- fastmatch::fmatch(k_m, k2_u)
+    }
+    csi_u <- csi_num[rel_ord2][keep2_mask]
+    for (col in sirius_new_cols) {
+      val <- if (col == "candidate_score_sirius_csi") {
+        csi_u[m_pos]
+      } else {
+        annotation_table[[col]][keep2_idx][m_pos]
+      }
+      data.table::set(annotation_table_merged, j = col, value = val)
+    }
   }
 
   # Step 2: Add formula-level SIRIUS scores.

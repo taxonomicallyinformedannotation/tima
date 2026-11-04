@@ -1114,12 +1114,17 @@ complement_metadata_structures <- function(
   u_dv <- unique(dedup_val)
   dv_id <- fastmatch::fmatch(dedup_val, u_dv)
   n_dv <- length(u_dv)
-  gv_key <- if (as.double(n_grp) * n_dv < .Machine$integer.max) {
+  use_int_gv <- as.double(n_grp) * n_dv < .Machine$integer.max
+  gv_key <- if (use_int_gv) {
     (g_ok - 1L) * n_dv + dv_id
   } else {
     as.double(g_ok - 1L) * n_dv + dv_id
   }
-  keep <- !duplicated(gv_key)
+  keep <- if (use_int_gv) {
+    !duplicated(gv_key)
+  } else {
+    fastmatch::fmatch(gv_key, gv_key) == seq_along(gv_key)
+  }
   g_ok <- g_ok[keep]
   v_trim <- v_trim[keep]
 

@@ -319,7 +319,7 @@ rank_and_deduplicate <- function(df) {
 
   for (col in score_cols) {
     if (col %in% names(df)) {
-      df[[col]] <- suppressWarnings(as.numeric(df[[col]]))
+      df[[col]] <- .as_numeric_dedup(df[[col]])
     } else {
       df[[col]] <- rep(NA_real_, nrow(df))
     }
@@ -652,30 +652,34 @@ compute_candidate_M <- function(mz, adduct_string) {
   if (n == 0L) {
     return(numeric(0))
   }
-  mz_num <- as.numeric(mz)
+  mz_num <- .as_numeric_dedup(mz)
   out <- rep(NA_real_, n)
 
-  usable <- !is.na(mz_num) &
-    is.finite(mz_num) &
-    mz_num > 0 &
-    !is.na(adduct_string) &
-    nzchar(adduct_string)
-  if (!any(usable)) {
+  usable_idx <- which(
+    !is.na(mz_num) &
+      is.finite(mz_num) &
+      mz_num > 0 &
+      !is.na(adduct_string) &
+      nzchar(adduct_string)
+  )
+  if (length(usable_idx) == 0L) {
     return(out)
   }
 
-  # Group by unique adduct string: parse once per unique string, then apply
-  # the neutral-mass formula as vectorised arithmetic. This avoids O(N)
-  # calls into the validator-heavy `calculate_mass_of_m` and scales with
-  # the (typically small) number of distinct adducts rather than rows.
-  # Was: looped over unique adducts and rescanned all rows with
-  # which(usable & adduct_string == add) on each iteration.
-  # Now: split usable row indices by adduct once, then reuse each index group.
-  usable_idx <- which(usable)
-  adduct_groups <- split(usable_idx, adduct_string[usable_idx])
-  for (add in names(adduct_groups)) {
+  add_sub <- adduct_string[usable_idx]
+  u_add <- unique(add_sub)
+  add_id <- fastmatch::fmatch(add_sub, u_add)
+
+  n_u <- length(u_add)
+  u_n_charges <- rep(NA_real_, n_u)
+  u_n_mer <- rep(NA_real_, n_u)
+  u_iso_shift <- rep(NA_real_, n_u)
+  u_mass_mods <- rep(NA_real_, n_u)
+  u_z_elec <- rep(NA_real_, n_u)
+
+  for (ui in seq_len(n_u)) {
     parsed <- tryCatch(
-      suppressWarnings(parse_adduct(add)),
+      suppressWarnings(parse_adduct(u_add[[ui]])),
       error = function(.err) {
         invisible(.err)
         NULL
@@ -686,29 +690,30 @@ compute_candidate_M <- function(mz, adduct_string) {
     }
     n_charges <- parsed[["n_charges"]]
     n_mer <- parsed[["n_mer"]]
-    n_iso <- parsed[["n_iso"]]
-    mass_mods <- parsed[["los_add_clu"]]
-    charge_sign <- parsed[["charge"]]
     if (n_mer == 0L || n_charges == 0L) {
       next
     }
-
-    idx <- adduct_groups[[add]]
-    if (!length(idx)) {
-      next
-    }
-    mz_vec <- mz_num[idx]
-    iso_shift <- n_iso * ISOTOPE_MASS_SHIFT_DALTONS
-    z_signed <- n_charges * charge_sign
-    m_vec <- (n_charges *
-      (mz_vec - iso_shift) -
-      mass_mods +
-      z_signed * ELECTRON_MASS_DALTONS) /
-      n_mer
-    m_vec[!is.finite(m_vec) | m_vec == 0] <- NA_real_
-    valid <- !is.na(m_vec)
-    out[idx[valid]] <- m_vec[valid]
+    u_n_charges[[ui]] <- n_charges
+    u_n_mer[[ui]] <- n_mer
+    u_iso_shift[[ui]] <- parsed[["n_iso"]] * ISOTOPE_MASS_SHIFT_DALTONS
+    u_mass_mods[[ui]] <- parsed[["los_add_clu"]]
+    u_z_elec[[ui]] <- (n_charges * parsed[["charge"]]) * ELECTRON_MASS_DALTONS
   }
 
+  nc <- u_n_charges[add_id]
+  valid_add <- !is.na(nc)
+  if (!any(valid_add)) {
+    return(out)
+  }
+
+  v_idx <- usable_idx[valid_add]
+  v_aid <- add_id[valid_add]
+  m_vec <- (u_n_charges[v_aid] *
+    (mz_num[v_idx] - u_iso_shift[v_aid]) -
+    u_mass_mods[v_aid] +
+    u_z_elec[v_aid]) /
+    u_n_mer[v_aid]
+  m_vec[!is.finite(m_vec) | m_vec == 0] <- NA_real_
+  out[v_idx] <- m_vec
   out
 }

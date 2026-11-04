@@ -151,12 +151,18 @@ split_tables_sop <- function(table, cache) {
     ik_id_k <- fastmatch::fmatch(table_keys$structure_inchikey, u_ik_k)
     org_id_k <- fastmatch::fmatch(table_keys$organism_name, u_org_k)
     n_org_k <- length(u_org_k)
-    io_key <- if (as.double(length(u_ik_k)) * n_org_k < .Machine$integer.max) {
+    use_int_io <- as.double(length(u_ik_k)) * n_org_k < .Machine$integer.max
+    io_key <- if (use_int_io) {
       (ik_id_k - 1L) * n_org_k + org_id_k
     } else {
       as.double(ik_id_k - 1L) * n_org_k + org_id_k
     }
-    dup_io <- unique(io_key[duplicated(io_key)])
+    is_dup_io <- if (use_int_io) {
+      duplicated(io_key)
+    } else {
+      fastmatch::fmatch(io_key, io_key) != seq_along(io_key)
+    }
+    dup_io <- unique(io_key[is_dup_io])
     if (length(dup_io) > 0L) {
       drop_na <- na_doi & !is.na(fastmatch::fmatch(io_key, dup_io))
       if (any(drop_na)) {
@@ -282,12 +288,17 @@ split_tables_sop <- function(table, cache) {
     u_dv <- unique(dedup_val)
     dv_id <- fastmatch::fmatch(dedup_val, u_dv)
     n_dv <- length(u_dv)
-    gv_key <- if (as.double(n_grp) * n_dv < .Machine$integer.max) {
+    use_int_gv <- as.double(n_grp) * n_dv < .Machine$integer.max
+    gv_key <- if (use_int_gv) {
       (g_ok - 1L) * n_dv + dv_id
     } else {
       as.double(g_ok - 1L) * n_dv + dv_id
     }
-    keep <- !duplicated(gv_key)
+    keep <- if (use_int_gv) {
+      !duplicated(gv_key)
+    } else {
+      fastmatch::fmatch(gv_key, gv_key) == seq_along(gv_key)
+    }
     g_ok <- g_ok[keep]
     v_trim <- v_trim[keep]
 

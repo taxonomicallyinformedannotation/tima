@@ -645,8 +645,18 @@ summarize_results <- function(
   u_dois <- unique(all_dois)
   doi_id <- fastmatch::fmatch(all_dois, u_dois)
   n_u_dois <- max(1L, length(u_dois))
-  pd_code <- (as.numeric(pid_grp - 1L) * n_u_dois) + doi_id
-  first_pd <- !duplicated(pd_code)
+  use_int_pd <- as.double(length(u_matched_pids)) * n_u_dois <
+    .Machine$integer.max
+  pd_code <- if (use_int_pd) {
+    (pid_grp - 1L) * n_u_dois + doi_id
+  } else {
+    (as.numeric(pid_grp - 1L) * n_u_dois) + doi_id
+  }
+  first_pd <- if (use_int_pd) {
+    !duplicated(pd_code)
+  } else {
+    fastmatch::fmatch(pd_code, pd_code) == seq_along(pd_code)
+  }
 
   pid_grp_u <- pid_grp[first_pd]
   dois_u <- all_dois[first_pd]
@@ -696,9 +706,19 @@ summarize_results <- function(
   g_m <- in_matched[has_m]
   u_fids <- unique(f_m)
   f_id <- fastmatch::fmatch(f_m, u_fids)
-  n_g <- length(u_matched_pids)
-  fg_code <- (as.numeric(f_id - 1L) * n_g) + g_m
-  keep_fg <- has_m[!duplicated(fg_code)]
+  n_g <- max(1L, length(u_matched_pids))
+  use_int_fg <- as.double(length(u_fids)) * n_g < .Machine$integer.max
+  fg_code <- if (use_int_fg) {
+    (f_id - 1L) * n_g + g_m
+  } else {
+    (as.numeric(f_id - 1L) * n_g) + g_m
+  }
+  first_fg <- if (use_int_fg) {
+    !duplicated(fg_code)
+  } else {
+    fastmatch::fmatch(fg_code, fg_code) == seq_along(fg_code)
+  }
+  keep_fg <- has_m[first_fg]
   g_final <- in_matched[keep_fg]
 
   tidytable::tidytable(

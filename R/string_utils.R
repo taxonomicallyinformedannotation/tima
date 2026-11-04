@@ -9,29 +9,86 @@ NULL
 # equals a value of `str`. Unlike a regex search, "Ara" does not match
 # "Arabidopsis" and regex metacharacters in names are taken literally.
 stri_detect_token <- function(str, pattern, separator = " $ ") {
-  str <- as.character(str)
-  pattern <- as.character(pattern)
-  out <- !is.na(str) & !is.na(pattern) & str == pattern
-  multi <- which(
-    !out &
-      !is.na(str) &
-      !is.na(pattern) &
-      (grepl(separator, str, fixed = TRUE) |
-        grepl(separator, pattern, fixed = TRUE))
-  )
-  if (length(multi) > 0L) {
-    out[multi] <- mapply(
-      FUN = function(x, p) {
-        any(
-          trimws(strsplit(p, separator, fixed = TRUE)[[1L]]) %in%
-            trimws(strsplit(x, separator, fixed = TRUE)[[1L]])
-        )
-      },
-      str[multi],
-      pattern[multi],
-      USE.NAMES = FALSE
-    )
+  str <- if (is.character(str)) str else as.character(str)
+  pattern <- if (is.character(pattern)) pattern else as.character(pattern)
+  n_s <- length(str)
+  n_p <- length(pattern)
+  if (n_s == 0L || n_p == 0L) {
+    return(logical(0L))
   }
+  n <- max(n_s, n_p)
+  if (n_s != n) {
+    str <- rep_len(str, n)
+  }
+  if (n_p != n) {
+    pattern <- rep_len(pattern, n)
+  }
+
+  valid <- !is.na(str) & !is.na(pattern)
+  out <- valid & (str == pattern)
+  rem <- which(valid & !out)
+  if (length(rem) == 0L) {
+    return(out)
+  }
+
+  sv_rem <- str[rem]
+  pv_rem <- pattern[rem]
+  u_s <- unique(sv_rem)
+  u_p <- unique(pv_rem)
+  s_has_sep <- grepl(separator, u_s, fixed = TRUE)
+  p_has_sep <- grepl(separator, u_p, fixed = TRUE)
+  if (!any(s_has_sep) && !any(p_has_sep)) {
+    return(out)
+  }
+
+  s_id <- fastmatch::fmatch(sv_rem, u_s)
+  p_id <- fastmatch::fmatch(pv_rem, u_p)
+  can_match <- which(s_has_sep[s_id] | p_has_sep[p_id])
+  if (length(can_match) == 0L) {
+    return(out)
+  }
+
+  s_sub <- s_id[can_match]
+  p_sub <- p_id[can_match]
+  n_up <- length(u_p)
+  use_int <- as.double(length(u_s)) * n_up < .Machine$integer.max
+  sp_key <- if (use_int) {
+    (s_sub - 1L) * n_up + p_sub
+  } else {
+    as.double(s_sub - 1L) * n_up + p_sub
+  }
+  u_sp_idx <- if (use_int) {
+    which(!duplicated(sp_key))
+  } else {
+    which(fastmatch::fmatch(sp_key, sp_key) == seq_along(sp_key))
+  }
+  sp_grp <- fastmatch::fmatch(sp_key, sp_key[u_sp_idx])
+
+  u_s_used <- unique(s_sub[u_sp_idx])
+  u_p_used <- unique(p_sub[u_sp_idx])
+
+  s_toks <- vector("list", length(u_s))
+  s_toks[u_s_used] <- lapply(
+    strsplit(u_s[u_s_used], separator, fixed = TRUE),
+    trimws
+  )
+  p_toks <- vector("list", length(u_p))
+  p_toks[u_p_used] <- lapply(
+    strsplit(u_p[u_p_used], separator, fixed = TRUE),
+    trimws
+  )
+
+  s_u_pair <- s_sub[u_sp_idx]
+  p_u_pair <- p_sub[u_sp_idx]
+  pair_hit <- vapply(
+    seq_along(u_sp_idx),
+    function(i) {
+      any(p_toks[[p_u_pair[[i]]]] %in% s_toks[[s_u_pair[[i]]]])
+    },
+    logical(1L)
+  )
+
+  out[rem[can_match]] <- pair_hit[sp_grp]
   out
 }
 

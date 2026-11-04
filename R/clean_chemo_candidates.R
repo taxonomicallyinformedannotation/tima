@@ -1000,76 +1000,116 @@ build_mini_taxonomy_table <- function(
     }
   }
 
-  normalize_tax_label <- function(x) {
-    vals <- trimws(as.character(x))
-    vals[
-      vals %in% c("", "notClassified", "empty", "N/A", "null")
+  normalize_tax_label_dedup <- function(x) {
+    if (length(x) == 0L) {
+      return(character(0L))
+    }
+    x_chr <- if (is.character(x)) x else as.character(x)
+    u <- unique(x_chr)
+    u_trim <- trimws(u)
+    u_trim[
+      u_trim %in% c("", "notClassified", "empty", "N/A", "null")
     ] <- NA_character_
-    vals
+    idx <- if (anyNA(u)) match(x_chr, u) else fastmatch::fmatch(x_chr, u)
+    u_trim[idx]
   }
 
-  # Prepare all candidates with their structure taxonomy scored by
-  # score_weighted_chemo so they compete on equal footing with predicted labels.
-  df_all <- df_percentile |>
-    tidytable::mutate(
-      score_weighted_chemo = as.numeric(score_weighted_chemo),
-      has_inchikey = !is.na(candidate_structure_inchikey_connectivity_layer),
-      tidytable::across(
-        .cols = tidyselect::starts_with(match = "candidate_structure_tax_"),
-        .fns = normalize_tax_label
-      ),
-      .label_cla_str = tidytable::coalesce(
-        candidate_structure_tax_cla_04dirpar,
-        candidate_structure_tax_cla_03cla,
-        candidate_structure_tax_cla_02sup,
-        candidate_structure_tax_cla_01kin
-      ),
-      .label_npc_str = tidytable::coalesce(
-        candidate_structure_tax_npc_03cla,
-        candidate_structure_tax_npc_02sup,
-        candidate_structure_tax_npc_01pat
-      )
-    )
+  fids <- df_percentile$feature_id
+  u_fids <- unique(fids)
+  fid_id <- if (anyNA(u_fids)) {
+    match(fids, u_fids)
+  } else {
+    fastmatch::fmatch(fids, u_fids)
+  }
+  attr(u_fids, ".match.hash") <- NULL
 
-  # has_inchikey flag at feature level
-  df_has_ik <- df_all |>
-    tidytable::summarize(
-      has_inchikey = any(has_inchikey, na.rm = TRUE),
-      .by = feature_id
-    )
+  sc_chemo <- .as_numeric_dedup(df_percentile$score_weighted_chemo)
+  has_ik_row <- !is.na(
+    df_percentile$candidate_structure_inchikey_connectivity_layer
+  )
+  fids_with_ik <- unique(fid_id[has_ik_row])
+  has_ik_u <- logical(length(u_fids))
+  has_ik_u[fids_with_ik[!is.na(fids_with_ik)]] <- TRUE
+  df_has_ik <- tidytable::tidytable(
+    feature_id = u_fids,
+    has_inchikey = has_ik_u
+  )
+
+  label_cla_str <- tidytable::coalesce(
+    normalize_tax_label_dedup(
+      df_percentile$candidate_structure_tax_cla_04dirpar
+    ),
+    normalize_tax_label_dedup(df_percentile$candidate_structure_tax_cla_03cla),
+    normalize_tax_label_dedup(df_percentile$candidate_structure_tax_cla_02sup),
+    normalize_tax_label_dedup(df_percentile$candidate_structure_tax_cla_01kin)
+  )
+  label_npc_str <- tidytable::coalesce(
+    normalize_tax_label_dedup(df_percentile$candidate_structure_tax_npc_03cla),
+    normalize_tax_label_dedup(df_percentile$candidate_structure_tax_npc_02sup),
+    normalize_tax_label_dedup(df_percentile$candidate_structure_tax_npc_01pat)
+  )
 
   # Best structure label per feature (highest score_weighted_chemo wins)
-  df_str_cla <- df_all |>
-    tidytable::filter(!is.na(.label_cla_str)) |>
-    tidytable::arrange(tidytable::desc(score_weighted_chemo)) |>
-    tidytable::distinct(feature_id, .keep_all = TRUE) |>
-    tidytable::select(
-      feature_id,
-      label_classyfire_str = .label_cla_str,
-      score_cla_str = score_weighted_chemo
+  idx_cla <- which(!is.na(label_cla_str))
+  if (length(idx_cla) > 0L) {
+    ord_cla <- idx_cla[
+      order(-sc_chemo[idx_cla], na.last = TRUE, method = "radix")
+    ]
+    keep_cla <- ord_cla[!duplicated(fid_id[ord_cla])]
+    df_str_cla <- tidytable::tidytable(
+      feature_id = fids[keep_cla],
+      label_classyfire_str = label_cla_str[keep_cla],
+      score_cla_str = sc_chemo[keep_cla]
     )
+  } else {
+    df_str_cla <- tidytable::tidytable(
+      feature_id = character(0),
+      label_classyfire_str = character(0),
+      score_cla_str = numeric(0)
+    )
+  }
 
-  df_str_npc <- df_all |>
-    tidytable::filter(!is.na(.label_npc_str)) |>
-    tidytable::arrange(tidytable::desc(score_weighted_chemo)) |>
-    tidytable::distinct(feature_id, .keep_all = TRUE) |>
-    tidytable::select(
-      feature_id,
-      label_npclassifier_str = .label_npc_str,
-      score_npc_str = score_weighted_chemo
+  idx_npc <- which(!is.na(label_npc_str))
+  if (length(idx_npc) > 0L) {
+    ord_npc <- idx_npc[
+      order(-sc_chemo[idx_npc], na.last = TRUE, method = "radix")
+    ]
+    keep_npc <- ord_npc[!duplicated(fid_id[ord_npc])]
+    df_str_npc <- tidytable::tidytable(
+      feature_id = fids[keep_npc],
+      label_npclassifier_str = label_npc_str[keep_npc],
+      score_npc_str = sc_chemo[keep_npc]
     )
+  } else {
+    df_str_npc <- tidytable::tidytable(
+      feature_id = character(0),
+      label_npclassifier_str = character(0),
+      score_npc_str = numeric(0)
+    )
+  }
+  rm(label_cla_str, label_npc_str, sc_chemo)
 
   # Best predicted label per feature (highest prediction score wins)
-  df_pred_tax <- df_percentile |>
-    tidytable::select(
-      tidyselect::contains(match = c("feature_id", "feature_pred"))
-    ) |>
-    tidytable::mutate(
-      tidytable::across(
-        tidyselect::contains(match = "score"),
-        as.numeric
-      )
+  pred_cols <- grep(
+    "^(feature_id|feature_pred)",
+    names(df_percentile),
+    value = TRUE
+  )
+  df_pred_tax <- if (nrow(df_percentile) > 10000L) {
+    first_f_idx <- which(!duplicated(fid_id))
+    df_percentile[first_f_idx, ..pred_cols]
+  } else {
+    df_percentile[, ..pred_cols] |>
+      tidytable::distinct()
+  }
+  score_pred_cols <- grep("score", names(df_pred_tax), value = TRUE)
+  for (col in score_pred_cols) {
+    data.table::set(
+      df_pred_tax,
+      j = col,
+      value = .as_numeric_dedup(df_pred_tax[[col]])
     )
+  }
 
   if (nrow(df_pred_tax) > 0L) {
     weights <- list(
@@ -1183,29 +1223,36 @@ build_mini_results_table <- function(
   if (nrow(best_results) > 0L && "feature_id" %in% names(best_results)) {
     rank_num <- suppressWarnings(as.integer(best_results$rank_final))
     score_final_num <- if ("score_final" %in% names(best_results)) {
-      -suppressWarnings(as.numeric(best_results$score_final))
+      -.as_numeric_dedup(best_results$score_final)
     } else if ("score_weighted_chemo" %in% names(best_results)) {
-      -suppressWarnings(as.numeric(best_results$score_weighted_chemo))
+      -.as_numeric_dedup(best_results$score_weighted_chemo)
     } else {
       rep_len(0, nrow(best_results))
     }
     initial_num <- if ("score_initial" %in% names(best_results)) {
-      -suppressWarnings(as.numeric(best_results$score_initial))
+      -.as_numeric_dedup(best_results$score_initial)
     } else if ("candidate_score_pseudo_initial" %in% names(best_results)) {
-      -suppressWarnings(as.numeric(best_results$candidate_score_pseudo_initial))
+      -.as_numeric_dedup(best_results$candidate_score_pseudo_initial)
     } else {
       rep_len(0, nrow(best_results))
     }
 
     ord <- order(
-      best_results$feature_id,
       rank_num,
       score_final_num,
       initial_num,
-      na.last = TRUE
+      na.last = TRUE,
+      method = "radix"
     )
-    best_results <- best_results[ord, , drop = FALSE] |>
-      tidytable::distinct(feature_id, .keep_all = TRUE)
+    fids_ord <- best_results$feature_id[ord]
+    u_fids_br <- unique(fids_ord)
+    fid_id_ord <- if (anyNA(u_fids_br)) {
+      match(fids_ord, u_fids_br)
+    } else {
+      fastmatch::fmatch(fids_ord, u_fids_br)
+    }
+    keep_br <- ord[!duplicated(fid_id_ord)]
+    best_results <- best_results[keep_br, , drop = FALSE]
   }
 
   results_mini <- Reduce(
@@ -1496,26 +1543,33 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
     ))
   }
 
-  df_with_comp <- df_with_comp |>
-    tidytable::mutate(
-      .candidate_M_exact = if (has_exact_mass_col) {
-        as.numeric(candidate_structure_exact_mass)
-      } else {
-        NA_real_
-      },
-      .candidate_M_mz = if (has_mz_adduct_fallback) {
-        compute_candidate_M(mz, candidate_adduct)
-      } else {
-        NA_real_
-      },
-      .candidate_M = tidytable::coalesce(.candidate_M_exact, .candidate_M_mz),
-      .candidate_M_key = round(.candidate_M, NEUTRAL_MASS_GROUP_DECIMALS)
-    )
+  cand_m_exact <- if (has_exact_mass_col) {
+    .as_numeric_dedup(df_with_comp$candidate_structure_exact_mass)
+  } else {
+    rep.int(NA_real_, nrow(df_with_comp))
+  }
+  cand_m_mz <- rep.int(NA_real_, nrow(df_with_comp))
+  if (has_mz_adduct_fallback) {
+    missing_exact <- which(is.na(cand_m_exact))
+    if (length(missing_exact) > 0L) {
+      cand_m_mz[missing_exact] <- compute_candidate_M(
+        df_with_comp$mz[missing_exact],
+        df_with_comp$candidate_adduct[missing_exact]
+      )
+    }
+  }
+  cand_m <- tidytable::coalesce(cand_m_exact, cand_m_mz)
+  data.table::set(df_with_comp, j = ".candidate_M_exact", value = cand_m_exact)
+  data.table::set(df_with_comp, j = ".candidate_M_mz", value = cand_m_mz)
+  data.table::set(df_with_comp, j = ".candidate_M", value = cand_m)
+  data.table::set(
+    df_with_comp,
+    j = ".candidate_M_key",
+    value = round(cand_m, NEUTRAL_MASS_GROUP_DECIMALS)
+  )
 
   if (has_exact_mass_col && has_mz_adduct_fallback) {
-    n_fallback_rows <- df_with_comp |>
-      tidytable::filter(is.na(.candidate_M_exact), !is.na(.candidate_M_mz)) |>
-      nrow()
+    n_fallback_rows <- sum(is.na(cand_m_exact) & !is.na(cand_m_mz))
     if (n_fallback_rows > 0L) {
       log_info(
         "Cluster-consensus mass key used mz/adduct fallback for %d row(s) with missing exact mass",
@@ -1523,6 +1577,7 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
       )
     }
   }
+  rm(cand_m_exact, cand_m_mz, cand_m)
 
   # For each (component_id, .candidate_M_key) group with rank_final == 1
   # identify the anchor InChIKey from the best-scored feature using radix order

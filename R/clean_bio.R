@@ -503,8 +503,17 @@ clean_bio <- function(
     n_tax <- length(u_tax)
     tax_v <- fastmatch::fmatch(vals_v, u_tax)
 
-    pair_key <- (as.numeric(fid_v) - 1) * n_tax + tax_v
-    first_pair <- !duplicated(pair_key)
+    use_int_pair <- as.double(n_fids) * n_tax < .Machine$integer.max
+    pair_key <- if (use_int_pair) {
+      (fid_v - 1L) * n_tax + tax_v
+    } else {
+      (as.numeric(fid_v) - 1) * n_tax + tax_v
+    }
+    first_pair <- if (use_int_pair) {
+      !duplicated(pair_key)
+    } else {
+      fastmatch::fmatch(pair_key, pair_key) == seq_along(pair_key)
+    }
 
     u_fid_pair <- fid_v[first_pair]
     u_tax_pair <- tax_v[first_pair]
@@ -541,7 +550,11 @@ clean_bio <- function(
     c_cnt <- count_dt$count
 
     cons_vec <- c_cnt / n_targets_by_fid[c_src]
-    c_pair_key <- (as.numeric(c_src) - 1) * n_tax + c_tax
+    c_pair_key <- if (use_int_pair) {
+      (c_src - 1L) * n_tax + c_tax
+    } else {
+      (as.numeric(c_src) - 1) * n_tax + c_tax
+    }
     src_sc <- u_sc_pair[fastmatch::fmatch(c_pair_key, u_pair_keys)]
     score_vec <- cons_vec * src_sc
 

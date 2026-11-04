@@ -129,22 +129,20 @@ filter_annotations <- function(
   # Load and Merge Annotations ----
 
   log_debug("Loading %d annotation file(s)", length(annotations))
-  annotation_tables_list <- Map(
-    function(x, y) {
-      safe_fread(
-        file = x,
-        file_type = paste0("annotation file ", y),
-        na.strings = c("", "NA"),
-        colClasses = "character"
-      )
-    },
-    annotations,
-    seq_along(annotations)
+  annotation_table <- filter_ms1_redundancy(
+    Map(
+      function(x, y) {
+        safe_fread(
+          file = x,
+          file_type = paste0("annotation file ", y),
+          na.strings = c("", "NA"),
+          colClasses = "character"
+        )
+      },
+      annotations,
+      seq_along(annotations)
+    )
   )
-
-  # Filter MS1 redundancy
-  annotation_table <- filter_ms1_redundancy(annotation_tables_list)
-  rm(annotation_tables_list)
 
   n_total_annotations <- nrow(annotation_table)
   log_info(
@@ -178,9 +176,11 @@ filter_annotations <- function(
   rm(annotation_table)
 
   n_before_adduct_semantics <- nrow(features_annotated_table_1)
-  features_annotated_table_1 <- enforce_ms1_adduct_semantics(
-    features_annotated_table_1
-  )
+  features_annotated_table_1 <- enforce_ms1_adduct_semantics({
+    tmp_annotated <- features_annotated_table_1
+    features_annotated_table_1 <- NULL
+    tmp_annotated
+  })
   adduct_semantics_audit <- attr(
     features_annotated_table_1,
     "adduct_semantics_audit"
@@ -469,12 +469,10 @@ filter_ms1_redundancy <- function(
 
   log_info("Removing MS1 annotations superseded by quality spectral matches")
 
-  # Extract spectral annotations (all non-MS1)
-  spectral_names <- names(annotation_tables_list)[
-    names(annotation_tables_list) != "ms1"
-  ]
-  annotations_tables_spectral <- annotation_tables_list[spectral_names] |>
-    tidytable::bind_rows()
+  ms1_tbl <- annotation_tables_list[["ms1"]]
+  annotation_tables_list[["ms1"]] <- NULL
+  annotations_tables_spectral <- tidytable::bind_rows(annotation_tables_list)
+  rm(annotation_tables_list)
 
   n_spectral <- nrow(annotations_tables_spectral)
   log_debug("Found %d spectral annotations", n_spectral)
@@ -489,95 +487,107 @@ filter_ms1_redundancy <- function(
   }
 
   # Quality gate: only consider spectral matches that are genuinely
-
   # informative. This prevents a noisy spectral hit from killing a valid
-
   # MS1 annotation backed by accurate mass.
   has_similarity <- "candidate_score_similarity" %in%
     names(annotations_tables_spectral)
   has_peaks <- "candidate_count_similarity_peaks_matched" %in%
     names(annotations_tables_spectral)
 
-  filter_cols <- intersect(
-    c(
-      anti_join_cols,
-      "candidate_score_similarity",
-      "candidate_count_similarity_peaks_matched"
-    ),
-    names(annotations_tables_spectral)
-  )
-  quality_spectral <- annotations_tables_spectral |>
-    tidytable::select(tidyselect::all_of(filter_cols))
-  if (has_similarity) {
-    quality_spectral <- quality_spectral |>
-      tidytable::filter(
-        is.na(candidate_score_similarity) |
-          as.numeric(candidate_score_similarity) >= similarity_threshold
-      )
+  qual_mask <- rep.int(TRUE, n_spectral)
+  if (has_similarity && n_spectral > 0L) {
+    sim_col <- annotations_tables_spectral$candidate_score_similarity
+    sim_num <- .as_numeric_dedup(sim_col)
+    qual_mask <- qual_mask &
+      (is.na(sim_col) | (!is.na(sim_num) & sim_num >= similarity_threshold))
   }
-  if (has_peaks) {
-    quality_spectral <- quality_spectral |>
-      tidytable::filter(
-        is.na(candidate_count_similarity_peaks_matched) |
-          as.integer(candidate_count_similarity_peaks_matched) >= min_peaks
-      )
+  if (has_peaks && n_spectral > 0L) {
+    pks_col <- annotations_tables_spectral$candidate_count_similarity_peaks_matched
+    pks_num <- .as_numeric_dedup(pks_col)
+    qual_mask <- qual_mask &
+      (is.na(pks_col) | (!is.na(pks_num) & as.integer(pks_num) >= min_peaks))
   }
 
-  n_quality <- nrow(quality_spectral)
+  qual_idx <- which(qual_mask)
+  rm(qual_mask)
+  n_quality <- length(qual_idx)
   log_debug(
     "Quality-gated spectral annotations for MS1 suppression: %d / %d",
     n_quality,
     n_spectral
   )
 
-  spectral_keys <- quality_spectral |>
-    tidytable::distinct(tidyselect::any_of(anti_join_cols))
-  rm(quality_spectral)
-
-  ms1_tbl <- annotation_tables_list[["ms1"]]
   n_ms1_before <- nrow(ms1_tbl)
-
   join_cols <- intersect(
     anti_join_cols,
-    intersect(names(ms1_tbl), names(spectral_keys))
+    intersect(names(ms1_tbl), names(annotations_tables_spectral))
   )
+
   if (
     n_ms1_before > 0L &&
-      nrow(spectral_keys) > 0L &&
+      n_quality > 0L &&
       length(join_cols) == 2L
   ) {
     c1 <- join_cols[[1L]]
     c2 <- join_cols[[2L]]
-    u_fids <- unique(spectral_keys[[c1]])
-    in_feat <- !is.na(fastmatch::fmatch(ms1_tbl[[c1]], u_fids))
-    idx_cand <- which(in_feat)
+    s1 <- annotations_tables_spectral[[c1]][qual_idx]
+    s2 <- annotations_tables_spectral[[c2]][qual_idx]
+    u_fids <- unique(s1)
+    m_fid <- if (anyNA(u_fids)) {
+      match(ms1_tbl[[c1]], u_fids)
+    } else {
+      fastmatch::fmatch(ms1_tbl[[c1]], u_fids)
+    }
+    idx_cand <- which(!is.na(m_fid))
     if (length(idx_cand) > 0L) {
-      s1 <- ifelse(is.na(spectral_keys[[c1]]), "\u0001", spectral_keys[[c1]])
-      s2 <- ifelse(is.na(spectral_keys[[c2]]), "\u0001", spectral_keys[[c2]])
-      spec_k <- paste(s1, s2, sep = "\r")
-      m1 <- ifelse(
-        is.na(ms1_tbl[[c1]][idx_cand]),
-        "\u0001",
-        ms1_tbl[[c1]][idx_cand]
-      )
-      m2 <- ifelse(
-        is.na(ms1_tbl[[c2]][idx_cand]),
-        "\u0001",
-        ms1_tbl[[c2]][idx_cand]
-      )
-      ms1_k <- paste(m1, m2, sep = "\r")
-      matched <- !is.na(fastmatch::fmatch(ms1_k, spec_k))
-      if (any(matched)) {
-        keep_mask <- !logical(n_ms1_before)
-        keep_mask[idx_cand[matched]] <- FALSE
-        ms1_tbl <- ms1_tbl[keep_mask, ]
+      u_iks <- unique(s2)
+      m_ik <- if (anyNA(u_iks)) {
+        match(ms1_tbl[[c2]][idx_cand], u_iks)
+      } else {
+        fastmatch::fmatch(ms1_tbl[[c2]][idx_cand], u_iks)
+      }
+      in_both <- which(!is.na(m_ik))
+      if (length(in_both) > 0L) {
+        idx_sub <- idx_cand[in_both]
+        fid_id_m <- m_fid[idx_sub]
+        ik_id_m <- m_ik[in_both]
+        fid_id_s <- if (anyNA(u_fids)) {
+          match(s1, u_fids)
+        } else {
+          fastmatch::fmatch(s1, u_fids)
+        }
+        ik_id_s <- if (anyNA(u_iks)) {
+          match(s2, u_iks)
+        } else {
+          fastmatch::fmatch(s2, u_iks)
+        }
+        n_ik <- length(u_iks)
+        if (as.double(length(u_fids)) * n_ik < .Machine$integer.max) {
+          spec_k <- unique((fid_id_s - 1L) * n_ik + ik_id_s)
+          ms1_k <- (fid_id_m - 1L) * n_ik + ik_id_m
+        } else {
+          spec_k <- unique(as.double(fid_id_s - 1L) * n_ik + ik_id_s)
+          ms1_k <- as.double(fid_id_m - 1L) * n_ik + ik_id_m
+        }
+        matched <- !is.na(fastmatch::fmatch(ms1_k, spec_k))
+        if (any(matched)) {
+          keep_mask <- !logical(n_ms1_before)
+          keep_mask[idx_sub[matched]] <- FALSE
+          ms1_tbl <- ms1_tbl[keep_mask, ]
+        }
       }
     }
-  } else if (n_ms1_before > 0L && nrow(spectral_keys) > 0L) {
+  } else if (
+    n_ms1_before > 0L &&
+      n_quality > 0L &&
+      length(join_cols) > 0L
+  ) {
+    spectral_keys <- annotations_tables_spectral[qual_idx, ..join_cols] |>
+      tidytable::distinct()
     ms1_tbl <- tidytable::anti_join(
       ms1_tbl,
       y = spectral_keys,
-      by = anti_join_cols
+      by = join_cols
     )
   }
 
@@ -626,8 +636,8 @@ apply_rt_filter <- function(features_annotated_table, rt_table, tolerance_rt) {
   if (!anyDuplicated(rt_iks)) {
     rt_idx <- fastmatch::fmatch(features_annotated_table[[ik_col]], rt_iks)
     err_rt <- if (!all(is.na(rt_idx))) {
-      as.numeric(features_annotated_table$rt) -
-        as.numeric(rt_table$rt_target)[rt_idx]
+      .as_numeric_dedup(features_annotated_table$rt) -
+        .as_numeric_dedup(rt_table$rt_target)[rt_idx]
     } else {
       rep(NA_real_, nrow(features_annotated_table))
     }
@@ -636,10 +646,15 @@ apply_rt_filter <- function(features_annotated_table, rt_table, tolerance_rt) {
       "RT deltas computed for %d annotations (no hard cutoff applied; scoring handles RT penalty)",
       sum(!is.na(err_rt))
     )
-    return(
-      features_annotated_table |>
-        tidytable::select(-tidyselect::any_of(x = c("rt_target", "type")))
+    drop_rt_cols <- intersect(
+      c("rt_target", "type"),
+      names(features_annotated_table)
     )
+    if (length(drop_rt_cols) > 0L) {
+      features_annotated_table <- features_annotated_table |>
+        tidytable::select(-tidyselect::any_of(x = drop_rt_cols))
+    }
+    return(features_annotated_table)
   }
 
   joined <- features_annotated_table |>
@@ -707,7 +722,8 @@ enforce_ms1_adduct_semantics <- function(
   tolerance_ppm = 10,
   tolerance_dalton = 0.0025
 ) {
-  if (nrow(features_annotated_table) == 0L) {
+  n_total <- nrow(features_annotated_table)
+  if (n_total == 0L) {
     return(features_annotated_table)
   }
 
@@ -717,28 +733,49 @@ enforce_ms1_adduct_semantics <- function(
   }
 
   out <- features_annotated_table
+  rm(features_annotated_table)
   if (!"candidate_adduct_match_mode" %in% names(out)) {
-    out$candidate_adduct_match_mode <- NA_character_
+    data.table::set(
+      out,
+      j = "candidate_adduct_match_mode",
+      value = rep.int(NA_character_, n_total)
+    )
   }
   if (!"annotation_note" %in% names(out)) {
-    out$annotation_note <- NA_character_
+    data.table::set(
+      out,
+      j = "annotation_note",
+      value = rep.int(NA_character_, n_total)
+    )
   }
 
-  # Parse adduct text once per unique adduct to avoid O(n) parser calls on
-  # large annotation tables.
-  adduct_values <- unique(stats::na.omit(as.character(out$candidate_adduct)))
+  # Parse adduct text once per unique adduct and assign compact integer state IDs
+  cand_adducts <- out$candidate_adduct
+  u_adducts_all <- unique(cand_adducts)
+  adduct_values <- as.character(u_adducts_all[!is.na(u_adducts_all)])
   adduct_state_map <- build_adduct_state_key_map(adduct_values) |>
     tidytable::rename(
       candidate_adduct = adduct,
       adduct_state_key = state_key
     )
+  u_state_str <- tidytable::coalesce(
+    adduct_state_map$adduct_state_key[
+      fastmatch::fmatch(adduct_values, adduct_state_map$candidate_adduct)
+    ],
+    adduct_values
+  )
+  u_states <- unique(u_state_str)
+  state_id_by_u_add <- fastmatch::fmatch(u_state_str, u_states)
 
   is_ms1_row <- if ("candidate_library" %in% names(out)) {
-    unique_libs <- unique(stats::na.omit(as.character(out$candidate_library)))
-    ms1_libs <- unique_libs[grepl("ms1", tolower(unique_libs), fixed = TRUE)]
-    out$candidate_library %in% ms1_libs
+    u_libs <- unique(out$candidate_library)
+    u_libs_non_na <- as.character(u_libs[!is.na(u_libs)])
+    ms1_libs <- u_libs_non_na[
+      grepl("ms1", tolower(u_libs_non_na), fixed = TRUE)
+    ]
+    !is.na(fastmatch::fmatch(out$candidate_library, ms1_libs))
   } else {
-    rep(FALSE, nrow(out))
+    rep.int(FALSE, n_total)
   }
 
   has_ms1_semantics <- all(
@@ -755,7 +792,7 @@ enforce_ms1_adduct_semantics <- function(
   }
 
   strong_idx <- which(
-    is_ms1_row & !is.na(out$candidate_adduct) & nzchar(out$candidate_adduct)
+    is_ms1_row & !is.na(cand_adducts) & nzchar(cand_adducts)
   )
 
   if (has_ms1_semantics && length(strong_idx) > 0L) {
@@ -775,13 +812,11 @@ enforce_ms1_adduct_semantics <- function(
 
   # Deduplicate strong MS1 rows to 1 row per feature_id BEFORE computing M:
   # avoids sorting and parsing 9M+ MS1 structure matches when each feature
-  # has a single primary strong adduct. Uses integer encoding + radix sort
-  # to avoid expensive string paste()/order() on millions of rows.
+  # has a single primary strong adduct.
   u_fids <- unique(out$feature_id)
   f_int <- fastmatch::fmatch(out$feature_id, u_fids)
-  cand_adducts <- out$candidate_adduct
-  m_add <- fastmatch::fmatch(cand_adducts, adduct_state_map$candidate_adduct)
-  n_add_map <- max(1L, nrow(adduct_state_map))
+  m_add <- fastmatch::fmatch(cand_adducts, adduct_values)
+  n_add_map <- max(1L, length(adduct_values))
 
   sf_int <- f_int[strong_idx]
   sa_int <- m_add[strong_idx]
@@ -799,9 +834,7 @@ enforce_ms1_adduct_semantics <- function(
     in_dup_rel <- which(!is.na(fastmatch::fmatch(sf_int, dup_f_int)))
     in_dup <- strong_idx[in_dup_rel]
     err_vals <- if ("candidate_structure_error_mz" %in% names(out)) {
-      abs(suppressWarnings(as.numeric(
-        out$candidate_structure_error_mz[in_dup]
-      )))
+      abs(.as_numeric_dedup(out$candidate_structure_error_mz[in_dup]))
     } else {
       rep(NA_real_, length(in_dup))
     }
@@ -824,61 +857,73 @@ enforce_ms1_adduct_semantics <- function(
 
   strong_f_int <- f_int[chosen_strong_idx]
   strong_adducts <- as.character(cand_adducts[chosen_strong_idx])
-  strong_m_add <- m_add[chosen_strong_idx]
-  strong_state_col <- tidytable::coalesce(
-    adduct_state_map$adduct_state_key[strong_m_add],
-    strong_adducts
-  )
+  strong_state_id_col <- state_id_by_u_add[m_add[chosen_strong_idx]]
   strong_M_col <- compute_candidate_M(
-    mz = as.numeric(out$mz[chosen_strong_idx]),
+    mz = out$mz[chosen_strong_idx],
     adduct_string = strong_adducts
   )
 
   is_spectral_row <- if ("candidate_library" %in% names(out)) {
-    unique_libs <- unique(stats::na.omit(as.character(out$candidate_library)))
-    spectral_libs <- unique_libs[
-      grepl("spectral", tolower(unique_libs), fixed = TRUE)
+    u_libs <- unique(out$candidate_library)
+    u_libs_non_na <- as.character(u_libs[!is.na(u_libs)])
+    spectral_libs <- u_libs_non_na[
+      grepl("spectral", tolower(u_libs_non_na), fixed = TRUE)
     ]
-    out$candidate_library %in% spectral_libs
+    !is.na(fastmatch::fmatch(out$candidate_library, spectral_libs))
   } else {
     !is_ms1_row
   }
 
   m_feat <- fastmatch::fmatch(f_int, strong_f_int)
   has_strong <- !is.na(m_feat)
-  strong_state_keys <- strong_state_col[m_feat]
-
-  candidate_state_keys <- tidytable::coalesce(
-    adduct_state_map$adduct_state_key[m_add],
-    cand_adducts
-  )
+  cand_state_id <- state_id_by_u_add[m_add]
+  strong_state_id <- strong_state_id_col[m_feat]
 
   exact_adduct_match <- has_strong &
-    !is.na(candidate_state_keys) &
-    (candidate_state_keys == strong_state_keys)
-  exact_adduct_match[is.na(exact_adduct_match)] <- FALSE
+    !is.na(cand_state_id) &
+    (cand_state_id == strong_state_id)
+  rm(cand_state_id, strong_state_id)
 
-  needs_m_check <- !is_ms1_row &
-    has_strong &
-    !is.na(cand_adducts) &
-    !exact_adduct_match
+  idx_m <- which(
+    !is_ms1_row &
+      has_strong &
+      !is.na(cand_adducts) &
+      !exact_adduct_match
+  )
 
-  m_delta_rescued <- rep(FALSE, nrow(out))
-  idx_m <- which(needs_m_check)
+  m_delta_rescued <- logical(n_total)
   if (length(idx_m) > 0L && "mz" %in% names(out)) {
-    cand_M <- compute_candidate_M(
-      mz = out$mz[idx_m],
-      adduct_string = cand_adducts[idx_m]
+    f_m <- f_int[idx_m]
+    a_m <- m_add[idx_m]
+    fa_m_key <- (f_m - 1L) * n_add_map + a_m
+    u_fa_m_idx <- which(!duplicated(fa_m_key))
+    fa_m_grp <- fastmatch::fmatch(fa_m_key, fa_m_key[u_fa_m_idx])
+
+    u_idx_m <- idx_m[u_fa_m_idx]
+    u_cand_M <- compute_candidate_M(
+      mz = out$mz[u_idx_m],
+      adduct_string = cand_adducts[u_idx_m]
     )
-    strong_M_vals <- strong_M_col[m_feat[idx_m]]
-    mass_diff <- abs(cand_M - strong_M_vals)
-    ppm_window <- tolerance_ppm * 1e-6 * pmax(abs(cand_M), abs(strong_M_vals))
-    rescued <- !is.na(cand_M) &
-      !is.na(strong_M_vals) &
+    u_strong_M <- strong_M_col[m_feat[u_idx_m]]
+    mass_diff <- abs(u_cand_M - u_strong_M)
+    ppm_window <- tolerance_ppm * 1e-6 * pmax(abs(u_cand_M), abs(u_strong_M))
+    u_rescued <- !is.na(u_cand_M) &
+      !is.na(u_strong_M) &
       (mass_diff <= ppm_window | mass_diff <= tolerance_dalton)
-    rescued[is.na(rescued)] <- FALSE
-    m_delta_rescued[idx_m] <- rescued
+    u_rescued[is.na(u_rescued)] <- FALSE
+    m_delta_rescued[idx_m] <- u_rescued[fa_m_grp]
+    rm(
+      f_m,
+      a_m,
+      fa_m_key,
+      u_fa_m_idx,
+      fa_m_grp,
+      u_idx_m,
+      u_cand_M,
+      u_strong_M
+    )
   }
+  rm(f_int, m_add, m_feat, cand_adducts)
 
   keep_row <- is_ms1_row |
     !has_strong |
@@ -887,18 +932,17 @@ enforce_ms1_adduct_semantics <- function(
     m_delta_rescued
 
   if (all(is.na(out$candidate_adduct_match_mode))) {
-    mm <- rep("incompatible", nrow(out))
+    mm <- rep.int("incompatible", n_total)
     mm[!has_strong & !is_ms1_row] <- "unconstrained"
     mm[is_ms1_row] <- "ms1_reference"
     mm[exact_adduct_match] <- "exact_adduct"
     mm[m_delta_rescued] <- "m_delta_rescued"
-    out$candidate_adduct_match_mode <- mm
+    data.table::set(out, j = "candidate_adduct_match_mode", value = mm)
     rm(mm)
   } else {
     missing_mode_idx <- which(is.na(out$candidate_adduct_match_mode))
     if (length(missing_mode_idx) > 0L) {
-      mm <- character(length(missing_mode_idx))
-      mm[] <- "incompatible"
+      mm <- rep.int("incompatible", length(missing_mode_idx))
       mm[!has_strong[missing_mode_idx] & !is_ms1_row[missing_mode_idx]] <-
         "unconstrained"
       mm[is_ms1_row[missing_mode_idx]] <- "ms1_reference"
@@ -908,21 +952,26 @@ enforce_ms1_adduct_semantics <- function(
       rm(mm)
     }
   }
+  rm(has_strong, exact_adduct_match)
 
   rescued_note_idx <- which(!is_ms1_row & m_delta_rescued)
+  rm(m_delta_rescued)
   if (length(rescued_note_idx) > 0L) {
-    out$annotation_note[rescued_note_idx] <- tidytable::coalesce(
-      out$annotation_note[rescued_note_idx],
-      "Adduct differs from strong MS1 state; retained by neutral-mass delta consistency"
-    )
+    cur_notes <- out$annotation_note[rescued_note_idx]
+    na_notes <- is.na(cur_notes)
+    if (any(na_notes)) {
+      out$annotation_note[rescued_note_idx[na_notes]] <-
+        "Adduct differs from strong MS1 state; retained by neutral-mass delta consistency"
+    }
   }
 
-  dropped_n <- sum(!keep_row)
+  dropped_n <- n_total - sum(keep_row)
   dropped_spectral_n <- if (dropped_n > 0L) {
     sum(!keep_row & is_spectral_row)
   } else {
     0L
   }
+  rm(is_ms1_row, is_spectral_row)
 
   if (dropped_n > 0L) {
     log_info(
@@ -937,9 +986,10 @@ enforce_ms1_adduct_semantics <- function(
     )
   }
 
-  out_filtered <- if (dropped_n == 0L) out else out[keep_row, ]
+  out_filtered <- if (dropped_n == 0L) out else out[which(keep_row), ]
+  rm(out, keep_row)
   attr(out_filtered, "adduct_semantics_audit") <- list(
-    n_input = nrow(out),
+    n_input = n_total,
     n_removed = dropped_n,
     n_removed_spectral = dropped_spectral_n,
     n_output = nrow(out_filtered)

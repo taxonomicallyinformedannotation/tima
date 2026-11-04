@@ -83,6 +83,22 @@ test_that("clean_collapse deduplicates repeated values", {
   # No separator should appear since only one unique value
   expect_false(grepl("$", out$val, fixed = TRUE))
   expect_equal(out$val, "x")
+  expect_null(attr(out$group, ".match.hash"))
+})
+
+test_that("clean_collapse fast-paths singleton groups and trims whitespace", {
+  df_single <- tidytable::tidytable(
+    group = c("G1", "G2", "G3"),
+    val1 = c("  a  ", NA_character_, "c"),
+    val2 = c("1", " 2 ", "3")
+  ) |>
+    tidytable::group_by(group)
+
+  out_single <- clean_collapse(df_single, cols = c("val1", "val2"))
+  expect_equal(nrow(out_single), 3L)
+  expect_equal(out_single$val1, c("a", NA_character_, "c"))
+  expect_equal(out_single$val2, c("1", "2", "3"))
+  expect_null(attr(out_single$group, ".match.hash"))
 })
 
 # ---- fake_annotations_columns ------------------------------------------------
@@ -156,7 +172,14 @@ test_that("normalize_chemontid handles mixed input", {
 
 test_that("normalize_chemontid deduplicates equivalent chemontids", {
   # The main use case: 2011 and 0002011 should become identical
-  result <- unique(normalize_chemontid(c("2011", "0002011")))
+  normed <- normalize_chemontid(c("2011", "0002011"))
+  expect_null(attr(normed, ".match.hash"))
+  result <- unique(normed)
   expect_length(result, 1L)
   expect_equal(result, "CHEMONTID:0002011")
+  expect_equal(normalize_chemontid(character(0)), character(0))
+  expect_equal(
+    normalize_chemontid(c(NA_character_, NA_character_)),
+    c(NA_character_, NA_character_)
+  )
 })

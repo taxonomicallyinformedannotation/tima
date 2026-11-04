@@ -325,14 +325,20 @@ prepare_taxa <- function(
     }
   }
   if (!is.null(taxon)) {
+    feat_min <- if ("feature_id" %in% names(feature_table_0)) {
+      tidytable::tidytable(feature_id = unique(feature_table_0$feature_id))
+    } else {
+      feature_table_0
+    }
     metadata_table_joined <- tidytable::inner_join(
-      x = feature_table_0 |>
+      x = feat_min |>
         tidytable::mutate(join = "x"),
       y = biological_metadata |>
         tidytable::select(organismOriginal = organism_name) |>
         tidytable::mutate(join = "x")
     ) |>
       tidytable::select(-join)
+    rm(feat_min)
   } else {
     # Validate join keys exist in their respective tables
     if (!"sample" %in% names(feature_table_0)) {
@@ -369,14 +375,21 @@ prepare_taxa <- function(
       )
     }
 
+    feat_cols_keep <- intersect(
+      c("feature_id", "sample"),
+      names(feature_table_0)
+    )
+    meta_cols_keep <- unique(c(name_filename, colname))
     metadata_table_joined <-
       tidytable::left_join(
-        x = feature_table_0,
-        y = metadata_table,
+        x = feature_table_0[, ..feat_cols_keep] |>
+          tidytable::distinct(),
+        y = metadata_table[, ..meta_cols_keep] |>
+          tidytable::distinct(),
         by = c("sample" = name_filename)
       ) |>
       tidytable::select(
-        feature_id,
+        tidyselect::any_of("feature_id"),
         organismOriginal = tidyselect::all_of(x = colname),
         tidyselect::everything()
       ) |>
