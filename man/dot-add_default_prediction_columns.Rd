@@ -4,10 +4,12 @@
 \alias{.add_default_prediction_columns}
 \title{Add or fill default prediction columns in data frame}
 \usage{
-.add_default_prediction_columns(df)
+.add_default_prediction_columns(df, copy_input = TRUE)
 }
 \arguments{
 \item{df}{Data frame to process}
+
+\item{copy_input}{Logical whether to copy \code{df} before mutating}
 }
 \value{
 Data frame with all prediction columns properly initialized

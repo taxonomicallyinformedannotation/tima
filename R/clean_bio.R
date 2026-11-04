@@ -115,6 +115,13 @@ clean_bio <- function(
     colnames(annotations_distinct) &&
     !all(is.na(annotations_distinct$feature_pred_tax_cla_02sup_val))
 
+  pred_tax_cols <- grep(
+    "feature_pred_tax",
+    names(annotations_distinct),
+    value = TRUE
+  )
+  non_pred_cols <- setdiff(names(annotations_distinct), pred_tax_cols)
+
   if (has_pred_col) {
     has_pred_row <- !is.na(annotations_distinct$feature_pred_tax_cla_02sup_val)
     df1 <- annotations_distinct[has_pred_row, ]
@@ -123,12 +130,14 @@ clean_bio <- function(
       annotations_distinct$feature_id,
       pred_fids
     ))
-    df2 <- annotations_distinct[keep_no_pred, ] |>
-      tidytable::select(-tidyselect::contains(match = "feature_pred_tax"))
+    df2 <- annotations_distinct[keep_no_pred, ..non_pred_cols]
   } else {
     df1 <- NULL
-    df2 <- annotations_distinct |>
-      tidytable::select(-tidyselect::contains(match = "feature_pred_tax"))
+    df2 <- if (length(pred_tax_cols) > 0L) {
+      tidytable::as_tidytable(as.list(annotations_distinct)[non_pred_cols])
+    } else {
+      tidytable::as_tidytable(as.list(annotations_distinct))
+    }
   }
   rm(annotations_distinct)
 
@@ -136,13 +145,15 @@ clean_bio <- function(
   # instead of sequential purrr::reduce operations
   annot_table_wei_bio_preclean <- .merge_consistency_tables(
     base_df = df2,
-    consistency_list = consistency_results
+    consistency_list = consistency_results,
+    copy_input = FALSE
   )
 
   rm(df2, consistency_results)
 
   annot_table_wei_bio_preclean <- .add_default_prediction_columns(
-    annot_table_wei_bio_preclean
+    annot_table_wei_bio_preclean,
+    copy_input = FALSE
   )
 
   if (is.null(df1) || nrow(df1) == 0L) {
@@ -175,16 +186,25 @@ clean_bio <- function(
 #'
 #' @param base_df Data frame to which consistency data will be added
 #' @param consistency_list List of consistency result data frames
+#' @param copy_input Logical whether to copy `base_df` before mutating
 #'
 #' @return Merged dataframe with all consistency columns
 #'
 #' @keywords internal
-.merge_consistency_tables <- function(base_df, consistency_list) {
+.merge_consistency_tables <- function(
+  base_df,
+  consistency_list,
+  copy_input = TRUE
+) {
   if (length(consistency_list) == 0L) {
     return(base_df)
   }
 
-  result <- data.table::copy(tidytable::as_tidytable(base_df))
+  result <- if (copy_input) {
+    data.table::copy(tidytable::as_tidytable(base_df))
+  } else {
+    tidytable::as_tidytable(base_df)
+  }
   fids <- result$feature_id
   for (right_df in consistency_list) {
     val_cols <- setdiff(names(right_df), "feature_source")
@@ -204,7 +224,13 @@ clean_bio <- function(
     }
   }
 
-  result |> tidytable::select(feature_id, tidyselect::everything())
+  if ("feature_id" %in% names(result) && names(result)[[1L]] != "feature_id") {
+    data.table::setcolorder(
+      result,
+      c("feature_id", setdiff(names(result), "feature_id"))
+    )
+  }
+  result
 }
 
 #' Add or fill default prediction columns in data frame
@@ -214,11 +240,12 @@ clean_bio <- function(
 #' Adds missing columns and fills NA values using clean vectorized approach.
 #'
 #' @param df Data frame to process
+#' @param copy_input Logical whether to copy `df` before mutating
 #'
 #' @return Data frame with all prediction columns properly initialized
 #'
 #' @keywords internal
-.add_default_prediction_columns <- function(df) {
+.add_default_prediction_columns <- function(df, copy_input = TRUE) {
   defaults <- list(
     feature_pred_tax_cla_01kin_val = NA_character_,
     consistency_structure_cla_kin = 1,
@@ -243,7 +270,11 @@ clean_bio <- function(
     feature_pred_tax_cla_04dirpar_score = NA_real_
   )
 
-  out <- data.table::copy(tidytable::as_tidytable(df))
+  out <- if (copy_input) {
+    data.table::copy(tidytable::as_tidytable(df))
+  } else {
+    tidytable::as_tidytable(df)
+  }
   missing_cols <- setdiff(names(defaults), names(out))
   existing_cols <- intersect(names(defaults), names(out))
 
@@ -257,9 +288,10 @@ clean_bio <- function(
   for (col in existing_cols) {
     def_val <- defaults[[col]]
     if (!is.na(def_val)) {
-      na_idx <- which(is.na(out[[col]]))
-      if (length(na_idx) > 0L) {
-        data.table::set(out, i = na_idx, j = col, value = def_val)
+      col_v <- out[[col]]
+      if (anyNA(col_v)) {
+        col_v[is.na(col_v)] <- def_val
+        data.table::set(out, j = col, value = col_v)
       }
     }
   }
@@ -280,18 +312,64 @@ clean_bio <- function(
 #'
 #' @keywords internal
 .extract_distinct_taxonomy_pairs <- function(annot_table) {
+  annot_table <- tidytable::as_tidytable(annot_table)
+  n <- nrow(annot_table)
+  if (n <= 1L) {
+    return(annot_table)
+  }
+  tax_cols <- intersect(
+    c(
+      "feature_id",
+      "candidate_structure_inchikey_connectivity_layer",
+      "candidate_structure_tax_cla_01kin",
+      "candidate_structure_tax_npc_01pat",
+      "candidate_structure_tax_cla_02sup",
+      "candidate_structure_tax_npc_02sup",
+      "candidate_structure_tax_cla_03cla",
+      "candidate_structure_tax_npc_03cla",
+      "candidate_structure_tax_cla_04dirpar",
+      "score_weighted_bio"
+    ),
+    names(annot_table)
+  )
+  if (
+    all(
+      c(
+        "feature_id",
+        "candidate_structure_inchikey_connectivity_layer"
+      ) %in%
+        tax_cols
+    )
+  ) {
+    f <- annot_table$feature_id
+    k <- annot_table$candidate_structure_inchikey_connectivity_layer
+    uf <- unique(f)
+    uk <- unique(k)
+    fid <- if (anyNA(uf)) match(f, uf) else fastmatch::fmatch(f, uf)
+    kid <- if (anyNA(uk)) match(k, uk) else fastmatch::fmatch(k, uk)
+    nk <- max(1L, length(uk))
+    pk <- if (as.double(length(uf)) * nk < .Machine$integer.max) {
+      (fid - 1L) * nk + kid
+    } else {
+      as.double(fid - 1L) * nk + kid
+    }
+    if (anyDuplicated(pk) == 0L) {
+      return(annot_table)
+    }
+    is_dup_pk <- duplicated(pk) | duplicated(pk, fromLast = TRUE)
+    dup_idx <- which(is_dup_pk)
+    sub_dt <- tidytable::as_tidytable(
+      lapply(as.list(annot_table)[tax_cols], `[`, dup_idx)
+    )
+    sub_dups <- duplicated(sub_dt)
+    if (!any(sub_dups)) {
+      return(annot_table)
+    }
+    return(annot_table[-dup_idx[sub_dups], ])
+  }
   annot_table |>
     tidytable::distinct(
-      feature_id,
-      candidate_structure_inchikey_connectivity_layer,
-      candidate_structure_tax_cla_01kin,
-      candidate_structure_tax_npc_01pat,
-      candidate_structure_tax_cla_02sup,
-      candidate_structure_tax_npc_02sup,
-      candidate_structure_tax_cla_03cla,
-      candidate_structure_tax_npc_03cla,
-      candidate_structure_tax_cla_04dirpar,
-      score_weighted_bio,
+      tidyselect::all_of(tax_cols),
       .keep_all = TRUE
     )
 }
@@ -464,10 +542,14 @@ clean_bio <- function(
   # n_targets per source is simply tabulate(edge_src_ann)
   n_targets_by_fid <- tabulate(edge_src_ann, nbins = n_fids)
 
-  edges_int_dt <- data.table::data.table(
-    src_id = edge_src_ann,
-    tgt_id = edge_tgt_ann
-  )
+  if (length(edge_src_ann) > 0L) {
+    ord_e <- order(edge_tgt_ann, edge_src_ann, method = "radix")
+    e_tgt_s <- edge_tgt_ann[ord_e]
+    e_src_s <- edge_src_ann[ord_e]
+    tgt_deg <- tabulate(e_tgt_s, nbins = n_fids)
+    tgt_ends <- cumsum(tgt_deg)
+    tgt_starts <- tgt_ends - tgt_deg + 1L
+  }
 
   # Pre-sort annotations by decreasing score_weighted_bio so first occurrence
   # per (fid, tax_id) has max(score_weighted_bio, na.rm = TRUE) in O(N)
@@ -524,37 +606,38 @@ clean_bio <- function(
       u_sc_pair[is.na(u_sc_pair)] <- -Inf
     }
 
-    target_dt <- data.table::data.table(
-      tgt_id = u_fid_pair,
-      tax_id = u_tax_pair
-    )
-
-    joined_dt <- edges_int_dt[
-      target_dt,
-      on = "tgt_id",
-      nomatch = NULL,
-      allow.cartesian = TRUE
-    ]
-    if (nrow(joined_dt) == 0L) {
+    deg_p <- tgt_deg[u_fid_pair]
+    has_e <- deg_p > 0L
+    if (!any(has_e)) {
       return(empty_result)
     }
+    deg_k <- deg_p[has_e]
+    starts_k <- tgt_starts[u_fid_pair[has_e]]
+    tax_k <- u_tax_pair[has_e]
 
-    # keyby sorts by (src_id, tax_id), matching tidytable::summarize(.by = ...)
-    count_dt <- joined_dt[, list(count = .N), keyby = c("src_id", "tax_id")]
-    if (nrow(count_dt) == 0L) {
-      return(empty_result)
+    j_src <- e_src_s[sequence(deg_k, from = starts_k)]
+    j_tax <- rep.int(tax_k, deg_k)
+
+    if (use_int_pair) {
+      j_key <- (j_src - 1L) * n_tax + j_tax
+      u_j_key <- sort(unique(j_key), method = "radix")
+      j_id <- fastmatch::fmatch(j_key, u_j_key)
+      c_cnt <- tabulate(j_id, nbins = length(u_j_key))
+      c_src <- (u_j_key - 1L) %/% n_tax + 1L
+      c_tax <- (u_j_key - 1L) %% n_tax + 1L
+      c_pair_key <- u_j_key
+    } else {
+      count_dt <- data.table::data.table(src_id = j_src, tax_id = j_tax)[,
+        list(count = .N),
+        keyby = c("src_id", "tax_id")
+      ]
+      c_src <- count_dt$src_id
+      c_tax <- count_dt$tax_id
+      c_cnt <- count_dt$count
+      c_pair_key <- (as.numeric(c_src) - 1) * n_tax + c_tax
     }
-
-    c_src <- count_dt$src_id
-    c_tax <- count_dt$tax_id
-    c_cnt <- count_dt$count
 
     cons_vec <- c_cnt / n_targets_by_fid[c_src]
-    c_pair_key <- if (use_int_pair) {
-      (c_src - 1L) * n_tax + c_tax
-    } else {
-      (as.numeric(c_src) - 1) * n_tax + c_tax
-    }
     src_sc <- u_sc_pair[fastmatch::fmatch(c_pair_key, u_pair_keys)]
     score_vec <- cons_vec * src_sc
 

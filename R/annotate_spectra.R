@@ -701,20 +701,22 @@ remove_empty_peak_spectra <- function(sp) {
   sp[has_peaks]
 }
 
-extract_vector <- function(obj, field, len, fill = NA) {
+extract_vector <- function(obj, field, len, fill = NA, subset_idx = NULL) {
   spectra_data <- obj@backend@spectraData
+  out_len <- if (is.null(subset_idx)) len else length(subset_idx)
   if (!length(field)) {
-    return(rep(fill, len))
+    return(rep.int(fill, out_len))
   }
 
   # Try exact names first (in priority order), then case-insensitive aliases.
-  idx_exact <- match(field, names(spectra_data), nomatch = 0L)
+  sd_names <- names(spectra_data)
+  idx_exact <- match(field, sd_names, nomatch = 0L)
   idx_exact <- idx_exact[idx_exact > 0L]
   if (!length(idx_exact)) {
-    idx_ci <- match(tolower(field), tolower(names(spectra_data)), nomatch = 0L)
+    idx_ci <- match(tolower(field), tolower(sd_names), nomatch = 0L)
     idx_ci <- idx_ci[idx_ci > 0L]
     if (!length(idx_ci)) {
-      return(rep(fill, len))
+      return(rep.int(fill, out_len))
     }
     idx <- idx_ci[[1L]]
   } else {
@@ -723,18 +725,20 @@ extract_vector <- function(obj, field, len, fill = NA) {
 
   v <- spectra_data[[idx]]
   if (is.null(v)) {
-    return(rep(fill, len))
+    return(rep.int(fill, out_len))
   }
   if (length(v) == len) {
-    return(v)
+    return(if (is.null(subset_idx)) v else v[subset_idx])
   }
   if (length(v) == 1L) {
-    return(rep(v, len))
+    return(rep.int(v, out_len))
   }
-  if (length(v) < len) {
-    return(c(v, rep(fill, len - length(v))))
+  v_full <- if (length(v) < len) {
+    c(v, rep.int(fill, len - length(v)))
+  } else {
+    v[seq_len(len)]
   }
-  v[seq_len(len)]
+  if (is.null(subset_idx)) v_full else v_full[subset_idx]
 }
 
 # harmonize_adduct_vector moved to R/annotate_masses.R to avoid duplicate definitions
@@ -755,8 +759,9 @@ build_library_metadata <- function(
       lib_sp,
       c("adduct", "precursor_type"),
       lib_len,
-      NA_character_
-    )[target_ids]
+      NA_character_,
+      subset_idx = target_ids
+    )
   } else if (
     length(target_adduct_raw) == length(target_ids) &&
       length(target_ids) != lib_len
@@ -765,19 +770,21 @@ build_library_metadata <- function(
   } else {
     as.character(target_adduct_raw[target_ids])
   }
-  spectrum_id_full <- extract_vector(
+  spectrum_id_sub <- extract_vector(
     lib_sp,
     c("spectrum_id", "spectrumid", "id"),
     lib_len,
-    NA_character_
+    NA_character_,
+    subset_idx = target_ids
   )
-  smiles_full <- extract_vector(
+  smiles_sub <- extract_vector(
     lib_sp,
     c("smiles", "structure_smiles", "SMILES"),
     lib_len,
-    NA_character_
+    NA_character_,
+    subset_idx = target_ids
   )
-  smiles_no_stereo_full <- extract_vector(
+  smiles_no_stereo_sub <- extract_vector(
     lib_sp,
     c(
       "smiles_no_stereo",
@@ -787,35 +794,39 @@ build_library_metadata <- function(
       "structure_smiles_2D"
     ),
     lib_len,
-    NA_character_
+    NA_character_,
+    subset_idx = target_ids
   )
-  library_full <- extract_vector(
+  library_sub <- extract_vector(
     lib_sp,
     c("library", "source_library", "database"),
     lib_len,
-    NA_character_
+    NA_character_,
+    subset_idx = target_ids
   )
-  name_full <- extract_vector(
+  name_sub <- extract_vector(
     lib_sp,
     c("name", "structure_name", "compound_name", "compoundName", "NAME"),
     lib_len,
-    NA_character_
+    NA_character_,
+    subset_idx = target_ids
   )
-  tag_full <- extract_vector(
+  tag_sub <- extract_vector(
     lib_sp,
     c("tag", "structure_tag"),
     lib_len,
-    NA_character_
+    NA_character_,
+    subset_idx = target_ids
   )
   out <- tidytable::tidytable(
     target_id = target_ids,
     target_adduct = adducts_sub,
-    target_spectrum_id = spectrum_id_full[target_ids],
-    target_smiles = smiles_full[target_ids],
-    target_smiles_no_stereo = smiles_no_stereo_full[target_ids],
-    target_library = library_full[target_ids],
-    target_name = name_full[target_ids],
-    target_tag = tag_full[target_ids],
+    target_spectrum_id = spectrum_id_sub,
+    target_smiles = smiles_sub,
+    target_smiles_no_stereo = smiles_no_stereo_sub,
+    target_library = library_sub,
+    target_name = name_sub,
+    target_tag = tag_sub,
     target_precursorMz = lib_precursors[target_ids]
   ) |>
     harmonize_adducts(
@@ -1581,49 +1592,76 @@ finalize_results <- function(
 log_library_stats <- function(lib_sp) {
   # Use backend spectraData directly to avoid materializing peak data
   sd <- lib_sp@backend@spectraData
-  if (!"library" %in% names(sd)) {
+  sd_names <- names(sd)
+  if (!"library" %in% sd_names) {
     return(invisible(NULL))
   }
-  # Only extract the columns needed for stats — avoids copying the full wide
-  # spectraData (which may contain dozens of metadata columns).
-  need_cols <- c(
-    "library",
-    "smiles_no_stereo",
-    "smiles",
-    "inchikey",
-    "compound_id"
-  )
-  avail_cols <- intersect(need_cols, names(sd))
-  df <- as.data.frame(sd[, avail_cols, drop = FALSE])
-  rownames(df) <- NULL
-  df <- df |>
-    tidytable::as_tidytable() |>
-    tidytable::filter(!is.na(library))
 
-  # Build a reliable structure identity column using coalesce
-  id_cols <- intersect(
-    c("smiles_no_stereo", "smiles", "inchikey", "compound_id"),
-    names(df)
-  )
-  if (length(id_cols) > 0L) {
-    df$.structure_id <- do.call(
-      tidytable::coalesce,
-      unname(as.list(df)[id_cols])
-    )
-  } else {
-    df$.structure_id <- NA_character_
+  lib_vec <- sd[["library"]]
+  if (length(lib_vec) == 0L) {
+    return(invisible(NULL))
+  }
+  keep_idx <- if (anyNA(lib_vec)) which(!is.na(lib_vec)) else NULL
+  if (!is.null(keep_idx)) {
+    if (length(keep_idx) == 0L) {
+      return(invisible(NULL))
+    }
+    lib_vec <- lib_vec[keep_idx]
   }
 
-  stats <- df |>
-    tidytable::group_by(library) |>
-    tidytable::summarize(
-      spectra = tidytable::n(),
-      unique_structures = tidytable::n_distinct(
-        .structure_id,
-        na.rm = TRUE
-      )
-    ) |>
-    tidytable::arrange(tidytable::desc(x = spectra))
+  id_cols <- intersect(
+    c("smiles_no_stereo", "smiles", "inchikey", "compound_id"),
+    sd_names
+  )
+  struct_id <- NULL
+  if (length(id_cols) > 0L) {
+    c1 <- sd[[id_cols[1L]]]
+    struct_id <- if (is.null(keep_idx)) c1 else c1[keep_idx]
+    if (length(id_cols) > 1L && anyNA(struct_id)) {
+      for (col in id_cols[-1L]) {
+        na_pos <- which(is.na(struct_id))
+        if (length(na_pos) == 0L) {
+          break
+        }
+        ck <- sd[[col]]
+        struct_id[na_pos] <- if (is.null(keep_idx)) {
+          ck[na_pos]
+        } else {
+          ck[keep_idx[na_pos]]
+        }
+      }
+    }
+  }
+
+  u_lib <- unique(lib_vec)
+  n_lib <- length(u_lib)
+  lib_id <- fastmatch::fmatch(lib_vec, u_lib)
+  spectra_cnt <- tabulate(lib_id, nbins = n_lib)
+
+  unique_struct_cnt <- integer(n_lib)
+  if (!is.null(struct_id)) {
+    valid_s <- !is.na(struct_id)
+    if (any(valid_s)) {
+      s_sub <- if (all(valid_s)) struct_id else struct_id[valid_s]
+      l_sub <- if (all(valid_s)) lib_id else lib_id[valid_s]
+      u_s <- unique(s_sub)
+      n_s <- length(u_s)
+      s_id <- fastmatch::fmatch(s_sub, u_s)
+      pair_key <- if (as.double(n_lib) * n_s < .Machine$integer.max) {
+        (l_sub - 1L) * n_s + s_id
+      } else {
+        as.double(l_sub - 1L) * n_s + s_id
+      }
+      unique_struct_cnt <- tabulate(l_sub[!duplicated(pair_key)], nbins = n_lib)
+    }
+  }
+
+  ord <- order(spectra_cnt, decreasing = TRUE)
+  stats <- tidytable::tidytable(
+    library = u_lib[ord],
+    spectra = spectra_cnt[ord],
+    unique_structures = unique_struct_cnt[ord]
+  )
   stats <- add_percentage_column(
     stats,
     count_col = "spectra",

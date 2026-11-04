@@ -110,25 +110,8 @@ summarize_results <- function(
           names(df)
       )
   ) {
-    # Predicate pushdown: Extract only structures present in df to reduce
-    # organism_lookup table size before building.
-    needed_structures <- unique(
-      stats::na.omit(
-        as.character(df$candidate_structure_inchikey_connectivity_layer)
-      )
-    )
-
-    filtered_sop_table <- if (length(needed_structures) > 0L) {
-      structure_organism_pairs_table |>
-        tidytable::filter(
-          structure_inchikey_connectivity_layer %in% needed_structures
-        )
-    } else {
-      structure_organism_pairs_table[0L, ]
-    }
-
     .build_organism_lookup(
-      structure_organism_pairs_table = filtered_sop_table,
+      structure_organism_pairs_table = structure_organism_pairs_table,
       df = df
     )
   } else {
@@ -186,76 +169,103 @@ summarize_results <- function(
     "annotation_note"
   ))
 
-  features_min <- features_table |>
-    tidytable::select(
-      tidyselect::any_of(c("feature_id", "rt", "mz"))
-    ) |>
-    tidytable::distinct(feature_id, .keep_all = TRUE)
+  feat_min_cols <- intersect(c("feature_id", "rt", "mz"), names(features_table))
+  features_min <- .fast_distinct_with_key_guard(
+    tidytable::as_tidytable(as.list(features_table)[feat_min_cols]),
+    "feature_id"
+  )
 
-  components_min <- components_table |>
-    tidytable::select(
-      tidyselect::any_of(c("feature_id", model$components_columns))
-    ) |>
-    tidytable::distinct(feature_id, .keep_all = TRUE)
+  comp_min_cols <- intersect(
+    c("feature_id", model$components_columns),
+    names(components_table)
+  )
+  components_min <- .fast_distinct_with_key_guard(
+    tidytable::as_tidytable(as.list(components_table)[comp_min_cols]),
+    "feature_id"
+  )
 
   # Start from annotation rows and add compact per-feature metadata.
   df_joined <- df |>
     tidytable::select(tidyselect::any_of(x = select_cols))
 
   if (nrow(df_joined) > 0L) {
-    organism_lookup_filtered <- if (
-      nrow(organism_lookup) > 0L &&
-        "candidate_structure_inchikey_connectivity_layer" %in% names(df_joined)
-    ) {
-      df_lookup_keys <- tidytable::tidytable(
-        candidate_structure_inchikey_connectivity_layer = unique(
-          stats::na.omit(
-            as.character(
-              df_joined$candidate_structure_inchikey_connectivity_layer
-            )
-          )
-        )
-      )
+    df_joined <- tidytable::as_tidytable(as.list(df_joined))
+    fids_j <- df_joined$feature_id
 
-      # Semi-join keeps only organism_lookup rows that match df_lookup_keys
-      organism_lookup |>
-        tidytable::semi_join(
-          y = df_lookup_keys,
-          by = "candidate_structure_inchikey_connectivity_layer"
-        )
-    } else {
-      organism_lookup
+    feat_add_cols <- setdiff(names(features_min), names(df_joined))
+    if (length(feat_add_cols) > 0L && nrow(features_min) > 0L) {
+      f_min_ids <- features_min$feature_id
+      m_f <- if (anyNA(f_min_ids) || anyNA(fids_j)) {
+        match(fids_j, f_min_ids)
+      } else {
+        fastmatch::fmatch(fids_j, f_min_ids)
+      }
+      for (col in feat_add_cols) {
+        data.table::set(df_joined, j = col, value = features_min[[col]][m_f])
+      }
     }
 
-    df_joined <- df_joined |>
-      tidytable::left_join(
-        y = features_min,
-        by = "feature_id",
-        .keep = "used",
-        suffix = c("", "_feature")
-      ) |>
-      tidytable::left_join(
-        y = components_min,
-        by = "feature_id",
-        .keep = "used",
-        suffix = c("", "_component")
-      ) |>
-      tidytable::left_join(
-        y = organism_lookup_filtered,
-        by = c(
-          "feature_id",
-          "candidate_structure_inchikey_connectivity_layer",
-          "candidate_structure_organism_occurrence_closest"
-        ),
-        .keep = "used"
-      ) |>
-      tidytable::select(tidyselect::any_of(x = final_select_cols))
+    comp_add_cols <- setdiff(names(components_min), names(df_joined))
+    if (length(comp_add_cols) > 0L && nrow(components_min) > 0L) {
+      c_min_ids <- components_min$feature_id
+      m_c <- if (anyNA(c_min_ids) || anyNA(fids_j)) {
+        match(fids_j, c_min_ids)
+      } else {
+        fastmatch::fmatch(fids_j, c_min_ids)
+      }
+      for (col in comp_add_cols) {
+        data.table::set(df_joined, j = col, value = components_min[[col]][m_c])
+      }
+    }
+
+    org_join_by <- c(
+      "feature_id",
+      "candidate_structure_inchikey_connectivity_layer",
+      "candidate_structure_organism_occurrence_closest"
+    )
+    org_add_cols <- setdiff(names(organism_lookup), names(df_joined))
+    if (
+      length(org_add_cols) > 0L &&
+        all(org_join_by %in% names(df_joined)) &&
+        all(org_join_by %in% names(organism_lookup))
+    ) {
+      if (nrow(organism_lookup) == 0L) {
+        for (col in org_add_cols) {
+          data.table::set(
+            df_joined,
+            j = col,
+            value = rep.int(
+              organism_lookup[[col]][NA_integer_],
+              nrow(df_joined)
+            )
+          )
+        }
+      } else {
+        m_org <- .fast_match_rows(df_joined, organism_lookup, by = org_join_by)
+        for (col in org_add_cols) {
+          data.table::set(
+            df_joined,
+            j = col,
+            value = organism_lookup[[col]][m_org]
+          )
+        }
+      }
+    }
+
+    keep_j_cols <- intersect(final_select_cols, names(df_joined))
+    drop_j_cols <- setdiff(names(df_joined), keep_j_cols)
+    if (length(drop_j_cols) > 0L) {
+      data.table::set(df_joined, j = drop_j_cols, value = NULL)
+    }
+    if (!identical(names(df_joined), keep_j_cols) && length(keep_j_cols) > 0L) {
+      data.table::setcolorder(df_joined, keep_j_cols)
+    }
   } else {
     df_joined <- df_joined |>
       tidytable::select(tidyselect::any_of(x = final_select_cols))
   }
 
-  rm(features_min, components_min, organism_lookup_filtered)
+  rm(features_min, components_min)
 
   # Add annotation_note from lookup table at the very end
   # Note: annotation_notes_lookup has been pre-collapsed to ensure
@@ -272,11 +282,33 @@ summarize_results <- function(
     )
     note_join_cols <- intersect(note_join_cols, names(df_joined))
     if (length(note_join_cols) > 0L) {
-      df_joined <- df_joined |>
-        tidytable::left_join(
-          y = annotation_notes_lookup,
+      note_add_cols <- setdiff(names(annotation_notes_lookup), names(df_joined))
+      notes_key_df <- as.data.frame(
+        as.list(annotation_notes_lookup)[note_join_cols]
+      )
+      if (
+        length(note_add_cols) > 0L &&
+          anyDuplicated(notes_key_df) == 0L
+      ) {
+        m_note <- .fast_match_rows(
+          df_joined,
+          annotation_notes_lookup,
           by = note_join_cols
         )
+        for (col in note_add_cols) {
+          data.table::set(
+            df_joined,
+            j = col,
+            value = annotation_notes_lookup[[col]][m_note]
+          )
+        }
+      } else {
+        df_joined <- df_joined |>
+          tidytable::left_join(
+            y = annotation_notes_lookup,
+            by = note_join_cols
+          )
+      }
     }
   }
 
@@ -285,8 +317,38 @@ summarize_results <- function(
   # Remove ties if requested
   if (remove_ties) {
     log_info("Removing ties")
-    df_joined <- df_joined |>
-      tidytable::distinct(feature_id, rank_final, .keep_all = TRUE)
+    if (
+      nrow(df_joined) > 1L &&
+        all(c("feature_id", "rank_final") %in% names(df_joined))
+    ) {
+      f_rt <- df_joined$feature_id
+      r_rt <- df_joined$rank_final
+      u_f_rt <- unique(f_rt)
+      u_r_rt <- unique(r_rt)
+      f_id_rt <- if (anyNA(u_f_rt)) {
+        match(f_rt, u_f_rt)
+      } else {
+        fastmatch::fmatch(f_rt, u_f_rt)
+      }
+      r_id_rt <- if (anyNA(u_r_rt)) {
+        match(r_rt, u_r_rt)
+      } else {
+        fastmatch::fmatch(r_rt, u_r_rt)
+      }
+      nr_rt <- max(1L, length(u_r_rt))
+      key_rt <- if (as.double(length(u_f_rt)) * nr_rt < .Machine$integer.max) {
+        (f_id_rt - 1L) * nr_rt + r_id_rt
+      } else {
+        as.double(f_id_rt - 1L) * nr_rt + r_id_rt
+      }
+      dup_rt <- duplicated(key_rt)
+      if (any(dup_rt)) {
+        df_joined <- df_joined[!dup_rt, , drop = FALSE]
+      }
+    } else {
+      df_joined <- df_joined |>
+        tidytable::distinct(feature_id, rank_final, .keep_all = TRUE)
+    }
   }
 
   # Summarize if requested
@@ -297,32 +359,50 @@ summarize_results <- function(
       rank_num <- suppressWarnings(as.integer(df_joined$rank_final))
 
       score_final_num <- if ("score_final" %in% names(df_joined)) {
-        -suppressWarnings(as.numeric(df_joined$score_final))
+        -.as_numeric_dedup(df_joined$score_final)
       } else if ("score_weighted_chemo" %in% names(df_joined)) {
-        -suppressWarnings(as.numeric(df_joined$score_weighted_chemo))
+        -.as_numeric_dedup(df_joined$score_weighted_chemo)
       } else {
         rep_len(0, nrow(df_joined))
       }
 
       initial_num <- if ("score_initial" %in% names(df_joined)) {
-        -suppressWarnings(as.numeric(df_joined$score_initial))
+        -.as_numeric_dedup(df_joined$score_initial)
       } else if ("candidate_score_pseudo_initial" %in% names(df_joined)) {
-        -suppressWarnings(as.numeric(df_joined$candidate_score_pseudo_initial))
+        -.as_numeric_dedup(df_joined$candidate_score_pseudo_initial)
       } else {
         rep_len(0, nrow(df_joined))
       }
 
+      fids_sum <- df_joined$feature_id
+      u_fids_sum <- sort(unique(fids_sum), na.last = TRUE)
+      fid_id_sum <- if (anyNA(u_fids_sum)) {
+        match(fids_sum, u_fids_sum)
+      } else {
+        fastmatch::fmatch(fids_sum, u_fids_sum)
+      }
+
       ord <- order(
-        df_joined$feature_id,
+        fid_id_sum,
         rank_num,
         score_final_num,
         initial_num,
-        na.last = TRUE
+        na.last = TRUE,
+        method = "radix"
       )
-      keep <- !duplicated(df_joined$feature_id[ord])
+      keep <- !duplicated(fid_id_sum[ord])
       df_final <- df_joined[ord[keep], , drop = FALSE]
 
-      rm(ord, keep, rank_num, score_final_num, initial_num)
+      rm(
+        ord,
+        keep,
+        rank_num,
+        score_final_num,
+        initial_num,
+        fids_sum,
+        u_fids_sum,
+        fid_id_sum
+      )
     }
 
     rm(df_joined)
@@ -378,14 +458,25 @@ summarize_results <- function(
   }
 
   for (col in char_cols) {
-    df_final[[col]] <- trim_col_fast(df_final[[col]])
+    data.table::set(df_final, j = col, value = trim_col_fast(df_final[[col]]))
   }
   for (col in factor_cols) {
-    df_final[[col]] <- trim_col_fast(as.character(df_final[[col]]))
+    data.table::set(
+      df_final,
+      j = col,
+      value = trim_col_fast(as.character(df_final[[col]]))
+    )
   }
 
-  df_processed <- df_final |>
-    tidytable::select(tidyselect::any_of(x = final_select_cols))
+  keep_p_cols <- intersect(final_select_cols, names(df_final))
+  drop_p_cols <- setdiff(names(df_final), keep_p_cols)
+  if (length(drop_p_cols) > 0L) {
+    data.table::set(df_final, j = drop_p_cols, value = NULL)
+  }
+  if (!identical(names(df_final), keep_p_cols) && length(keep_p_cols) > 0L) {
+    data.table::setcolorder(df_final, keep_p_cols)
+  }
+  df_processed <- df_final
 
   rm(df_final)
 
@@ -395,16 +486,18 @@ summarize_results <- function(
     df_processed$candidate_structure_inchikey_connectivity_layer
   )
 
-  results_with_structure <- df_processed[has_structure, , drop = FALSE]
-  results_without_structure <- if (!all(has_structure)) {
+  if (all(has_structure)) {
+    results <- df_processed
+  } else {
+    results_with_structure <- df_processed[has_structure, , drop = FALSE]
     # Without the weighted table, `df` (its ranked candidates, same columns)
     # is the consensus source
     feature_consensus_table <- feature_consensus_table %||%
       .build_feature_consensus_table(
-        annot_table_wei_chemo = annot_table_wei_chemo %||% df,
+        annot_table_wei_chemo = annot_table_wei_chemo %||% df_processed,
         model = model
       )
-    df_processed[!has_structure, , drop = FALSE] |>
+    results_without_structure <- df_processed[!has_structure, , drop = FALSE] |>
       tidytable::distinct(tidyselect::any_of(x = model$features_columns)) |>
       tidytable::left_join(y = feature_consensus_table) |>
       tidytable::select(
@@ -419,23 +512,33 @@ summarize_results <- function(
         )
       ) |>
       tidytable::distinct()
-  } else {
-    tidytable::tidytable()
+
+    results <- tidytable::bind_rows(
+      results_with_structure,
+      results_without_structure
+    )
+    rm(results_with_structure, results_without_structure)
+  }
+  rm(df_processed)
+
+  if (nrow(results) > 1L && "feature_id" %in% names(results)) {
+    fid_num <- .as_numeric_dedup(results$feature_id)
+    ord_res <- order(fid_num, na.last = TRUE, method = "radix")
+    if (is.unsorted(ord_res)) {
+      results <- results[ord_res, , drop = FALSE]
+    }
   }
 
-  results <- tidytable::bind_rows(
-    results_with_structure,
-    results_without_structure
-  ) |>
-    tidytable::arrange(
-      # Sort numerically when feature_id is numeric, otherwise alphabetically
-      suppressWarnings(as.numeric(feature_id))
-    ) |>
-    tidytable::select(
-      tidyselect::where(fn = ~ !all(is.na(.)))
-    )
-
-  rm(df_processed, results_with_structure, results_without_structure)
+  all_na_cols <- names(results)[vapply(
+    results,
+    function(col) all(is.na(col)),
+    logical(1L)
+  )]
+  if (length(all_na_cols) > 0L) {
+    results <- tidytable::as_tidytable(as.list(results)[
+      setdiff(names(results), all_na_cols)
+    ])
+  }
 
   # Log percentage of annotated features against the full feature universe.
   # The summarized output is one row per feature and can omit unannotated
@@ -478,14 +581,24 @@ summarize_results <- function(
   if (!is.null(results) && nrow(results) > 0L) {
     has_annotation_col <- annotation_col %in% names(results)
     if (has_annotation_col) {
-      annotated_ids <- results[[feature_id_col]][
-        !is.na(results[[annotation_col]]) &
-          nzchar(trimws(as.character(results[[annotation_col]])))
-      ]
+      ann_col_val <- results[[annotation_col]]
+      u_ann <- unique(ann_col_val)
+      u_ann_ok <- !is.na(u_ann) & nzchar(trimws(as.character(u_ann)))
+      has_ann <- if (all(u_ann_ok)) {
+        rep.int(TRUE, length(ann_col_val))
+      } else if (!any(u_ann_ok)) {
+        rep.int(FALSE, length(ann_col_val))
+      } else {
+        u_ann_ok[fastmatch::fmatch(ann_col_val, u_ann)]
+      }
+      annotated_ids <- results[[feature_id_col]][has_ann]
       if (length(annotated_ids) > 0L) {
         annotated_ids <- unique(as.character(annotated_ids))
         if (length(total_feature_ids) > 0L) {
-          annotated_features <- sum(total_feature_ids %in% annotated_ids)
+          annotated_features <- sum(
+            fastmatch::fmatch(total_feature_ids, annotated_ids, nomatch = 0L) >
+              0L
+          )
         } else {
           annotated_features <- length(annotated_ids)
         }
@@ -530,61 +643,32 @@ summarize_results <- function(
     return(empty_lookup())
   }
 
-  candidate_structure_ids <- unique(
-    stats::na.omit(as.character(
-      df$candidate_structure_inchikey_connectivity_layer
-    ))
-  )
-  if (length(candidate_structure_ids) == 0L) {
-    return(empty_lookup())
-  }
-
-  # Narrow FIRST, before any join or reshape.
-  sop_narrow <- structure_organism_pairs_table |>
-    tidytable::filter(
-      structure_inchikey_connectivity_layer %in% candidate_structure_ids
-    ) |>
-    tidytable::select(
-      candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
-      reference_doi,
-      tidyselect::contains(match = "organism_taxonomy_"),
-      -tidyselect::any_of("organism_taxonomy_ottid")
-    ) |>
-    tidytable::distinct()
-
-  if (nrow(sop_narrow) == 0L) {
-    return(empty_lookup())
-  }
-
   inchikey_col <- intersect(
     c(
-      "candidate_structure_inchikey_connectivity_layer",
-      "structure_inchikey_connectivity_layer"
+      "structure_inchikey_connectivity_layer",
+      "candidate_structure_inchikey_connectivity_layer"
     ),
-    names(sop_narrow)
-  )[1]
+    names(structure_organism_pairs_table)
+  )[1L]
   if (is.na(inchikey_col) || length(inchikey_col) == 0L) {
     return(empty_lookup())
   }
 
-  taxonomy_cols <- grep("^organism_taxonomy_", names(sop_narrow), value = TRUE)
+  taxonomy_cols <- setdiff(
+    grep(
+      "^organism_taxonomy_",
+      names(structure_organism_pairs_table),
+      value = TRUE
+    ),
+    "organism_taxonomy_ottid"
+  )
   if (length(taxonomy_cols) == 0L) {
     return(empty_lookup())
   }
 
-  candidate_occurrences <- unique(
-    df$candidate_structure_organism_occurrence_closest
-  )
-  candidate_occurrences <- candidate_occurrences[
-    !is.na(candidate_occurrences) & nzchar(candidate_occurrences)
-  ]
-  if (length(candidate_occurrences) == 0L) {
-    return(empty_lookup())
-  }
-
   # Extract unique (inchikey, occurrence) pairs present in df using integer IDs
-  ik_df <- df$candidate_structure_inchikey_connectivity_layer
-  occ_df <- df$candidate_structure_organism_occurrence_closest
+  ik_df <- as.character(df$candidate_structure_inchikey_connectivity_layer)
+  occ_df <- as.character(df$candidate_structure_organism_occurrence_closest)
   valid_df <- which(
     !is.na(ik_df) &
       !is.na(occ_df) &
@@ -597,29 +681,42 @@ summarize_results <- function(
 
   ik_sub <- ik_df[valid_df]
   occ_sub <- occ_df[valid_df]
-  fid_sub <- df$feature_id[valid_df]
+  fid_sub <- as.character(df$feature_id[valid_df])
 
   u_ik <- unique(ik_sub)
   u_occ <- unique(occ_sub)
   n_occ <- length(u_occ)
+
+  ik_sop_all <- fastmatch::fmatch(
+    structure_organism_pairs_table[[inchikey_col]],
+    u_ik
+  )
+  sop_keep <- which(!is.na(ik_sop_all))
+  if (length(sop_keep) == 0L) {
+    return(empty_lookup())
+  }
 
   ik_id <- fastmatch::fmatch(ik_sub, u_ik)
   occ_id <- fastmatch::fmatch(occ_sub, u_occ)
   pair_id_df <- (as.numeric(ik_id - 1L) * n_occ) + occ_id
   u_pair_ids <- unique(pair_id_df)
 
-  # Scan taxonomy columns against u_pair_ids without pivot_longer
-  ik_sop <- fastmatch::fmatch(sop_narrow[[inchikey_col]], u_ik)
-  doi_sop <- sop_narrow$reference_doi
+  # Scan taxonomy columns against u_pair_ids without pivot_longer or table copy
+  ik_sop <- ik_sop_all[sop_keep]
+  doi_sop <- if ("reference_doi" %in% names(structure_organism_pairs_table)) {
+    structure_organism_pairs_table$reference_doi[sop_keep]
+  } else {
+    rep.int(NA_character_, length(sop_keep))
+  }
 
   matched_pair_list <- vector("list", length(taxonomy_cols))
   matched_doi_list <- vector("list", length(taxonomy_cols))
 
   for (idx in seq_along(taxonomy_cols)) {
     tc <- taxonomy_cols[[idx]]
-    v <- sop_narrow[[tc]]
+    v <- structure_organism_pairs_table[[tc]][sop_keep]
     occ_m <- fastmatch::fmatch(v, u_occ)
-    keep <- which(!is.na(ik_sop) & !is.na(occ_m))
+    keep <- which(!is.na(occ_m))
     if (length(keep) > 0L) {
       pid <- (as.numeric(ik_sop[keep] - 1L) * n_occ) + occ_m[keep]
       in_df <- !is.na(fastmatch::fmatch(pid, u_pair_ids))

@@ -421,8 +421,15 @@ weight_annotations <- function(
   # Log statistics
   log_annotation_stats(annotation_table)
 
-  features_table <- annotation_table |>
-    tidytable::distinct(tidyselect::any_of(x = c("feature_id", "rt", "mz")))
+  feat_cols <- intersect(c("feature_id", "rt", "mz"), names(annotation_table))
+  features_table <- if (length(feat_cols) == 0L) {
+    tidytable::tidytable()
+  } else {
+    .fast_distinct_with_key_guard(
+      annotation_table[, ..feat_cols],
+      "feature_id"
+    )
+  }
   log_debug("Extracted %d unique features", nrow(features_table))
 
   # Rearrange and Merge Annotations ----
@@ -447,16 +454,43 @@ weight_annotations <- function(
   # Add Biological Metadata and Perform Scoring ----
   log_debug("Adding taxonomic metadata and computing biological scores")
 
-  annotation_table_taxed <- annotation_table |>
-    tidytable::left_join(
-      y = safe_fread(
-        file = taxa,
-        file_type = "features taxed",
-        na.strings = c("", "NA"),
-        colClasses = "character"
-      ),
-      by = "feature_id"
-    )
+  taxa_table <- safe_fread(
+    file = taxa,
+    file_type = "features taxed",
+    na.strings = c("", "NA"),
+    colClasses = "character"
+  )
+  taxa_new_cols <- setdiff(names(taxa_table), names(annotation_table))
+  if (
+    "feature_id" %in%
+      names(taxa_table) &&
+      "feature_id" %in% names(annotation_table) &&
+      !anyDuplicated(taxa_table$feature_id)
+  ) {
+    annotation_table_taxed <- tidytable::as_tidytable(as.list(annotation_table))
+    t_fids <- taxa_table$feature_id
+    a_fids <- annotation_table_taxed$feature_id
+    m_tax <- if (anyNA(t_fids) || anyNA(a_fids)) {
+      match(a_fids, t_fids)
+    } else {
+      fastmatch::fmatch(a_fids, t_fids)
+    }
+    for (col in taxa_new_cols) {
+      data.table::set(
+        annotation_table_taxed,
+        j = col,
+        value = taxa_table[[col]][m_tax]
+      )
+    }
+    rm(t_fids, a_fids, m_tax)
+  } else {
+    annotation_table_taxed <- annotation_table |>
+      tidytable::left_join(
+        y = taxa_table,
+        by = "feature_id"
+      )
+  }
+  rm(taxa_table)
   annotation_table_taxed <- select_weight_annotations_working_columns(
     annotation_table_taxed
   )

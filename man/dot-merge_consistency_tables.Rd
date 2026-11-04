@@ -4,12 +4,14 @@
 \alias{.merge_consistency_tables}
 \title{Merge consistency tables efficiently for large datasets}
 \usage{
-.merge_consistency_tables(base_df, consistency_list)
+.merge_consistency_tables(base_df, consistency_list, copy_input = TRUE)
 }
 \arguments{
 \item{base_df}{Data frame to which consistency data will be added}
 
 \item{consistency_list}{List of consistency result data frames}
+
+\item{copy_input}{Logical whether to copy \code{base_df} before mutating}
 }
 \value{
 Merged dataframe with all consistency columns

@@ -315,3 +315,60 @@ test_that("summarize_results collapses multiple organism DOIs and trims whitespa
   )))
   expect_true(anyNA(out$candidate_structure_tag))
 })
+
+test_that("summarize_results removes ties by (feature_id, rank_final) and sorts numeric feature_id", {
+  df <- tidytable::tidytable(
+    feature_id = c("10", "2", "2", "1"),
+    rt = c(10.0, 2.0, 2.0, 1.0),
+    mz = c(200.0, 150.0, 150.0, 100.0),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "IK_TEN",
+      "IK_TWO_A",
+      "IK_TWO_B",
+      "IK_ONE"
+    ),
+    candidate_structure_organism_occurrence_closest = c(
+      "Arabidopsis thaliana",
+      "Arabidopsis thaliana",
+      "Arabidopsis thaliana",
+      "Arabidopsis thaliana"
+    ),
+    candidate_score_pseudo_initial = c(0.5, 0.9, 0.8, 0.7),
+    score_biological = c(0.5, 0.9, 0.9, 0.7),
+    score_weighted_bio = c(0.5, 0.9, 0.9, 0.7),
+    score_chemical = c(0.5, 0.9, 0.9, 0.7),
+    score_weighted_chemo = c(0.5, 0.9, 0.9, 0.7),
+    rank_initial = c(1L, 1L, 2L, 1L),
+    rank_final = c(1L, 1L, 1L, 1L)
+  )
+  features_table <- tidytable::tidytable(
+    feature_id = c("1", "2", "10"),
+    rt = c(1.0, 2.0, 10.0),
+    mz = c(100.0, 150.0, 200.0)
+  )
+  components_table <- tidytable::tidytable(
+    feature_id = c("1", "2", "10"),
+    component_id = c("C1", "C2", "C10")
+  )
+  sop <- tidytable::tidytable(
+    structure_inchikey_connectivity_layer = c("IK_ONE", "IK_TWO_A", "IK_TEN"),
+    reference_doi = c("10.1/one", "10.1/two", "10.1/ten"),
+    organism_taxonomy_08species = rep("Arabidopsis thaliana", 3)
+  )
+
+  res <- summarize_results(
+    df = df,
+    features_table = features_table,
+    components_table = components_table,
+    structure_organism_pairs_table = sop,
+    annot_table_wei_chemo = df,
+    remove_ties = TRUE,
+    summarize = FALSE
+  )
+
+  expect_equal(res$feature_id, c("1", "2", "10"))
+  expect_equal(
+    res$candidate_structure_inchikey_connectivity_layer,
+    c("IK_ONE", "IK_TWO_A", "IK_TEN")
+  )
+})

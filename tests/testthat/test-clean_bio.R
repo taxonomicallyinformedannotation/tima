@@ -701,3 +701,49 @@ test_that("clean_bio breaks ties deterministically and deduplicates neighbor edg
   expect_equal(unique(f1_rows$consistency_structure_npc_pat), 0.5)
   expect_equal(unique(f1_rows$feature_pred_tax_npc_01pat_score), 0.4)
 })
+
+test_that("clean_bio handles unique vs duplicate feature-inchikey pairs and does not mutate input", {
+  ik <- generate_fake_inchikey(2, seed = 201)
+  annotations_unique <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    candidate_structure_inchikey_connectivity_layer = ik,
+    candidate_structure_tax_cla_01kin = c(
+      "Organic compounds",
+      "Organic compounds"
+    ),
+    candidate_structure_tax_npc_01pat = c("Alkaloids", "Alkaloids"),
+    candidate_structure_tax_cla_02sup = c(
+      "Phenylpropanoids",
+      "Phenylpropanoids"
+    ),
+    candidate_structure_tax_npc_02sup = c("Alkaloids", "Alkaloids"),
+    candidate_structure_tax_cla_03cla = c("Flavonoids", "Flavonoids"),
+    candidate_structure_tax_npc_03cla = c("Iridoids", "Iridoids"),
+    candidate_structure_tax_cla_04dirpar = c("Flavones", "Flavones"),
+    score_weighted_bio = c(0.8, 0.9)
+  )
+
+  orig_cols <- names(annotations_unique)
+  extracted_u <- .extract_distinct_taxonomy_pairs(annotations_unique)
+  expect_equal(nrow(extracted_u), 2L)
+
+  annotations_dup <- tidytable::bind_rows(
+    annotations_unique,
+    annotations_unique[1L, ]
+  )
+  extracted_d <- .extract_distinct_taxonomy_pairs(annotations_dup)
+  expect_equal(nrow(extracted_d), 2L)
+
+  edges <- tidytable::tidytable(
+    feature_source = "F1",
+    feature_target = "F2",
+    feature_spectrum_entropy = 0.7
+  )
+  res <- clean_bio(
+    annot_table_wei_bio = annotations_unique,
+    edges_table = edges,
+    minimal_consistency = 0.5
+  )
+  expect_identical(names(annotations_unique), orig_cols)
+  expect_true("consistency_structure_npc_pat" %in% names(res))
+})
