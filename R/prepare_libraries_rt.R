@@ -425,14 +425,10 @@ prepare_libraries_rt <- function(
   )
   export_output(x = rts, file = output_rt)
   # Write SOP with organism_name encoded as 'NA' to roundtrip to NA on read
-  sop_to_write <- sop |>
-    tidytable::mutate(
-      organism_name = tidytable::if_else(
-        condition = is.na(organism_name),
-        true = "NA",
-        false = organism_name
-      )
-    )
+  sop_to_write <- tidytable::as_tidytable(as.list(sop))
+  org_col <- sop_to_write$organism_name
+  org_col[is.na(org_col)] <- "NA"
+  data.table::set(sop_to_write, j = "organism_name", value = org_col)
   export_output(x = sop_to_write, file = output_sop)
   rm(rts, sop)
   c("rt" = output_rt, "sop" = output_sop)

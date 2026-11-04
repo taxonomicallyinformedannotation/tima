@@ -155,8 +155,7 @@ prepare_libraries_sop_merged <- function(
 
   tables <- load_and_merge_libraries(files, cache)
 
-  table_keys <- tables$key |>
-    data.frame()
+  table_keys <- tables$key
   table_org_tax_ott <- tables$org_tax_ott
 
   # Complete organism taxonomy
@@ -177,10 +176,8 @@ prepare_libraries_sop_merged <- function(
       length(npc_cache) == 1L &&
       nzchar(npc_cache)
   ) {
-    all_smiles <- table_structures_stereo |>
-      tidytable::filter(!is.na(structure_smiles)) |>
-      tidytable::pull(structure_smiles) |>
-      unique()
+    u_smiles <- unique(table_structures_stereo$structure_smiles)
+    all_smiles <- u_smiles[!is.na(u_smiles)]
 
     table_structures_taxonomy_npc <- enrich_taxonomy_from_cache(
       taxonomy_table = table_structures_taxonomy_npc,
@@ -212,10 +209,8 @@ prepare_libraries_sop_merged <- function(
       length(cla_cache) == 1L &&
       nzchar(cla_cache)
   ) {
-    all_inchikeys <- table_keys |>
-      tidytable::filter(!is.na(structure_inchikey)) |>
-      tidytable::pull(structure_inchikey) |>
-      unique()
+    u_inchikeys <- unique(table_keys$structure_inchikey)
+    all_inchikeys <- u_inchikeys[!is.na(u_inchikeys)]
 
     table_structures_taxonomy_cla <- enrich_taxonomy_from_cache(
       taxonomy_table = table_structures_taxonomy_cla,

@@ -459,7 +459,6 @@ test_that("get_organism_taxonomy_ott deduplicates repeated organism names before
     df = data.frame(
       organism = c(
         "Gentiana lutea",
-        "Gentiana   lutea",
         "  Gentiana lutea  ",
         "Homo sapiens",
         "Homo sapiens"
@@ -468,6 +467,29 @@ test_that("get_organism_taxonomy_ott deduplicates repeated organism names before
   )
 
   expect_length(calls$tnrs, 1L)
-  expect_equal(calls$tnrs[[1L]]$names, c("gentiana lutea", "homo sapiens"))
-  expect_equal(nrow(result), 3L)
+  expect_equal(calls$tnrs[[1L]]$names, c("Gentiana lutea", "Homo sapiens"))
+  expect_equal(nrow(result), 2L)
+})
+
+test_that("get_organism_taxonomy_ott handles sub-ranks and duplicate search_string matches", {
+  local_fake_ott_api()
+  local_mocked_bindings(
+    tnrs_match_names = function(names, ...) {
+      res <- .fake_tnrs_match_names(names)
+      rbind(res, res[1L, , drop = FALSE])
+    },
+    .package = "rotl"
+  )
+
+  result <- get_organism_taxonomy_ott(
+    df = data.frame(organism = c("Homo sapiens", "Gentiana lutea")),
+    retry = FALSE
+  )
+
+  expect_equal(result$organism_name, c("Gentiana lutea", "Homo sapiens"))
+  expect_equal(result$organism_taxonomy_ottid, c(576855L, 770315L))
+  expect_equal(
+    result$organism_taxonomy_09species,
+    c("Gentiana lutea", "Homo sapiens")
+  )
 })

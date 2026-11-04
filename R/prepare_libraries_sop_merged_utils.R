@@ -192,10 +192,16 @@ apply_taxonomic_filter <- function(
   }
 
   tax_vals <- table_org_tax_ott[[level_col[[1L]]]]
-  match_org_mask <- !is.na(tax_vals) &
-    grepl(pattern = value, x = tax_vals, perl = TRUE)
-  matching_orgs <- unique(table_org_tax_ott$organism_name[match_org_mask])
-  matching_orgs <- matching_orgs[!is.na(matching_orgs)]
+  u_tax <- unique(tax_vals)
+  u_tax <- u_tax[!is.na(u_tax)]
+  u_match <- u_tax[grepl(pattern = value, x = u_tax, perl = TRUE)]
+  if (length(u_match) == 0L) {
+    matching_orgs <- character(0L)
+  } else {
+    match_org_mask <- fastmatch::fmatch(tax_vals, u_match, nomatch = 0L) > 0L
+    matching_orgs <- unique(table_org_tax_ott$organism_name[match_org_mask])
+    matching_orgs <- matching_orgs[!is.na(matching_orgs)]
+  }
 
   if (length(matching_orgs) == 0L) {
     cli::cli_abort(
@@ -229,14 +235,15 @@ apply_taxonomic_filter <- function(
     )
   }
 
-  table_keys[keep_rows, ] |>
-    tidytable::select(
-      structure_inchikey,
-      structure_smiles_no_stereo,
-      organism_name,
-      reference_doi
-    ) |>
-    tidytable::distinct()
+  idx <- which(keep_rows)
+  tidytable::distinct(
+    tidytable::tidytable(
+      structure_inchikey = table_keys$structure_inchikey[idx],
+      structure_smiles_no_stereo = table_keys$structure_smiles_no_stereo[idx],
+      organism_name = table_keys$organism_name[idx],
+      reference_doi = table_keys$reference_doi[idx]
+    )
+  )
 }
 
 #' Export All Library Tables
@@ -349,19 +356,26 @@ export_library_tables <- function(
 ) {
   tryCatch(
     {
-      cache_clean <- cache_data |>
-        tidytable::select(tidyselect::any_of(expected_cols)) |>
-        tidytable::mutate(
-          tidytable::across(
-            tidyselect::everything(),
-            ~ {
-              x <- as.character(.x)
-              x[!is.na(x) & x == "notClassified"] <- NA_character_
-              x
-            }
-          )
-        ) |>
-        tidytable::distinct()
+      keep_cols <- intersect(expected_cols, names(cache_data))
+      cache_clean <- tidytable::as_tidytable(as.list(cache_data)[keep_cols])
+      for (col in keep_cols) {
+        x <- cache_clean[[col]]
+        if (!is.character(x)) {
+          x <- as.character(x)
+          nc_mask <- !is.na(x) & x == "notClassified"
+          if (any(nc_mask)) {
+            x[nc_mask] <- NA_character_
+          }
+          data.table::set(cache_clean, j = col, value = x)
+        } else {
+          nc_mask <- !is.na(x) & x == "notClassified"
+          if (any(nc_mask)) {
+            x[nc_mask] <- NA_character_
+            data.table::set(cache_clean, j = col, value = x)
+          }
+        }
+      }
+      cache_clean <- tidytable::distinct(cache_clean)
 
       compress_method <- if (grepl("\\.gz$", cache_path, ignore.case = TRUE)) {
         "gzip"
@@ -414,8 +428,13 @@ export_library_tables <- function(
   taxonomy_name
 ) {
   # Keep only cache entries for keys present in library but missing taxonomy
-  missing_keys <- setdiff(all_keys, existing_keys)
-  missing_keys <- missing_keys[!is.na(missing_keys)]
+  u_all <- unique(all_keys)
+  u_all <- u_all[!is.na(u_all)]
+  missing_keys <- if (length(existing_keys) == 0L) {
+    u_all
+  } else {
+    u_all[fastmatch::fmatch(u_all, existing_keys, nomatch = 0L) == 0L]
+  }
 
   if (length(missing_keys) == 0) {
     log_info(
@@ -580,9 +599,21 @@ export_library_tables <- function(
 
       combined_cache <- tidytable::bind_rows(existing_cache, cache_to_write)
       for (col in names(combined_cache)) {
-        x <- as.character(combined_cache[[col]])
-        x[!is.na(x) & x == "notClassified"] <- NA_character_
-        data.table::set(combined_cache, j = col, value = x)
+        x <- combined_cache[[col]]
+        if (!is.character(x)) {
+          x <- as.character(x)
+          nc_mask <- !is.na(x) & x == "notClassified"
+          if (any(nc_mask)) {
+            x[nc_mask] <- NA_character_
+          }
+          data.table::set(combined_cache, j = col, value = x)
+        } else {
+          nc_mask <- !is.na(x) & x == "notClassified"
+          if (any(nc_mask)) {
+            x[nc_mask] <- NA_character_
+            data.table::set(combined_cache, j = col, value = x)
+          }
+        }
       }
       combined_cache <- tidytable::distinct(combined_cache)
 

@@ -323,8 +323,8 @@ prepare_libraries_spectra <-
         col_sp,
         col_sy
       )
-      spectra_harmonized_pos_min <- spectra_harmonized_pos |>
-        tidytable::select(smiles, smiles_no_stereo)
+      pos_smiles <- spectra_harmonized_pos$smiles
+      pos_smiles_ns <- spectra_harmonized_pos$smiles_no_stereo
       spectra_pos <- Spectra::Spectra(object = spectra_harmonized_pos)
       rm(spectra_harmonized_pos)
 
@@ -353,8 +353,8 @@ prepare_libraries_spectra <-
         col_sp,
         col_sy
       )
-      spectra_harmonized_neg_min <- spectra_harmonized_neg |>
-        tidytable::select(smiles, smiles_no_stereo)
+      neg_smiles <- spectra_harmonized_neg$smiles
+      neg_smiles_ns <- spectra_harmonized_neg$smiles_no_stereo
       spectra_neg <- Spectra::Spectra(object = spectra_harmonized_neg)
       rm(spectra_harmonized_neg)
 
@@ -364,16 +364,20 @@ prepare_libraries_spectra <-
         phase = "sop_extraction",
         n_neg_spectra = length(spectra_neg)
       )
-      sop <- tidytable::bind_rows(
-        spectra_harmonized_pos_min,
-        spectra_harmonized_neg_min
-      ) |>
-        tidytable::filter(!is.na(smiles)) |>
-        tidytable::distinct(
-          structure_smiles = smiles,
-          structure_smiles_no_stereo = smiles_no_stereo
-        ) |>
-        tidytable::mutate(organism_name = NA_character_)
+      all_sm <- c(pos_smiles, neg_smiles)
+      all_sm_ns <- c(pos_smiles_ns, neg_smiles_ns)
+      keep_sm <- !is.na(all_sm)
+      sop <- tidytable::distinct(
+        tidytable::tidytable(
+          structure_smiles = all_sm[keep_sm],
+          structure_smiles_no_stereo = all_sm_ns[keep_sm]
+        )
+      )
+      data.table::set(
+        sop,
+        j = "organism_name",
+        value = rep.int(NA_character_, nrow(sop))
+      )
     }
 
     # Export ----

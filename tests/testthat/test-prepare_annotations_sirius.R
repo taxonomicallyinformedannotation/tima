@@ -1503,6 +1503,21 @@ test_that(".fast_distinct_with_key_guard preserves unique keys and deduplicates 
     .fast_distinct_with_key_guard(df_dup, c("nonexistent_col")),
     tidytable::distinct(df_dup)
   )
+
+  # High-duplicate-ratio table and narrow full-key table match distinct()
+  df_many_dups <- tidytable::tidytable(
+    k1 = rep(c("a", "b"), each = 10L),
+    k2 = rep(c("x", "y"), times = 10L),
+    val = rep(c(1, 2), times = 10L)
+  )
+  expect_equal(
+    .fast_distinct_with_key_guard(df_many_dups, "k1"),
+    tidytable::distinct(df_many_dups)
+  )
+  expect_equal(
+    .fast_distinct_with_key_guard(df_many_dups[, c("k1", "k2")], c("k1", "k2")),
+    tidytable::distinct(df_many_dups[, c("k1", "k2")])
+  )
 })
 
 test_that(".fast_match_rows matches single and multi-column composite keys accurately", {

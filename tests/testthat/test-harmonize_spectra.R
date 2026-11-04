@@ -257,4 +257,27 @@ test_that("harmonize_spectra populates defaults and preserves list columns for m
   expect_true(is.list(res$intensity))
   expect_setequal(res$compound_id, c("Caffeine", "Aspirin"))
   expect_setequal(res$spectrum_id, c("1", "2"))
+
+  # Also works when all 13 column mappings are provided (columns_missing is empty)
+  res_all_cols <- harmonize_spectra(
+    spectra = test_spectra,
+    metad = "TestLib",
+    mode = "pos",
+    col_ad = "adduct",
+    col_ce = "collision_energy",
+    col_ci = "compound_id",
+    col_in = "inchi",
+    col_io = "inchi_no_stereo",
+    col_ik = "inchikey",
+    col_il = "inchikey_connectivity_layer",
+    col_na = "name_col",
+    col_po = "polarity",
+    col_sm = "smiles_col",
+    col_sn = "smiles_no_stereo",
+    col_si = "spectrum_id",
+    col_sp = "splash",
+    col_sy = "synonyms"
+  )
+  expect_equal(nrow(res_all_cols), 2L)
+  expect_setequal(res_all_cols$compound_id, c("Caffeine", "Aspirin"))
 })

@@ -173,7 +173,7 @@ harmonize_spectra <- function(
   }
 
   n_keep <- length(keep_idx)
-  if (n_keep == 0L || length(columns_missing) == 0L) {
+  if (n_keep == 0L && length(columns_missing) > 0L) {
     names(columns_missing) <- columns_missing
     spectra_missing <- columns_missing |>
       data.frame() |>

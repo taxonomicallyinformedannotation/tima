@@ -473,98 +473,121 @@ get_organism_taxonomy_ott <- function(
   }
 
   # Join organism names with taxonomy data
-  biological_metadata <- tidytable::left_join(
-    x = organism_table,
-    y = new_matched_otl_exact
-  ) |>
-    tidytable::left_join(
-      y = otl |>
-        tidytable::rename(unique_name.y = unique_name, ott_id.y = ott_id),
-      by = c("ott_id" = "id")
-    ) |>
-    tidytable::filter(
-      rank %in%
-        c(
-          "domain",
-          "kingdom",
-          "phylum",
-          "class",
-          "order",
-          "infraorder",
-          "family",
-          "subfamily",
-          "tribe",
-          "subtribe",
-          "genus",
-          "subgenus",
-          "species",
-          "subspecies",
-          "varietas"
-        )
-    ) |>
-    tidytable::distinct() |>
-    tidytable::distinct(canonical_name, ott_id, rank, .keep_all = TRUE)
+  valid_ranks <- c(
+    "domain",
+    "kingdom",
+    "phylum",
+    "class",
+    "order",
+    "infraorder",
+    "family",
+    "subfamily",
+    "tribe",
+    "subtribe",
+    "genus",
+    "subgenus",
+    "species",
+    "subspecies",
+    "varietas"
+  )
+  keep_otl <- !is.na(otl$rank) &
+    fastmatch::fmatch(otl$rank, valid_ranks, nomatch = 0L) > 0L &
+    !is.na(otl$id)
+  if (!any(keep_otl)) {
+    return(.empty_organism_taxonomy_table())
+  }
+  otl_sub_id <- otl$id[keep_otl]
+  otl_sub_rank <- otl$rank[keep_otl]
+  otl_sub_name <- as.character(otl$name[keep_otl])
 
-  if (nrow(biological_metadata) != 0) {
-    biological_metadata <- biological_metadata |>
-      ## canonical_name important for synonyms
-      tidytable::pivot_wider(
-        names_from = "rank",
-        values_from = c("name", "unique_name.y", "ott_id.y")
-      ) |>
-      tidytable::select(
-        organism_name = canonical_name,
-        organism_taxonomy_ottid = ott_id,
-        organism_taxonomy_01domain = tidyselect::matches(match = "name_domain"),
-        organism_taxonomy_02kingdom = tidyselect::matches(
-          match = "name_kingdom"
-        ),
-        organism_taxonomy_03phylum = tidyselect::matches(match = "name_phylum"),
-        organism_taxonomy_04class = tidyselect::matches(match = "name_class"),
-        organism_taxonomy_05order = tidyselect::matches(match = "name_order"),
-        organism_taxonomy_06family = tidyselect::matches(match = "name_family"),
-        organism_taxonomy_07tribe = tidyselect::matches(match = "name_tribe"),
-        organism_taxonomy_08genus = tidyselect::matches(match = "name_genus"),
-        organism_taxonomy_09species = tidyselect::matches(
-          match = "name_species"
-        ),
-        organism_taxonomy_10varietas = tidyselect::matches(
-          match = "name_varietas"
-        )
-      )
+  valid_ott_ids <- unique(otl_sub_id)
+  keep_m <- !is.na(new_matched_otl_exact$ott_id) &
+    fastmatch::fmatch(
+      new_matched_otl_exact$ott_id,
+      valid_ott_ids,
+      nomatch = 0L
+    ) >
+      0L
+  if (!any(keep_m)) {
+    return(.empty_organism_taxonomy_table())
+  }
+  m_ss <- new_matched_otl_exact$search_string[keep_m]
+  m_ott <- new_matched_otl_exact$ott_id[keep_m]
 
-    cols_to_set <- c(
-      "organism_name",
-      "organism_taxonomy_ottid",
-      "organism_taxonomy_01domain",
-      "organism_taxonomy_02kingdom",
-      "organism_taxonomy_03phylum",
-      "organism_taxonomy_04class",
-      "organism_taxonomy_05order",
-      "organism_taxonomy_06family",
-      "organism_taxonomy_07tribe",
-      "organism_taxonomy_08genus",
-      "organism_taxonomy_09species",
-      "organism_taxonomy_10varietas"
+  if (anyDuplicated(m_ss) == 0L) {
+    m_org <- fastmatch::fmatch(organism_table$search_string, m_ss)
+    keep_org <- which(!is.na(m_org))
+    if (length(keep_org) == 0L) {
+      return(.empty_organism_taxonomy_table())
+    }
+    cn_vec <- organism_table$canonical_name[keep_org]
+    ott_vec <- m_ott[m_org[keep_org]]
+  } else {
+    joined_orgs <- tidytable::left_join(
+      organism_table,
+      tidytable::tidytable(search_string = m_ss, ott_id = m_ott),
+      by = "search_string"
     )
+    ok_j <- !is.na(joined_orgs$ott_id)
+    if (!any(ok_j)) {
+      return(.empty_organism_taxonomy_table())
+    }
+    cn_vec <- joined_orgs$canonical_name[ok_j]
+    ott_vec <- joined_orgs$ott_id[ok_j]
+  }
 
-    new_cols <- setdiff(cols_to_set, colnames(biological_metadata))
-    # Add new columns if they don't exist
-    if (length(new_cols) > 0) {
-      # Create list of NA columns to add
-      new_cols_list <- stats::setNames(
-        rep(list(NA_character_), length(new_cols)),
-        new_cols
-      )
-      biological_metadata <- biological_metadata |>
-        tidytable::as_tidytable() |>
-        tidytable::mutate(!!!new_cols_list)
+  ord_org <- order(cn_vec, ott_vec)
+  cn_vec <- cn_vec[ord_org]
+  ott_vec <- ott_vec[ord_org]
+  if (length(cn_vec) > 1L) {
+    not_dup <- c(
+      TRUE,
+      cn_vec[-1L] != cn_vec[-length(cn_vec)] |
+        ott_vec[-1L] != ott_vec[-length(ott_vec)]
+    )
+    if (!all(not_dup)) {
+      cn_vec <- cn_vec[not_dup]
+      ott_vec <- ott_vec[not_dup]
     }
   }
 
-  if (nrow(biological_metadata) == 0L) {
-    return(.empty_organism_taxonomy_table())
+  target_ranks <- c(
+    "organism_taxonomy_01domain" = "domain",
+    "organism_taxonomy_02kingdom" = "kingdom",
+    "organism_taxonomy_03phylum" = "phylum",
+    "organism_taxonomy_04class" = "class",
+    "organism_taxonomy_05order" = "order",
+    "organism_taxonomy_06family" = "family",
+    "organism_taxonomy_07tribe" = "tribe",
+    "organism_taxonomy_08genus" = "genus",
+    "organism_taxonomy_09species" = "species",
+    "organism_taxonomy_10varietas" = "varietas"
+  )
+
+  n_out <- length(cn_vec)
+  out_list <- vector("list", 12L)
+  names(out_list) <- c(
+    "organism_name",
+    "organism_taxonomy_ottid",
+    names(target_ranks)
+  )
+  out_list[["organism_name"]] <- cn_vec
+  out_list[["organism_taxonomy_ottid"]] <- ott_vec
+
+  for (col_nm in names(target_ranks)) {
+    rk <- target_ranks[[col_nm]]
+    rk_idx <- which(otl_sub_rank == rk)
+    if (length(rk_idx) == 0L) {
+      out_list[[col_nm]] <- rep.int(NA_character_, n_out)
+    } else {
+      rk_ids <- otl_sub_id[rk_idx]
+      rk_names <- otl_sub_name[rk_idx]
+      first_rk <- !duplicated(rk_ids)
+      m_id <- fastmatch::fmatch(ott_vec, rk_ids[first_rk])
+      out_list[[col_nm]] <- rk_names[first_rk][m_id]
+    }
   }
+  biological_metadata <- tidytable::as_tidytable(out_list)
 
   log_info("Got OTTaxonomy!")
   biological_metadata

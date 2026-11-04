@@ -281,20 +281,24 @@ create_empty_sirius_annotations <- function() {
     return(df)
   }
   present_keys <- intersect(key_cols, names(df))
-  if (length(present_keys) == 0L) {
+  n_keys <- length(present_keys)
+  if (n_keys == 0L || (n_keys == ncol(df) && n_keys > 1L)) {
     return(tidytable::distinct(df))
   }
   k1 <- df[[present_keys[[1L]]]]
   u1 <- unique(k1)
+  if (length(u1) == n) {
+    return(df)
+  }
   id1 <- if (anyNA(u1)) match(k1, u1) else fastmatch::fmatch(k1, u1)
-  if (length(present_keys) == 1L) {
+  use_paste <- FALSE
+  if (n_keys == 1L) {
     comp_key <- id1
   } else {
     comp_key <- as.double(id1 - 1L)
     total_space <- as.double(length(u1) + 1L)
-    use_paste <- FALSE
     ids <- list(id1)
-    for (i in 2:length(present_keys)) {
+    for (i in 2:n_keys) {
       ki <- df[[present_keys[[i]]]]
       ui <- unique(ki)
       idi <- if (anyNA(ui)) match(ki, ui) else fastmatch::fmatch(ki, ui)
@@ -309,12 +313,20 @@ create_empty_sirius_annotations <- function() {
     }
     if (use_paste) {
       comp_key <- do.call(paste, c(ids, list(sep = ":")))
+    } else if (total_space <= .Machine$integer.max) {
+      comp_key <- as.integer(comp_key)
     }
   }
 
   dup_fwd <- duplicated(comp_key)
   if (!any(dup_fwd)) {
     return(df)
+  }
+  if (n_keys == ncol(df) && !use_paste) {
+    return(df[!dup_fwd, ])
+  }
+  if (sum(dup_fwd) * 4L >= n) {
+    return(tidytable::distinct(df))
   }
   is_dup_key <- dup_fwd | duplicated(comp_key, fromLast = TRUE)
   dup_idx <- which(is_dup_key)
