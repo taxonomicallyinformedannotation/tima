@@ -2,22 +2,25 @@
 
 library(testthat)
 
-.chemo_wide <- function() {
-  tidytable::tidytable(
-    feature_id = c("F1", "F1", "F2"),
-    candidate_structure_inchikey_connectivity_layer = c("AAA", "BBB", "AAA"),
-    score_chemical = c(0.8, 0.4, 0.6),
-    score_weighted_chemo = c(0.5, 0.2, 0.3),
-    score_bio = c(0.1, 0.9, 0.7),
-    other_column = c(10, 20, 30)
+test_that("extract_chemo_scores validates dataframe input and handles zero-row tables", {
+  expect_error(
+    extract_chemo_scores(NULL),
+    class = "tima_validation_error"
   )
-}
+  expect_error(
+    extract_chemo_scores("not_a_df"),
+    class = "tima_validation_error"
+  )
 
-test_that("extract_chemo_scores narrows the weight_chemo output to four columns", {
-  out <- extract_chemo_scores(.chemo_wide())
-
-  expect_named(
-    out,
+  empty_df <- data.frame(
+    feature_id = character(0),
+    other_col = numeric(0)
+  )
+  res_empty <- extract_chemo_scores(empty_df)
+  expect_s3_class(res_empty, "tidytable")
+  expect_identical(nrow(res_empty), 0L)
+  expect_identical(
+    names(res_empty),
     c(
       "feature_id",
       "candidate_structure_inchikey_connectivity_layer",
@@ -25,40 +28,51 @@ test_that("extract_chemo_scores narrows the weight_chemo output to four columns"
       "score_weighted_chemo"
     )
   )
-  expect_equal(nrow(out), 3L)
-  # Row order and values are preserved verbatim.
-  expect_equal(
-    as.data.frame(out),
-    as.data.frame(.chemo_wide())[, names(out)]
-  )
-})
-
-test_that("extract_chemo_scores returns a typed empty table for an empty input", {
-  out <- extract_chemo_scores(.chemo_wide()[0, ])
-
-  expect_equal(nrow(out), 0L)
-  expect_named(
-    out,
-    c(
-      "feature_id",
-      "candidate_structure_inchikey_connectivity_layer",
-      "score_chemical",
-      "score_weighted_chemo"
-    )
-  )
-  # The empty schema is typed, so downstream tidyselect/numeric code does not
-  # have to special-case a 0-column data.frame.
-  expect_type(out$feature_id, "character")
+  expect_type(res_empty$feature_id, "character")
   expect_type(
-    out$candidate_structure_inchikey_connectivity_layer,
+    res_empty$candidate_structure_inchikey_connectivity_layer,
     "character"
   )
-  expect_type(out$score_chemical, "double")
-  expect_type(out$score_weighted_chemo, "double")
-  expect_length(out$score_chemical, 0L)
+  expect_type(res_empty$score_chemical, "double")
+  expect_type(res_empty$score_weighted_chemo, "double")
 })
 
-test_that("extract_chemo_scores still rejects a non-data-frame input", {
-  expect_error(extract_chemo_scores("not a table"), "data frame")
-  expect_error(extract_chemo_scores(NULL), "data frame")
+test_that("extract_chemo_scores extracts narrow columns and errors when required columns are missing", {
+  wide_df <- tidytable::tidytable(
+    extra_before = c("x", "y"),
+    score_weighted_chemo = c(0.85, 0.40),
+    feature_id = c("F1", "F2"),
+    score_chemical = c(0.75, 0.25),
+    candidate_structure_inchikey_connectivity_layer = c("IK1", "IK2"),
+    extra_after = c(1L, 2L)
+  )
+
+  res <- extract_chemo_scores(wide_df)
+  expect_s3_class(res, "tidytable")
+  expect_identical(
+    names(res),
+    c(
+      "feature_id",
+      "candidate_structure_inchikey_connectivity_layer",
+      "score_chemical",
+      "score_weighted_chemo"
+    )
+  )
+  expect_identical(res$feature_id, c("F1", "F2"))
+  expect_identical(
+    res$candidate_structure_inchikey_connectivity_layer,
+    c("IK1", "IK2")
+  )
+  expect_equal(res$score_chemical, c(0.75, 0.25), tolerance = 1e-12)
+  expect_equal(res$score_weighted_chemo, c(0.85, 0.40), tolerance = 1e-12)
+
+  # Missing required column falls through to tidytable::select and errors cleanly
+  incomplete_df <- tidytable::tidytable(
+    feature_id = "F1",
+    score_chemical = 0.5
+  )
+  expect_error(
+    extract_chemo_scores(incomplete_df),
+    class = "vctrs_error_subscript_oob"
+  )
 })

@@ -478,3 +478,81 @@ test_that("create_edges GNPS path filters by threshold and matched_peaks accurat
   expect_equal(res_strict$target_id, 2L)
   expect_equal(res_strict$matched_peaks, 4L)
 })
+
+test_that("create_edges validates threshold and matched_peaks boundaries", {
+  sp <- create_test_spectrum()
+  frags <- list(sp, sp)
+  precs <- c(200, 200)
+
+  for (bad_thresh in list(-0.01, 1.01, "0.5", c(0.1, 0.2), Inf, NA_real_)) {
+    expect_error(
+      create_edges(
+        frags = frags,
+        nspecs = 2L,
+        precs = precs,
+        method = "gnps",
+        ms2_tolerance = 0.01,
+        ppm_tolerance = 10,
+        threshold = bad_thresh,
+        matched_peaks = 1L
+      ),
+      class = "tima_validation_error"
+    )
+  }
+
+  for (bad_mp in list(-1L, "2", c(1L, 2L), Inf, NA_integer_)) {
+    expect_error(
+      create_edges(
+        frags = frags,
+        nspecs = 2L,
+        precs = precs,
+        method = "gnps",
+        ms2_tolerance = 0.01,
+        ppm_tolerance = 10,
+        threshold = 0.1,
+        matched_peaks = bad_mp
+      ),
+      class = "tima_validation_error"
+    )
+  }
+})
+
+test_that("create_edges sanitizes unsorted spectra on-demand and handles NULL thresholds and non-finite GNPS scores", {
+  # Unsorted m/z triggers on-demand sanitization when assume_sanitized = FALSE
+  unsorted_sp <- cbind(mz = c(200, 100), intensity = c(50, 100))
+  sorted_sp <- cbind(mz = c(100, 200), intensity = c(0.6666667, 0.3333333))
+
+  res_san <- create_edges(
+    frags = list(unsorted_sp, sorted_sp),
+    nspecs = 2L,
+    precs = c(250, 250),
+    method = "gnps",
+    ms2_tolerance = 0.02,
+    ppm_tolerance = 10,
+    threshold = NULL,
+    matched_peaks = NULL,
+    assume_sanitized = FALSE
+  )
+  expect_identical(nrow(res_san), 1L)
+  expect_identical(res_san$feature_id, 1L)
+  expect_identical(res_san$target_id, 2L)
+
+  # Non-finite / NA scores in GNPS batch wrapper
+  local_mocked_bindings(
+    gnps_chain_dp_batch_wrapper = function(...) {
+      matrix(c(NA_real_, 0.85, 2, 3, 0, 0, 0, 0), nrow = 2L, ncol = 4L)
+    }
+  )
+  res_na <- create_edges(
+    frags = list(sorted_sp, sorted_sp, sorted_sp),
+    nspecs = 3L,
+    precs = c(250, 250, 250),
+    method = "gnps",
+    ms2_tolerance = 0.02,
+    ppm_tolerance = 10,
+    threshold = 0.5,
+    matched_peaks = 2L,
+    assume_sanitized = TRUE
+  )
+  expect_identical(nrow(res_na), 2L)
+})

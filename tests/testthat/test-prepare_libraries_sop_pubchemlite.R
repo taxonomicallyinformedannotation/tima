@@ -125,3 +125,90 @@ test_that("prepare_libraries_sop_pubchemlite deduplicates identical structures a
   expect_equal(out$structure_exact_mass, c(78.04695, 75.06841))
   expect_equal(out$structure_xlogp, c(2.13457, NA_real_))
 })
+
+test_that("prepare_libraries_sop_pubchemlite validates arguments, handles missing/empty inputs, missing columns, and cache hit", {
+  expect_error(
+    prepare_libraries_sop_pubchemlite(input = 123, output = "out.tsv"),
+    class = "tima_validation_error"
+  )
+  expect_error(
+    prepare_libraries_sop_pubchemlite(
+      input = c("a.csv", "b.csv"),
+      output = "out.tsv"
+    ),
+    class = "tima_validation_error"
+  )
+  expect_error(
+    prepare_libraries_sop_pubchemlite(input = "in.csv", output = NULL),
+    class = "tima_validation_error"
+  )
+  expect_error(
+    prepare_libraries_sop_pubchemlite(
+      input = "in.csv",
+      output = c("o1.tsv", "o2.tsv")
+    ),
+    class = "tima_validation_error"
+  )
+
+  tmp_dir <- withr::local_tempdir()
+
+  # 1. Missing input file exports fake_sop_columns()
+  out_missing <- file.path(tmp_dir, "missing_out.tsv")
+  res_missing <- prepare_libraries_sop_pubchemlite(
+    input = file.path(tmp_dir, "does_not_exist.csv"),
+    output = out_missing
+  )
+  expect_identical(res_missing, out_missing)
+  expect_true(file.exists(out_missing))
+  tbl_missing <- tidytable::fread(out_missing)
+  expect_identical(nrow(tbl_missing), 1L)
+  expect_true(all(is.na(tbl_missing$structure_inchikey)))
+
+  # 2. Header-only (0-row) CSV exports fake_sop_columns()
+  in_empty <- file.path(tmp_dir, "header_only.csv")
+  fake_pubchemlite(export = in_empty)
+  out_empty <- file.path(tmp_dir, "empty_out.tsv")
+  res_empty <- prepare_libraries_sop_pubchemlite(
+    input = in_empty,
+    output = out_empty
+  )
+  expect_identical(res_empty, out_empty)
+  tbl_empty <- tidytable::fread(out_empty)
+  expect_identical(nrow(tbl_empty), 1L)
+  expect_true(all(is.na(tbl_empty$structure_inchikey)))
+
+  # 3. CSV missing an optional column (e.g., XLogP) fills NA via clean_col(NULL)
+  in_no_xlogp <- file.path(tmp_dir, "no_xlogp.csv")
+  utils::write.csv(
+    data.frame(
+      CompoundName = "Caffeine",
+      InChIKey = "RYYVLZVUVIJVGH-UHFFFAOYSA-N",
+      SMILES = "CN1C=NC2=C1C(=O)N(C(=O)N2C)C",
+      MolecularFormula = "C8H10N4O2",
+      MonoisotopicMass = "194.080376",
+      stringsAsFactors = FALSE
+    ),
+    in_no_xlogp,
+    row.names = FALSE
+  )
+  out_no_xlogp <- file.path(tmp_dir, "no_xlogp_out.tsv")
+  prepare_libraries_sop_pubchemlite(
+    input = in_no_xlogp,
+    output = out_no_xlogp
+  )
+  tbl_no_xlogp <- tidytable::fread(out_no_xlogp)
+  expect_identical(nrow(tbl_no_xlogp), 1L)
+  expect_true(is.na(tbl_no_xlogp$structure_xlogp))
+
+  # 4. Existing output file >= 100,000 bytes is reused without overwriting
+  out_cached <- file.path(tmp_dir, "cached_out.tsv")
+  big_content <- paste(rep("x", 100005L), collapse = "")
+  writeLines(big_content, out_cached)
+  size_before <- file.size(out_cached)
+  res_cached <- prepare_libraries_sop_pubchemlite(
+    input = in_no_xlogp,
+    output = out_cached
+  )
+  expect_identical(res_cached, out_cached)
+  expect_identical(file.size(out_cached), size_before)
+})

@@ -744,3 +744,87 @@ test_that("sanitize_metadata matches custom substring columns via fallback when 
   expect_true(res$filenames_match)
   expect_equal(res$n_matched, 2L)
 })
+
+test_that("sanitize_all_inputs reports MGF issues, >5 unmatched metadata files, and SIRIUS issues", {
+  tmp_dir <- withr::local_tempdir()
+  features_file <- file.path(tmp_dir, "features.csv")
+  mgf_file <- file.path(tmp_dir, "bad.mgf")
+  metadata_file <- file.path(tmp_dir, "meta_bad.tsv")
+  sirius_dir <- file.path(tmp_dir, "sirius_incomplete")
+
+  # Valid features with 1 sample column that matches none of the 7 metadata rows
+  utils::write.csv(
+    data.frame(feature_id = 1:2, other_sample = c(10, 20)),
+    features_file,
+    row.names = FALSE
+  )
+
+  # Invalid MGF (MSLEVEL=2 without PEPMASS)
+  writeLines(
+    c("BEGIN IONS", "MSLEVEL=2", "50.0 100", "END IONS"),
+    mgf_file
+  )
+
+  # Metadata with 7 unmatched files (> 5 triggers '... and 2 more')
+  utils::write.table(
+    data.frame(filename = paste0("unmatched_", 1:7, ".mzML")),
+    metadata_file,
+    sep = "\t",
+    row.names = FALSE
+  )
+
+  # Incomplete SIRIUS directory (missing canopus & structure files)
+  dir.create(sirius_dir, recursive = TRUE)
+  utils::write.table(
+    data.frame(id = 1:2),
+    file.path(sirius_dir, "formula_identifications_all.tsv"),
+    sep = "\t",
+    row.names = FALSE
+  )
+
+  expect_error(
+    sanitize_all_inputs(
+      features_file = features_file,
+      mgf_file = mgf_file,
+      metadata_file = metadata_file,
+      sirius_dir = sirius_dir
+    ),
+    class = "tima_validation_error"
+  )
+})
+
+test_that("sanitize_all_inputs handles non-matching metadata debug branch and unknown SIRIUS version", {
+  local_mocked_bindings(
+    sanitize_metadata = function(...) {
+      list(
+        valid = TRUE,
+        n_samples = 3L,
+        n_with_organism = 2L,
+        filenames_match = FALSE,
+        n_matched = 2L,
+        n_unmatched = 1L,
+        unmatched_files = "s3",
+        issues = character(0)
+      )
+    },
+    sanitize_sirius = function(...) {
+      list(
+        valid = TRUE,
+        is_zip = FALSE,
+        sirius_version = "unknown",
+        n_features = 4L,
+        has_formula = FALSE,
+        has_canopus = FALSE,
+        has_structure = FALSE,
+        issues = character(0)
+      )
+    }
+  )
+
+  expect_true(
+    sanitize_all_inputs(
+      metadata_file = "dummy_meta.tsv",
+      sirius_dir = "dummy_sirius"
+    )
+  )
+})

@@ -766,6 +766,21 @@ test_that("annotate_spectra maps deprecated qutoff to cutoff", {
 
   expect_identical(out, output_file)
   expect_true(file.exists(out))
+
+  # Also works when evaluated in a non-namespace package environment (e.g. covr)
+  fn_pkg_env <- annotate_spectra
+  environment(fn_pkg_env) <- new.env(parent = as.environment("package:tima"))
+  expect_warning(
+    fn_pkg_env(
+      input = query_file,
+      libraries = lib_file,
+      polarity = "pos",
+      output = output_file,
+      qutoff = 42,
+      approx = TRUE
+    ),
+    "deprecated"
+  )
 })
 
 test_that("annotate_spectra reports missing input files after pre-flight checks", {

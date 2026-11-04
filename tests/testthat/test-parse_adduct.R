@@ -814,3 +814,102 @@ test_that("parse_adduct preserves deterministic output for equivalent notations"
   res2 <- parse_adduct("[M+H]+")
   expect_identical(res1, res2)
 })
+
+test_that("parse_adduct internal helpers handle NULL/NA normalization, regex errors, and mass calculation failures", {
+  expect_null(normalize_adduct_string(NULL))
+  expect_identical(normalize_adduct_string(NA_character_), NA_character_)
+  expect_identical(
+    suppressWarnings(extract_isotope_shift("not_an_int")),
+    0L
+  )
+
+  # Invalid regex in match_adduct_regex returns valid = FALSE
+  res_re <- suppressWarnings(match_adduct_regex(
+    "[M+H]+",
+    regex = "[invalid_regex"
+  ))
+  expect_false(res_re$valid)
+  expect_null(res_re$matches)
+
+  # process_modifications when parse_modification_components fails
+  res_pm_bad <- process_modifications("no_sign")
+  expect_false(res_pm_bad$valid)
+  expect_identical(res_pm_bad$total_mass, 0)
+
+  # calculate_modification_masses when calculate_formula_mass throws an error
+  local_mocked_bindings(
+    calculate_formula_mass = function(x) stop("formula mass error")
+  )
+  res_cm_err <- calculate_modification_masses("H", 1L, 1L)
+  expect_false(res_cm_err$valid)
+  expect_identical(res_cm_err$total_mass, 0)
+  expect_match(res_cm_err$message, "Mass calculation failed")
+
+  res_pm_err <- process_modifications("+H")
+  expect_false(res_pm_err$valid)
+
+  # parse_adduct when process_modifications fails or returns NA total_mass
+  rec <- new.env(parent = emptyenv())
+  rec$msgs <- character(0)
+  with_mocked_bindings(
+    log_debug = function(fmt, ...) {
+      rec$msgs <- c(
+        rec$msgs,
+        if (length(list(...)) > 0L) sprintf(fmt, ...) else fmt
+      )
+      invisible(NULL)
+    },
+    {
+      out_fail <- parse_adduct("[7M+H]+")
+      expect_identical(unname(out_fail), c(0, 0, 0, 0, 0))
+      expect_false(any(grepl("%s", rec$msgs, fixed = TRUE)))
+      expect_true(any(grepl(
+        "Failed to process modifications in: \\[7M\\+H\\]\\+",
+        rec$msgs
+      )))
+    }
+  )
+
+  rec$msgs <- character(0)
+  with_mocked_bindings(
+    process_modifications = function(...) {
+      list(valid = TRUE, total_mass = NA_real_, message = "")
+    },
+    log_debug = function(fmt, ...) {
+      rec$msgs <- c(
+        rec$msgs,
+        if (length(list(...)) > 0L) sprintf(fmt, ...) else fmt
+      )
+      invisible(NULL)
+    },
+    {
+      out_na <- parse_adduct("[8M+H]+")
+      expect_identical(unname(out_na), c(0, 0, 0, 0, 0))
+      expect_false(any(grepl("%s", rec$msgs, fixed = TRUE)))
+      expect_true(any(grepl(
+        "Unexpected NA values during adduct parsing for: \\[8M\\+H\\]\\+",
+        rec$msgs
+      )))
+    }
+  )
+})
+
+test_that("parse_modification_components handles stri_split_regex errors and excess element tokens", {
+  with_mocked_bindings(
+    stri_split_regex = function(...) stop("split error"),
+    {
+      res <- parse_modification_components("+H")
+      expect_false(res$valid)
+    }
+  )
+
+  with_mocked_bindings(
+    stri_split_regex = function(...) list(c("", "H", "Na", "Extra")),
+    stri_extract_all_regex = function(...) list(c("+", "+")),
+    {
+      res2 <- parse_modification_components("+H+Na")
+      expect_true(res2$valid)
+      expect_identical(res2$elements, c("H", "Na"))
+    }
+  )
+})

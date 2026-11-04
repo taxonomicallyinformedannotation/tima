@@ -92,3 +92,31 @@ test_that("select_sop_columns returns zero-row result for empty input", {
   out <- select_sop_columns(sop_row(0L))
   expect_equal(nrow(out), 0L)
 })
+
+test_that("select_sop_columns works without optional structure_tag and normalizes chemontid", {
+  df <- sop_row(2L)
+  df$structure_tag <- NULL
+  df$structure_taxonomy_classyfire_chemontid <- c(
+    "0000001",
+    "CHEMONTID:0000002"
+  )
+
+  out <- select_sop_columns(df)
+  expect_identical(ncol(out), 29L)
+  expect_false("structure_tag" %in% names(out))
+  expect_identical(
+    out$structure_tax_cla_chemontid,
+    c("CHEMONTID:0000001", "CHEMONTID:0000002")
+  )
+})
+
+test_that("select_sop_columns errors with exact missing column names when required columns are absent", {
+  df <- sop_row(1L)
+  df$structure_smiles_2D <- NULL
+  df$reference_doi <- NULL
+
+  expect_error(
+    select_sop_columns(df),
+    "Column\\(s\\) structure_smiles_2D, reference_doi don't exist\\."
+  )
+})

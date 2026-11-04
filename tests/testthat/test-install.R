@@ -418,3 +418,168 @@ test_that("install_tima surfaces installation failures and missing namespace", {
     class = "tima_runtime_error"
   )
 })
+
+test_that("validate_install_inputs normalizes platform pkgType variants and rejects invalid type", {
+  expect_null(validate_install_inputs(
+    package = "tima",
+    repos = .make_repos(),
+    type = c("mac.binary.big-sur-arm64", "source"),
+    dependencies = TRUE
+  ))
+  expect_null(validate_install_inputs(
+    package = "tima",
+    repos = .make_repos(),
+    type = "win.binary",
+    dependencies = TRUE
+  ))
+  expect_null(validate_install_inputs(
+    package = "tima",
+    repos = .make_repos(),
+    type = "source-custom",
+    dependencies = TRUE
+  ))
+  expect_null(validate_install_inputs(
+    package = "tima",
+    repos = .make_repos(),
+    type = "both",
+    dependencies = FALSE
+  ))
+  expect_error(
+    validate_install_inputs(
+      package = "tima",
+      repos = .make_repos(),
+      type = "unsupported_type",
+      dependencies = TRUE
+    ),
+    class = "tima_validation_error"
+  )
+})
+
+test_that("setup_virtualenv resolves python via check_or_install_python when python is NULL", {
+  resolved <- new.env(parent = emptyenv())
+  resolved$called <- 0L
+  resolved$created_with <- NULL
+
+  with_mocked_bindings(
+    check_or_install_python = function() {
+      resolved$called <- resolved$called + 1L
+      "/mock/python3"
+    },
+    .virtualenv_exists = function(envname) FALSE,
+    .virtualenv_create = function(envname, python) {
+      resolved$created_with <- python
+      invisible(NULL)
+    },
+    .virtualenv_install = function(envname, packages) invisible(NULL),
+    .py_install = function(packages) invisible(NULL),
+    log_info = function(...) invisible(NULL),
+    log_success = function(...) invisible(NULL),
+    setup_virtualenv(envname = "null-py-env", python = NULL)
+  )
+
+  expect_identical(resolved$called, 1L)
+  expect_identical(resolved$created_with, "/mock/python3")
+})
+
+test_that("verify_package_installation returns FALSE when reading DESCRIPTION emits a warning", {
+  expect_false(
+    with_mocked_bindings(
+      .require_namespace = function(package, quietly = TRUE) TRUE,
+      .find_package_paths = function(package, quiet = TRUE) "/good/pkg",
+      .path_exists = function(path) TRUE,
+      .read_description_dcf = function(path) warning("corrupt DCF header"),
+      log_warn = function(...) invisible(NULL),
+      verify_package_installation("warnpkg")
+    )
+  )
+})
+
+test_that("install_tima tolerates post-install copy_backbone and tar_destroy errors", {
+  rec <- new.env(parent = emptyenv())
+  rec$warns <- character(0)
+  rec$debugs <- character(0)
+
+  expect_invisible(
+    with_mocked_bindings(
+      log_info = function(...) invisible(NULL),
+      log_success = function(...) invisible(NULL),
+      log_warn = function(fmt, ...) {
+        rec$warns <- c(rec$warns, sprintf(fmt, ...))
+        invisible(NULL)
+      },
+      log_debug = function(fmt, ...) {
+        rec$debugs <- c(rec$debugs, sprintf(fmt, ...))
+        invisible(NULL)
+      },
+      check_or_install_python = function() "/usr/bin/python3",
+      .install_packages = function(...) invisible(NULL),
+      .require_namespace = function(package, quietly = TRUE) TRUE,
+      setup_virtualenv = function(...) invisible(NULL),
+      .load_namespace = function(package) invisible(TRUE),
+      copy_backbone = function() stop("disk full"),
+      .tar_destroy = function() stop("no _targets store"),
+      install_tima(
+        package = "tima",
+        repos = .make_repos(),
+        dependencies = FALSE
+      )
+    )
+  )
+  expect_true(any(grepl("Failed to copy backbone files: disk full", rec$warns)))
+  expect_true(any(grepl(
+    "No targets pipeline to clean: no _targets store",
+    rec$debugs
+  )))
+})
+
+test_that("install emits lifecycle deprecation warning and delegates to install_tima", {
+  rec <- new.env(parent = emptyenv())
+  rec$args <- NULL
+
+  with_mocked_bindings(
+    install_tima = function(package, repos, type, dependencies) {
+      rec$args <- list(
+        package = package,
+        repos = repos,
+        type = type,
+        dependencies = dependencies
+      )
+      invisible(NULL)
+    },
+    {
+      expect_warning(
+        install(
+          package = "tima",
+          repos = "https://cran.r-universe.dev",
+          type = "source",
+          dependencies = FALSE
+        ),
+        "install_tima"
+      )
+      expect_identical(
+        rec$args,
+        list(
+          package = "tima",
+          repos = "https://cran.r-universe.dev",
+          type = "source",
+          dependencies = FALSE
+        )
+      )
+
+      # Also works when evaluated in a non-namespace package environment (e.g. covr)
+      fn_pkg_env <- install
+      environment(fn_pkg_env) <- new.env(
+        parent = as.environment("package:tima")
+      )
+      expect_warning(
+        fn_pkg_env(
+          package = "tima",
+          repos = "https://cran.r-universe.dev",
+          type = "source",
+          dependencies = FALSE
+        ),
+        "install_tima"
+      )
+    }
+  )
+})

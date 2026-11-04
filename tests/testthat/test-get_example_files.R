@@ -2,31 +2,6 @@
 
 library(testthat)
 
-with_overridden_tima_bindings <- function(bindings, code) {
-  ns <- asNamespace("tima")
-  old <- list()
-
-  for (nm in names(bindings)) {
-    old[[nm]] <- get(nm, envir = ns)
-    unlockBinding(nm, ns)
-    assign(nm, bindings[[nm]], envir = ns)
-    lockBinding(nm, ns)
-  }
-
-  on.exit(
-    {
-      for (nm in names(old)) {
-        unlockBinding(nm, ns)
-        assign(nm, old[[nm]], envir = ns)
-        lockBinding(nm, ns)
-      }
-    },
-    add = TRUE
-  )
-
-  force(code)
-}
-
 test_that("get_example_files validates inputs", {
   expect_error(
     get_example_files(example = numeric()),
@@ -50,45 +25,59 @@ test_that("get_example_files validates inputs", {
 })
 
 test_that("get_example_files orchestrates wrapper dependencies", {
-  skip_on_covr()
-
   calls <- new.env(parent = emptyenv())
-  calls$get_file <- 0L
-  calls$get_example_sirius <- 0L
+  calls$get_file <- list()
+  calls$get_example_sirius <- list()
   calls$go_to_cache <- 0L
 
-  out <- with_overridden_tima_bindings(
-    bindings = list(
-      get_file = function(url, export) {
-        force(url)
-        force(export)
-        calls$get_file <- calls$get_file + 1L
-        invisible(export)
-      },
-      get_example_sirius = function(url, export) {
-        force(url)
-        force(export)
-        calls$get_example_sirius <- calls$get_example_sirius + 1L
-        invisible(export)
-      },
-      go_to_cache = function(...) {
-        calls$go_to_cache <- calls$go_to_cache + 1L
-        invisible("~/.tima")
-      },
-      log_debug = function(...) invisible(NULL),
-      log_info = function(...) invisible(NULL)
-    ),
-    code = withVisible(get_example_files(
-      example = "features",
-      in_cache = FALSE
-    ))
+  local_mocked_bindings(
+    get_file = function(url, export) {
+      calls$get_file[[length(calls$get_file) + 1L]] <- list(
+        url = url,
+        export = export
+      )
+      invisible(export)
+    },
+    get_example_sirius = function(url, export) {
+      calls$get_example_sirius[[length(calls$get_example_sirius) + 1L]] <- list(
+        url = url,
+        export = export
+      )
+      invisible(export)
+    },
+    go_to_cache = function(...) {
+      calls$go_to_cache <- calls$go_to_cache + 1L
+      invisible("~/.tima")
+    },
+    log_debug = function(...) invisible(NULL),
+    log_info = function(...) invisible(NULL)
   )
+
+  out <- withVisible(get_example_files(
+    example = c("features", "sirius"),
+    in_cache = TRUE
+  ))
 
   expect_false(out$visible)
   expect_null(out$value)
-  expect_equal(calls$get_file, 1L)
-  expect_equal(calls$get_example_sirius, 0L)
-  expect_equal(calls$go_to_cache, 0L)
+  expect_identical(calls$go_to_cache, 1L)
+  expect_length(calls$get_file, 1L)
+  expect_length(calls$get_example_sirius, 1L)
+  paths <- get_default_paths()
+  expect_identical(
+    calls$get_file[[1L]],
+    list(
+      url = paths$urls$examples$features,
+      export = paths$data$source$features
+    )
+  )
+  expect_identical(
+    calls$get_example_sirius[[1L]],
+    list(
+      url = paths$urls$examples$sirius,
+      export = paths$data$interim$annotations$example_sirius
+    )
+  )
 })
 
 test_that("get_example_files dispatches requested downloads without cache", {
