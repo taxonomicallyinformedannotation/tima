@@ -1568,4 +1568,142 @@ test_that(".fast_match_rows matches single and multi-column composite keys accur
     .fast_match_rows(x_df, y_df[0, ], c("k1", "k2")),
     rep(NA_integer_, nrow(x_df))
   )
+
+  # Numeric/integer key columns in single and multi-column matching
+  x_num <- tidytable::tidytable(k1 = c(10L, 20L, 30L), k2 = c(1.5, 2.5, 3.5))
+  y_num <- tidytable::tidytable(k1 = c(20L, 10L), k2 = c(2.5, 1.5))
+  expect_identical(.fast_match_rows(x_num, y_num, "k1"), c(2L, 1L, NA_integer_))
+  expect_identical(
+    .fast_match_rows(x_num, y_num, c("k1", "k2")),
+    c(2L, 1L, NA_integer_)
+  )
+})
+
+test_that("SIRIUS utility helpers cover low-duplicate key guard, whitespace overlap, and error fallbacks", {
+  # 1. .fast_distinct_with_key_guard: low duplicate ratio (<25%) with identical vs differing non-key values, and NA key in high-dup
+  df_low_dup_diff <- tidytable::tidytable(
+    k = c("k1", "k1", paste0("u", 1:8)),
+    val = c(1L, 2L, 1:8)
+  )
+  expect_identical(
+    .fast_distinct_with_key_guard(df_low_dup_diff, "k"),
+    df_low_dup_diff
+  )
+  df_low_dup_same <- tidytable::tidytable(
+    k = c("k1", "k1", paste0("u", 1:8)),
+    val = c(1L, 1L, 1:8)
+  )
+  expect_identical(
+    nrow(.fast_distinct_with_key_guard(df_low_dup_same, "k")),
+    9L
+  )
+
+  df_na_high <- tidytable::tidytable(
+    k = c(rep(NA_character_, 5L), rep("a", 5L)),
+    v = rep(1L, 10L)
+  )
+  expect_identical(
+    nrow(.fast_distinct_with_key_guard(df_na_high, "k")),
+    2L
+  )
+
+  # 2. split_sirius_results without filter columns and with NA feature_id
+  raw_split <- tidytable::tidytable(
+    feature_id = c("F1", NA_character_),
+    feature_mz = c("100.0", "200.0"),
+    candidate_structure_smiles_no_stereo = c("C", "CC")
+  )
+  sp_out <- split_sirius_results(raw_split)
+  expect_identical(nrow(sp_out$canopus), 1L)
+  expect_identical(nrow(sp_out$formula), 1L)
+  expect_identical(nrow(sp_out$structures), 1L)
+
+  # 3. merge_sirius_structures_with_spectral: empty inputs, all-NA spectral SMILES, and mismatched typeof coalesce
+  expect_identical(
+    nrow(
+      merge_sirius_structures_with_spectral(
+        tidytable::tidytable(),
+        tidytable::tidytable()
+      )
+    ),
+    0L
+  )
+  fn_v6 <- get_sirius_filenames(version = "6")
+  expect_true(grepl("structure_identifications", fn_v6$structures))
+  st_prep <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_structure_smiles_no_stereo = "C",
+    candidate_adduct = "[M+H]+",
+    candidate_library = "SIRIUS",
+    shared_col = 1L
+  )
+  sp_na_smi <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_structure_smiles_no_stereo = NA_character_,
+    candidate_adduct = "[M+H]+",
+    candidate_library = "GNPS"
+  )
+  res_na_smi <- merge_sirius_structures_with_spectral(st_prep, sp_na_smi)
+  expect_identical(nrow(res_na_smi), 2L)
+
+  sp_type_diff <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_structure_smiles_no_stereo = "C",
+    candidate_adduct = "[M+H]+",
+    candidate_library = "GNPS",
+    candidate_score_similarity = "0.9",
+    shared_col = 2.5
+  )
+  res_type_diff <- merge_sirius_structures_with_spectral(st_prep, sp_type_diff)
+  expect_identical(nrow(res_type_diff), 1L)
+
+  # 4. .has_overlap_non_na: missing col, whitespace trimming, and whitespace-only strings
+  expect_false(
+    .has_overlap_non_na(
+      tidytable::tidytable(a = "1"),
+      tidytable::tidytable(b = "1"),
+      "a"
+    )
+  )
+  expect_false(
+    .has_overlap_non_na(
+      tidytable::tidytable(a = "   "),
+      tidytable::tidytable(a = "\t "),
+      "a"
+    )
+  )
+  expect_true(
+    .has_overlap_non_na(
+      tidytable::tidytable(a = c("  ", " val ")),
+      tidytable::tidytable(a = c("\t", " val ")),
+      "a"
+    )
+  )
+
+  # 5. .build_formula_error_fallback and .apply_candidate_error_mz_fallback edge cases
+  expect_identical(
+    nrow(.build_formula_error_fallback(tidytable::tidytable())),
+    0L
+  )
+  expect_identical(
+    nrow(
+      .build_formula_error_fallback(
+        tidytable::tidytable(
+          feature_id = "F1",
+          candidate_structure_error_mz = NA_real_
+        )
+      )
+    ),
+    0L
+  )
+  fb_tbl <- tidytable::tidytable(
+    feature_id = c("F1", NA_character_),
+    candidate_structure_error_mz_fallback = c(0.002, 0.005)
+  )
+  df_fb <- tidytable::tidytable(
+    feature_id = c("F1", NA_character_),
+    candidate_structure_error_mz = c(NA_real_, NA_real_)
+  )
+  res_fb <- .apply_candidate_error_mz_fallback(df_fb, fb_tbl)
+  expect_equal(res_fb$candidate_structure_error_mz, c(0.002, 0.005))
 })

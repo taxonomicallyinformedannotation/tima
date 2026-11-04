@@ -878,4 +878,483 @@ test_that("log_annotation_stats logs distinct feature-library-inchikey counts", 
   logged <- paste(readLines(log_file, warn = FALSE), collapse = "\n")
   expect_true(grepl("ISDB\\s+2\\s+66\\.67%", logged))
   expect_true(grepl("GNPS\\s+1\\s+33\\.33%", logged))
+
+  # Also test when all inchikey connectivity layers are NA (length(keep) == 0L)
+  ann_na <- tidytable::tidytable(
+    feature_id = "1",
+    candidate_library = "ISDB",
+    candidate_structure_inchikey_connectivity_layer = NA_character_
+  )
+  expect_null(log_annotation_stats(ann_na))
+})
+
+test_that("validate_weight_annotations_inputs, load_annotation_tables, load_structure_organism_pairs, and load_edges_table cover all branches", {
+  tmp_dir <- withr::local_tempdir()
+  req_f <- file.path(tmp_dir, "req.tsv")
+  tidytable::fwrite(
+    tidytable::tidytable(
+      feature_id = c("1", "2", "3"),
+      structure_inchikey_connectivity_layer = c("IK1", "IK2", "IK3"),
+      organism_name = c("Org1", "Org2", "Org3")
+    ),
+    req_f,
+    sep = "\t"
+  )
+
+  # 1. validate_weight_annotations_inputs: missing annotation file and non-numeric/NA weight
+  expect_error(
+    validate_weight_annotations_inputs(
+      library = req_f,
+      components = req_f,
+      edges = req_f,
+      taxa = req_f,
+      annotations = c(req_f, file.path(tmp_dir, "missing_ann.tsv")),
+      minimal_ms1_condition = "OR",
+      weight_spectral = 0.5,
+      weight_chemical = 0.3,
+      weight_biological = 0.2,
+      minimal_consistency = 0.5,
+      minimal_ms1_bio = 0.5,
+      minimal_ms1_chemo = 0.5,
+      ms1_only = FALSE,
+      compounds_names = FALSE,
+      high_evidence = FALSE,
+      remove_ties = FALSE,
+      summarize = FALSE,
+      force = FALSE,
+      candidates_neighbors = 1L,
+      candidates_final = 1L
+    ),
+    "Annotation file\\(s\\) not found",
+    class = "tima_validation_error"
+  )
+
+  expect_error(
+    validate_weight_annotations_inputs(
+      library = req_f,
+      components = req_f,
+      edges = req_f,
+      taxa = req_f,
+      annotations = req_f,
+      minimal_ms1_condition = "OR",
+      weight_spectral = NA_real_,
+      weight_chemical = 0.5,
+      weight_biological = 0.5,
+      minimal_consistency = 0.5,
+      minimal_ms1_bio = 0.5,
+      minimal_ms1_chemo = 0.5,
+      ms1_only = FALSE,
+      compounds_names = FALSE,
+      high_evidence = FALSE,
+      remove_ties = FALSE,
+      summarize = FALSE,
+      force = FALSE,
+      candidates_neighbors = 1L,
+      candidates_final = 1L
+    ),
+    "must be numeric and non-NA",
+    class = "tima_validation_error"
+  )
+
+  # 2. load_annotation_tables: multiple files, ms1_only with sirius_confidence, all-pass, empty result, and read error
+  ann1 <- file.path(tmp_dir, "ann1.tsv")
+  ann2 <- file.path(tmp_dir, "ann2.tsv")
+  tidytable::fwrite(
+    tidytable::tidytable(
+      feature_id = c("1", "2"),
+      candidate_score_similarity = c(NA_character_, NA_character_),
+      candidate_score_sirius_csi = c(NA_character_, NA_character_),
+      candidate_score_sirius_confidence = c("0", "0.8")
+    ),
+    ann1,
+    sep = "\t"
+  )
+  tidytable::fwrite(
+    tidytable::tidytable(
+      feature_id = "3",
+      candidate_score_similarity = NA_character_,
+      candidate_score_sirius_csi = NA_character_,
+      candidate_score_sirius_confidence = NA_character_
+    ),
+    ann2,
+    sep = "\t"
+  )
+  res_multi <- load_annotation_tables(c(ann1, ann2), ms1_only = TRUE)
+  expect_identical(res_multi$feature_id, c("1", "3"))
+
+  # All rows pass ms1_only filter (hits else branch rm(keep_mask))
+  res_all_ms1 <- load_annotation_tables(ann2, ms1_only = TRUE)
+  expect_identical(nrow(res_all_ms1), 1L)
+
+  # No rows pass ms1_only filter (hits nrow == 0L warn)
+  ann_ms2_only <- file.path(tmp_dir, "ann_ms2.tsv")
+  tidytable::fwrite(
+    tidytable::tidytable(
+      feature_id = "1",
+      candidate_score_similarity = "0.9"
+    ),
+    ann_ms2_only,
+    sep = "\t"
+  )
+  res_empty <- load_annotation_tables(ann_ms2_only, ms1_only = TRUE)
+  expect_identical(nrow(res_empty), 0L)
+
+  expect_error(
+    load_annotation_tables(
+      file.path(tmp_dir, "nonexistent_ann.tsv"),
+      ms1_only = FALSE
+    ),
+    "Failed to load annotation files",
+    class = "tima_runtime_error"
+  )
+
+  # 3. load_structure_organism_pairs: error path, needed_structures with/without stereo, 2-key join, and duplicate-key left_join fallback
+  expect_error(
+    load_structure_organism_pairs(
+      library = file.path(tmp_dir, "nonexistent_lib.tsv"),
+      str_stereo = NULL,
+      org_tax_ott = NULL
+    ),
+    "Failed to load library file",
+    class = "tima_runtime_error"
+  )
+
+  lib_path <- file.path(tmp_dir, "lib.tsv")
+  stereo_path <- file.path(tmp_dir, "stereo.tsv")
+  org_path <- file.path(tmp_dir, "org.tsv")
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_inchikey_connectivity_layer = c("IK1", "IK2"),
+      structure_inchikey = c("IK1-A", "IK2-A"),
+      organism_name = c("Org1", "Org2")
+    ),
+    lib_path,
+    sep = "\t"
+  )
+  # 2-key join on (structure_inchikey_connectivity_layer, structure_inchikey)
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_inchikey_connectivity_layer = c("IK1", "IK2"),
+      structure_inchikey = c("IK1-A", "IK2-A"),
+      structure_smiles_no_stereo = c("C", "CC")
+    ),
+    stereo_path,
+    sep = "\t"
+  )
+  # Duplicate organism_name triggers left_join fallback
+  tidytable::fwrite(
+    tidytable::tidytable(
+      organism_name = c("Org1", "Org1"),
+      organism_taxonomy_01domain = c("Eukaryota", "Eukaryota")
+    ),
+    org_path,
+    sep = "\t"
+  )
+
+  sop_with_stereo <- load_structure_organism_pairs(
+    library = lib_path,
+    str_stereo = stereo_path,
+    org_tax_ott = org_path,
+    needed_structures = "IK1"
+  )
+  expect_true(all(
+    sop_with_stereo$structure_inchikey_connectivity_layer == "IK1"
+  ))
+
+  sop_no_stereo <- load_structure_organism_pairs(
+    library = lib_path,
+    str_stereo = NULL,
+    org_tax_ott = NULL,
+    needed_structures = "IK2"
+  )
+  expect_identical(
+    sop_no_stereo$structure_inchikey_connectivity_layer,
+    "IK2"
+  )
+
+  # 1-key join on structure_inchikey_connectivity_layer and unique organism_name
+  stereo_1key_path <- file.path(tmp_dir, "stereo_1key.tsv")
+  org_uniq_path <- file.path(tmp_dir, "org_uniq.tsv")
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_inchikey_connectivity_layer = c("IK1", "IK2"),
+      structure_smiles_no_stereo = c("C", "CC")
+    ),
+    stereo_1key_path,
+    sep = "\t"
+  )
+  tidytable::fwrite(
+    tidytable::tidytable(
+      organism_name = c("Org1", "Org2"),
+      organism_taxonomy_01domain = c("Eukaryota", "Bacteria")
+    ),
+    org_uniq_path,
+    sep = "\t"
+  )
+  sop_1key <- load_structure_organism_pairs(
+    library = lib_path,
+    str_stereo = stereo_1key_path,
+    org_tax_ott = org_uniq_path
+  )
+  expect_identical(nrow(sop_1key), 2L)
+
+  # Direct validate_weight_annotations_inputs happy path, negative weight, and sum != 1 errors
+  expect_null(
+    validate_weight_annotations_inputs(
+      library = lib_path,
+      org_tax_ott = org_uniq_path,
+      str_stereo = stereo_1key_path,
+      annotations = ann1,
+      canopus = lib_path,
+      formula = lib_path,
+      components = lib_path,
+      edges = lib_path,
+      taxa = lib_path,
+      candidates_neighbors = 1L,
+      candidates_final = 1L,
+      weight_spectral = 0.5,
+      weight_chemical = 0.3,
+      weight_biological = 0.2,
+      minimal_consistency = 0.5,
+      minimal_ms1_bio = 0.5,
+      minimal_ms1_chemo = 0.5,
+      minimal_ms1_condition = "OR",
+      ms1_only = FALSE,
+      compounds_names = FALSE,
+      high_evidence = FALSE,
+      remove_ties = FALSE,
+      summarize = FALSE,
+      force = FALSE
+    )
+  )
+  expect_error(
+    validate_weight_annotations_inputs(
+      library = lib_path,
+      org_tax_ott = org_uniq_path,
+      str_stereo = NULL,
+      annotations = ann1,
+      canopus = lib_path,
+      formula = lib_path,
+      components = lib_path,
+      edges = lib_path,
+      taxa = lib_path,
+      candidates_neighbors = 1L,
+      candidates_final = 1L,
+      weight_spectral = -0.1,
+      weight_chemical = 0.6,
+      weight_biological = 0.5,
+      minimal_consistency = 0.5,
+      minimal_ms1_bio = 0.5,
+      minimal_ms1_chemo = 0.5,
+      minimal_ms1_condition = "OR",
+      ms1_only = FALSE,
+      compounds_names = FALSE,
+      high_evidence = FALSE,
+      remove_ties = FALSE,
+      summarize = FALSE,
+      force = FALSE
+    ),
+    "All weights must be non-negative",
+    class = "tima_validation_error"
+  )
+  expect_error(
+    validate_weight_annotations_inputs(
+      library = lib_path,
+      org_tax_ott = org_uniq_path,
+      str_stereo = NULL,
+      annotations = ann1,
+      canopus = lib_path,
+      formula = lib_path,
+      components = lib_path,
+      edges = lib_path,
+      taxa = lib_path,
+      candidates_neighbors = 1L,
+      candidates_final = 1L,
+      weight_spectral = 0.5,
+      weight_chemical = 0.5,
+      weight_biological = 0.5,
+      minimal_consistency = 0.5,
+      minimal_ms1_bio = 0.5,
+      minimal_ms1_chemo = 0.5,
+      minimal_ms1_condition = "OR",
+      ms1_only = FALSE,
+      compounds_names = FALSE,
+      high_evidence = FALSE,
+      remove_ties = FALSE,
+      summarize = FALSE,
+      force = FALSE
+    ),
+    "Weights must sum to 1",
+    class = "tima_validation_error"
+  )
+
+  # 4. load_edges_table error path, missing similarity col, and .safe_fread_selected_columns empty selector fallback
+  expect_error(
+    load_edges_table(file.path(tmp_dir, "missing_edges.tsv"), 2L),
+    "Failed to load edges file",
+    class = "tima_runtime_error"
+  )
+
+  edges_nosim <- file.path(tmp_dir, "edges_nosim.tsv")
+  tidytable::fwrite(
+    tidytable::tidytable(
+      feature_source = c("F1", "F1"),
+      feature_target = c("T1", "T2")
+    ),
+    edges_nosim,
+    sep = "\t"
+  )
+  res_nosim <- load_edges_table(edges_nosim, 1L)
+  expect_identical(nrow(res_nosim), 1L)
+
+  unmatched_cols_file <- file.path(tmp_dir, "unmatched.tsv")
+  tidytable::fwrite(
+    tidytable::tidytable(unrelated_col = c("a", "b")),
+    unmatched_cols_file,
+    sep = "\t"
+  )
+  res_unm <- .safe_fread_selected_columns(
+    file = unmatched_cols_file,
+    file_type = "unmatched test",
+    selector = .select_edges_working_columns
+  )
+  expect_identical(res_unm$unrelated_col, c("a", "b"))
+})
+
+test_that("rearrange_annotations and export_results cover consume_input, join fallbacks, and export paths", {
+  tmp_dir <- withr::local_tempdir()
+
+  # 1. n_in == 1L with consume_input = FALSE and consume_input = TRUE, missing similarity col, identical no_stereo & connectivity_layer
+  single_ann <- tidytable::tidytable(
+    feature_id = "1",
+    candidate_structure_inchikey_no_stereo = "IK1",
+    candidate_structure_inchikey_connectivity_layer = "IK1",
+    extra_drop_col = "drop_me"
+  )
+  empty_for <- tidytable::tidytable(feature_id = character(0))
+  empty_can <- tidytable::tidytable(feature_id = character(0))
+  empty_edg <- tidytable::tidytable(feature_source = character(0))
+
+  res_single_copy <- rearrange_annotations(
+    annotation_table = data.table::copy(single_ann),
+    formula_table = empty_for,
+    canopus_table = empty_can,
+    edges_table = empty_edg,
+    consume_input = FALSE
+  )
+  expect_identical(nrow(res_single_copy), 1L)
+
+  res_single_consume <- rearrange_annotations(
+    annotation_table = tidytable::tidytable(
+      feature_id = "1",
+      candidate_structure_inchikey_no_stereo = "IK1",
+      candidate_structure_inchikey_connectivity_layer = "IK1",
+      candidate_score_similarity = "0.9",
+      candidate_score_sirius_csi = NA_character_,
+      extra_drop_col = "drop_me"
+    ),
+    formula_table = empty_for,
+    canopus_table = empty_can,
+    edges_table = empty_edg,
+    consume_input = TRUE
+  )
+  expect_identical(nrow(res_single_consume), 1L)
+  expect_false("extra_drop_col" %in% names(res_single_consume))
+
+  # 2. n_in > 1L with consume_input = TRUE when all rows are unique vs when duplicates exist,
+  # plus 1-col formula join, duplicate formula join fallback, duplicate canopus join fallback, and edges metadata join
+  ann_unique <- tidytable::tidytable(
+    feature_id = c("1", "2"),
+    candidate_structure_inchikey_no_stereo = c("IK1", "IK2"),
+    candidate_structure_inchikey_connectivity_layer = c("IK1", "IK2"),
+    candidate_score_similarity = c("0.9", "0.8"),
+    candidate_score_sirius_csi = c(NA_character_, NA_character_),
+    extra_drop_col = c("x", "y")
+  )
+  for_1key <- tidytable::tidytable(
+    feature_id = c("1", "2"),
+    candidate_score_sirius_zodiac = c("0.95", "0.85")
+  )
+  can_dup <- tidytable::tidytable(
+    feature_id = c("1", "1"),
+    feature_pred_tax_npc_01pat_val = c("Path1", "Path1")
+  )
+  edg_meta <- tidytable::tidytable(
+    feature_source = c("1", "2"),
+    feature_spectrum_entropy = c("1.5", "2.5"),
+    feature_spectrum_peaks = c("12", "24")
+  )
+  res_unique_consume <- rearrange_annotations(
+    annotation_table = data.table::copy(ann_unique),
+    formula_table = for_1key,
+    canopus_table = can_dup,
+    edges_table = edg_meta,
+    consume_input = TRUE
+  )
+  expect_identical(nrow(res_unique_consume), 3L)
+  expect_identical(
+    res_unique_consume$candidate_score_sirius_zodiac,
+    c("0.95", "0.95", "0.85")
+  )
+  expect_identical(
+    res_unique_consume$feature_spectrum_entropy,
+    c("1.5", "1.5", "2.5")
+  )
+
+  # Duplicate rows with consume_input = TRUE and duplicate 2-key formula_table (triggers left_join fallback)
+  ann_dups <- tidytable::tidytable(
+    feature_id = c("1", "1", NA_character_),
+    candidate_structure_inchikey_no_stereo = c("IK1", "IK1", NA_character_),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "IK1",
+      "IK1",
+      NA_character_
+    ),
+    candidate_structure_molecular_formula = c(
+      "C6H12O6",
+      "C6H12O6",
+      NA_character_
+    ),
+    candidate_score_similarity = c("0.9", "0.5", "0.1"),
+    candidate_score_sirius_csi = c("-10", "-20", "-30"),
+    extra_drop_col = c("a", "b", "c")
+  )
+  for_dup_2key <- tidytable::tidytable(
+    feature_id = c("1", "1", NA_character_),
+    candidate_structure_molecular_formula = c(
+      "C6H12O6",
+      "C6H12O6",
+      NA_character_
+    ),
+    candidate_score_sirius_zodiac = c("0.99", "0.99", "0.10")
+  )
+  res_dups_consume <- rearrange_annotations(
+    annotation_table = data.table::copy(ann_dups),
+    formula_table = for_dup_2key,
+    canopus_table = empty_can,
+    edges_table = empty_edg,
+    consume_input = TRUE
+  )
+  expect_true(nrow(res_dups_consume) >= 2L)
+
+  # 3. export_results writes mini, filtered, and full tables
+  local_mocked_bindings(
+    get_default_paths = function() {
+      list(data = list(processed = list(path = tmp_dir)))
+    },
+    get_params = function(step) list(step = step),
+    export_params = function(...) invisible(NULL),
+    .package = "tima"
+  )
+  exp_res <- export_results(
+    results_list = list(
+      mini = tidytable::tidytable(a = 1L),
+      filtered = tidytable::tidytable(a = 1L),
+      full = tidytable::tidytable(a = 1L)
+    ),
+    output = "out.tsv",
+    pattern = "pat"
+  )
+  expect_identical(names(exp_res), c("filtered", "full"))
+  expect_true(all(file.exists(exp_res)))
 })
