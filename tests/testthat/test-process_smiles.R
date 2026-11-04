@@ -585,18 +585,21 @@ test_that("process_smiles reuses canonical stereo and 2D no-stereo cache entries
   )
   res_cached <- process_smiles(input_all_cached, cache = cache_path)
   expect_identical(nrow(res_cached), 4L)
+  expect_null(attr(res_cached$structure_smiles_initial, ".match.hash"))
+  expect_null(attr(res_cached$structure_smiles, ".match.hash"))
+  expect_null(attr(res_cached$structure_smiles_no_stereo, ".match.hash"))
   expect_identical(
-    as.character(res_cached$structure_smiles_initial),
+    res_cached$structure_smiles_initial,
     c("INIT_A", "CAN_A", "2D_B", "2D_SHORT")
   )
   # Canonical match keeps stereo InChIKey
   row_can <- res_cached[res_cached$structure_smiles_initial == "CAN_A", ]
   expect_identical(row_can$structure_inchikey, "AAAAAAAAAAAAAA-BBBBBBBBBB-N")
-  expect_identical(as.character(row_can$structure_smiles), "CAN_A")
+  expect_identical(row_can$structure_smiles, "CAN_A")
 
   # 2D match with 27-char InChIKey rewrites stereo layer to UHFFFAOYSA
   row_2d <- res_cached[res_cached$structure_smiles_initial == "2D_B", ]
-  expect_identical(as.character(row_2d$structure_smiles), "2D_B")
+  expect_identical(row_2d$structure_smiles, "2D_B")
   expect_identical(row_2d$structure_inchikey, "CCCCCCCCCCCCCC-UHFFFAOYSA-P")
   expect_identical(
     row_2d$structure_inchikey_connectivity_layer,

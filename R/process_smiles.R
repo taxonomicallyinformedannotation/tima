@@ -112,12 +112,14 @@ process_smiles <- function(
         table_processed_1[[smiles_colname]]
       ))
     ]
+    attr(table_processed_1[[smiles_colname]], ".match.hash") <- NULL
     if (length(unmatched) > 0L) {
       # 1. Exact match against canonical stereo SMILES
       m_can <- fastmatch::fmatch(
         unmatched,
         table_processed_1$structure_smiles
       )
+      attr(table_processed_1$structure_smiles, ".match.hash") <- NULL
       hit_can <- !is.na(m_can)
       if (any(hit_can)) {
         extra_can <- table_processed_1[m_can[hit_can], ]
@@ -132,6 +134,7 @@ process_smiles <- function(
         unmatched,
         table_processed_1$structure_smiles_no_stereo
       )
+      attr(table_processed_1$structure_smiles_no_stereo, ".match.hash") <- NULL
       hit_2d <- !is.na(m_2d)
       if (any(hit_2d)) {
         extra_2d <- table_processed_1[m_2d[hit_2d], ]
@@ -163,6 +166,7 @@ process_smiles <- function(
       table_smiles[[smiles_colname]],
       table_processed_1[[smiles_colname]]
     ))
+    attr(table_processed_1[[smiles_colname]], ".match.hash") <- NULL
     table_smiles_to_process <- table_smiles[!in_cache, ]
   }
 
