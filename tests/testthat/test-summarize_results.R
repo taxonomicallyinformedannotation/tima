@@ -372,3 +372,33 @@ test_that("summarize_results removes ties by (feature_id, rank_final) and sorts 
     c("IK_ONE", "IK_TWO_A", "IK_TEN")
   )
 })
+
+test_that(".build_feature_consensus_table handles all-NA scores and note tie-breaking", {
+  model <- columns_model()
+  df_na <- tidytable::tidytable(
+    feature_id = c("F2", "F1", "F1"),
+    rt = c(2.0, 1.0, 1.0),
+    mz = c(200.0, 100.0, 100.0),
+    component_id = c("C2", "C1", "C1"),
+    score_weighted_chemo = c(NA_real_, NA_real_, NA_real_),
+    rank_final = c(NA_integer_, NA_integer_, NA_integer_)
+  )
+  out_na <- .build_feature_consensus_table(df_na, model)
+  expect_equal(out_na$feature_id, c("F1", "F2"))
+  expect_equal(out_na$component_id, c("C1", "C2"))
+  expect_true(all(is.na(out_na$annotation_note)))
+
+  df_notes <- tidytable::tidytable(
+    feature_id = c("F1", "F1", "F2", "F2"),
+    rt = c(1.0, 1.0, 2.0, 2.0),
+    mz = c(100.0, 100.0, 200.0, 200.0),
+    component_id = c("C1_A", "C1_B", "C2_A", "C2_B"),
+    score_weighted_chemo = c(0.9, 0.4, NA_real_, 0.5),
+    rank_final = c(1L, 2L, 1L, 2L),
+    annotation_note = c(NA_character_, "Consensus note", NA_character_, "   ")
+  )
+  out_notes <- .build_feature_consensus_table(df_notes, model)
+  expect_equal(out_notes$feature_id, c("F1", "F2"))
+  expect_equal(out_notes$component_id, c("C1_B", "C2_B"))
+  expect_equal(out_notes$annotation_note, c("Consensus note", "   "))
+})

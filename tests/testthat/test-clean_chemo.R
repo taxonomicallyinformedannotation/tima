@@ -2110,3 +2110,36 @@ test_that("retain_promoted_rank1_in_filtered ignores notes that only mention pro
     df_filtered
   )
 })
+
+test_that("coerce_score_columns and remove_compound_names preserve tidytable semantics", {
+  df_chr <- tidytable::tidytable(
+    feature_id = c("F1", "F2", "F3"),
+    score_biological = c("0.5", "0.5", NA_character_),
+    score_weighted_chemo = c(0.8, 0.4, 0.9)
+  )
+  coerced <- coerce_score_columns(df_chr)
+  expect_equal(coerced$score_biological, c(0.5, 0.5, NA_real_))
+  expect_equal(coerced$score_weighted_chemo, c(0.8, 0.4, 0.9))
+  expect_identical(coerce_score_columns(coerced), coerced)
+
+  res_list <- list(
+    mini = tidytable::tidytable(
+      feature_id = "F1",
+      candidate_structure_name = "Quercetin"
+    ),
+    filtered = tidytable::tidytable(
+      feature_id = "F1",
+      candidate_structure_name = "Quercetin",
+      score_final = 0.9
+    ),
+    full = data.frame(
+      feature_id = "F1",
+      candidate_structure_name = "Quercetin",
+      stringsAsFactors = FALSE
+    )
+  )
+  stripped <- remove_compound_names(res_list, compounds_names = FALSE)
+  expect_false("candidate_structure_name" %in% names(stripped$mini))
+  expect_false("candidate_structure_name" %in% names(stripped$filtered))
+  expect_false("candidate_structure_name" %in% names(stripped$full))
+})

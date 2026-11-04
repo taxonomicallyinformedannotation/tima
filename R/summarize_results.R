@@ -185,11 +185,26 @@ summarize_results <- function(
   )
 
   # Start from annotation rows and add compact per-feature metadata.
-  df_joined <- df |>
-    tidytable::select(tidyselect::any_of(x = select_cols))
+  src_cols <- unname(select_cols)
+  tgt_cols <- names(select_cols)
+  if (is.null(tgt_cols)) {
+    tgt_cols <- src_cols
+  } else {
+    empty_tgt <- is.na(tgt_cols) | !nzchar(tgt_cols)
+    tgt_cols[empty_tgt] <- src_cols[empty_tgt]
+  }
+  keep_sel <- src_cols %in% names(df)
+  src_present <- src_cols[keep_sel]
+  tgt_present <- tgt_cols[keep_sel]
+  first_src <- !duplicated(src_present)
+  u_src <- src_present[first_src]
+  u_tgt <- tgt_present[first_src]
+  df_list <- as.list(df)[u_src]
+  names(df_list) <- u_tgt
+  df_joined <- tidytable::as_tidytable(df_list)
+  rm(df_list)
 
   if (nrow(df_joined) > 0L) {
-    df_joined <- tidytable::as_tidytable(as.list(df_joined))
     fids_j <- df_joined$feature_id
 
     feat_add_cols <- setdiff(names(features_min), names(df_joined))
@@ -497,8 +512,13 @@ summarize_results <- function(
         annot_table_wei_chemo = annot_table_wei_chemo %||% df_processed,
         model = model
       )
-    results_without_structure <- df_processed[!has_structure, , drop = FALSE] |>
-      tidytable::distinct(tidyselect::any_of(x = model$features_columns)) |>
+    no_str_idx <- which(!has_structure)
+    feat_cols_no_str <- intersect(model$features_columns, names(df_processed))
+    no_str_sub <- tidytable::as_tidytable(
+      lapply(as.list(df_processed)[feat_cols_no_str], `[`, no_str_idx)
+    )
+    results_without_structure <- no_str_sub |>
+      tidytable::distinct() |>
       tidytable::left_join(y = feature_consensus_table) |>
       tidytable::select(
         tidyselect::any_of(
@@ -827,74 +847,97 @@ summarize_results <- function(
 }
 
 .build_feature_consensus_table <- function(annot_table_wei_chemo, model) {
-  base_cols <- c(
+  base_cols <- unique(c(
     model$features_columns,
     "feature_rt",
     "feature_mz",
     model$features_calculated_columns,
     model$components_columns,
     "annotation_note"
-  )
+  ))
 
-  consensus_src <- annot_table_wei_chemo |>
-    tidytable::select(
-      tidyselect::any_of(c(base_cols, "score_weighted_chemo", "rank_final"))
-    )
-
-  n_src <- nrow(consensus_src)
-  keep_cols <- intersect(base_cols, names(consensus_src))
+  nms_src <- names(annot_table_wei_chemo)
+  keep_cols <- intersect(base_cols, nms_src)
+  n_src <- nrow(annot_table_wei_chemo)
   if (n_src == 0L) {
-    out <- as.data.frame(consensus_src, stringsAsFactors = FALSE)[,
-      keep_cols,
-      drop = FALSE
-    ]
+    out <- as.data.frame(
+      as.list(annot_table_wei_chemo)[keep_cols],
+      stringsAsFactors = FALSE
+    )
     if (!"annotation_note" %in% names(out)) {
       out$annotation_note <- character(0L)
     }
     return(out)
   }
 
-  note_present <- if ("annotation_note" %in% names(consensus_src)) {
-    an <- consensus_src$annotation_note
-    !is.na(an) & nzchar(trimws(as.character(an)))
-  } else {
-    rep.int(FALSE, n_src)
+  note_present <- rep.int(FALSE, n_src)
+  if ("annotation_note" %in% nms_src) {
+    an <- annot_table_wei_chemo$annotation_note
+    non_na_an <- which(!is.na(an))
+    if (length(non_na_an) > 0L) {
+      note_present[non_na_an] <- nzchar(trimws(as.character(an[non_na_an])))
+    }
   }
 
-  score_num <- if ("score_weighted_chemo" %in% names(consensus_src)) {
-    suppressWarnings(as.numeric(consensus_src$score_weighted_chemo))
+  score_num <- if ("score_weighted_chemo" %in% nms_src) {
+    sc_col <- annot_table_wei_chemo$score_weighted_chemo
+    if (is.double(sc_col)) {
+      sc_col
+    } else {
+      suppressWarnings(.as_numeric_dedup(sc_col))
+    }
   } else {
     rep.int(NA_real_, n_src)
   }
 
-  rank_num <- if ("rank_final" %in% names(consensus_src)) {
-    suppressWarnings(as.numeric(consensus_src$rank_final))
+  rank_num <- if ("rank_final" %in% nms_src) {
+    rk_col <- annot_table_wei_chemo$rank_final
+    if (is.numeric(rk_col)) {
+      rk_col
+    } else {
+      suppressWarnings(.as_numeric_dedup(rk_col))
+    }
   } else {
     rep.int(NA_real_, n_src)
   }
 
-  score_present <- !is.na(score_num)
-  fids <- consensus_src$feature_id
+  fids <- annot_table_wei_chemo$feature_id
   u_fids <- sort(unique(fids), na.last = TRUE)
-  fid_id <- fastmatch::fmatch(fids, u_fids)
-
-  ord <- order(
-    fid_id,
-    -as.integer(note_present),
-    -as.integer(score_present),
-    -score_num,
-    rank_num,
-    na.last = TRUE,
-    method = "radix"
-  )
-  best_idx <- ord[!duplicated(fid_id[ord])]
-
-  out <- as.data.frame(
-    consensus_src[best_idx, ],
-    stringsAsFactors = FALSE
-  )[, keep_cols, drop = FALSE]
-  if (!"annotation_note" %in% names(out)) {
-    out$annotation_note <- rep.int(NA_character_, nrow(out))
+  fid_id <- if (anyNA(u_fids)) {
+    match(fids, u_fids)
+  } else {
+    fastmatch::fmatch(fids, u_fids)
   }
-  out
+
+  ord_keys <- list(fid_id)
+  if (any(note_present)) {
+    ord_keys[[length(ord_keys) + 1L]] <- -as.integer(note_present)
+  }
+  if (!all(is.na(score_num))) {
+    score_present <- !is.na(score_num)
+    if (!all(score_present)) {
+      ord_keys[[length(ord_keys) + 1L]] <- -as.integer(score_present)
+    }
+    ord_keys[[length(ord_keys) + 1L]] <- -score_num
+  }
+  if (!all(is.na(rank_num))) {
+    ord_keys[[length(ord_keys) + 1L]] <- rank_num
+  }
+
+  if (length(ord_keys) == 1L) {
+    best_idx <- integer(length(u_fids))
+    first_u <- which(!duplicated(fid_id))
+    best_idx[fid_id[first_u]] <- first_u
+  } else {
+    ord <- do.call(order, c(ord_keys, list(na.last = TRUE, method = "radix")))
+    best_idx <- ord[!duplicated(fid_id[ord])]
+  }
+
+  out_list <- lapply(as.list(annot_table_wei_chemo)[keep_cols], `[`, best_idx)
+  if (!"annotation_note" %in% names(out_list)) {
+    out_list[["annotation_note"]] <- rep.int(NA_character_, length(best_idx))
+  }
+  attr(out_list, "row.names") <- .set_row_names(length(best_idx))
+  class(out_list) <- "data.frame"
+  out_list
 }

@@ -353,7 +353,7 @@ clean_chemo <- function(
     n_final_full = nrow(results_full),
     n_final_filtered = nrow(results_filtered),
     n_final_mini = nrow(results_mini),
-    n_features = tidytable::n_distinct(results_filtered$feature_id)
+    n_features = length(unique(results_filtered$feature_id))
   )
 
   # Clean up intermediate objects
