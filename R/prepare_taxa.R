@@ -547,39 +547,81 @@ prepare_taxa <- function(
       nrow(metadata_table_joined) > 256L &&
         "feature_id" %in% names(metadata_table_joined)
     ) {
-      feat_org <- metadata_table_joined[, c(
-        "feature_id",
-        "organismOriginal"
-      )] |>
-        tidytable::mutate(organismOriginal = trimws(organismOriginal)) |>
+      org_raw <- as.character(metadata_table_joined$organismOriginal)
+      u_org_raw <- unique(org_raw)
+      u_org_trim <- trimws(u_org_raw)
+      org_trimmed <- if (identical(u_org_trim, u_org_raw)) {
+        org_raw
+      } else {
+        m_o <- if (anyNA(u_org_raw)) {
+          match(org_raw, u_org_raw)
+        } else {
+          fastmatch::fmatch(org_raw, u_org_raw)
+        }
+        u_org_trim[m_o]
+      }
+      feat_org <- tidytable::tidytable(
+        feature_id = metadata_table_joined$feature_id,
+        organismOriginal = org_trimmed
+      ) |>
         .fast_distinct_with_key_guard(c("feature_id", "organismOriginal"))
-      rm(metadata_table_joined)
+      rm(metadata_table_joined, org_raw, org_trimmed)
 
       f_vec <- as.character(feat_org$feature_id)
       o_vec <- as.character(feat_org$organismOriginal)
-      o_key <- ifelse(is.na(o_vec), "<NA>", o_vec)
+      o_key <- o_vec
+      na_o <- is.na(o_key)
+      if (any(na_o)) {
+        o_key[na_o] <- "<NA>"
+      }
       u_f <- as.vector(unique(f_vec))
-      f_id <- fastmatch::fmatch(f_vec, u_f)
-      orgs_by_f <- split(o_key, f_id)
-      combo_sig <- vapply(
-        orgs_by_f,
-        paste,
-        character(1L),
-        collapse = "\r",
-        USE.NAMES = FALSE
-      )
-      u_combos <- as.vector(unique(combo_sig))
-      combo_id_per_f <- as.vector(fastmatch::fmatch(combo_sig, u_combos))
+      n_uf <- length(u_f)
 
-      first_f_for_combo <- match(seq_along(u_combos), combo_id_per_f)
-      rep_orgs_list <- orgs_by_f[first_f_for_combo]
-      rep_lens <- lengths(rep_orgs_list)
-      rep_o_raw <- unlist(rep_orgs_list, use.names = FALSE)
-      rep_o <- ifelse(rep_o_raw == "<NA>", NA_character_, rep_o_raw)
-      rep_dt <- tidytable::tidytable(
-        feature_id = as.character(rep(seq_along(u_combos), rep_lens)),
-        organismOriginal = rep_o
-      )
+      if (n_uf == length(f_vec)) {
+        combo_sig <- o_key
+        u_combos <- as.vector(unique(combo_sig))
+        combo_id_per_f <- as.vector(fastmatch::fmatch(combo_sig, u_combos))
+        first_f_for_combo <- match(seq_along(u_combos), combo_id_per_f)
+        rep_dt <- tidytable::tidytable(
+          feature_id = as.character(seq_along(u_combos)),
+          organismOriginal = o_vec[first_f_for_combo]
+        )
+      } else {
+        f_id <- as.vector(fastmatch::fmatch(f_vec, u_f))
+        attr(u_f, ".match.hash") <- NULL
+        if (is.unsorted(f_id)) {
+          ord <- order(f_id, method = "radix")
+          f_id <- f_id[ord]
+          o_key <- o_key[ord]
+          o_vec <- o_vec[ord]
+        }
+        counts <- tabulate(f_id, nbins = n_uf)
+        ends <- cumsum(counts)
+        starts <- ends - counts + 1L
+
+        combo_sig <- character(n_uf)
+        idx1 <- which(counts == 1L)
+        if (length(idx1) > 0L) {
+          combo_sig[idx1] <- o_key[starts[idx1]]
+        }
+        u_lens <- sort(unique(counts[counts > 1L]))
+        for (L in u_lens) {
+          idx_L <- which(counts == L)
+          s_L <- starts[idx_L]
+          cols <- lapply(0L:(L - 1L), function(k) o_key[s_L + k])
+          combo_sig[idx_L] <- do.call(paste, c(cols, list(sep = "\r")))
+        }
+
+        u_combos <- as.vector(unique(combo_sig))
+        combo_id_per_f <- as.vector(fastmatch::fmatch(combo_sig, u_combos))
+        first_f_for_combo <- match(seq_along(u_combos), combo_id_per_f)
+        rep_lens <- counts[first_f_for_combo]
+        rep_idx <- sequence(rep_lens, from = starts[first_f_for_combo])
+        rep_dt <- tidytable::tidytable(
+          feature_id = as.character(rep.int(seq_along(u_combos), rep_lens)),
+          organismOriginal = o_vec[rep_idx]
+        )
+      }
 
       joined_rep <- rep_dt |>
         tidytable::left_join(

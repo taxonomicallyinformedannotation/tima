@@ -356,46 +356,48 @@ prepare_libraries_rt <- function(
     empty_df
   }
 
-  df_rts <- tidytable::bind_rows(rts_exp_1, rts_exp_2, rts_is_1, rts_is_2) |>
-    tidytable::filter(!is.na(as.numeric(rt)) & !is.na(structure_inchikey))
+  df_rts <- tidytable::bind_rows(rts_exp_1, rts_exp_2, rts_is_1, rts_is_2)
+  rt_num <- if (is.numeric(df_rts$rt)) df_rts$rt else as.numeric(df_rts$rt)
+  keep_rts <- !is.na(rt_num) & !is.na(df_rts$structure_inchikey)
+  if (!all(keep_rts)) {
+    df_rts <- df_rts[keep_rts, ]
+  }
 
   # Free memory
-  rm(rts_exp_1, rts_exp_2, rts_is_1, rts_is_2)
+  rm(rts_exp_1, rts_exp_2, rts_is_1, rts_is_2, rt_num, keep_rts)
 
-  sop <- df_rts |>
-    tidytable::select(
-      structure_smiles,
-      structure_inchikey,
-      structure_name
-    ) |>
-    tidytable::distinct() |>
-    tidytable::mutate(
-      structure_inchikey_connectivity_layer = stri_sub(
-        str = structure_inchikey,
-        from = 1L,
-        to = 14L
-      ),
-      organism_name = NA_character_
-    )
+  sop <- tidytable::tidytable(
+    structure_smiles = df_rts$structure_smiles,
+    structure_inchikey = df_rts$structure_inchikey,
+    structure_name = df_rts$structure_name
+  ) |>
+    tidytable::distinct()
 
-  rts <- df_rts |>
-    tidytable::select(-structure_smiles) |>
-    tidytable::distinct() |>
-    tidytable::mutate(
-      candidate_structure_inchikey_connectivity_layer = substr(
-        structure_inchikey,
-        1L,
-        14L
-      )
-    ) |>
-    # Keep only unique RT entries per structure connectivity layer and type
-    # This deduplicates stereoisomers while preserving both experimental and
-    # predicted RTs
-    tidytable::distinct(
-      rt,
-      candidate_structure_inchikey_connectivity_layer,
-      type
-    )
+  ik_sop <- sop$structure_inchikey
+  u_ik_sop <- unique(ik_sop)
+  u_ik14_sop <- substr(u_ik_sop, 1L, 14L)
+  m_sop <- fastmatch::fmatch(ik_sop, u_ik_sop)
+  data.table::set(
+    sop,
+    j = "structure_inchikey_connectivity_layer",
+    value = u_ik14_sop[m_sop]
+  )
+  data.table::set(
+    sop,
+    j = "organism_name",
+    value = rep.int(NA_character_, nrow(sop))
+  )
+
+  # Keep only unique RT entries per structure connectivity layer and type.
+  # This deduplicates stereoisomers while preserving both experimental and
+  # predicted RTs.
+  m_all <- fastmatch::fmatch(df_rts$structure_inchikey, u_ik_sop)
+  rts <- tidytable::tidytable(
+    rt = df_rts$rt,
+    candidate_structure_inchikey_connectivity_layer = u_ik14_sop[m_all],
+    type = df_rts$type
+  ) |>
+    tidytable::distinct()
 
   rm(df_rts)
 

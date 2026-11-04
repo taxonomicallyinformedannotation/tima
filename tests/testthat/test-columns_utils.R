@@ -182,4 +182,12 @@ test_that("normalize_chemontid deduplicates equivalent chemontids", {
     normalize_chemontid(c(NA_character_, NA_character_)),
     c(NA_character_, NA_character_)
   )
+  expect_equal(
+    normalize_chemontid(c("CHEMONTID:0002011", NA_character_)),
+    c("CHEMONTID:0002011", NA_character_)
+  )
+  expect_equal(
+    normalize_chemontid(c("non_numeric", NA_character_)),
+    c("non_numeric", NA_character_)
+  )
 })

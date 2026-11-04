@@ -94,50 +94,65 @@ prepare_libraries_sop_hmdb_like <- function(
           if (nrow(hmdb_df) == 0L) {
             hmdb_like_prepared <- fake_sop_columns()[0, ]
           } else {
-            hmdb_like_prepared <- hmdb_df |>
-              tidytable::mutate(tidytable::across(
-                .cols = tidyselect::everything(),
-                .fns = tidytable::na_if,
-                ""
-              )) |>
-              ## SMILES is the single source of truth. All computable
-              ## fields (InChIKey, formula, mass, xlogp) are derived
-              ## from SMILES via process_smiles() in split_tables_sop().
-              tidytable::filter(!is.na(smiles)) |>
-              tidytable::mutate(
-                structure_inchikey_2D = NA_character_,
-                structure_smiles_2D = NA_character_
-              ) |>
-              tidytable::select(
-                structure_name = name,
-                structure_inchikey = inchikey,
-                structure_smiles = smiles,
-                structure_inchikey_2D,
-                structure_smiles_2D,
-                structure_molecular_formula = formula,
-                structure_exact_mass = mass,
-                structure_xlogp = logp
-              ) |>
-              tidytable::mutate(
-                structure_taxonomy_npclassifier_01pathway = NA_character_,
-                structure_taxonomy_npclassifier_02superclass = NA_character_,
-                structure_taxonomy_npclassifier_03class = NA_character_,
-                structure_taxonomy_classyfire_chemontid = NA_character_,
-                structure_taxonomy_classyfire_01kingdom = NA_character_,
-                structure_taxonomy_classyfire_02superclass = NA_character_,
-                structure_taxonomy_classyfire_03class = NA_character_,
-                structure_taxonomy_classyfire_04directparent = NA_character_,
-                structure_tag = tag,
-                organism_name = organism_name,
-                reference_doi = NA_character_
-              ) |>
-              tidytable::mutate(!!!organism_taxonomy) |>
-              select_sop_columns() |>
-              round_reals() |>
-              tidytable::distinct()
-
-            if (nrow(hmdb_like_prepared) == 0L) {
+            ## SMILES is the single source of truth. All computable
+            ## fields (InChIKey, formula, mass, xlogp) are derived
+            ## from SMILES via process_smiles() in split_tables_sop().
+            sm <- hmdb_df$smiles
+            keep <- !is.na(sm) & nzchar(sm)
+            if (!any(keep)) {
               hmdb_like_prepared <- fake_sop_columns()[0, ]
+            } else {
+              clean_empty <- function(x) {
+                v <- x[keep]
+                empty_mask <- !is.na(v) & !nzchar(v)
+                if (any(empty_mask)) {
+                  v[empty_mask] <- NA_character_
+                }
+                v
+              }
+              core <- tidytable::tidytable(
+                structure_name = clean_empty(hmdb_df$name),
+                structure_inchikey = clean_empty(hmdb_df$inchikey),
+                structure_smiles = sm[keep],
+                structure_molecular_formula = clean_empty(hmdb_df$formula),
+                structure_exact_mass = clean_empty(hmdb_df$mass),
+                structure_xlogp = clean_empty(hmdb_df$logp)
+              ) |>
+                round_reals() |>
+                tidytable::distinct()
+
+              if (nrow(core) == 0L) {
+                hmdb_like_prepared <- fake_sop_columns()[0, ]
+              } else {
+                n_c <- nrow(core)
+                na_chr <- rep.int(NA_character_, n_c)
+                out_list <- c(
+                  list(
+                    structure_name = core$structure_name,
+                    structure_inchikey = core$structure_inchikey,
+                    structure_smiles = core$structure_smiles,
+                    structure_inchikey_2D = na_chr,
+                    structure_smiles_2D = na_chr,
+                    structure_molecular_formula = core$structure_molecular_formula,
+                    structure_exact_mass = core$structure_exact_mass,
+                    structure_xlogp = core$structure_xlogp,
+                    structure_taxonomy_npclassifier_01pathway = na_chr,
+                    structure_taxonomy_npclassifier_02superclass = na_chr,
+                    structure_taxonomy_npclassifier_03class = na_chr,
+                    structure_taxonomy_classyfire_chemontid = na_chr,
+                    structure_taxonomy_classyfire_01kingdom = na_chr,
+                    structure_taxonomy_classyfire_02superclass = na_chr,
+                    structure_taxonomy_classyfire_03class = na_chr,
+                    structure_taxonomy_classyfire_04directparent = na_chr,
+                    structure_tag = rep.int(tag, n_c),
+                    organism_name = rep.int(organism_name, n_c),
+                    reference_doi = na_chr
+                  ),
+                  lapply(organism_taxonomy, rep.int, times = n_c)
+                )
+                hmdb_like_prepared <- tidytable::as_tidytable(out_list) |>
+                  select_sop_columns()
+              }
             }
           }
 
@@ -292,27 +307,29 @@ parse_hmdb_like_sdf_lines <- function(sdf_lines) {
     return(tidytable::as_tidytable(out))
   }
 
-  header_match <- stri_match_first_regex(
-    str = sdf_lines[cand_idx],
+  cand_lines <- sdf_lines[cand_idx]
+  u_cand <- unique(cand_lines)
+  u_match <- stri_match_first_regex(
+    str = u_cand,
     pattern = "^>\\s*<([^>]+)>"
   )
-  valid_hdr <- which(!is.na(header_match[, 2]))
+  u_fields <- toupper(trimws(u_match[, 2L]))
+  u_canonical <- unname(field_map[u_fields])
+  u_field_id <- match(u_canonical, names(out))
 
-  if (length(valid_hdr) == 0L) {
+  if (all(is.na(u_field_id))) {
     return(tidytable::as_tidytable(out))
   }
 
-  header_idx <- cand_idx[valid_hdr]
-  header_fields <- toupper(trimws(header_match[valid_hdr, 2]))
-  canonical_fields <- unname(field_map[header_fields])
-  keep_idx <- which(!is.na(canonical_fields))
+  cand_field_id <- u_field_id[fastmatch::fmatch(cand_lines, u_cand)]
+  keep_idx <- which(!is.na(cand_field_id))
 
   if (length(keep_idx) == 0L) {
     return(tidytable::as_tidytable(out))
   }
 
-  header_idx <- header_idx[keep_idx]
-  canonical_fields <- canonical_fields[keep_idx]
+  header_idx <- cand_idx[keep_idx]
+  field_ids <- cand_field_id[keep_idx]
 
   value_idx <- pmin(header_idx + 1L, length(sdf_lines))
   values <- trimws(sdf_lines[value_idx])
@@ -320,7 +337,7 @@ parse_hmdb_like_sdf_lines <- function(sdf_lines) {
 
   if (!all(valid_values)) {
     header_idx <- header_idx[valid_values]
-    canonical_fields <- canonical_fields[valid_values]
+    field_ids <- field_ids[valid_values]
     values <- values[valid_values]
   }
 
@@ -334,14 +351,18 @@ parse_hmdb_like_sdf_lines <- function(sdf_lines) {
     findInterval(header_idx, record_end_idx) + 1L
   }
 
-  field_positions <- split(seq_along(canonical_fields), canonical_fields)
-
-  for (field_pos in field_positions) {
-    field_name <- canonical_fields[[field_pos[[1L]]]]
-    field_records <- record_ids[field_pos]
-    first_occurrence <- !duplicated(field_records)
-    out[[field_name]][field_records[first_occurrence]] <-
-      values[field_pos[first_occurrence]]
+  for (fid in seq_along(out)) {
+    field_pos <- which(field_ids == fid)
+    if (length(field_pos) > 0L) {
+      field_records <- record_ids[field_pos]
+      if (anyDuplicated(field_records) > 0L) {
+        first_occurrence <- !duplicated(field_records)
+        out[[fid]][field_records[first_occurrence]] <-
+          values[field_pos[first_occurrence]]
+      } else {
+        out[[fid]][field_records] <- values[field_pos]
+      }
+    }
   }
 
   tidytable::as_tidytable(out)

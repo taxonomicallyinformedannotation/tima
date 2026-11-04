@@ -663,21 +663,28 @@ normalize_chemontid <- function(x) {
     return(character(0L))
   }
   u <- unique(x_chr)
-  idx <- if (anyNA(u)) {
-    match(x_chr, u)
-  } else {
-    fastmatch::fmatch(x_chr, u)
+  if (length(u) == 1L && is.na(u[[1L]])) {
+    return(x_chr)
   }
-  attr(u, ".match.hash") <- NULL
+  u_orig <- u
   # Strip "CHEMONTID:" or "CHEMONT:" prefix if present (case-insensitive)
   stripped <- sub("^CHEMONT(ID)?:", "", u, ignore.case = TRUE)
   # Zero-pad the numeric part to 7 digits and add the canonical prefix
-  is_numeric <- !is.na(stripped) & grepl("^[0-9]+$", stripped)
-  if (any(is_numeric)) {
-    u[is_numeric] <- paste0(
-      "CHEMONTID:",
-      sprintf("%07d", as.integer(stripped[is_numeric]))
-    )
+  is_num <- !is.na(stripped) & grepl("^[0-9]+$", stripped)
+  if (!any(is_num)) {
+    return(x_chr)
+  }
+  u[is_num] <- paste0(
+    "CHEMONTID:",
+    sprintf("%07d", as.integer(stripped[is_num]))
+  )
+  if (identical(u, u_orig)) {
+    return(x_chr)
+  }
+  idx <- if (anyNA(u_orig)) {
+    match(x_chr, u_orig)
+  } else {
+    fastmatch::fmatch(x_chr, u_orig)
   }
   u[idx]
 }

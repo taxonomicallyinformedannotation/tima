@@ -692,4 +692,31 @@ test_that("prepare_taxa high-volume combination collapse (>256 rows) matches sma
   expect_identical(df$feature_id, f_ids)
   expect_true(all(grepl("Org1", df$sample_organism_name)))
   expect_true(all(grepl("Org2", df$sample_organism_name)))
+
+  # Also test high-volume single-organism per feature fast path (>256 rows)
+  input_single <- temp_test_path("features-high-vol-single.tsv")
+  output_single <- temp_test_path("output-high-vol-single.tsv")
+  f_ids_s <- sprintf("FTS%04d", 1:300)
+  feat_single <- tidytable::tidytable(
+    feature_id = f_ids_s,
+    rt = "2.5",
+    mz = "300.1",
+    sample = rep(c("s2", "s3"), length.out = 300L)
+  )
+  tidytable::fwrite(feat_single, input_single, sep = "\t")
+
+  prepare_taxa(
+    input = input_single,
+    org_tax_ott = ott,
+    taxon = NULL,
+    metadata = metadata,
+    name_filename = "filename",
+    colname = "organism",
+    output = output_single,
+    extension = TRUE
+  )
+  df_s <- tidytable::fread(output_single)
+  expect_equal(nrow(df_s), 300L)
+  expect_identical(df_s$feature_id, f_ids_s)
+  expect_identical(df_s$sample_organism_name[1:2], c("Org1", "Org2"))
 })

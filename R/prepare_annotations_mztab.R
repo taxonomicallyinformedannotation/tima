@@ -122,14 +122,18 @@ prepare_annotations_mztab <- function(
       "SME_ID_REFS" %in% names(tabs$sml) &&
       "SME_ID" %in% names(src)
   ) {
-    refs_split <- strsplit(
-      as.character(tabs$sml$SME_ID_REFS),
-      "|",
-      fixed = TRUE
-    )
-    ref_lengths <- lengths(refs_split)
-    refs_flat <- unlist(refs_split, use.names = FALSE)
-    sml_flat <- rep(as.character(tabs$sml$SML_ID), ref_lengths)
+    s_refs <- as.character(tabs$sml$SME_ID_REFS)
+    s_ids <- as.character(tabs$sml$SML_ID)
+    has_pipe <- !is.na(s_refs) & grepl("|", s_refs, fixed = TRUE)
+    if (!any(has_pipe)) {
+      refs_flat <- s_refs
+      sml_flat <- s_ids
+    } else {
+      refs_split <- strsplit(s_refs, "|", fixed = TRUE)
+      ref_lengths <- lengths(refs_split)
+      refs_flat <- unlist(refs_split, use.names = FALSE)
+      sml_flat <- rep.int(s_ids, ref_lengths)
+    }
 
     keep <- !is.na(refs_flat) & nzchar(refs_flat) & refs_flat != "null"
     refs_flat <- refs_flat[keep]
@@ -139,14 +143,25 @@ prepare_annotations_mztab <- function(
       first_ref <- !duplicated(refs_flat)
       sme_keys <- refs_flat[first_ref]
       sml_vals <- sml_flat[first_ref]
-      mapped <- sml_vals[match(as.character(src$SME_ID), sme_keys)]
+      mapped <- sml_vals[fastmatch::fmatch(as.character(src$SME_ID), sme_keys)]
     } else {
-      mapped <- rep(NA_character_, nrow(src))
+      mapped <- rep.int(NA_character_, nrow(src))
     }
 
-    fallback <- as.character(src[[id_col]])
-    fallback[fallback %in% c("", "null", "NA")] <- NA_character_
-    mapped[is.na(mapped)] <- fallback[is.na(mapped)]
+    if (anyNA(mapped)) {
+      na_m <- is.na(mapped)
+      fallback <- as.character(src[[id_col]][na_m])
+      bad_fb <- fastmatch::fmatch(
+        fallback,
+        c("", "null", "NA"),
+        nomatch = 0L
+      ) >
+        0L
+      if (any(bad_fb)) {
+        fallback[bad_fb] <- NA_character_
+      }
+      mapped[na_m] <- fallback
+    }
   } else {
     mapped <- as.character(src[[id_col]])
   }
@@ -176,17 +191,26 @@ prepare_annotations_mztab <- function(
   candidate_score_similarity[!is.finite(candidate_score_similarity)] <-
     NA_real_
 
-  is_ms1 <- !is.na(lib_col) &
-    grepl("exact mass database search", lib_col, ignore.case = TRUE)
-  candidate_score_similarity[is_ms1] <- NA_real_
+  u_lib <- unique(lib_col)
+  u_ms1 <- !is.na(u_lib) &
+    grepl("exact mass database search", u_lib, ignore.case = TRUE)
+  if (any(u_ms1)) {
+    ms1_libs <- u_lib[u_ms1]
+    is_ms1 <- fastmatch::fmatch(lib_col, ms1_libs, nomatch = 0L) > 0L
+    candidate_score_similarity[is_ms1] <- NA_real_
+  }
 
+  cand_lib <- lib_col
+  bad_lib <- is.na(cand_lib) | !nzchar(cand_lib)
+  if (any(bad_lib)) {
+    cand_lib[bad_lib] <- "mztab"
+  }
+
+  n_r <- nrow(src)
+  na_chr <- rep.int(NA_character_, n_r)
   ann <- tidytable::tidytable(
     feature_id = mapped,
-    candidate_library = ifelse(
-      is.na(lib_col) | !nzchar(lib_col),
-      "mztab",
-      lib_col
-    ),
+    candidate_library = cand_lib,
     candidate_structure_name = .mztab_pick_col(
       src,
       c("chemical_name", "description")
@@ -218,23 +242,19 @@ prepare_annotations_mztab <- function(
       c("adduct_ion", "adduct_ions", "adduct")
     ),
     candidate_score_similarity = candidate_score_similarity,
-    candidate_structure_error_mz = NA_real_,
-    candidate_structure_error_rt = NA_real_,
-    candidate_count_similarity_peaks_matched = NA_integer_,
-    rank_final = .mztab_pick_col(src, c("rank"))
+    candidate_structure_error_mz = rep.int(NA_real_, n_r),
+    candidate_structure_error_rt = rep.int(NA_real_, n_r),
+    candidate_count_similarity_peaks_matched = rep.int(NA_integer_, n_r),
+    rank_final = .mztab_pick_col(src, c("rank")),
+    candidate_structure_tax_npc_01pat = na_chr,
+    candidate_structure_tax_npc_02sup = na_chr,
+    candidate_structure_tax_npc_03cla = na_chr,
+    candidate_structure_tax_cla_chemontid = na_chr,
+    candidate_structure_tax_cla_01kin = na_chr,
+    candidate_structure_tax_cla_02sup = na_chr,
+    candidate_structure_tax_cla_03cla = na_chr,
+    candidate_structure_tax_cla_04dirpar = na_chr
   )
-
-  ann <- ann |>
-    tidytable::mutate(
-      candidate_structure_tax_npc_01pat = NA_character_,
-      candidate_structure_tax_npc_02sup = NA_character_,
-      candidate_structure_tax_npc_03cla = NA_character_,
-      candidate_structure_tax_cla_chemontid = NA_character_,
-      candidate_structure_tax_cla_01kin = NA_character_,
-      candidate_structure_tax_cla_02sup = NA_character_,
-      candidate_structure_tax_cla_03cla = NA_character_,
-      candidate_structure_tax_cla_04dirpar = NA_character_
-    )
 
   ann <- select_annotations_columns(
     df = ann,
