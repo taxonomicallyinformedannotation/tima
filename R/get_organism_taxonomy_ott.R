@@ -58,7 +58,70 @@
 #' @return Data frame with complete taxonomy lineage
 #' @keywords internal
 .build_taxonomy_lineage <- function(taxon_info, taxon_lineage, ott_ids) {
-  # Helper: combine taxon info with lineage for a single OTT ID
+  n_taxa <- length(taxon_lineage)
+  if (n_taxa == 0L) {
+    return(tidytable::tidytable(
+      id = integer(),
+      rank = character(),
+      name = character(),
+      unique_name = character(),
+      ott_id = integer()
+    ))
+  }
+
+  std_cols <- c("rank", "name", "unique_name", "ott_id")
+  all_std <- all(vapply(
+    taxon_lineage,
+    function(tl) is.data.frame(tl) && identical(names(tl), std_cols),
+    logical(1L)
+  ))
+  if (all_std) {
+    lin_n <- vapply(taxon_lineage, nrow, integer(1L))
+    tot_per_taxon <- 1L + lin_n
+    total_rows <- sum(tot_per_taxon)
+    if (total_rows == 0L) {
+      return(tidytable::tidytable(
+        id = integer(),
+        rank = character(),
+        name = character(),
+        unique_name = character(),
+        ott_id = integer()
+      ))
+    }
+
+    id_col <- rep.int(ott_ids[seq_len(n_taxa)], tot_per_taxon)
+    rank_parts <- vector("list", n_taxa * 2L)
+    name_parts <- vector("list", n_taxa * 2L)
+    uname_parts <- vector("list", n_taxa * 2L)
+    ott_parts <- vector("list", n_taxa * 2L)
+
+    for (idx in seq_len(n_taxa)) {
+      ti <- taxon_info[[idx]]
+      tl <- taxon_lineage[[idx]]
+      p1 <- 2L * idx - 1L
+      p2 <- 2L * idx
+      rank_parts[[p1]] <- as.character(ti$rank)
+      name_parts[[p1]] <- as.character(ti$name)
+      uname_parts[[p1]] <- as.character(ti$unique_name)
+      ott_parts[[p1]] <- as.integer(ti$ott_id)
+
+      rank_parts[[p2]] <- as.character(tl$rank)
+      name_parts[[p2]] <- as.character(tl$name)
+      uname_parts[[p2]] <- as.character(tl$unique_name)
+      ott_parts[[p2]] <- as.integer(tl$ott_id)
+    }
+
+    rev_idx <- total_rows:1L
+    return(tidytable::tidytable(
+      id = id_col[rev_idx],
+      rank = unlist(rank_parts, use.names = FALSE)[rev_idx],
+      name = unlist(name_parts, use.names = FALSE)[rev_idx],
+      unique_name = unlist(uname_parts, use.names = FALSE)[rev_idx],
+      ott_id = unlist(ott_parts, use.names = FALSE)[rev_idx]
+    ))
+  }
+
+  # Fallback when lineage data frames have non-standard columns
   .combine_single_taxon <- function(idx, taxon_info, taxon_lineage, ott_ids) {
     tidytable::bind_rows(
       tidytable::tidytable(
@@ -74,7 +137,6 @@
     )
   }
 
-  # Combine taxon info with lineage for each OTT ID
   list_df <- lapply(
     X = seq_along(taxon_lineage),
     FUN = .combine_single_taxon,
@@ -83,13 +145,12 @@
     ott_ids = ott_ids
   )
 
-  tidytable::bind_rows(list_df) |>
-    tidytable::mutate(
-      ott_id = as.integer(ott_id),
-      n = tidytable::row_number()
-    ) |>
-    tidytable::arrange(tidytable::desc(x = n)) |>
-    tidytable::select(-n)
+  out <- tidytable::bind_rows(list_df)
+  out$ott_id <- as.integer(out$ott_id)
+  if (nrow(out) > 1L) {
+    out <- out[nrow(out):1L, ]
+  }
+  out
 }
 
 #' Create empty taxonomy template

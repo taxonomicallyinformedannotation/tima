@@ -185,3 +185,25 @@ test_that("extract_spectra preserves all original columns", {
   # All original columns should be present (possibly renamed)
   expect_true(ncol(result) >= ncol(df))
 })
+
+test_that("extract_spectra drops pre-existing target columns when harmonizing source columns", {
+  df <- data.frame(
+    ms_level = 1L,
+    msLevel = 2L,
+    precursor_intensity = 10.0,
+    precursorIntensity = 999.0,
+    precursorMz = 100.0,
+    PrecursorMZ = "250.5",
+    stringsAsFactors = FALSE
+  )
+
+  spectra <- Spectra::Spectra(object = df)
+  result <- extract_spectra(object = spectra)
+
+  expect_equal(result$ms_level, 2L)
+  expect_equal(result$precursor_intensity, 999.0)
+  expect_equal(result$precursorMz, 250.5)
+  expect_false(any(
+    c("msLevel", "precursorIntensity", "PrecursorMZ") %in% names(result)
+  ))
+})

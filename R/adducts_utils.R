@@ -475,6 +475,8 @@ ISOTOPE_MONOISOTOPIC_MASS <- c(
   "))(?<Number>[0-9]*)"
 )
 
+.FORMULA_MASS_CACHE <- new.env(hash = TRUE, parent = emptyenv())
+
 #' Calculate monoisotopic exact mass from chemical formulas
 #' @concept EDAM:format_1198 mf
 #' @keywords internal
@@ -482,48 +484,90 @@ calculate_formula_mass <- function(x) {
   if (!is.character(x)) {
     stop("x must be a character vector of chemical formulas.", call. = FALSE)
   }
-  if (length(x) == 0L) {
+  n_x <- length(x)
+  if (n_x == 0L) {
     return(numeric(0))
   }
-  rx <- gregexpr(pattern = .ELEMENT_REGEX_PATTERN, text = x, perl = TRUE)
-  res <- vapply(
-    seq_along(x),
-    function(i) {
-      xx <- x[[i]]
-      rr <- rx[[i]]
-      if (is.na(xx)) {
-        return(NA_real_)
+  res <- rep(NA_real_, n_x)
+  non_na <- which(!is.na(x))
+  if (length(non_na) == 0L) {
+    return(stats::setNames(res, x))
+  }
+
+  x_sub <- x[non_na]
+  u_x <- unique(x_sub)
+  u_mass <- numeric(length(u_x))
+  u_valid <- logical(length(u_x))
+  need_parse <- integer(0L)
+
+  for (i in seq_along(u_x)) {
+    ux <- u_x[[i]]
+    if (nzchar(ux)) {
+      cached <- .FORMULA_MASS_CACHE[[ux]]
+      if (!is.null(cached)) {
+        u_mass[[i]] <- cached
+        u_valid[[i]] <- TRUE
+      } else {
+        need_parse <- c(need_parse, i)
       }
+    } else {
+      need_parse <- c(need_parse, i)
+    }
+  }
+
+  if (length(need_parse) > 0L) {
+    u_to_parse <- u_x[need_parse]
+    rx <- gregexpr(
+      pattern = .ELEMENT_REGEX_PATTERN,
+      text = u_to_parse,
+      perl = TRUE
+    )
+    for (k in seq_along(need_parse)) {
+      idx_u <- need_parse[[k]]
+      xx <- u_to_parse[[k]]
+      rr <- rx[[k]]
       clean_len <- nchar(gsub("\\[|\\]", "", xx))
       if (
         !nzchar(xx) ||
           identical(as.integer(rr), -1L) ||
           sum(attr(rr, "match.length")) != clean_len
       ) {
-        warning(
-          "The given formula '",
-          xx,
-          "' contains invalid symbols.",
-          call. = FALSE
-        )
-        return(NA_real_)
+        u_mass[[idx_u]] <- NA_real_
+        u_valid[[idx_u]] <- FALSE
+      } else {
+        n <- length(rr)
+        start <- attr(rr, "capture.start")
+        end <- start + attr(rr, "capture.length") - 1L
+        sbstr <- substring(xx, start, end)
+        sbstr[!nzchar(sbstr)] <- "1"
+        sl <- seq_len(n)
+        els <- sbstr[sl]
+        cnts <- as.integer(sbstr[n + sl])
+        masses <- ISOTOPE_MONOISOTOPIC_MASS[els]
+        if (anyNA(masses)) {
+          u_mass[[idx_u]] <- NA_real_
+        } else {
+          val <- sum(cnts * masses)
+          u_mass[[idx_u]] <- val
+          .FORMULA_MASS_CACHE[[xx]] <- val
+        }
+        u_valid[[idx_u]] <- TRUE
       }
-      n <- length(rr)
-      start <- attr(rr, "capture.start")
-      end <- start + attr(rr, "capture.length") - 1L
-      sbstr <- substring(xx, start, end)
-      sbstr[!nzchar(sbstr)] <- "1"
-      sl <- seq_len(n)
-      els <- sbstr[sl]
-      cnts <- as.integer(sbstr[n + sl])
-      masses <- ISOTOPE_MONOISOTOPIC_MASS[els]
-      if (anyNA(masses)) {
-        return(NA_real_)
-      }
-      sum(cnts * masses)
-    },
-    numeric(1L),
-    USE.NAMES = FALSE
-  )
+    }
+  }
+
+  m_idx <- fastmatch::fmatch(x_sub, u_x)
+  res[non_na] <- u_mass[m_idx]
+  if (!all(u_valid)) {
+    bad_pos <- which(!u_valid[m_idx])
+    for (bp in bad_pos) {
+      warning(
+        "The given formula '",
+        x_sub[[bp]],
+        "' contains invalid symbols.",
+        call. = FALSE
+      )
+    }
+  }
   stats::setNames(res, x)
 }

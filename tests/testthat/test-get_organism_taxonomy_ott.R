@@ -248,6 +248,13 @@ test_that(".build_taxonomy_lineage lists each taxon root-first under its id", {
       "Homo sapiens"
     )
   )
+
+  empty_otl <- .build_taxonomy_lineage(list(), list(), integer())
+  expect_equal(nrow(empty_otl), 0L)
+  expect_equal(
+    names(empty_otl),
+    c("id", "rank", "name", "unique_name", "ott_id")
+  )
 })
 
 test_that(".create_empty_taxonomy_template returns single NA rows", {

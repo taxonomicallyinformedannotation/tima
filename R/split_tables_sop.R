@@ -61,12 +61,6 @@ split_tables_sop <- function(table, cache) {
         structure_smiles_no_stereo
       )
     )
-  table_structural_initial <- table |>
-    tidytable::select(
-      tidyselect::contains(match = "structure")
-    ) |>
-    tidytable::distinct()
-
   table_organisms <- table |>
     tidytable::select(
       tidyselect::contains(match = "organism")
@@ -74,20 +68,57 @@ split_tables_sop <- function(table, cache) {
     tidytable::filter(!is.na(organism_name)) |>
     tidytable::distinct()
 
-  table_structural_standardized <- table_structural_initial |>
-    process_smiles(cache = cache) |>
-    tidytable::distinct(structure_smiles_initial, .keep_all = TRUE)
-
   log_debug("Joining structural data with computed properties")
-  table_structural <- table_structural_initial |>
-    tidytable::select(
-      structure_smiles_initial,
-      tidyselect::any_of("structure_name"),
-      tidyselect::contains(match = "_tag"),
-      tidyselect::contains(match = "_tax")
-    ) |>
-    tidytable::distinct()
-  rm(table_structural_initial)
+  has_valid_smi <- !all(is.na(table$structure_smiles_initial))
+  struct_all_cols <- grep("structure", names(table), value = TRUE)
+  keep_struct_cols <- unique(c(
+    "structure_smiles_initial",
+    intersect("structure_name", struct_all_cols),
+    grep("_tag|_tax", struct_all_cols, value = TRUE)
+  ))
+  if (has_valid_smi) {
+    table_structural_initial <- unique(
+      table[, struct_all_cols, with = FALSE],
+      by = keep_struct_cols
+    )
+    table_structural_standardized <- table_structural_initial |>
+      process_smiles(cache = cache) |>
+      tidytable::distinct(structure_smiles_initial, .keep_all = TRUE)
+    table_structural <- table_structural_initial[,
+      keep_struct_cols,
+      with = FALSE
+    ]
+    rm(table_structural_initial)
+  } else {
+    table_structural_initial <- table |>
+      tidytable::select(
+        tidyselect::contains(match = "structure")
+      ) |>
+      tidytable::distinct()
+
+    table_structural_standardized <- table_structural_initial |>
+      process_smiles(cache = cache) |>
+      tidytable::distinct(structure_smiles_initial, .keep_all = TRUE)
+
+    table_structural <- table_structural_initial |>
+      tidytable::select(tidyselect::all_of(keep_struct_cols)) |>
+      tidytable::distinct()
+    rm(table_structural_initial)
+  }
+
+  if ("structure_inchikey" %in% names(table_structural_standardized)) {
+    ik_std <- table_structural_standardized$structure_inchikey
+    valid_ik_std <- !is.na(ik_std) & nchar(ik_std) >= 27L
+    ik_ns_std <- rep(NA_character_, length(ik_std))
+    if (any(valid_ik_std)) {
+      ik_ns_std[valid_ik_std] <- paste0(
+        stri_sub(str = ik_std[valid_ik_std], from = 1L, to = 14L),
+        "-",
+        stri_sub(str = ik_std[valid_ik_std], from = -1L, to = -1L)
+      )
+    }
+    table_structural_standardized$structure_inchikey_no_stereo <- ik_ns_std
+  }
 
   std_cols <- setdiff(
     names(table_structural_standardized),
@@ -106,7 +137,9 @@ split_tables_sop <- function(table, cache) {
       )
     }
   }
-  table_structural <- tidytable::distinct(table_structural)
+  if (!has_valid_smi) {
+    table_structural <- tidytable::distinct(table_structural)
+  }
   log_debug(
     "table_structural: %s rows x %d cols",
     format_count(nrow(table_structural)),
@@ -175,34 +208,40 @@ split_tables_sop <- function(table, cache) {
   log_with_count("Referenced structure-organism pairs", n = nrow(table_keys))
 
   # str_can: Canonicalization mapping (smiles_initial -> smiles with stereo)
-  table_structures_canonical <- table_structural |>
-    tidytable::filter(!is.na(structure_smiles_initial)) |>
-    tidytable::filter(!is.na(structure_smiles)) |>
-    tidytable::select(
-      structure_smiles_initial,
-      structure_smiles
-    ) |>
-    tidytable::distinct(structure_smiles_initial, .keep_all = TRUE)
+  keep_can <- which(
+    !is.na(table_structural$structure_smiles_initial) &
+      !is.na(table_structural$structure_smiles)
+  )
+  u_can <- keep_can[
+    !duplicated(table_structural$structure_smiles_initial[keep_can])
+  ]
+  table_structures_canonical <- tidytable::tidytable(
+    structure_smiles_initial = table_structural$structure_smiles_initial[u_can],
+    structure_smiles = table_structural$structure_smiles[u_can]
+  )
+
+  if (!"structure_inchikey_no_stereo" %in% names(table_structural)) {
+    ik_all <- table_structural$structure_inchikey
+    valid_ik_all <- !is.na(ik_all) & nchar(ik_all) >= 27L
+    ik_ns_all <- rep(NA_character_, length(ik_all))
+    if (any(valid_ik_all)) {
+      ik_ns_all[valid_ik_all] <- paste0(
+        stri_sub(str = ik_all[valid_ik_all], from = 1L, to = 14L),
+        "-",
+        stri_sub(str = ik_all[valid_ik_all], from = -1L, to = -1L)
+      )
+    }
+    table_structural$structure_inchikey_no_stereo <- ik_ns_all
+  }
 
   # str_stereo: keyed by full inchikey, includes name, tag, xlogp
-  table_structures_stereo <- table_structural |>
-    tidytable::filter(!is.na(structure_inchikey)) |>
-    tidytable::filter(
-      !is.na(structure_smiles) |
-        !is.na(structure_smiles_no_stereo)
-    ) |>
-    tidytable::filter(!is.na(structure_inchikey_connectivity_layer)) |>
-    tidytable::mutate(
-      structure_inchikey_no_stereo = tidytable::if_else(
-        !is.na(structure_inchikey) & nchar(structure_inchikey) >= 27L,
-        paste0(
-          stri_sub(str = structure_inchikey, from = 1L, to = 14L),
-          "-",
-          stri_sub(str = structure_inchikey, from = -1L, to = -1L)
-        ),
-        NA_character_
-      )
-    )
+  keep_st <- which(
+    !is.na(table_structural$structure_inchikey) &
+      (!is.na(table_structural$structure_smiles) |
+        !is.na(table_structural$structure_smiles_no_stereo)) &
+      !is.na(table_structural$structure_inchikey_connectivity_layer)
+  )
+  table_structures_stereo <- table_structural[keep_st, ]
 
   # Calculate structure statistics in one pass over unique InChIKeys
   u_ik <- unique(table_structures_stereo$structure_inchikey)
@@ -399,29 +438,23 @@ split_tables_sop <- function(table, cache) {
   ## process_smiles() and are stereo-invariant (same connectivity + protonation
   ## = same formula = same mass). No group_by + summarize needed — distinct()
   ## is sufficient since values are deterministic.
-  table_structures_metadata <- table_structural |>
-    tidytable::filter(
-      !is.na(structure_inchikey) &
-        !is.na(structure_molecular_formula) &
-        !is.na(structure_exact_mass)
-    ) |>
-    tidytable::mutate(
-      structure_inchikey_no_stereo = tidytable::if_else(
-        !is.na(structure_inchikey) & nchar(structure_inchikey) >= 27L,
-        paste0(
-          stri_sub(str = structure_inchikey, from = 1L, to = 14L),
-          "-",
-          stri_sub(str = structure_inchikey, from = -1L, to = -1L)
-        ),
-        NA_character_
-      )
-    ) |>
-    tidytable::select(
-      structure_inchikey_no_stereo,
-      structure_molecular_formula,
-      structure_exact_mass
-    ) |>
-    tidytable::distinct(structure_inchikey_no_stereo, .keep_all = TRUE)
+  keep_met <- which(
+    !is.na(table_structural$structure_inchikey) &
+      !is.na(table_structural$structure_molecular_formula) &
+      !is.na(table_structural$structure_exact_mass)
+  )
+  u_met <- keep_met[
+    !duplicated(table_structural$structure_inchikey_no_stereo[keep_met])
+  ]
+  table_structures_metadata <- tidytable::tidytable(
+    structure_inchikey_no_stereo = table_structural$structure_inchikey_no_stereo[
+      u_met
+    ],
+    structure_molecular_formula = table_structural$structure_molecular_formula[
+      u_met
+    ],
+    structure_exact_mass = table_structural$structure_exact_mass[u_met]
+  )
 
   # str_tax_npc: keyed by canonical SMILES with stereo
   table_structures_taxonomy_npc <- table_structural |>
@@ -554,20 +587,20 @@ split_tables_sop <- function(table, cache) {
   }
   rm(ik_cla, dup_ik_cla, cla_single, cla_multi)
 
-  table_organisms_names <- table_organisms |>
-    tidytable::filter(!is.na(organism_name)) |>
-    tidytable::select(organism_name) |>
-    tidytable::distinct()
+  log_with_count(
+    "Unique organisms",
+    n = length(unique(table_organisms$organism_name))
+  )
 
-  log_with_count("Unique organisms", n = nrow(table_organisms_names))
-
-  table_org_tax_ott <- table_organisms |>
-    tidytable::filter(!is.na(organism_taxonomy_ottid)) |>
-    tidytable::distinct() |>
-    tidytable::mutate(tidytable::across(
-      .cols = tidyselect::where(fn = is.character),
-      .fns = ~ tidytable::replace_na(.x = .x, replace = "notClassified")
-    ))
+  keep_ott <- which(!is.na(table_organisms$organism_taxonomy_ottid))
+  table_org_tax_ott <- table_organisms[keep_ott, ]
+  for (col in names(table_org_tax_ott)) {
+    v_col <- table_org_tax_ott[[col]]
+    if (is.character(v_col) && anyNA(v_col)) {
+      v_col[is.na(v_col)] <- "notClassified"
+      data.table::set(table_org_tax_ott, j = col, value = v_col)
+    }
+  }
   rm(table_organisms)
 
   tables <-

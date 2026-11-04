@@ -42,3 +42,32 @@ test_that("forbidden adducts map to canonical forms", {
   expect_equal(adducts_forbidden_translations[["[M-H2O+H2O]+"]], "[M]+")
   expect_equal(adducts_forbidden_translations[["[M-H2O+H2O+H]+"]], "[M+H]+")
 })
+
+test_that("calculate_formula_mass memoizes repeated formulas and warns per invalid occurrence", {
+  expect_error(
+    calculate_formula_mass(123),
+    "x must be a character vector"
+  )
+  expect_equal(calculate_formula_mass(character(0)), numeric(0))
+
+  f_vec <- c("C6H12O6", "H2O", "C6H12O6", NA_character_, "[13C6]H12O6")
+  res1 <- calculate_formula_mass(f_vec)
+  res2 <- calculate_formula_mass(f_vec)
+  expect_identical(res1, res2)
+  expect_equal(names(res1), f_vec)
+  expect_true(is.na(res1[[4L]]))
+  expect_gt(res1[["[13C6]H12O6"]], res1[["C6H12O6"]])
+
+  w_env <- new.env(parent = emptyenv())
+  w_env$cnt <- 0L
+  bad_res <- withCallingHandlers(
+    calculate_formula_mass(c("C6H12O6", "INVALID!", "INVALID!")),
+    warning = function(w) {
+      w_env$cnt <- w_env$cnt + 1L
+      invokeRestart("muffleWarning")
+    }
+  )
+  expect_equal(w_env$cnt, 2L)
+  expect_true(!is.na(bad_res[[1L]]))
+  expect_true(all(is.na(bad_res[2:3])))
+})

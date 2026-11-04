@@ -126,27 +126,87 @@ decorate_chemo <- function(
 
   # Helper Functions ----
   n_rows <- nrow(annot_table_wei_chemo)
-  sc_col <- as.numeric(annot_table_wei_chemo$score_chemical)
+  raw_sc <- annot_table_wei_chemo$score_chemical
+  sc_col <- if (is.double(raw_sc)) raw_sc else as.numeric(raw_sc)
   ik_col <- annot_table_wei_chemo$candidate_structure_inchikey_connectivity_layer
-  u_ik <- unique(ik_col)
-  n_u_ik <- length(u_ik)
-  ik_id <- if (n_u_ik > 0L) fastmatch::fmatch(ik_col, u_ik) else integer(n_rows)
+  bad_vals <- c(NA_character_, "notAnnotated", "notConsistent")
 
-  valid_level_mask <- function(prev_mask, score_threshold, col_name) {
-    if (!col_name %in% names(annot_table_wei_chemo)) {
-      return(rep.int(FALSE, n_rows))
+  filter_cascade_idx <- function(prev_idx, score_threshold, col_name) {
+    if (
+      length(prev_idx) == 0L ||
+        is.na(score_threshold) ||
+        !col_name %in% names(annot_table_wei_chemo)
+    ) {
+      return(integer(0L))
     }
-    v <- annot_table_wei_chemo[[col_name]]
-    prev_mask &
-      !is.na(sc_col) &
-      sc_col >= score_threshold &
-      !is.na(v) &
-      v != "notAnnotated" &
-      v != "notConsistent"
+    idx <- prev_idx[sc_col[prev_idx] >= score_threshold]
+    if (length(idx) == 0L) {
+      return(integer(0L))
+    }
+    v_sub <- annot_table_wei_chemo[[col_name]][idx]
+    idx[is.na(fastmatch::fmatch(v_sub, bad_vals))]
   }
 
-  count_mask_stats <- function(mask) {
-    idx <- which(mask)
+  min_thresh <- min(
+    c(score_chemical_cla_kingdom, score_chemical_npc_pathway),
+    na.rm = TRUE
+  )
+  base_idx <- which(!is.na(sc_col) & sc_col >= min_thresh)
+
+  # Classyfire Hierarchy (cascading filters) ----
+  idx_cla_kingdom <- filter_cascade_idx(
+    base_idx,
+    score_chemical_cla_kingdom,
+    "feature_pred_tax_cla_01kin_val"
+  )
+  idx_cla_superclass <- filter_cascade_idx(
+    idx_cla_kingdom,
+    score_chemical_cla_superclass,
+    "feature_pred_tax_cla_02sup_val"
+  )
+  idx_cla_class <- filter_cascade_idx(
+    idx_cla_superclass,
+    score_chemical_cla_class,
+    "feature_pred_tax_cla_03cla_val"
+  )
+  idx_cla_parent <- filter_cascade_idx(
+    idx_cla_class,
+    score_chemical_cla_parent,
+    "feature_pred_tax_cla_04dirpar_val"
+  )
+
+  # NPClassifier Hierarchy (cascading filters, independent of Classyfire) ----
+  idx_npc_pathway <- filter_cascade_idx(
+    base_idx,
+    score_chemical_npc_pathway,
+    "feature_pred_tax_npc_01pat_val"
+  )
+  idx_npc_superclass <- filter_cascade_idx(
+    idx_npc_pathway,
+    score_chemical_npc_superclass,
+    "feature_pred_tax_npc_02sup_val"
+  )
+  idx_npc_class <- filter_cascade_idx(
+    idx_npc_superclass,
+    score_chemical_npc_class,
+    "feature_pred_tax_npc_03cla_val"
+  )
+
+  active_idx <- union(idx_cla_kingdom, idx_npc_pathway)
+  ik_id <- integer(n_rows)
+  n_u_ik <- 0L
+  if (length(active_idx) > 0L) {
+    ik_act <- ik_col[active_idx]
+    u_ik <- unique(ik_act)
+    n_u_ik <- length(u_ik)
+    ik_id[active_idx] <- if (anyNA(u_ik)) {
+      match(ik_act, u_ik)
+    } else {
+      fastmatch::fmatch(ik_act, u_ik)
+    }
+  }
+
+  count_idx_stats <- function(idx) {
     n_cand <- length(idx)
     if (n_cand == 0L) {
       return(c(n_candidates = 0L, n_unique_structures = 0L))
@@ -155,57 +215,16 @@ decorate_chemo <- function(
     c(n_candidates = n_cand, n_unique_structures = n_uniq)
   }
 
-  all_true <- rep.int(TRUE, n_rows)
-
-  # Classyfire Hierarchy (cascading filters) ----
-  m_cla_kingdom <- valid_level_mask(
-    all_true,
-    score_chemical_cla_kingdom,
-    "feature_pred_tax_cla_01kin_val"
-  )
-  m_cla_superclass <- valid_level_mask(
-    m_cla_kingdom,
-    score_chemical_cla_superclass,
-    "feature_pred_tax_cla_02sup_val"
-  )
-  m_cla_class <- valid_level_mask(
-    m_cla_superclass,
-    score_chemical_cla_class,
-    "feature_pred_tax_cla_03cla_val"
-  )
-  m_cla_parent <- valid_level_mask(
-    m_cla_class,
-    score_chemical_cla_parent,
-    "feature_pred_tax_cla_04dirpar_val"
-  )
-
-  # NPClassifier Hierarchy (cascading filters, independent of Classyfire) ----
-  m_npc_pathway <- valid_level_mask(
-    all_true,
-    score_chemical_npc_pathway,
-    "feature_pred_tax_npc_01pat_val"
-  )
-  m_npc_superclass <- valid_level_mask(
-    m_npc_pathway,
-    score_chemical_npc_superclass,
-    "feature_pred_tax_npc_02sup_val"
-  )
-  m_npc_class <- valid_level_mask(
-    m_npc_superclass,
-    score_chemical_npc_class,
-    "feature_pred_tax_npc_03cla_val"
-  )
-
   # Count total candidates and unique structures ----
   cla_masks <- list(
-    kingdom = m_cla_kingdom,
-    superclass = m_cla_superclass,
-    class = m_cla_class,
-    parent = m_cla_parent
+    kingdom = idx_cla_kingdom,
+    superclass = idx_cla_superclass,
+    class = idx_cla_class,
+    parent = idx_cla_parent
   )
   cla_counts <- vapply(
     X = cla_masks,
-    FUN = count_mask_stats,
+    FUN = count_idx_stats,
     integer(2L),
     USE.NAMES = FALSE
   )
@@ -213,13 +232,13 @@ decorate_chemo <- function(
   colnames(cla_counts) <- names(cla_masks)
 
   npc_masks <- list(
-    pathway = m_npc_pathway,
-    superclass = m_npc_superclass,
-    class = m_npc_class
+    pathway = idx_npc_pathway,
+    superclass = idx_npc_superclass,
+    class = idx_npc_class
   )
   npc_counts <- vapply(
     X = npc_masks,
-    FUN = count_mask_stats,
+    FUN = count_idx_stats,
     integer(2L),
     USE.NAMES = FALSE
   )

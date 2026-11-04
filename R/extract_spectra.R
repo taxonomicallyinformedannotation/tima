@@ -73,70 +73,60 @@ extract_spectra <- function(object) {
 
   spectra <- as.data.frame(object@backend@spectraData)
   rownames(spectra) <- NULL
+
+  # Harmonize Column Types & Names Before Wrapping ----
+  s_names <- names(spectra)
+  if (
+    incoherent_logical %in%
+      s_names &&
+      !is.logical(spectra[[incoherent_logical]])
+  ) {
+    spectra[[incoherent_logical]] <- as.logical(spectra[[incoherent_logical]])
+  }
+  if (
+    incoherent_integer %in%
+      s_names &&
+      !is.integer(spectra[[incoherent_integer]])
+  ) {
+    spectra[[incoherent_integer]] <- as.integer(spectra[[incoherent_integer]])
+  }
+  if (
+    incoherent_numeric %in% s_names && !is.double(spectra[[incoherent_numeric]])
+  ) {
+    spectra[[incoherent_numeric]] <- as.numeric(spectra[[incoherent_numeric]])
+  }
+
+  columns_to_harmonize <- incoherent_colnames[
+    unname(incoherent_colnames) %in% s_names
+  ]
+  if (length(columns_to_harmonize) > 0L) {
+    target_names <- names(columns_to_harmonize)
+    source_names <- unname(columns_to_harmonize)
+    drop_existing <- intersect(target_names, setdiff(s_names, source_names))
+    if (length(drop_existing) > 0L) {
+      spectra[drop_existing] <- NULL
+      s_names <- names(spectra)
+    }
+    m_pos <- match(source_names, s_names)
+    names(spectra)[m_pos] <- target_names
+  }
+
   spectra <- tidytable::as_tidytable(spectra)
 
   # Extract Peak Data ----
-
-  # Extract peak data (mz and intensity) efficiently
+  peaks_data <- object@backend@peaksData
 
   # Extract m/z values (first column of peak matrices)
   spectra$mz <- lapply(
-    X = object@backend@peaksData,
-    # Extract m/z column from peak data matrix, return empty vector if invalid
+    X = peaks_data,
     FUN = .extract_mz_values
   )
 
   # Extract intensity values (second column of peak matrices)
   spectra$intensity <- lapply(
-    X = object@backend@peaksData,
-    # Extract intensity column from peak data matrix, return empty vector if
-    # invalid
+    X = peaks_data,
     FUN = .extract_intensity_values
   )
-
-  ## Synonyms issue
-  # spectra <- spectra |>
-  # tidytable::group_by(c(-tidyselect::any_of(x="synonym"))) |>
-  # tidytable::reframe(tidytable::across(
-  # .cols = tidyselect::where(is.list),
-  # .fns = as.character
-  # )) |>
-  # tidytable::ungroup()
-
-  # Harmonize Column Types ----
-
-  # Harmonize column types
-  spectra <- spectra |>
-    tidytable::mutate(
-      tidytable::across(
-        .cols = tidyselect::any_of(x = incoherent_logical),
-        .fns = as.logical
-      ),
-      tidytable::across(
-        .cols = tidyselect::any_of(x = incoherent_integer),
-        .fns = as.integer
-      ),
-      tidytable::across(
-        .cols = tidyselect::any_of(x = incoherent_numeric),
-        .fns = as.numeric
-      )
-    )
-
-  # Harmonize Column Names ----
-
-  # Harmonize column names: remove old names and add standardized names
-  # Only process columns that actually exist in the data
-  columns_to_harmonize <- incoherent_colnames[
-    unname(incoherent_colnames) %in% colnames(spectra)
-  ]
-
-  if (length(columns_to_harmonize) > 0L) {
-    spectra <- spectra |>
-      tidytable::select(
-        -tidyselect::any_of(x = names(columns_to_harmonize))
-      ) |>
-      tidytable::rename(tidyselect::any_of(x = columns_to_harmonize))
-  }
 
   log_debug("Extracted %d spectra", nrow(spectra))
 

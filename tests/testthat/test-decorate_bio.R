@@ -146,3 +146,38 @@ test_that("decoration functions are fast", {
   expect_fast(difftime(end_time, start_time, units = "secs"), 1.0)
   expect_identical(result, large_df)
 })
+
+test_that("decorate_bio ignores below-minimum rows when counting unique structures per level", {
+  test_df <- tidytable::tidytable(
+    feature_id = c("FT1", "FT2", "FT3", "FT4"),
+    score_biological = c(0.0, 0.2, 0.8, 0.8),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "IK_ZERO",
+      "IK_SHARED",
+      "IK_SHARED",
+      "IK_HIGH"
+    )
+  )
+
+  log_file <- withr::local_tempfile(fileext = ".log")
+  setup_logger(filename = log_file, threshold = 400)
+
+  decorate_bio(
+    annot_table_wei_bio = test_df,
+    score_biological_kingdom = 0.1,
+    score_biological_phylum = 0.2,
+    score_biological_class = 0.3,
+    score_biological_order = 0.4,
+    score_biological_family = 0.5,
+    score_biological_tribe = 0.6,
+    score_biological_genus = 0.7,
+    score_biological_species = 0.8,
+    score_biological_variety = 0.9,
+    score_biological_biota = 1.0
+  )
+
+  logged <- paste(readLines(log_file, warn = FALSE), collapse = "\n")
+  expect_true(grepl("Kingdom\\s+level:\\s+3 candidates \\(2 unique\\)", logged))
+  expect_true(grepl("Species\\s+level:\\s+2 candidates \\(2 unique\\)", logged))
+  expect_true(grepl("Variety\\s+level:\\s+0 candidates \\(0 unique\\)", logged))
+})
