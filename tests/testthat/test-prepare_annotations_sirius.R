@@ -1706,4 +1706,35 @@ test_that("SIRIUS utility helpers cover low-duplicate key guard, whitespace over
   )
   res_fb <- .apply_candidate_error_mz_fallback(df_fb, fb_tbl)
   expect_equal(res_fb$candidate_structure_error_mz, c(0.002, 0.005))
+
+  # 6. max_radix_space overflow paste fallback in .fast_distinct_with_key_guard and .fast_match_rows,
+  # single-col all-key distinct, and get_sirius_filenames default branch
+  fn_v4 <- get_sirius_filenames(version = "4")
+  expect_identical(fn_v4$canopus, "canopus_formula_summary[^/]*\\.tsv$")
+
+  df_1col_dup <- tidytable::tidytable(k = c("x", "x", "y"))
+  expect_identical(
+    .fast_distinct_with_key_guard(df_1col_dup, "k")$k,
+    c("x", "y")
+  )
+
+  df_paste <- tidytable::tidytable(
+    k1 = c("a", "a", "b"),
+    k2 = c("1", "1", "2"),
+    val = c(10L, 10L, 20L)
+  )
+  res_paste_dist <- .fast_distinct_with_key_guard(
+    df_paste,
+    c("k1", "k2"),
+    max_radix_space = 1
+  )
+  expect_identical(res_paste_dist$val, c(10L, 20L))
+
+  res_paste_match <- .fast_match_rows(
+    tidytable::tidytable(k1 = c("b", "a", "z"), k2 = c("2", "1", "9")),
+    df_paste,
+    by = c("k1", "k2"),
+    max_radix_space = 1
+  )
+  expect_identical(res_paste_match, c(3L, 1L, NA_integer_))
 })

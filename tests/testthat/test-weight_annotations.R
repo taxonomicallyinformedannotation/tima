@@ -1098,12 +1098,12 @@ test_that("validate_weight_annotations_inputs, load_annotation_tables, load_stru
   )
   expect_identical(nrow(sop_1key), 2L)
 
-  # Direct validate_weight_annotations_inputs happy path, negative weight, and sum != 1 errors
+  # Direct validate_weight_annotations_inputs happy path (with missing optional str_stereo), missing required file, negative weight, and sum != 1 errors
   expect_null(
     validate_weight_annotations_inputs(
       library = lib_path,
       org_tax_ott = org_uniq_path,
-      str_stereo = stereo_1key_path,
+      str_stereo = file.path(tmp_dir, "missing_opt_stereo.tsv"),
       annotations = ann1,
       canopus = lib_path,
       formula = lib_path,
@@ -1126,6 +1126,36 @@ test_that("validate_weight_annotations_inputs, load_annotation_tables, load_stru
       summarize = FALSE,
       force = FALSE
     )
+  )
+  expect_error(
+    validate_weight_annotations_inputs(
+      library = file.path(tmp_dir, "missing_req_lib.tsv"),
+      org_tax_ott = org_uniq_path,
+      str_stereo = NULL,
+      annotations = ann1,
+      canopus = lib_path,
+      formula = lib_path,
+      components = lib_path,
+      edges = lib_path,
+      taxa = lib_path,
+      candidates_neighbors = 1L,
+      candidates_final = 1L,
+      weight_spectral = 0.5,
+      weight_chemical = 0.3,
+      weight_biological = 0.2,
+      minimal_consistency = 0.5,
+      minimal_ms1_bio = 0.5,
+      minimal_ms1_chemo = 0.5,
+      minimal_ms1_condition = "OR",
+      ms1_only = FALSE,
+      compounds_names = FALSE,
+      high_evidence = FALSE,
+      remove_ties = FALSE,
+      summarize = FALSE,
+      force = FALSE
+    ),
+    "Required file\\(s\\) not found",
+    class = "tima_validation_error"
   )
   expect_error(
     validate_weight_annotations_inputs(
@@ -1357,4 +1387,27 @@ test_that("rearrange_annotations and export_results cover consume_input, join fa
   )
   expect_identical(names(exp_res), c("filtered", "full"))
   expect_true(all(file.exists(exp_res)))
+
+  # 4. .dedup_ordered_tuple_indices across 32-bit, 53-bit, and table-fallback regimes
+  tup_df <- tidytable::tidytable(
+    k1 = c("A", "A", "B", "A"),
+    k2 = c("X", "X", "Y", "Z")
+  )
+  ord_tup <- c(2L, 1L, 3L, 4L)
+  idx_32 <- .dedup_ordered_tuple_indices(tup_df, c("k1", "k2"), ord_tup)
+  idx_53 <- .dedup_ordered_tuple_indices(
+    tup_df,
+    c("k1", "k2"),
+    ord_tup,
+    bases_override = c(65536, 65536)
+  )
+  idx_fb <- .dedup_ordered_tuple_indices(
+    tup_df,
+    c("k1", "k2"),
+    ord_tup,
+    bases_override = c(1e9, 1e9)
+  )
+  expect_identical(idx_32, c(2L, 3L, 4L))
+  expect_identical(idx_53, c(2L, 3L, 4L))
+  expect_identical(idx_fb, c(2L, 3L, 4L))
 })
