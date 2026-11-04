@@ -1,3 +1,5 @@
+.PARSE_ADDUCT_CACHE <- new.env(hash = TRUE, parent = emptyenv())
+
 #' @title Parse adduct
 #'
 #' @description This function parses mass spectrometry adduct notation strings
@@ -51,6 +53,19 @@ parse_adduct <- function(
   adduct_string,
   regex = ADDUCT_REGEX_PATTERN
 ) {
+  use_cache <- !missing(adduct_string) &&
+    identical(regex, ADDUCT_REGEX_PATTERN) &&
+    is.character(adduct_string) &&
+    length(adduct_string) == 1L &&
+    !is.na(adduct_string) &&
+    nzchar(adduct_string)
+  if (use_cache) {
+    cached <- .PARSE_ADDUCT_CACHE[[adduct_string]]
+    if (!is.null(cached)) {
+      return(cached)
+    }
+  }
+
   # Define return value for failed parsing (DRY principle)
   failed_parse <- create_failed_parse_result()
 
@@ -112,7 +127,11 @@ parse_adduct <- function(
 
     # If we found a valid alternative, parse and return it
     if (!is.null(result)) {
-      return(parse_single_adduct(result, regex, failed_parse))
+      parsed_alt <- parse_single_adduct(result, regex, failed_parse)
+      if (use_cache && !all(parsed_alt == 0)) {
+        .PARSE_ADDUCT_CACHE[[adduct_string]] <- parsed_alt
+      }
+      return(parsed_alt)
     }
 
     # If none of the alternatives worked, return failed parse silently
@@ -126,7 +145,11 @@ parse_adduct <- function(
   # Standard single adduct parsing
   # Use original string to preserve any comments for logging, but they will
   # be removed during modification processing
-  parse_single_adduct(adduct_string, regex, failed_parse)
+  parsed_res <- parse_single_adduct(adduct_string, regex, failed_parse)
+  if (use_cache && !all(parsed_res == 0)) {
+    .PARSE_ADDUCT_CACHE[[adduct_string]] <- parsed_res
+  }
+  parsed_res
 }
 
 #' Parse a single adduct (internal helper)

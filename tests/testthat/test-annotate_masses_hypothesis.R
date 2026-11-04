@@ -420,3 +420,82 @@ test_that("prune_candidates_by_network_consensus drops unsupported candidates an
   # F3: sole candidate is kept
   expect_identical(pruned$adduct[pruned$feature_id == "F3"], "[2M+Fe]2+")
 })
+
+test_that("generate_multi_hypotheses_from_node_masses matches within ppm or dalton tolerance and preserves order", {
+  # Feature F1: base neutral mass = 200.0; mz = 401.007276 implies [2M+H]+ neutral mass = 200.0
+  # Feature F2: base neutral mass = 300.0; mz = 151.007276 implies [M+2H]2+ neutral mass = 300.0
+  # Feature F3: base neutral mass = 250.0; mz = 251.007276 does not match any multi adduct
+  m_h <- 1.007276466812
+  node_hyps <- tidytable::tidytable(
+    feature_id = c("F1", "F2", "F3"),
+    adduct = c("[M+H]+", "[M+H]+", "[M+H]+"),
+    source = c("pair", "pair", "baseline"),
+    is_preassigned = c(FALSE, FALSE, FALSE),
+    adduct_support = c(1L, 1L, 0L),
+    mz = c(2 * 200.0 + m_h, (300.0 + 2 * m_h) / 2, 250.0 + m_h),
+    rt = c(1.5, 2.5, 3.5),
+    mass = c(200.0, 300.0, 250.0)
+  )
+  multi_adducts <- tidytable::tidytable(
+    adduct = c("[2M+H]+", "[M+2H]2+", "[3M+H]+")
+  )
+  lookup <- build_adduct_lookup_from_strings(c("[M+H]+", multi_adducts$adduct))
+
+  res <- generate_multi_hypotheses_from_node_masses(
+    node_hypotheses = node_hyps,
+    multi_adducts = multi_adducts,
+    adduct_lookup = lookup,
+    tolerance_ppm = 10,
+    tolerance_dalton = 0.0025
+  )
+  expect_identical(res$feature_id, c("F1", "F2"))
+  expect_identical(res$adduct, c("[2M+H]+", "[M+2H]2+"))
+  expect_identical(res$source, c("multi", "multi"))
+  expect_identical(res$adduct_support, c(0L, 0L))
+  expect_equal(res$mass, c(200.0, 300.0), tolerance = 1e-5)
+})
+
+test_that("append_component_weak_hypotheses expands weak hypotheses only for unresolved component features", {
+  m_h <- 1.007276466812
+  m_na <- 22.989218
+  features_table <- tidytable::tidytable(
+    feature_id = c("F1", "F2", "F3"),
+    mz = c(200.0 + m_h, 200.0 + m_na, 350.0 + m_h),
+    rt = c(5.0, 5.0, 8.0)
+  )
+  # F1 is resolved by pair edge; F2 is in component 1 with only baseline hypothesis
+  node_hyps <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    adduct = c("[M+H]+", "[M+H]+"),
+    source = c("pair", "baseline"),
+    is_preassigned = c(FALSE, FALSE),
+    candidate_adduct_origin = c("supported", "baseline"),
+    adduct_support = c(1L, 0L),
+    mz = c(200.0 + m_h, 200.0 + m_na),
+    rt = c(5.0, 5.0),
+    mass = c(200.0, 200.0 + m_na - m_h)
+  )
+  attr(node_hyps, "component_membership") <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    component_id = c(1L, 1L)
+  )
+  attr(node_hyps, "feature_m_map") <- tidytable::tidytable(
+    feature_id = "F1",
+    component_id = 1L,
+    neutral_mass = 200.0
+  )
+  lookup <- build_adduct_lookup_from_strings(c("[M+H]+", "[M+Na]+"))
+
+  out <- append_component_weak_hypotheses(
+    node_hypotheses = node_hyps,
+    features_table = features_table,
+    neutral_losses_list = character(),
+    clusters = c("Na"),
+    baseline_adducts = c("[M+H]+"),
+    adduct_lookup = lookup,
+    tolerance_ppm = 10,
+    tolerance_dalton = 0.0025
+  )
+  f2_rows <- out[out$feature_id == "F2", ]
+  expect_true(nrow(f2_rows) >= 1L)
+})

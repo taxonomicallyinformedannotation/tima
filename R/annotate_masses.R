@@ -807,113 +807,166 @@ append_component_weak_hypotheses <- function(
     return(node_hypotheses)
   }
 
-  component_m <- feature_m_map |>
-    tidytable::filter(
-      !is.na(neutral_mass) & is.finite(neutral_mass) & neutral_mass > 0
-    ) |>
-    tidytable::summarize(
-      component_mass = stats::median(neutral_mass),
-      .by = component_id
-    )
-  if (nrow(component_m) == 0L) {
+  fm_nm <- feature_m_map$neutral_mass
+  valid_fm <- which(!is.na(fm_nm) & is.finite(fm_nm) & fm_nm > 0)
+  if (length(valid_fm) == 0L) {
+    return(node_hypotheses)
+  }
+  med_c <- .fast_group_median(
+    fm_nm[valid_fm],
+    feature_m_map$component_id[valid_fm]
+  )
+  if (length(med_c$groups) == 0L) {
     return(node_hypotheses)
   }
 
-  supported_features <- node_hypotheses |>
-    tidytable::mutate(
-      candidate_adduct_origin = tidytable::coalesce(
-        candidate_adduct_origin,
-        "supported"
+  nh_orig <- tidytable::coalesce(
+    node_hypotheses$candidate_adduct_origin,
+    "supported"
+  )
+  supp_fids <- unique(node_hypotheses$feature_id[nh_orig == "supported"])
+
+  cm_fids <- component_membership$feature_id
+  keep_unres <- is.na(fastmatch::fmatch(cm_fids, supp_fids))
+  if (!any(keep_unres)) {
+    return(node_hypotheses)
+  }
+  idx_unres <- which(keep_unres)
+  u_fids <- cm_fids[idx_unres]
+  u_cids <- component_membership$component_id[idx_unres]
+  u_cmass <- med_c$medians[fastmatch::fmatch(u_cids, med_c$groups)]
+
+  ft_fids <- features_table$feature_id
+  ft_mz <- features_table$mz
+  ft_rt <- features_table$rt
+  if (anyDuplicated(ft_fids) > 0L) {
+    keep_ft <- !duplicated(paste(ft_fids, ft_mz, ft_rt, sep = "\r"))
+    ft_fids <- ft_fids[keep_ft]
+    ft_mz <- ft_mz[keep_ft]
+    ft_rt <- ft_rt[keep_ft]
+  }
+  if (anyDuplicated(ft_fids) == 0L) {
+    m_ft <- fastmatch::fmatch(u_fids, ft_fids)
+    u_mz <- as.numeric(ft_mz[m_ft])
+    u_rt <- as.numeric(ft_rt[m_ft])
+  } else {
+    unresolved_df <- tidytable::tidytable(
+      feature_id = u_fids,
+      component_id = u_cids,
+      component_mass = u_cmass
+    ) |>
+      tidytable::left_join(
+        tidytable::tidytable(feature_id = ft_fids, mz = ft_mz, rt = ft_rt),
+        by = "feature_id"
       )
-    ) |>
-    tidytable::filter(candidate_adduct_origin == "supported") |>
-    tidytable::distinct(feature_id)
-
-  unresolved <- component_membership |>
-    tidytable::anti_join(supported_features, by = "feature_id") |>
-    tidytable::left_join(component_m, by = "component_id") |>
-    tidytable::left_join(
-      features_table |>
-        tidytable::distinct(feature_id, mz, rt),
-      by = "feature_id"
-    ) |>
-    tidytable::filter(!is.na(component_mass) & !is.na(mz) & is.finite(mz))
-  if (nrow(unresolved) == 0L) {
-    return(node_hypotheses)
+    u_fids <- unresolved_df$feature_id
+    u_cmass <- unresolved_df$component_mass
+    u_mz <- as.numeric(unresolved_df$mz)
+    u_rt <- as.numeric(unresolved_df$rt)
   }
 
-  base_candidates <- unresolved |>
-    tidytable::cross_join(tidytable::tidytable(adduct = baseline_adducts)) |>
-    tidytable::mutate(source = "weak_component")
+  valid_u <- which(!is.na(u_cmass) & !is.na(u_mz) & is.finite(u_mz))
+  if (length(valid_u) == 0L) {
+    return(node_hypotheses)
+  }
+  u_fids <- u_fids[valid_u]
+  u_cmass <- as.numeric(u_cmass[valid_u])
+  u_mz <- u_mz[valid_u]
+  u_rt <- u_rt[valid_u]
+  n_u <- length(u_fids)
+
+  base_parts <- sub("M(?![a-z]).*", "M", baseline_adducts, perl = TRUE)
+  char_parts <- sub(".*M(?![a-z])", "", baseline_adducts, perl = TRUE)
+  tpl_adduct <- baseline_adducts
+  tpl_source <- rep.int("weak_component", length(baseline_adducts))
 
   loss_terms <- unique(gsub(" .*", "", as.character(neutral_losses_list)))
   loss_terms <- loss_terms[!is.na(loss_terms) & nzchar(loss_terms)]
-  loss_candidates <- if (length(loss_terms) > 0L) {
-    base_candidates |>
-      tidytable::cross_join(tidytable::tidytable(modifier = loss_terms)) |>
-      tidytable::mutate(
-        .base_part = sub("M(?![a-z]).*", "M", adduct, perl = TRUE),
-        .char_part = sub(".*M(?![a-z])", "", adduct, perl = TRUE),
-        adduct = paste0(.base_part, "-", modifier, .char_part),
-        source = "weak_component_loss"
-      ) |>
-      tidytable::select(-modifier, -.base_part, -.char_part)
-  } else {
-    base_candidates[0L, ]
+  if (length(loss_terms) > 0L) {
+    n_b <- length(baseline_adducts)
+    n_l <- length(loss_terms)
+    l_ads <- paste0(
+      rep(base_parts, each = n_l),
+      "-",
+      rep(loss_terms, times = n_b),
+      rep(char_parts, each = n_l)
+    )
+    tpl_adduct <- c(tpl_adduct, l_ads)
+    tpl_source <- c(tpl_source, rep.int("weak_component_loss", length(l_ads)))
   }
 
   cluster_terms <- unique(as.character(clusters))
   cluster_terms <- cluster_terms[!is.na(cluster_terms) & nzchar(cluster_terms)]
-  cluster_candidates <- if (length(cluster_terms) > 0L) {
-    base_candidates |>
-      tidytable::cross_join(tidytable::tidytable(modifier = cluster_terms)) |>
-      tidytable::mutate(
-        .base_part = sub("M(?![a-z]).*", "M", adduct, perl = TRUE),
-        .char_part = sub(".*M(?![a-z])", "", adduct, perl = TRUE),
-        adduct = paste0(.base_part, "+", modifier, .char_part),
-        source = "weak_component_cluster"
-      ) |>
-      tidytable::select(-modifier, -.base_part, -.char_part)
-  } else {
-    base_candidates[0L, ]
+  if (length(cluster_terms) > 0L) {
+    n_b <- length(baseline_adducts)
+    n_c <- length(cluster_terms)
+    c_ads <- paste0(
+      rep(base_parts, each = n_c),
+      "+",
+      rep(cluster_terms, times = n_b),
+      rep(char_parts, each = n_c)
+    )
+    tpl_adduct <- c(tpl_adduct, c_ads)
+    tpl_source <- c(
+      tpl_source,
+      rep.int("weak_component_cluster", length(c_ads))
+    )
   }
 
-  weak_all <- tidytable::bind_rows(
-    base_candidates,
-    loss_candidates,
-    cluster_candidates
+  tpl_df <- harmonize_adducts(
+    tidytable::tidytable(adduct = tpl_adduct, source = tpl_source),
+    adducts_translations = adducts_translations
+  )
+  keep_tpl <- !duplicated(paste(tpl_df$adduct, tpl_df$source, sep = "\r"))
+  tpl_adduct <- tpl_df$adduct[keep_tpl]
+  tpl_source <- tpl_df$source[keep_tpl]
+  n_tpl <- length(tpl_adduct)
+
+  u_tpl_ads <- unique(tpl_adduct)
+  n_uta <- length(u_tpl_ads)
+  all_cmass_rep <- rep(u_cmass, times = n_uta)
+  all_ads_rep <- rep(u_tpl_ads, each = n_u)
+  all_mz_exp <- as.numeric(calculate_mz_from_lookup(
+    neutral_mass = all_cmass_rep,
+    adducts = all_ads_rep,
+    adduct_lookup = adduct_lookup
+  ))
+  mz_exp_mat <- matrix(all_mz_exp, nrow = n_u, ncol = n_uta)
+
+  has_dalton <- !is.null(tolerance_dalton)
+  hit_u_list <- vector("list", n_tpl)
+  hit_t_list <- vector("list", n_tpl)
+  for (t_i in seq_len(n_tpl)) {
+    col_i <- match(tpl_adduct[[t_i]], u_tpl_ads)
+    mz_exp <- mz_exp_mat[, col_i]
+    mz_diff <- abs(u_mz - mz_exp)
+    ppm_diff <- mz_diff * 1e6 / pmax(u_mz, mz_exp)
+    ok <- (is.finite(ppm_diff) & ppm_diff <= tolerance_ppm) |
+      (if (has_dalton) !is.na(mz_diff) & mz_diff <= tolerance_dalton else FALSE)
+    w_ok <- which(ok)
+    if (length(w_ok) > 0L) {
+      hit_u_list[[t_i]] <- w_ok
+      hit_t_list[[t_i]] <- rep.int(t_i, length(w_ok))
+    }
+  }
+
+  hit_u <- unlist(hit_u_list, use.names = FALSE)
+  if (length(hit_u) == 0L) {
+    return(node_hypotheses)
+  }
+  hit_t <- unlist(hit_t_list, use.names = FALSE)
+
+  weak_all <- tidytable::tidytable(
+    feature_id = u_fids[hit_u],
+    adduct = tpl_adduct[hit_t],
+    source = tpl_source[hit_t],
+    is_preassigned = FALSE,
+    adduct_support = 0L,
+    candidate_adduct_origin = "supported_weak",
+    mz = u_mz[hit_u],
+    rt = u_rt[hit_u],
+    mass = u_cmass[hit_u]
   ) |>
-    harmonize_adducts(adducts_translations = adducts_translations) |>
-    tidytable::mutate(
-      mz_expected = calculate_mz_from_lookup(
-        neutral_mass = as.numeric(component_mass),
-        adducts = adduct,
-        adduct_lookup = adduct_lookup
-      ),
-      # Cache numeric conversions to avoid repeated conversions
-      .mz_num = as.numeric(mz),
-      .mz_exp_num = as.numeric(mz_expected),
-      mz_diff = abs(.mz_num - .mz_exp_num),
-      ppm_diff = mz_diff * 1e6 / pmax(.mz_num, .mz_exp_num),
-      ppm_ok = is.finite(ppm_diff) & ppm_diff <= tolerance_ppm,
-      dalton_ok = if (is.null(tolerance_dalton)) {
-        FALSE
-      } else {
-        mz_diff <= tolerance_dalton
-      }
-    ) |>
-    tidytable::filter(ppm_ok | dalton_ok) |>
-    tidytable::transmute(
-      feature_id,
-      adduct,
-      source,
-      is_preassigned = FALSE,
-      adduct_support = 0L,
-      candidate_adduct_origin = "supported_weak",
-      mz = as.numeric(mz),
-      rt = as.numeric(rt),
-      mass = as.numeric(component_mass)
-    ) |>
     tidytable::distinct()
 
   if (nrow(weak_all) == 0L) {

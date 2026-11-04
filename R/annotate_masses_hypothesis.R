@@ -1682,19 +1682,124 @@ generate_multi_hypotheses_from_node_masses <- function(
     return(empty_out)
   }
 
-  base_mass_by_feature <- node_hypotheses |>
-    tidytable::filter(source != "multi") |>
-    tidytable::filter(!is.na(mass) & is.finite(mass) & mass > 0) |>
-    tidytable::distinct(feature_id, neutral_mass_ref = mass)
-  if (nrow(base_mass_by_feature) == 0L) {
+  nh_src <- node_hypotheses$source
+  nh_mass <- node_hypotheses$mass
+  keep_bm <- which(
+    (is.na(nh_src) | nh_src != "multi") &
+      !is.na(nh_mass) &
+      is.finite(nh_mass) &
+      nh_mass > 0
+  )
+  if (length(keep_bm) == 0L) {
+    return(empty_out)
+  }
+  bm_fids <- node_hypotheses$feature_id[keep_bm]
+  bm_masses <- nh_mass[keep_bm]
+  keep_u_bm <- !duplicated(paste(bm_fids, bm_masses, sep = "\r"))
+  bm_fids <- bm_fids[keep_u_bm]
+  bm_masses <- bm_masses[keep_u_bm]
+
+  u_ma <- unique(multi_adducts$adduct)
+  n_ma <- length(u_ma)
+  if (n_ma == 0L) {
     return(empty_out)
   }
 
-  feature_meta <- node_hypotheses |>
-    tidytable::distinct(feature_id, mz, rt)
+  nh_fids <- node_hypotheses$feature_id
+  nh_mz <- node_hypotheses$mz
+  nh_rt <- node_hypotheses$rt
+  if (anyDuplicated(nh_fids) == 0L) {
+    fm_fids <- nh_fids
+    fm_mz <- nh_mz
+    fm_rt <- nh_rt
+  } else {
+    first_f <- !duplicated(nh_fids)
+    f_idx <- fastmatch::fmatch(nh_fids, nh_fids[first_f])
+    if (
+      identical(nh_mz, nh_mz[first_f][f_idx]) &&
+        identical(nh_rt, nh_rt[first_f][f_idx])
+    ) {
+      fm_fids <- nh_fids[first_f]
+      fm_mz <- nh_mz[first_f]
+      fm_rt <- nh_rt[first_f]
+    } else {
+      fm_df <- tidytable::distinct(node_hypotheses, feature_id, mz, rt)
+      fm_fids <- fm_df$feature_id
+      fm_mz <- fm_df$mz
+      fm_rt <- fm_df$rt
+    }
+  }
+
+  if (anyDuplicated(fm_fids) == 0L) {
+    in_bm <- which(!is.na(fastmatch::fmatch(fm_fids, bm_fids)))
+    if (length(in_bm) == 0L) {
+      return(empty_out)
+    }
+    fm_fids <- fm_fids[in_bm]
+    fm_mz <- fm_mz[in_bm]
+    fm_rt <- fm_rt[in_bm]
+    fm_mz_num <- as.numeric(fm_mz)
+    n_fm <- length(fm_fids)
+
+    all_m <- calculate_neutral_mass_from_lookup(
+      mzs = rep(fm_mz_num, each = n_ma),
+      adducts = rep(u_ma, times = n_fm),
+      adduct_lookup = adduct_lookup
+    )
+    bm_fm_id <- fastmatch::fmatch(bm_fids, fm_fids)
+    ord_bm <- order(bm_fm_id, method = "radix")
+    bm_fm_id <- bm_fm_id[ord_bm]
+    bm_masses <- bm_masses[ord_bm]
+
+    n_bm <- length(bm_fm_id)
+    cand_idx <- rep((bm_fm_id - 1L) * n_ma, each = n_ma) +
+      rep.int(seq_len(n_ma), n_bm)
+    cand_m <- all_m[cand_idx]
+    ref_m <- rep(bm_masses, each = n_ma)
+
+    valid_m <- !is.na(cand_m) & is.finite(cand_m) & cand_m > 0
+    diff <- abs(cand_m - ref_m)
+    ppm <- diff * 1e6 / ref_m
+    ppm_pass <- is.finite(ppm) & ppm <= tolerance_ppm
+    dalton_pass <- if (is.null(tolerance_dalton)) {
+      FALSE
+    } else {
+      !is.na(diff) & diff <= tolerance_dalton
+    }
+    pass <- which(valid_m & (ppm_pass | dalton_pass))
+    if (length(pass) == 0L) {
+      return(empty_out)
+    }
+    hit_cand_idx <- sort(unique(cand_idx[pass]))
+    hit_fm <- (hit_cand_idx - 1L) %/% n_ma + 1L
+    hit_ma <- (hit_cand_idx - 1L) %% n_ma + 1L
+
+    out <- tidytable::tidytable(
+      feature_id = fm_fids[hit_fm],
+      adduct = u_ma[hit_ma],
+      source = "multi",
+      adduct_support = 0L,
+      mz = fm_mz[hit_fm],
+      rt = fm_rt[hit_fm],
+      mass = all_m[hit_cand_idx]
+    ) |>
+      tidytable::distinct()
+    return(out)
+  }
+
+  base_mass_by_feature <- tidytable::tidytable(
+    feature_id = bm_fids,
+    neutral_mass_ref = bm_masses
+  )
+
+  feature_meta <- tidytable::tidytable(
+    feature_id = fm_fids,
+    mz = fm_mz,
+    rt = fm_rt
+  )
 
   multi_candidates <- feature_meta |>
-    tidytable::cross_join(multi_adducts |> tidytable::distinct(adduct)) |>
+    tidytable::cross_join(tidytable::tidytable(adduct = u_ma)) |>
     tidytable::mutate(
       source = "multi",
       adduct_support = 0L,

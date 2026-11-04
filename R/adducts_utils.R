@@ -107,6 +107,13 @@ adducts_translations <-
     "[M+2H]+2" = "[M+2H]2+"
   )
 
+.ADDUCTS_TRANSLATIONS_DEFAULT_REF <- adducts_translations
+.ADDUCTS_TRANSLATIONS_DEFAULT_SORTED <- adducts_translations[order(
+  nchar(names(adducts_translations)),
+  decreasing = TRUE
+)]
+.CANONICAL_ADDUCT_CACHE <- new.env(hash = TRUE, parent = emptyenv())
+
 #' Canonicalize adducts with vectorized memoization
 #'
 #' Fast vectorized canonicalization of many adducts, exploiting high repetition
@@ -133,19 +140,34 @@ canonicalize_adducts_vectorized <- function(adducts) {
 
   # Handle NA values separately to preserve positions
   na_mask <- is.na(adducts)
-  unique_ads <- unique(adducts[!na_mask])
+  non_na <- adducts[!na_mask]
+  if (length(non_na) == 0L) {
+    return(rep.int(NA_character_, length(adducts)))
+  }
+  unique_ads <- unique(non_na)
 
-  # Apply expensive canonicalization only to unique values
+  # Apply expensive canonicalization only to unique values (with session cache)
   canon_unique <- vapply(
     X = unique_ads,
-    FUN = canonicalize_adduct_notation,
+    FUN = function(a) {
+      if (nzchar(a)) {
+        cached <- .CANONICAL_ADDUCT_CACHE[[a]]
+        if (!is.null(cached)) {
+          return(cached)
+        }
+        val <- canonicalize_adduct_notation(a)
+        .CANONICAL_ADDUCT_CACHE[[a]] <- val
+        val
+      } else {
+        canonicalize_adduct_notation(a)
+      }
+    },
     FUN.VALUE = character(1L),
     USE.NAMES = FALSE
   )
 
-  # Vectorized mapping via match() + indexing
-  # match() returns indices in single C call; subscripting is O(1) per element
-  indices <- match(adducts[!na_mask], unique_ads)
+  # Vectorized mapping via fastmatch::fmatch() + indexing
+  indices <- fastmatch::fmatch(non_na, unique_ads)
   result <- character(length(adducts))
   result[!na_mask] <- canon_unique[indices]
   result[na_mask] <- NA_character_

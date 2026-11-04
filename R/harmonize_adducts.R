@@ -103,28 +103,38 @@ harmonize_adducts <- function(
     return(df)
   }
 
-  # Validate translations
-  validate_adduct_translations(adducts_translations)
+  if (identical(adducts_translations, .ADDUCTS_TRANSLATIONS_DEFAULT_REF)) {
+    adducts_translations <- .ADDUCTS_TRANSLATIONS_DEFAULT_SORTED
+  } else {
+    # Validate translations
+    validate_adduct_translations(adducts_translations)
 
-  # Sort them (important)
-  adducts_translations <- adducts_translations[order(
-    nchar(names(adducts_translations)),
-    decreasing = TRUE
-  )]
+    # Sort them (important)
+    adducts_translations <- adducts_translations[order(
+      nchar(names(adducts_translations)),
+      decreasing = TRUE
+    )]
+  }
 
   # Harmonize Adducts ----
   adducts <- df[[adducts_colname]]
   if (is.factor(adducts)) {
     adducts <- as.character(adducts)
   }
-  n_unique_before <- count_unique_values(adducts)
 
   if (length(adducts) == 0L) {
+    n_unique_before <- 0L
     n_unique_after <- 0L
   } else {
     unique_adducts <- unique(adducts)
-    inverse_idx <- match(adducts, unique_adducts)
     non_missing_unique <- !is.na(unique_adducts)
+    n_unique_before <- count_unique_values(unique_adducts)
+    inverse_idx <- if (all(non_missing_unique)) {
+      fastmatch::fmatch(adducts, unique_adducts)
+    } else {
+      match(adducts, unique_adducts)
+    }
+    attr(unique_adducts, ".match.hash") <- NULL
 
     if (any(non_missing_unique)) {
       unique_non_missing <- unique_adducts[non_missing_unique]
@@ -132,11 +142,13 @@ harmonize_adducts <- function(
       # Normalize internal spaces (e.g., "[M + K]+" -> "[M+K]+")
       unique_non_missing <- gsub("\\s+", "", unique_non_missing)
 
-      # Fast exact-match lookup via match()
-      idx <- match(unique_non_missing, names(adducts_translations))
+      # Fast exact-match lookup via fmatch()
+      idx <- fastmatch::fmatch(unique_non_missing, names(adducts_translations))
       matched <- !is.na(idx)
       if (any(matched)) {
-        unique_non_missing[matched] <- adducts_translations[idx[matched]]
+        unique_non_missing[matched] <- unname(
+          adducts_translations[idx[matched]]
+        )
       }
 
       # Second pass: substring-level formula normalization
@@ -158,7 +170,7 @@ harmonize_adducts <- function(
 
     adducts <- unique_adducts[inverse_idx]
     df[[adducts_colname]] <- adducts
-    n_unique_after <- count_unique_values(adducts)
+    n_unique_after <- count_unique_values(unique_adducts)
   }
 
   if (do_log) {
