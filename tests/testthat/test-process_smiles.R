@@ -445,15 +445,20 @@ test_that("process_smiles validates cache helper output template", {
 test_that("process_smiles load_smiles_cache falls back to empty template on read failure", {
   load_smiles_cache <- get("load_smiles_cache", envir = asNamespace("tima"))
 
-  result <- testthat::with_mocked_bindings(
-    safe_fread = function(...) stop("cache read failed"),
-    load_smiles_cache(NULL, "structure_smiles_initial"),
-    .package = "tima"
-  )
+  # NULL cache returns empty template immediately
+  res_null <- load_smiles_cache(NULL, "structure_smiles_initial")
+  expect_true("structure_smiles_initial" %in% names(res_null))
+  expect_identical(nrow(res_null), 1L)
+  expect_true(is.na(res_null$structure_smiles_initial[[1L]]))
 
-  expect_true("structure_smiles_initial" %in% names(result))
-  expect_equal(nrow(result), 1L)
-  expect_true(is.na(result$structure_smiles_initial[[1]]))
+  # Non-NULL unreadable/missing cache triggers tryCatch fallback
+  res_err <- load_smiles_cache(
+    "/nonexistent/path/to/smiles_cache.tsv",
+    "custom_smiles_col"
+  )
+  expect_true("custom_smiles_col" %in% names(res_err))
+  expect_identical(nrow(res_err), 1L)
+  expect_true(is.na(res_err$custom_smiles_col[[1L]]))
 })
 
 test_that("process_smiles returns input when no valid SMILES remain after extraction", {
@@ -473,6 +478,7 @@ test_that("process_smiles returns input when no valid SMILES remain after extrac
 })
 
 test_that("process_smiles returns cached-only result when all SMILES already cached", {
+  cache_file <- withr::local_tempfile(fileext = ".tsv")
   input <- tidytable::tidytable(
     structure_smiles_initial = c("C", "CC")
   )
@@ -485,15 +491,9 @@ test_that("process_smiles returns cached-only result when all SMILES already cac
     structure_smiles_no_stereo = c("C", "CC"),
     structure_xlogp = c(0, 0)
   )
+  tidytable::fwrite(cached, cache_file, sep = "\t")
 
-  out <- testthat::with_mocked_bindings(
-    load_smiles_cache = function(cache, smiles_colname) cached,
-    extract_unique_smiles = function(df, smiles_colname) {
-      tidytable::tidytable(structure_smiles_initial = c("C", "CC"))
-    },
-    process_smiles(input, cache = "cache.tsv"),
-    .package = "tima"
-  )
+  out <- process_smiles(input, cache = cache_file)
 
   expect_equal(nrow(out), 2L)
   expect_true(all(
@@ -557,4 +557,136 @@ test_that("load_smiles_cache reuses in-memory cache and invalidates when file ch
   data.table::fwrite(df2, cache_path, sep = "\t")
   res3 <- load_smiles_cache(cache_path, "structure_smiles_initial")
   expect_equal(nrow(res3), 2L)
+})
+
+test_that("process_smiles reuses canonical stereo and 2D no-stereo cache entries and deduplicates", {
+  tmp_dir <- withr::local_tempdir()
+  cache_path <- file.path(tmp_dir, "stereo_2d_cache.tsv")
+
+  cached_df <- tidytable::tidytable(
+    structure_smiles_initial = c("INIT_A", "INIT_A", "INIT_B", "INIT_SHORT"),
+    structure_smiles = c("CAN_A", "CAN_A", "CAN_B", "CAN_SHORT"),
+    structure_inchikey = c(
+      "AAAAAAAAAAAAAA-BBBBBBBBBB-N",
+      "AAAAAAAAAAAAAA-BBBBBBBBBB-N",
+      "CCCCCCCCCCCCCC-DDDDDDDDDD-P",
+      "SHORT_IK"
+    ),
+    structure_molecular_formula = c("C6H12O6", "C6H12O6", "C7H14O6", "CH4"),
+    structure_exact_mass = c(180.0634, 180.0634, 194.0790, 16.0313),
+    structure_smiles_no_stereo = c("2D_A", "2D_A", "2D_B", "2D_SHORT"),
+    structure_xlogp = c(-2.5, -2.5, -2.0, 0.5)
+  )
+  tidytable::fwrite(cached_df, cache_path, sep = "\t")
+
+  # Query 1: all matched via initial ("INIT_A"), canonical ("CAN_A"), and 2D ("2D_B", "2D_SHORT")
+  input_all_cached <- tidytable::tidytable(
+    structure_smiles_initial = c("INIT_A", "CAN_A", "2D_B", "2D_SHORT")
+  )
+  res_cached <- process_smiles(input_all_cached, cache = cache_path)
+  expect_identical(nrow(res_cached), 4L)
+  expect_identical(
+    as.character(res_cached$structure_smiles_initial),
+    c("INIT_A", "CAN_A", "2D_B", "2D_SHORT")
+  )
+  # Canonical match keeps stereo InChIKey
+  row_can <- res_cached[res_cached$structure_smiles_initial == "CAN_A", ]
+  expect_identical(row_can$structure_inchikey, "AAAAAAAAAAAAAA-BBBBBBBBBB-N")
+  expect_identical(as.character(row_can$structure_smiles), "CAN_A")
+
+  # 2D match with 27-char InChIKey rewrites stereo layer to UHFFFAOYSA
+  row_2d <- res_cached[res_cached$structure_smiles_initial == "2D_B", ]
+  expect_identical(as.character(row_2d$structure_smiles), "2D_B")
+  expect_identical(row_2d$structure_inchikey, "CCCCCCCCCCCCCC-UHFFFAOYSA-P")
+  expect_identical(
+    row_2d$structure_inchikey_connectivity_layer,
+    "CCCCCCCCCCCCCC"
+  )
+  expect_identical(row_2d$structure_inchikey_no_stereo, "CCCCCCCCCCCCCC-P")
+
+  # 2D match with <27-char InChIKey leaves InChIKey unchanged
+  row_short <- res_cached[res_cached$structure_smiles_initial == "2D_SHORT", ]
+  expect_identical(row_short$structure_inchikey, "SHORT_IK")
+})
+
+test_that("process_smiles combines partial cache matches with new RDKit results and persists cache", {
+  tmp_dir <- withr::local_tempdir()
+  gz_cache <- file.path(tmp_dir, "cache_out.csv.gz")
+
+  seed_df <- tidytable::tidytable(
+    structure_smiles_initial = "INIT_SEED",
+    structure_smiles = "CAN_SEED",
+    structure_inchikey = "SEEDINKKEY0001-BBBBBBBBBB-N",
+    structure_molecular_formula = "C2H6O",
+    structure_exact_mass = 46.0419,
+    structure_smiles_no_stereo = "CCO",
+    structure_xlogp = -0.1
+  )
+  tidytable::fwrite(seed_df, gz_cache, compress = "gzip")
+
+  # Query has "CAN_SEED" (matched via canonical stereo cache -> extra_parts) and "C" (new -> RDKit)
+  input_mixed <- tidytable::tidytable(
+    structure_smiles_initial = c("CAN_SEED", "C")
+  )
+  res_mixed <- process_smiles(input_mixed, cache = gz_cache)
+  expect_identical(nrow(res_mixed), 2L)
+  expect_true(all(c("CAN_SEED", "C") %in% res_mixed$structure_smiles_initial))
+
+  # Updated gz_cache on disk should be gzip-compressed and contain INIT_SEED, CAN_SEED, and C
+  expect_identical(readBin(gz_cache, "raw", n = 2L), as.raw(c(0x1f, 0x8b)))
+  disk_cache <- tidytable::fread(gz_cache)
+  expect_true(all(
+    c("INIT_SEED", "CAN_SEED", "C") %in% disk_cache$structure_smiles_initial
+  ))
+
+  # Also test plain text (.tsv) cache write-back and unwritable directory cache graceful handling
+  tsv_cache <- file.path(tmp_dir, "plain_cache.tsv")
+  writeLines("structure_smiles_initial\tstructure_smiles", tsv_cache)
+  res_tsv <- process_smiles(
+    tidytable::tidytable(structure_smiles_initial = "C"),
+    cache = tsv_cache
+  )
+  expect_identical(nrow(res_tsv), 1L)
+  expect_true(file.exists(tsv_cache))
+
+  # Passing an existing directory path as cache triggers fwrite error inside tryCatch without failing
+  dir_as_cache <- file.path(tmp_dir, "subdir_as_cache")
+  dir.create(dir_as_cache)
+  res_dir_cache <- process_smiles(
+    tidytable::tidytable(structure_smiles_initial = "C"),
+    cache = dir_as_cache
+  )
+  expect_identical(nrow(res_dir_cache), 1L)
+})
+
+test_that("load_python_smiles_processor and process_smiles abort with tima_runtime_error on Python failures", {
+  # 1. load_python_smiles_processor failure when py_require fails
+  expect_error(
+    with_mocked_bindings(
+      py_require = function(...) stop("simulated python environment error"),
+      load_python_smiles_processor(),
+      .package = "reticulate"
+    ),
+    "cannot load python smiles processor",
+    class = "tima_runtime_error"
+  )
+
+  # 2. process_smiles failure when reticulate::py$process_smiles raises an error
+  load_python_smiles_processor()
+  withr::defer(load_python_smiles_processor())
+  reticulate::py_run_string(
+    "def process_smiles(a, b):\n    raise RuntimeError('simulated rdkit crash')\n"
+  )
+  expect_error(
+    with_mocked_bindings(
+      source_python = function(...) invisible(NULL),
+      process_smiles(
+        tidytable::tidytable(structure_smiles_initial = "C"),
+        cache = NULL
+      ),
+      .package = "reticulate"
+    ),
+    "rdkit smiles processing failed",
+    class = "tima_runtime_error"
+  )
 })

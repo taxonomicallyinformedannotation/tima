@@ -1532,3 +1532,407 @@ test_that("complete_organism_taxonomy handles all-NA keys and enriches missing o
   expect_identical(res$flag_col, c("TRUE", "FALSE"))
   expect_identical(res$list_col, c("a", "b"))
 })
+
+test_that("load_and_merge_libraries, export_library_tables, and apply_taxonomic_filter edge branches work", {
+  tmp_dir <- withr::local_tempdir()
+
+  # 1. load_and_merge_libraries reads and binds multiple library files then splits
+  f1 <- file.path(tmp_dir, "l1.tsv")
+  f2 <- file.path(tmp_dir, "l2.tsv")
+  lib_row <- tidytable::tidytable(
+    structure_inchikey = "VNWKTOKETHGBQD-UHFFFAOYSA-N",
+    structure_smiles = "C",
+    structure_smiles_no_stereo = "C",
+    structure_molecular_formula = "CH4",
+    structure_name = "methane",
+    structure_exact_mass = "16.0313",
+    structure_xlogp = "0.6",
+    structure_tag = "alkane",
+    structure_tax_npc_01pat = "PathA",
+    structure_tax_npc_02sup = "SupA",
+    structure_tax_npc_03cla = "ClaA",
+    structure_tax_cla_chemontid = "0000001",
+    structure_tax_cla_01kin = "Organic",
+    structure_tax_cla_02sup = "Hydrocarbons",
+    structure_tax_cla_03cla = "Alkanes",
+    structure_tax_cla_04dirpar = "Methane",
+    organism_name = "Gentiana lutea",
+    organism_taxonomy_ottid = "100",
+    organism_taxonomy_01domain = "Eukaryota",
+    organism_taxonomy_02kingdom = "Plantae",
+    organism_taxonomy_03phylum = "Tracheophyta",
+    reference_doi = "10.1000/1"
+  )
+  tidytable::fwrite(lib_row, f1, sep = "\t")
+  tidytable::fwrite(lib_row, f2, sep = "\t")
+  cache_smi <- file.path(tmp_dir, "smi_cache.tsv")
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_smiles_initial = "C",
+      structure_smiles = "C",
+      structure_inchikey = "VNWKTOKETHGBQD-UHFFFAOYSA-N",
+      structure_molecular_formula = "CH4",
+      structure_exact_mass = 16.0313,
+      structure_smiles_no_stereo = "C",
+      structure_xlogp = 0.6
+    ),
+    cache_smi,
+    sep = "\t"
+  )
+
+  merged_split <- load_and_merge_libraries(c(f1, f2), cache = cache_smi)
+  expect_type(merged_split, "list")
+  expect_true("key" %in% names(merged_split))
+  expect_identical(nrow(merged_split$key), 1L)
+
+  # 2. export_library_tables writes all 7 tables and returns named path vector
+  paths <- file.path(
+    tmp_dir,
+    c("k.tsv", "o.tsv", "c.tsv", "s.tsv", "m.tsv", "cla.tsv", "npc.tsv")
+  )
+  dummy_tbl <- tidytable::tidytable(col = "val")
+  ret_paths <- export_library_tables(
+    table_keys = dummy_tbl,
+    table_org_tax_ott = dummy_tbl,
+    table_structures_canonical = dummy_tbl,
+    table_structures_stereo = dummy_tbl,
+    table_structures_metadata = dummy_tbl,
+    table_structures_taxonomy_cla = dummy_tbl,
+    table_structures_taxonomy_npc = dummy_tbl,
+    output_key = paths[[1]],
+    output_org_tax_ott = paths[[2]],
+    output_str_can = paths[[3]],
+    output_str_stereo = paths[[4]],
+    output_str_met = paths[[5]],
+    output_str_tax_cla = paths[[6]],
+    output_str_tax_npc = paths[[7]]
+  )
+  expect_identical(
+    names(ret_paths),
+    c(
+      "key",
+      "org_tax_ott",
+      "str_can",
+      "str_stereo",
+      "str_met",
+      "str_tax_cla",
+      "str_tax_npc"
+    )
+  )
+  expect_true(all(file.exists(ret_paths)))
+
+  # 3. apply_taxonomic_filter aborts when matching_orgs is non-empty in taxonomy table but absent from table_keys
+  expect_error(
+    validate_sop_merged_inputs(
+      files = character(0),
+      filter = FALSE,
+      level = "family",
+      value = "Test",
+      output_key = "k.tsv",
+      output_org_tax_ott = "o.tsv",
+      output_str_can = "c.tsv",
+      output_str_stereo = "s.tsv",
+      output_str_met = "m.tsv",
+      output_str_tax_cla = "cla.tsv",
+      output_str_tax_npc = "npc.tsv"
+    ),
+    "files must be a non-empty character vector",
+    class = "tima_validation_error"
+  )
+
+  keys_unmatched <- tidytable::tidytable(
+    structure_inchikey = "IK1",
+    structure_smiles_no_stereo = "C",
+    organism_name = "Unrelated_Org",
+    reference_doi = "10.1/x"
+  )
+  tax_matched <- tidytable::tidytable(
+    organism_name = "Matched_Org",
+    organism_taxonomy_06family = "Gentianaceae"
+  )
+  expect_error(
+    apply_taxonomic_filter(
+      table_keys = keys_unmatched,
+      table_org_tax_ott = tax_matched,
+      level = "family",
+      value = "Gentianaceae"
+    ),
+    "filter led to no entries",
+    class = "tima_validation_error"
+  )
+})
+
+test_that("taxonomy cache internal helpers cover all compression, headerless, normalization, and write-back branches", {
+  tmp_dir <- withr::local_tempdir()
+
+  # 1. .get_existing_keys on NULL/empty table
+  expect_identical(
+    .get_existing_keys(NULL, "structure_smiles"),
+    character(0)
+  )
+  expect_identical(
+    .get_existing_keys(tidytable::tidytable(), "structure_smiles"),
+    character(0)
+  )
+
+  # 2. .prepare_cache_supplement with empty existing_keys, no matching keys, and missing expected_cols
+  cache_data <- tidytable::tidytable(
+    structure_smiles = "C",
+    structure_tax_npc_01pat = "Alkaloids"
+  )
+  expect_null(
+    .prepare_cache_supplement(
+      cache_data = cache_data,
+      key_col = "structure_smiles",
+      all_keys = "UNMATCHED_SMI",
+      existing_keys = character(0),
+      expected_cols = c("structure_smiles", "structure_tax_npc_01pat"),
+      taxonomy_name = "NPClassifier"
+    )
+  )
+  supp_filled <- .prepare_cache_supplement(
+    cache_data = cache_data,
+    key_col = "structure_smiles",
+    all_keys = "C",
+    existing_keys = character(0),
+    expected_cols = c(
+      "structure_smiles",
+      "structure_tax_npc_01pat",
+      "missing_col"
+    ),
+    taxonomy_name = "NPClassifier"
+  )
+  expect_identical(nrow(supp_filled), 1L)
+  expect_identical(supp_filled$missing_col, NA_character_)
+
+  # 3. .read_taxonomy_cache_file: empty file, single-col, .gz, .bz2, and headerless with col_mapping / empty expected_cols
+  empty_file <- file.path(tmp_dir, "empty.tsv")
+  writeLines("", empty_file)
+  expect_identical(
+    nrow(
+      .read_taxonomy_cache_file(
+        cache_path = empty_file,
+        taxonomy_name = "NPC",
+        key_col = "structure_smiles",
+        all_keys = "C",
+        expected_cols = character(0),
+        col_mapping = NULL
+      )
+    ),
+    0L
+  )
+
+  single_col_file <- file.path(tmp_dir, "single.tsv")
+  writeLines(c("structure_smiles", "C"), single_col_file)
+  res_single <- .read_taxonomy_cache_file(
+    cache_path = single_col_file,
+    taxonomy_name = "NPC",
+    key_col = "structure_smiles",
+    all_keys = "C",
+    expected_cols = "structure_smiles",
+    col_mapping = NULL
+  )
+  expect_identical(res_single$structure_smiles, "C")
+
+  # .gz and .bz2 compressed headerless files with col_mapping vs NULL
+  gz_file <- file.path(tmp_dir, "cache.tsv.gz")
+  gz_con <- gzfile(gz_file, "wt")
+  writeLines("VNWKTOKETHGBQD-UHFFFAOYSA-N\tCHEMONTID:0000001", gz_con)
+  close(gz_con)
+  res_gz <- .read_taxonomy_cache_file(
+    cache_path = gz_file,
+    taxonomy_name = "CLA",
+    key_col = "structure_inchikey",
+    all_keys = "VNWKTOKETHGBQD-UHFFFAOYSA-N",
+    expected_cols = character(0),
+    col_mapping = list(
+      structure_inchikey = "inchikey",
+      structure_tax_cla_chemontid = "chemontid"
+    )
+  )
+  expect_identical(
+    names(res_gz),
+    c("structure_inchikey", "structure_tax_cla_chemontid")
+  )
+
+  bz_file <- file.path(tmp_dir, "cache.tsv.bz2")
+  bz_con <- bzfile(bz_file, "wt")
+  writeLines("VNWKTOKETHGBQD-UHFFFAOYSA-N\tCHEMONTID:0000001", bz_con)
+  close(bz_con)
+  res_bz <- .read_taxonomy_cache_file(
+    cache_path = bz_file,
+    taxonomy_name = "CLA",
+    key_col = "structure_inchikey",
+    all_keys = "VNWKTOKETHGBQD-UHFFFAOYSA-N",
+    expected_cols = character(0),
+    col_mapping = NULL
+  )
+  expect_identical(nrow(res_bz), 1L)
+
+  # 4. .cache_needs_disk_normalization branches
+  clean_df <- tidytable::tidytable(
+    structure_smiles = "C",
+    structure_tax_npc_01pat = "Alkaloids"
+  )
+  expect_true(
+    .cache_needs_disk_normalization(
+      cache_data = clean_df,
+      expected_cols = c("structure_smiles", "other_col")
+    )
+  )
+  nc_df <- tidytable::tidytable(
+    structure_smiles = "C",
+    structure_tax_npc_01pat = "notClassified"
+  )
+  expect_true(
+    .cache_needs_disk_normalization(
+      cache_data = nc_df,
+      expected_cols = c("structure_smiles", "structure_tax_npc_01pat")
+    )
+  )
+
+  # 5. .write_enriched_taxonomy_to_cache branches
+  # 5a. Early return FALSE when taxonomy_table is NULL and needs_disk_norm is FALSE
+  expect_false(
+    .write_enriched_taxonomy_to_cache(
+      enriched = clean_df,
+      cache_path = file.path(tmp_dir, "noop.tsv"),
+      expected_cols = names(clean_df),
+      col_mapping = NULL,
+      taxonomy_name = "NPC",
+      existing_cache = clean_df,
+      taxonomy_table = NULL,
+      key_col = "structure_smiles",
+      needs_disk_norm = FALSE
+    )
+  )
+
+  # 5b. existing_cache = NULL reads from disk, applies col_mapping, fills missing cols, handles non-char/notClassified, key_col = NULL, writes .gz
+  wb_gz <- file.path(tmp_dir, "wb_cache.tsv.gz")
+  tidytable::fwrite(
+    tidytable::tidytable(smiles = "C", pat = "notClassified"),
+    wb_gz,
+    sep = "\t",
+    compress = "gzip"
+  )
+  src_tbl <- tidytable::tidytable(
+    structure_smiles = "CC",
+    num_col = factor("notClassified")
+  )
+  ok_wb <- .write_enriched_taxonomy_to_cache(
+    enriched = src_tbl,
+    cache_path = wb_gz,
+    expected_cols = c(
+      "structure_smiles",
+      "structure_tax_npc_01pat",
+      "num_col"
+    ),
+    col_mapping = list(
+      structure_smiles = "smiles",
+      structure_tax_npc_01pat = "pat"
+    ),
+    taxonomy_name = "NPC",
+    existing_cache = NULL,
+    taxonomy_table = src_tbl,
+    key_col = NULL,
+    needs_disk_norm = TRUE
+  )
+  expect_true(ok_wb)
+  wb_read <- tidytable::fread(wb_gz, na.strings = "")
+  expect_identical(nrow(wb_read), 2L)
+  expect_true(all(is.na(wb_read$structure_tax_npc_01pat)))
+
+  # 5c. existing_cache = NULL with nonexistent file & empty source_for_new, and error fallback when path is a directory
+  wb_empty <- file.path(tmp_dir, "wb_empty.tsv")
+  expect_true(
+    suppressWarnings(
+      .write_enriched_taxonomy_to_cache(
+        enriched = tidytable::tidytable(),
+        cache_path = wb_empty,
+        expected_cols = "structure_smiles",
+        col_mapping = NULL,
+        taxonomy_name = "NPC",
+        existing_cache = NULL,
+        taxonomy_table = NULL,
+        key_col = NULL,
+        needs_disk_norm = TRUE
+      )
+    )
+  )
+  dir_path <- file.path(tmp_dir, "as_dir")
+  dir.create(dir_path)
+  expect_false(
+    .write_enriched_taxonomy_to_cache(
+      enriched = clean_df,
+      cache_path = dir_path,
+      expected_cols = names(clean_df),
+      col_mapping = NULL,
+      taxonomy_name = "NPC",
+      existing_cache = clean_df,
+      taxonomy_table = clean_df,
+      key_col = "structure_smiles",
+      needs_disk_norm = TRUE
+    )
+  )
+
+  # 6. enrich_taxonomy_from_cache edge branches: NULL taxonomy_table, empty cache file, missing key_col, read error
+  valid_cache_path <- file.path(tmp_dir, "valid_npc.tsv")
+  tidytable::fwrite(clean_df, valid_cache_path, sep = "\t")
+  res_null_tax <- enrich_taxonomy_from_cache(
+    taxonomy_table = NULL,
+    cache_path = valid_cache_path,
+    key_col = "structure_smiles",
+    all_keys = "C",
+    col_mapping = list(structure_smiles = "structure_smiles"),
+    taxonomy_name = "NPC"
+  )
+  expect_identical(nrow(res_null_tax), 1L)
+
+  res_null_tax_nomap <- enrich_taxonomy_from_cache(
+    taxonomy_table = NULL,
+    cache_path = empty_file,
+    key_col = "structure_smiles",
+    all_keys = "C",
+    col_mapping = NULL,
+    taxonomy_name = "NPC"
+  )
+  expect_null(res_null_tax_nomap)
+
+  wrong_key_path <- file.path(tmp_dir, "wrong_key.tsv")
+  tidytable::fwrite(
+    tidytable::tidytable(
+      other_col = "C",
+      structure_tax_npc_01pat = "Terpenoids"
+    ),
+    wrong_key_path,
+    sep = "\t"
+  )
+  orig_wrong_lines <- readLines(wrong_key_path)
+  expect_no_warning(
+    expect_identical(
+      enrich_taxonomy_from_cache(
+        taxonomy_table = clean_df,
+        cache_path = wrong_key_path,
+        key_col = "structure_smiles",
+        all_keys = c("C", "CC"),
+        taxonomy_name = "NPC"
+      ),
+      clean_df
+    )
+  )
+  expect_identical(readLines(wrong_key_path), orig_wrong_lines)
+
+  # Directory as cache_path triggers read error in .read_taxonomy_cache_file and returns taxonomy_table
+  expect_identical(
+    suppressWarnings(
+      enrich_taxonomy_from_cache(
+        taxonomy_table = clean_df,
+        cache_path = dir_path,
+        key_col = "structure_smiles",
+        all_keys = c("C", "CC"),
+        taxonomy_name = "NPC"
+      )
+    ),
+    clean_df
+  )
+})
