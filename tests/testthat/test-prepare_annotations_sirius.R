@@ -1472,3 +1472,63 @@ test_that("read_sirius_internal_file returns empty tidytable for missing fallbac
   expect_true(tidytable::is_tidytable(out))
   expect_equal(nrow(out), 0L)
 })
+
+test_that(".fast_distinct_with_key_guard preserves unique keys and deduplicates full-row duplicates", {
+  df_unique <- tidytable::tidytable(
+    feature_id = c("f1", "f2", "f3"),
+    candidate_formula = c("C6H12O6", "C7H6O2", "C8H10N4O2"),
+    score = c(0.9, 0.8, 0.7)
+  )
+  expect_equal(
+    .fast_distinct_with_key_guard(
+      df_unique,
+      c("feature_id", "candidate_formula")
+    ),
+    df_unique
+  )
+
+  # Duplicate key with one exact row duplicate and one differing non-key row
+  df_dup <- tidytable::tidytable(
+    feature_id = c("f1", "f1", "f1", "f2"),
+    candidate_formula = c("C6H12O6", "C6H12O6", "C6H12O6", "C7H6O2"),
+    score = c(0.9, 0.9, 0.5, 0.8)
+  )
+  expect_equal(
+    .fast_distinct_with_key_guard(df_dup, c("feature_id", "candidate_formula")),
+    tidytable::distinct(df_dup)
+  )
+
+  # Missing key columns fall back cleanly to distinct()
+  expect_equal(
+    .fast_distinct_with_key_guard(df_dup, c("nonexistent_col")),
+    tidytable::distinct(df_dup)
+  )
+})
+
+test_that(".fast_match_rows matches single and multi-column composite keys accurately", {
+  x_df <- tidytable::tidytable(
+    k1 = c("a", "b", "a", NA_character_, "c"),
+    k2 = c("1", "2", "2", "1", "3")
+  )
+  y_df <- tidytable::tidytable(
+    k1 = c("b", "a", NA_character_),
+    k2 = c("2", "1", "1")
+  )
+
+  expect_identical(
+    .fast_match_rows(x_df, y_df, "k1"),
+    c(2L, 1L, 2L, 3L, NA_integer_)
+  )
+  expect_identical(
+    .fast_match_rows(x_df, y_df, c("k1", "k2")),
+    c(2L, 1L, NA_integer_, 3L, NA_integer_)
+  )
+  expect_identical(
+    .fast_match_rows(x_df[0, ], y_df, c("k1", "k2")),
+    integer(0)
+  )
+  expect_identical(
+    .fast_match_rows(x_df, y_df[0, ], c("k1", "k2")),
+    rep(NA_integer_, nrow(x_df))
+  )
+})

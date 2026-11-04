@@ -336,3 +336,13 @@ test_that("read_from_sirius_zip returns character columns", {
   # All columns should be character due to colClasses = "character"
   expect_true(all(vapply(result, is.character, logical(1))))
 })
+
+test_that(".get_sirius_zip_names caches and returns identical archive member list", {
+  test_zip <- create_test_sirius_zip()
+
+  names1 <- .get_sirius_zip_names(test_zip$zip_file)
+  names2 <- .get_sirius_zip_names(test_zip$zip_file)
+
+  expect_identical(names1, names2)
+  expect_true(any(grepl("structure\\.tsv$", names1)))
+})

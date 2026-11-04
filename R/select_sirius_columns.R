@@ -1,3 +1,18 @@
+.fast_strip_whitespace <- function(x) {
+  n <- length(x)
+  if (n == 0L) {
+    return(x)
+  }
+  if (n > 256L) {
+    ux <- unique(x)
+    if (length(ux) * 2L < n) {
+      u_clean <- gsub("\\s+", "", ux, perl = TRUE)
+      return(u_clean[fastmatch::fmatch(x, ux)])
+    }
+  }
+  gsub("\\s+", "", x, perl = TRUE)
+}
+
 #' @title Select SIRIUS CANOPUS columns
 #'
 #' @description Standardize CANOPUS chemical classification columns.
@@ -77,35 +92,17 @@ select_sirius_columns_canopus <- function(df, sirius_version) {
           # ="ClassyFire.level.5.Probability",
           "feature_pred_tax_cla_04dirpar_val" = "ClassyFire.most.specific.class",
           "feature_pred_tax_cla_04dirpar_score" = "ClassyFire.most.specific.class.Probability"
-          # tidytable version
-          # "feature_pred_tax_npc_01pat_val" = "NPC#pathway",
-          # "feature_pred_tax_npc_01pat_score" = "NPC#pathway Probability",
-          # "feature_pred_tax_npc_02sup_val" = "NPC#superclass",
-          # "feature_pred_tax_npc_02sup_score" = "NPC#superclass Probability",
-          # "feature_pred_tax_npc_03cla_val" = "NPC#class",
-          # "feature_pred_tax_npc_03cla_score" = "NPC#class Probability",
-          # "feature_pred_tax_cla_01kin_val" = "ClassyFire#TODO",
-          # "feature_pred_tax_cla_01kin_score" = "ClassyFire#TODO Probability",
-          # "feature_pred_tax_cla_02sup_val" = "ClassyFire#superclass",
-          # "feature_pred_tax_cla_02sup_score" =
-          #   "ClassyFire#superclass probability",
-          # "feature_pred_tax_cla_03cla_val" = "ClassyFire#class",
-          # "feature_pred_tax_cla_03cla_score" = "ClassyFire#class Probability",
-          # "feature_pred_tax_cla_04dirpar_val" =
-          #   "ClassyFire#most specific class",
-          # "feature_pred_tax_cla_04dirpar_score" =
-          #   "ClassyFire#most specific class Probability"
         )
       )
     ) |>
-    # tidytable::bind_cols(tidytable::tidytable(
-    #   "feature_pred_tax_cla_01kin_val" = NA_character_,
-    #   "feature_pred_tax_cla_01kin_score" = 0
-    # )) |>
     tidytable::distinct()
   # Normalize SIRIUS adduct spacing (e.g., "[M + H]+" -> "[M+H]+")
   if ("candidate_adduct" %in% names(df)) {
-    df[["candidate_adduct"]] <- gsub("\\s+", "", df[["candidate_adduct"]])
+    data.table::set(
+      df,
+      j = "candidate_adduct",
+      value = .fast_strip_whitespace(df[["candidate_adduct"]])
+    )
   }
   df
 }
@@ -171,7 +168,11 @@ select_sirius_columns_formulas <- function(df, sirius_version) {
     )
   # Normalize SIRIUS adduct spacing (e.g., "[M + H]+" -> "[M+H]+")
   if ("candidate_adduct" %in% names(df)) {
-    df[["candidate_adduct"]] <- gsub("\\s+", "", df[["candidate_adduct"]])
+    data.table::set(
+      df,
+      j = "candidate_adduct",
+      value = .fast_strip_whitespace(df[["candidate_adduct"]])
+    )
   }
   df
 }
@@ -196,6 +197,11 @@ select_sirius_columns_formulas <- function(df, sirius_version) {
 #' )
 #' }
 select_sirius_columns_structures <- function(df, sirius_version) {
+  conf_col <- switch(
+    as.character(sirius_version),
+    "5" = "ConfidenceScore",
+    "6" = "ConfidenceScoreApproximate"
+  )
   df <- df |>
     tidytable::select(
       tidyselect::any_of(
@@ -214,33 +220,43 @@ select_sirius_columns_structures <- function(df, sirius_version) {
           ## recompute_structure_fields_from_smiles() downstream.
           "candidate_structure_molecular_formula" = "molecularFormula",
           # ISSUE see #147
-          "candidate_score_sirius_confidence" = switch(
-            as.character(sirius_version),
-            "5" = "ConfidenceScore",
-            "6" = "ConfidenceScoreApproximate"
-          ),
+          "candidate_score_sirius_confidence" = conf_col,
           "candidate_score_sirius_csi" = "CSI.FingerIDScore",
           # tidytable version
           # "candidate_score_sirius_csi" = "CSI:FingerIDScore",
           "candidate_score_sirius_msnovelist" = "ModelScore"
         )
       )
-    ) |>
-    tidytable::distinct() |>
-    tidytable::bind_cols(tidytable::tidytable(
-      candidate_library = "SIRIUS",
-      candidate_structure_tax_npc_01pat = NA_character_,
-      candidate_structure_tax_npc_02sup = NA_character_,
-      candidate_structure_tax_npc_03cla = NA_character_,
-      candidate_structure_tax_cla_chemontid = NA_character_,
-      candidate_structure_tax_cla_01kin = NA_character_,
-      candidate_structure_tax_cla_02sup = NA_character_,
-      candidate_structure_tax_cla_03cla = NA_character_,
-      candidate_structure_tax_cla_04dirpar = NA_character_
-    ))
+    )
+  df <- .fast_distinct_with_key_guard(
+    df,
+    c("feature_id", "candidate_structure_smiles_no_stereo", "candidate_adduct")
+  )
+  n_rows <- nrow(df)
+  data.table::set(
+    df,
+    j = "candidate_library",
+    value = rep.int("SIRIUS", n_rows)
+  )
+  for (tax_col in c(
+    "candidate_structure_tax_npc_01pat",
+    "candidate_structure_tax_npc_02sup",
+    "candidate_structure_tax_npc_03cla",
+    "candidate_structure_tax_cla_chemontid",
+    "candidate_structure_tax_cla_01kin",
+    "candidate_structure_tax_cla_02sup",
+    "candidate_structure_tax_cla_03cla",
+    "candidate_structure_tax_cla_04dirpar"
+  )) {
+    data.table::set(df, j = tax_col, value = rep.int(NA_character_, n_rows))
+  }
   # Normalize SIRIUS adduct spacing (e.g., "[M + H]+" -> "[M+H]+")
   if ("candidate_adduct" %in% names(df)) {
-    df[["candidate_adduct"]] <- gsub("\\s+", "", df[["candidate_adduct"]])
+    data.table::set(
+      df,
+      j = "candidate_adduct",
+      value = .fast_strip_whitespace(df[["candidate_adduct"]])
+    )
   }
   df
 }
@@ -306,14 +322,25 @@ select_sirius_columns_spectral <- function(df, sirius_version) {
     return(tidytable::tidytable())
   }
 
-  analog_vals <- .get_col_or_na(df, "analogHit")
-  analog_logical <- tolower(trimws(analog_vals)) %in% c("true", "t", "1")
-
   feature_id <- switch(
     as.character(sirius_version),
     "5" = harmonize_names_sirius(.get_col_or_na(df, "id")),
     "6" = .get_col_or_na(df, "mappingFeatureId")
   )
+
+  analog_vals <- .get_col_or_na(df, "analogHit")
+  analog_logical <- analog_vals %in% c("true", "TRUE", "True", "t", "T", "1")
+  other_analog <- which(
+    !analog_logical &
+      !is.na(analog_vals) &
+      !analog_vals %in% c("false", "FALSE", "False", "f", "F", "0")
+  )
+  if (length(other_analog) > 0L) {
+    analog_logical[other_analog] <- tolower(trimws(analog_vals[
+      other_analog
+    ])) %in%
+      c("true", "t", "1")
+  }
 
   # Mass deviation: feature precursor (ionMass) minus library reference
   # precursor
@@ -329,12 +356,15 @@ select_sirius_columns_spectral <- function(df, sirius_version) {
 
   result <- tidytable::tidytable(
     feature_id = feature_id,
-    candidate_library = tidytable::if_else(
+    candidate_library = ifelse(
       analog_logical,
       "SIRIUS spectral (analog)",
       "SIRIUS spectral"
     ),
-    candidate_adduct = gsub("\\s+", "", .get_col_or_na(df, "referenceAdduct")),
+    candidate_adduct = .fast_strip_whitespace(.get_col_or_na(
+      df,
+      "referenceAdduct"
+    )),
     candidate_structure_error_mz = raw_mz_dev,
     candidate_spectrum_id = .get_col_or_na(df, "referenceSplash"),
     candidate_structure_name = .get_col_or_na(df, "referenceName"),
@@ -362,9 +392,19 @@ select_sirius_columns_spectral <- function(df, sirius_version) {
     candidate_structure_tax_cla_02sup = NA_character_,
     candidate_structure_tax_cla_03cla = NA_character_,
     candidate_structure_tax_cla_04dirpar = NA_character_
-  ) |>
-    tidytable::filter(!is.na(feature_id)) |>
-    tidytable::distinct()
+  )
+  if (anyNA(result$feature_id)) {
+    result <- result[which(!is.na(result$feature_id)), ]
+  }
+  result <- .fast_distinct_with_key_guard(
+    result,
+    c(
+      "feature_id",
+      "candidate_structure_smiles_no_stereo",
+      "candidate_spectrum_id",
+      "candidate_adduct"
+    )
+  )
 
   rm(analog_vals, analog_logical, feature_id, ion_mz, ref_mz, raw_mz_dev)
   result

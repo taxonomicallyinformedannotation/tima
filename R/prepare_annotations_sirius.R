@@ -247,7 +247,11 @@ prepare_annotations_sirius <-
     structures_prepared_summary,
     structures_prepared_main
   ) |>
-    tidytable::distinct()
+    .fast_distinct_with_key_guard(c(
+      "feature_id",
+      "candidate_structure_inchikey_no_stereo",
+      "candidate_formula"
+    ))
 
   denovo_prepared <- tables$denovo |>
     tidytable::mutate(feature_id = mappingFeatureId) |>
@@ -277,14 +281,54 @@ prepare_annotations_sirius <-
 }
 
 .read_sirius_tabular <- function(con) {
-  utils::read.delim(
-    con,
+  if (is.character(con) && length(con) == 1L && file.exists(con)) {
+    info <- file.info(con)
+    if (is.na(info$size) || info$size == 0) {
+      stop("first five rows are empty", call. = FALSE)
+    }
+    dt <- data.table::fread(
+      file = con,
+      sep = "\t",
+      quote = "",
+      na.strings = c("", "NA"),
+      colClasses = "character",
+      data.table = TRUE,
+      showProgress = FALSE
+    )
+    if (ncol(dt) == 0L) {
+      stop("first five rows are empty", call. = FALSE)
+    }
+    data.table::setnames(dt, make.names(names(dt), unique = TRUE))
+    return(tidytable::as_tidytable(dt))
+  }
+  lines <- readLines(con, warn = FALSE)
+  try(close(con), silent = TRUE)
+  non_empty <- lines[nzchar(lines)]
+  if (length(non_empty) == 0L) {
+    stop("first five rows are empty", call. = FALSE)
+  }
+  if (length(lines) == 1L) {
+    hdr <- strsplit(lines[[1L]], "\t", fixed = TRUE)[[1L]]
+    hdr <- make.names(hdr, unique = TRUE)
+    out <- stats::setNames(
+      replicate(length(hdr), character(0L), simplify = FALSE),
+      hdr
+    )
+    return(tidytable::as_tidytable(out))
+  }
+  dt <- data.table::fread(
+    text = lines,
+    sep = "\t",
     quote = "",
     na.strings = c("", "NA"),
     colClasses = "character",
-    stringsAsFactors = FALSE
-  ) |>
-    tidytable::tidytable()
+    data.table = TRUE,
+    showProgress = FALSE
+  )
+  if (ncol(dt) > 0L) {
+    data.table::setnames(dt, make.names(names(dt), unique = TRUE))
+  }
+  tidytable::as_tidytable(dt)
 }
 
 read_sirius_internal_file <- function(input_directory, internal_file) {

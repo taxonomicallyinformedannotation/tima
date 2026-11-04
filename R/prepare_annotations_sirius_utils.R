@@ -126,30 +126,22 @@ load_sirius_tables <- function(input_directory, version) {
   if (
     version == "6" && nrow(canopus) > 0L && "formulaRank" %in% names(canopus)
   ) {
-    canopus <- canopus |>
-      tidytable::mutate(
-        .formula_rank = as.integer(formulaRank)
-      ) |>
-      tidytable::filter(!is.na(.formula_rank), .formula_rank == 1L) |>
-      tidytable::select(-.formula_rank)
+    fr_can <- suppressWarnings(as.integer(canopus$formulaRank))
+    canopus <- canopus[which(!is.na(fr_can) & fr_can == 1L), ]
   }
 
   formulas <- read_from_sirius_zip(input_directory, file = fnames$formulas)
   if (
     version == "6" && nrow(formulas) > 0L && "formulaRank" %in% names(formulas)
   ) {
-    formulas <- formulas |>
-      tidytable::mutate(
-        .formula_rank = as.integer(formulaRank)
-      ) |>
-      tidytable::filter(!is.na(.formula_rank), .formula_rank == 1L) |>
-      tidytable::select(-.formula_rank)
+    fr_for <- suppressWarnings(as.integer(formulas$formulaRank))
+    formulas <- formulas[which(!is.na(fr_for) & fr_for == 1L), ]
   }
 
   structures <- read_from_sirius_zip(input_directory, file = fnames$structures)
 
   files <- tryCatch(
-    utils::unzip(zipfile = input_directory, list = TRUE),
+    list(Name = .get_sirius_zip_names(input_directory)),
     error = function(e) {
       invisible(e)
       out <- list()
@@ -207,7 +199,7 @@ load_sirius_tables <- function(input_directory, version) {
 #' @keywords internal
 load_sirius_summaries <- function(input_directory) {
   zip_list <- tryCatch(
-    utils::unzip(zipfile = input_directory, list = TRUE),
+    list(Name = .get_sirius_zip_names(input_directory)),
     error = function(e) {
       invisible(e)
       out <- list()
@@ -283,6 +275,141 @@ create_empty_sirius_annotations <- function() {
     )
 }
 
+.fast_distinct_with_key_guard <- function(df, key_cols) {
+  n <- nrow(df)
+  if (n <= 1L) {
+    return(df)
+  }
+  present_keys <- intersect(key_cols, names(df))
+  if (length(present_keys) == 0L) {
+    return(tidytable::distinct(df))
+  }
+  k1 <- df[[present_keys[[1L]]]]
+  u1 <- unique(k1)
+  id1 <- if (anyNA(u1)) match(k1, u1) else fastmatch::fmatch(k1, u1)
+  if (length(present_keys) == 1L) {
+    comp_key <- id1
+  } else {
+    comp_key <- as.double(id1 - 1L)
+    total_space <- as.double(length(u1) + 1L)
+    use_paste <- FALSE
+    ids <- list(id1)
+    for (i in 2:length(present_keys)) {
+      ki <- df[[present_keys[[i]]]]
+      ui <- unique(ki)
+      idi <- if (anyNA(ui)) match(ki, ui) else fastmatch::fmatch(ki, ui)
+      ids[[i]] <- idi
+      bi <- as.double(length(ui) + 1L)
+      total_space <- total_space * bi
+      if (total_space < 4503599627370496) {
+        comp_key <- comp_key * bi + (idi - 1L)
+      } else {
+        use_paste <- TRUE
+      }
+    }
+    if (use_paste) {
+      comp_key <- do.call(paste, c(ids, list(sep = ":")))
+    }
+  }
+
+  dup_fwd <- duplicated(comp_key)
+  if (!any(dup_fwd)) {
+    return(df)
+  }
+  is_dup_key <- dup_fwd | duplicated(comp_key, fromLast = TRUE)
+  dup_idx <- which(is_dup_key)
+  sub_dups <- duplicated(df[dup_idx, ])
+  if (!any(sub_dups)) {
+    return(df)
+  }
+  df[-dup_idx[sub_dups], ]
+}
+
+.fast_match_rows <- function(x, y, by) {
+  nx <- nrow(x)
+  ny <- nrow(y)
+  if (nx == 0L || ny == 0L || length(by) == 0L) {
+    return(rep(NA_integer_, nx))
+  }
+  if (length(by) == 1L) {
+    k <- by[[1L]]
+    yk <- y[[k]]
+    if (!is.character(yk)) {
+      yk <- as.character(yk)
+    }
+    keep_y <- !duplicated(yk)
+    yk_u <- yk[keep_y]
+    y_first <- which(keep_y)
+    xk <- x[[k]]
+    if (!is.character(xk)) {
+      xk <- as.character(xk)
+    }
+    m <- if (anyNA(yk_u) || anyNA(xk)) {
+      match(xk, yk_u)
+    } else {
+      fastmatch::fmatch(xk, yk_u)
+    }
+    return(y_first[m])
+  }
+
+  y_ids <- vector("list", length(by))
+  x_ids <- vector("list", length(by))
+  bases <- integer(length(by))
+  valid_x <- rep(TRUE, nx)
+
+  for (i in seq_along(by)) {
+    k <- by[[i]]
+    yk <- y[[k]]
+    if (!is.character(yk)) {
+      yk <- as.character(yk)
+    }
+    uk <- unique(yk)
+    xk <- x[[k]]
+    if (!is.character(xk)) {
+      xk <- as.character(xk)
+    }
+    if (anyNA(uk) || anyNA(xk)) {
+      yi <- match(yk, uk)
+      xi <- match(xk, uk)
+    } else {
+      yi <- fastmatch::fmatch(yk, uk)
+      xi <- fastmatch::fmatch(xk, uk)
+    }
+    valid_x <- valid_x & !is.na(xi)
+    y_ids[[i]] <- yi
+    x_ids[[i]] <- xi
+    bases[[i]] <- length(uk) + 1L
+  }
+
+  if (!any(valid_x)) {
+    return(rep(NA_integer_, nx))
+  }
+
+  vx_idx <- which(valid_x)
+  total_space <- prod(as.double(bases))
+  if (total_space < 4503599627370496) {
+    y_key <- as.double(y_ids[[1L]] - 1L)
+    x_key <- as.double(x_ids[[1L]][vx_idx] - 1L)
+    for (i in 2:length(by)) {
+      b <- as.double(bases[[i]])
+      y_key <- y_key * b + (y_ids[[i]] - 1L)
+      x_key <- x_key * b + (x_ids[[i]][vx_idx] - 1L)
+    }
+  } else {
+    y_key <- do.call(paste, c(y_ids, list(sep = ":")))
+    x_sub <- lapply(x_ids, `[`, vx_idx)
+    x_key <- do.call(paste, c(x_sub, list(sep = ":")))
+  }
+
+  keep_y <- !duplicated(y_key)
+  u_y_key <- y_key[keep_y]
+  y_first <- which(keep_y)
+  m_vx <- fastmatch::fmatch(x_key, u_y_key)
+  out <- rep(NA_integer_, nx)
+  out[vx_idx] <- y_first[m_vx]
+  out
+}
+
 #' Split SIRIUS Results into Output Tables
 #'
 #' @description Internal helper to split combined SIRIUS table into CANOPUS,
@@ -304,47 +431,66 @@ create_empty_sirius_annotations <- function() {
 #' @keywords internal
 split_sirius_results <- function(table) {
   model <- columns_model()
-  canopus <- table |>
-    tidytable::select(
-      tidyselect::any_of(
-        x = c(
-          model$features_columns,
-          model$features_calculated_columns
-        )
-      )
-    ) |>
-    tidytable::filter(
-      !is.na(!!as.name(model$features_calculated_columns[5]))
-    ) |>
-    tidytable::filter(!is.na(!!as.name(model$features_columns[1]))) |>
-    tidytable::distinct()
-  formula <- table |>
-    tidytable::select(
-      tidyselect::any_of(
-        x = c(
-          model$features_columns,
-          model$candidates_sirius_for_columns
-        )
-      )
-    ) |>
-    tidytable::filter(
-      !is.na(!!as.name(model$candidates_sirius_for_columns[2]))
-    ) |>
-    tidytable::filter(!is.na(!!as.name(model$features_columns[1]))) |>
-    tidytable::distinct()
-  structures <- table |>
-    tidytable::select(
-      tidyselect::any_of(
-        x = c(
-          model$features_columns,
-          model$candidates_structures_columns,
-          model$candidates_spectra_columns,
-          model$candidates_sirius_str_columns
-        )
-      )
-    ) |>
-    tidytable::filter(!is.na(!!as.name(model$features_columns[1]))) |>
-    tidytable::distinct()
+  tbl_names <- names(table)
+  fid_col <- model$features_columns[1]
+  has_fid <- fid_col %in% tbl_names
+  valid_fid <- if (has_fid) !is.na(table[[fid_col]]) else rep(TRUE, nrow(table))
+
+  can_cols <- intersect(
+    c(model$features_columns, model$features_calculated_columns),
+    tbl_names
+  )
+  can_filter_col <- model$features_calculated_columns[5]
+  if (can_filter_col %in% tbl_names) {
+    keep_can <- which(valid_fid & !is.na(table[[can_filter_col]]))
+    canopus <- tidytable::distinct(
+      tidytable::as_tidytable(as.list(table)[can_cols])[keep_can, ]
+    )
+  } else {
+    canopus <- tidytable::distinct(
+      tidytable::as_tidytable(as.list(table)[can_cols])[which(valid_fid), ]
+    )
+  }
+
+  for_cols <- intersect(
+    c(model$features_columns, model$candidates_sirius_for_columns),
+    tbl_names
+  )
+  for_filter_col <- model$candidates_sirius_for_columns[2]
+  if (for_filter_col %in% tbl_names) {
+    keep_for <- which(valid_fid & !is.na(table[[for_filter_col]]))
+    formula <- tidytable::distinct(
+      tidytable::as_tidytable(as.list(table)[for_cols])[keep_for, ]
+    )
+  } else {
+    formula <- tidytable::distinct(
+      tidytable::as_tidytable(as.list(table)[for_cols])[which(valid_fid), ]
+    )
+  }
+
+  str_cols <- intersect(
+    c(
+      model$features_columns,
+      model$candidates_structures_columns,
+      model$candidates_spectra_columns,
+      model$candidates_sirius_str_columns
+    ),
+    tbl_names
+  )
+  str_sub <- tidytable::as_tidytable(as.list(table)[str_cols])
+  if (!all(valid_fid)) {
+    str_sub <- str_sub[which(valid_fid), ]
+  }
+  structures <- .fast_distinct_with_key_guard(
+    str_sub,
+    c(
+      "feature_id",
+      "candidate_structure_smiles_no_stereo",
+      "candidate_adduct",
+      "candidate_library"
+    )
+  )
+
   log_debug(
     "Split results: CANOPUS=%d, formulas=%d, structures=%d rows",
     nrow(canopus),
@@ -393,118 +539,141 @@ merge_sirius_structures_with_spectral <- function(
   }
 
   join_key <- c("feature_id", "candidate_structure_smiles_no_stereo")
-
-  spectral_direct <- spectral_prepared |>
-    tidytable::filter(candidate_library != "SIRIUS spectral (analog)")
-  spectral_analogs <- spectral_prepared |>
-    tidytable::filter(candidate_library == "SIRIUS spectral (analog)")
-
-  if (is.finite(max_analog_abs_mz_error) && nrow(spectral_analogs) > 0L) {
-    spectral_analogs <- spectral_analogs |>
-      tidytable::mutate(
-        .analog_abs_error_mz = abs(
-          as.numeric(candidate_structure_error_mz)
-        )
-      ) |>
-      tidytable::filter(
-        !is.na(.analog_abs_error_mz),
-        .analog_abs_error_mz <= max_analog_abs_mz_error
-      ) |>
-      tidytable::select(-.analog_abs_error_mz)
-  }
-
-  spectral_all <- tidytable::bind_rows(spectral_direct, spectral_analogs)
-
-  if (!"candidate_count_similarity_peaks_matched" %in% names(spectral_all)) {
-    spectral_all <- spectral_all |>
-      tidytable::mutate(candidate_count_similarity_peaks_matched = NA_integer_)
-  }
-  if (!"candidate_spectrum_id" %in% names(spectral_all)) {
-    spectral_all <- spectral_all |>
-      tidytable::mutate(candidate_spectrum_id = NA_character_)
-  }
-  if (!"candidate_structure_name" %in% names(spectral_all)) {
-    spectral_all <- spectral_all |>
-      tidytable::mutate(candidate_structure_name = NA_character_)
-  }
-
-  spectral_typed <- spectral_all |>
-    tidytable::mutate(
-      candidate_score_similarity = as.numeric(candidate_score_similarity),
-      candidate_count_similarity_peaks_matched = as.integer(
-        candidate_count_similarity_peaks_matched
-      )
+  lib_col <- spectral_prepared$candidate_library
+  dir_idx <- which(!is.na(lib_col) & lib_col != "SIRIUS spectral (analog)")
+  ana_idx <- which(!is.na(lib_col) & lib_col == "SIRIUS spectral (analog)")
+  if (is.finite(max_analog_abs_mz_error) && length(ana_idx) > 0L) {
+    err_ana <- abs(
+      as.numeric(spectral_prepared$candidate_structure_error_mz[ana_idx])
     )
-
-  structures_keyed <- structures_prepared |>
-    tidytable::filter(
-      !is.na(feature_id),
-      !is.na(candidate_structure_smiles_no_stereo)
-    )
-
-  structures_no_key <- structures_prepared |>
-    tidytable::filter(
-      is.na(feature_id) | is.na(candidate_structure_smiles_no_stereo)
-    )
-
-  spectral_keyed <- spectral_typed |>
-    tidytable::filter(
-      !is.na(feature_id),
-      !is.na(candidate_structure_smiles_no_stereo)
-    )
-
-  structure_keys <- structures_keyed |>
-    tidytable::select(tidyselect::any_of(join_key)) |>
-    tidytable::distinct()
-
-  spectral_overlap_keyed <- spectral_keyed |>
-    tidytable::semi_join(structure_keys, by = join_key)
-
-  spectral_non_overlap_keyed <- spectral_keyed |>
-    tidytable::anti_join(structure_keys, by = join_key)
-
-  spectral_overlap_keyed <- .reduce_sirius_spectral_candidates(
-    spectral_overlap_keyed,
-    join_key = join_key
+    ana_idx <- ana_idx[!is.na(err_ana) & err_ana <= max_analog_abs_mz_error]
+  }
+  spectral_all <- tidytable::as_tidytable(
+    as.list(spectral_prepared[c(dir_idx, ana_idx), ])
   )
 
-  spectral_keyed <- tidytable::bind_rows(
-    spectral_overlap_keyed,
+  n_sp <- nrow(spectral_all)
+  if (!"candidate_count_similarity_peaks_matched" %in% names(spectral_all)) {
+    data.table::set(
+      spectral_all,
+      j = "candidate_count_similarity_peaks_matched",
+      value = rep.int(NA_integer_, n_sp)
+    )
+  } else {
+    data.table::set(
+      spectral_all,
+      j = "candidate_count_similarity_peaks_matched",
+      value = as.integer(spectral_all$candidate_count_similarity_peaks_matched)
+    )
+  }
+  if (!"candidate_spectrum_id" %in% names(spectral_all)) {
+    data.table::set(
+      spectral_all,
+      j = "candidate_spectrum_id",
+      value = rep.int(NA_character_, n_sp)
+    )
+  }
+  if (!"candidate_structure_name" %in% names(spectral_all)) {
+    data.table::set(
+      spectral_all,
+      j = "candidate_structure_name",
+      value = rep.int(NA_character_, n_sp)
+    )
+  }
+  data.table::set(
+    spectral_all,
+    j = "candidate_score_similarity",
+    value = as.numeric(spectral_all$candidate_score_similarity)
+  )
+
+  st_valid <- !is.na(structures_prepared$feature_id) &
+    !is.na(structures_prepared$candidate_structure_smiles_no_stereo)
+  structures_keyed <- tidytable::as_tidytable(
+    as.list(structures_prepared[which(st_valid), ])
+  )
+  structures_no_key <- structures_prepared[which(!st_valid), ]
+
+  sp_valid <- !is.na(spectral_all$feature_id) &
+    !is.na(spectral_all$candidate_structure_smiles_no_stereo)
+  spectral_keyed <- spectral_all[which(sp_valid), ]
+  spectral_no_key <- spectral_all[which(!sp_valid), ]
+
+  in_struct <- !is.na(
+    .fast_match_rows(spectral_keyed, structures_keyed, by = join_key)
+  )
+  spectral_overlap_keyed <- .reduce_sirius_spectral_candidates(
+    spectral_keyed[which(in_struct), ],
+    join_key = join_key
+  )
+  spectral_non_overlap_keyed <- spectral_keyed[which(!in_struct), ]
+
+  st_orig_cols <- names(structures_keyed)
+  sp_orig_cols <- names(spectral_keyed)
+  suffixed_bases <- intersect(
+    setdiff(st_orig_cols, join_key),
+    setdiff(sp_orig_cols, join_key)
+  )
+  st_only_cols <- setdiff(st_orig_cols, c(join_key, suffixed_bases))
+  sp_only_cols <- setdiff(sp_orig_cols, c(join_key, suffixed_bases))
+
+  if (nrow(spectral_overlap_keyed) > 0L) {
+    m_ov <- .fast_match_rows(
+      structures_keyed,
+      spectral_overlap_keyed,
+      by = join_key
+    )
+    has_ov <- which(!is.na(m_ov))
+    ov_rows <- m_ov[has_ov]
+    sp_cols <- setdiff(names(spectral_overlap_keyed), join_key)
+    for (col in sp_cols) {
+      if (col %in% st_orig_cols) {
+        cur <- structures_keyed[[col]]
+        sp_v <- spectral_overlap_keyed[[col]][ov_rows]
+        if (!identical(typeof(cur), typeof(sp_v))) {
+          full_sp <- spectral_overlap_keyed[[col]][m_ov]
+          cur <- tidytable::coalesce(cur, full_sp)
+          data.table::set(structures_keyed, j = col, value = cur)
+        } else {
+          na_cur <- is.na(cur[has_ov])
+          if (any(na_cur)) {
+            cur[has_ov[na_cur]] <- sp_v[na_cur]
+            data.table::set(structures_keyed, j = col, value = cur)
+          }
+        }
+      } else {
+        data.table::set(
+          structures_keyed,
+          j = col,
+          value = spectral_overlap_keyed[[col]][m_ov]
+        )
+      }
+    }
+  } else {
+    for (col in sp_only_cols) {
+      data.table::set(
+        structures_keyed,
+        j = col,
+        value = spectral_keyed[[col]][rep(NA_integer_, nrow(structures_keyed))]
+      )
+    }
+  }
+
+  target_order <- c(
+    intersect(join_key, names(structures_keyed)),
+    st_only_cols,
+    sp_only_cols,
+    suffixed_bases
+  )
+  target_order <- intersect(target_order, names(structures_keyed))
+  if (length(target_order) > 0L) {
+    data.table::setcolorder(structures_keyed, target_order)
+  }
+
+  merged_keyed <- tidytable::bind_rows(
+    structures_keyed,
     spectral_non_overlap_keyed
   )
 
-  spectral_no_key <- spectral_typed |>
-    tidytable::filter(
-      is.na(feature_id) | is.na(candidate_structure_smiles_no_stereo)
-    )
-
-  # Full join keeps overlap rows merged and preserves non-overlap rows as
-  # candidates.
-  merged_keyed <- tidytable::full_join(
-    structures_keyed,
-    spectral_keyed,
-    by = join_key
-  )
-
-  suffixed_bases <- names(merged_keyed)
-  suffixed_bases <- suffixed_bases[grepl("\\.x$", suffixed_bases)]
-  suffixed_bases <- sub("\\.x$", "", suffixed_bases)
-
-  for (col in suffixed_bases) {
-    col_x <- paste0(col, ".x")
-    col_y <- paste0(col, ".y")
-
-    merged_keyed <- merged_keyed |>
-      tidytable::mutate(
-        !!as.name(col) := tidytable::coalesce(
-          !!as.name(col_x),
-          !!as.name(col_y)
-        )
-      ) |>
-      tidytable::select(-tidyselect::any_of(c(col_x, col_y)))
-  }
-
-  # Convert columns directly via assignment (faster than piped mutates)
   if ("candidate_score_similarity" %in% names(merged_keyed)) {
     merged_keyed$candidate_score_similarity <- as.numeric(
       merged_keyed$candidate_score_similarity
@@ -517,17 +686,24 @@ merge_sirius_structures_with_spectral <- function(
     )
   }
 
-  result <- tidytable::bind_rows(
-    merged_keyed,
-    structures_no_key,
-    spectral_no_key
-  ) |>
-    tidytable::distinct()
+  result <- .fast_distinct_with_key_guard(
+    tidytable::bind_rows(
+      merged_keyed,
+      structures_no_key,
+      spectral_no_key
+    ),
+    c(
+      "feature_id",
+      "candidate_structure_smiles_no_stereo",
+      "candidate_adduct",
+      "candidate_library"
+    )
+  )
 
   rm(
     structures_keyed,
     spectral_keyed,
-    spectral_typed,
+    spectral_all,
     merged_keyed,
     structures_no_key,
     spectral_no_key
@@ -541,12 +717,27 @@ merge_sirius_structures_with_spectral <- function(
   }
   xv <- unique(as.character(x[[col]]))
   yv <- unique(as.character(y[[col]]))
-  xv <- xv[!is.na(xv) & nzchar(trimws(xv))]
-  yv <- yv[!is.na(yv) & nzchar(trimws(yv))]
+  xv <- xv[!is.na(xv) & nzchar(xv)]
+  yv <- yv[!is.na(yv) & nzchar(yv)]
   if (length(xv) == 0L || length(yv) == 0L) {
     return(FALSE)
   }
-  length(intersect(xv, yv)) > 0L
+  ws_x <- grep("^[ \t\r\n]|[ \t\r\n]$", xv)
+  if (length(ws_x) > 0L) {
+    tx <- xv
+    tx[ws_x] <- trimws(xv[ws_x])
+    xv <- xv[nzchar(tx)]
+  }
+  ws_y <- grep("^[ \t\r\n]|[ \t\r\n]$", yv)
+  if (length(ws_y) > 0L) {
+    ty <- yv
+    ty[ws_y] <- trimws(yv[ws_y])
+    yv <- yv[nzchar(ty)]
+  }
+  if (length(xv) == 0L || length(yv) == 0L) {
+    return(FALSE)
+  }
+  any(fastmatch::fmatch(xv, yv, nomatch = 0L) > 0L)
 }
 
 .pick_sirius_join_keys <- function(x, y, preferred_keys) {
@@ -585,74 +776,85 @@ merge_sirius_structures_with_spectral <- function(
 
   # Prevent join fan-out when payload has multiple rows for the same key.
   # Keep only one row per key, preferring the first occurrence
-  y_reduced <- y |>
-    tidytable::select(tidyselect::any_of(c(by, new_cols))) |>
-    tidytable::distinct(tidyselect::any_of(by), .keep_all = TRUE)
-
-  tidytable::left_join(x, y_reduced, by = by)
+  m <- .fast_match_rows(x, y, by = by)
+  out <- tidytable::as_tidytable(as.list(x))
+  for (col in new_cols) {
+    data.table::set(out, j = col, value = y[[col]][m])
+  }
+  out
 }
 
 .reduce_sirius_spectral_candidates <- function(spectral_keyed, join_key) {
-  if (nrow(spectral_keyed) == 0L) {
+  n <- nrow(spectral_keyed)
+  if (n <= 1L) {
     return(spectral_keyed)
   }
 
-  spectral_keyed |>
-    tidytable::mutate(
-      .sim_rank = tidytable::if_else(
-        is.na(candidate_score_similarity),
-        -Inf,
-        candidate_score_similarity
-      ),
-      .peak_rank = tidytable::if_else(
-        is.na(candidate_count_similarity_peaks_matched),
-        -Inf,
-        as.numeric(candidate_count_similarity_peaks_matched)
-      )
-    ) |>
-    tidytable::arrange(
-      tidytable::across(tidyselect::all_of(join_key)),
-      tidytable::desc(.sim_rank),
-      tidytable::desc(.peak_rank)
-    ) |>
-    tidytable::distinct(
-      tidyselect::all_of(join_key),
-      .keep_all = TRUE
-    ) |>
-    tidytable::select(-.sim_rank, -.peak_rank)
+  sim <- as.numeric(spectral_keyed$candidate_score_similarity)
+  sim[is.na(sim)] <- -Inf
+  pk <- as.numeric(spectral_keyed$candidate_count_similarity_peaks_matched)
+  pk[is.na(pk)] <- -Inf
+  f_col <- spectral_keyed[[join_key[[1L]]]]
+  s_col <- spectral_keyed[[join_key[[2L]]]]
+  ord <- order(f_col, s_col, -sim, -pk, method = "radix")
+  f_ord <- f_col[ord]
+  s_ord <- s_col[ord]
+  keep <- c(TRUE, f_ord[-1L] != f_ord[-n] | s_ord[-1L] != s_ord[-n])
+  spectral_keyed[ord[keep], ]
 }
 
 .build_formula_error_fallback <- function(formulas_prepared) {
-  formulas_prepared |>
-    tidytable::filter(!is.na(feature_id)) |>
-    tidytable::mutate(
-      candidate_structure_error_mz = as.numeric(candidate_structure_error_mz)
-    ) |>
-    tidytable::filter(!is.na(candidate_structure_error_mz)) |>
-    tidytable::arrange(feature_id, abs(candidate_structure_error_mz)) |>
-    tidytable::distinct(feature_id, .keep_all = TRUE) |>
-    tidytable::select(
-      feature_id,
-      candidate_structure_error_mz_fallback = candidate_structure_error_mz
-    )
+  if (
+    nrow(formulas_prepared) == 0L ||
+      !"feature_id" %in% names(formulas_prepared) ||
+      !"candidate_structure_error_mz" %in% names(formulas_prepared)
+  ) {
+    return(tidytable::tidytable(
+      feature_id = character(),
+      candidate_structure_error_mz_fallback = numeric()
+    ))
+  }
+  fid <- formulas_prepared$feature_id
+  err <- as.numeric(formulas_prepared$candidate_structure_error_mz)
+  ok <- which(!is.na(fid) & !is.na(err))
+  if (length(ok) == 0L) {
+    return(tidytable::tidytable(
+      feature_id = character(),
+      candidate_structure_error_mz_fallback = numeric()
+    ))
+  }
+  fid_ok <- fid[ok]
+  err_ok <- err[ok]
+  ord <- order(fid_ok, abs(err_ok), method = "radix")
+  keep <- ord[!duplicated(fid_ok[ord])]
+  tidytable::tidytable(
+    feature_id = fid_ok[keep],
+    candidate_structure_error_mz_fallback = err_ok[keep]
+  )
 }
 
 .apply_candidate_error_mz_fallback <- function(df, formula_error_fallback) {
-  if (!"candidate_structure_error_mz" %in% names(df)) {
-    df <- df |>
-      tidytable::mutate(candidate_structure_error_mz = NA_real_)
+  out <- tidytable::as_tidytable(as.list(df))
+  err <- if ("candidate_structure_error_mz" %in% names(out)) {
+    as.numeric(out$candidate_structure_error_mz)
+  } else {
+    rep(NA_real_, nrow(out))
   }
-
-  df |>
-    tidytable::left_join(formula_error_fallback, by = "feature_id") |>
-    tidytable::mutate(
-      candidate_structure_error_mz = ifelse(
-        is.na(as.numeric(candidate_structure_error_mz)),
-        candidate_structure_error_mz_fallback,
-        as.numeric(candidate_structure_error_mz)
-      )
-    ) |>
-    tidytable::select(-candidate_structure_error_mz_fallback)
+  na_idx <- which(is.na(err))
+  if (length(na_idx) > 0L && nrow(formula_error_fallback) > 0L) {
+    fb_f <- formula_error_fallback$feature_id
+    q_f <- out$feature_id[na_idx]
+    m <- if (anyNA(fb_f) || anyNA(q_f)) {
+      match(q_f, fb_f)
+    } else {
+      fastmatch::fmatch(q_f, fb_f)
+    }
+    err[na_idx] <- formula_error_fallback$candidate_structure_error_mz_fallback[
+      m
+    ]
+  }
+  data.table::set(out, j = "candidate_structure_error_mz", value = err)
+  out
 }
 
 join_sirius_annotation_tables <- function(
@@ -707,12 +909,12 @@ join_sirius_annotation_tables <- function(
   ) {
     denovo_prepared
   } else {
-    denovo_prepared |>
-      tidytable::anti_join(
-        structures_prepared |>
-          tidytable::distinct(tidyselect::any_of(denovo_match_keys)),
-        by = denovo_match_keys
-      )
+    m_dn <- .fast_match_rows(
+      denovo_prepared,
+      structures_prepared,
+      by = denovo_match_keys
+    )
+    denovo_prepared[which(is.na(m_dn)), ]
   }
 
   denovo_only_enriched <- denovo_only |>
@@ -756,6 +958,13 @@ join_sirius_annotation_tables <- function(
     formula_error_fallback
   )
 
-  tidytable::bind_rows(structures_with_fallback, denovo_only_enriched) |>
-    tidytable::distinct()
+  .fast_distinct_with_key_guard(
+    tidytable::bind_rows(structures_with_fallback, denovo_only_enriched),
+    c(
+      "feature_id",
+      "candidate_structure_smiles_no_stereo",
+      "candidate_adduct",
+      "candidate_structure_molecular_formula"
+    )
+  )
 }

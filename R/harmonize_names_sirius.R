@@ -34,12 +34,18 @@ harmonize_names_sirius <- function(x) {
 
   # Remove everything up to and including the last underscore
   # This extracts the meaningful column name from SIRIUS prefixed names
-  harmonized_name <- gsub(
+  n <- length(x)
+  if (n > 256L) {
+    ux <- unique(x)
+    if (length(ux) * 2L < n) {
+      u_harm <- sub(pattern = ".*_", replacement = "", x = ux, perl = TRUE)
+      return(u_harm[fastmatch::fmatch(x, ux)])
+    }
+  }
+  sub(
     pattern = ".*_",
     replacement = "",
     x = x,
     perl = TRUE
   )
-
-  harmonized_name
 }

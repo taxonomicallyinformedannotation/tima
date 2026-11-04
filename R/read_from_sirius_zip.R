@@ -1,3 +1,24 @@
+.SIRIUS_ZIP_LIST_CACHE <- new.env(hash = TRUE, parent = emptyenv())
+
+.get_sirius_zip_names <- function(sirius_zip) {
+  info <- file.info(sirius_zip)
+  cache_key <- paste(
+    sirius_zip,
+    as.numeric(info$mtime),
+    info$size,
+    sep = "|"
+  )
+  cached <- get0(cache_key, envir = .SIRIUS_ZIP_LIST_CACHE, inherits = FALSE)
+  if (!is.null(cached)) {
+    return(cached)
+  }
+  zip_names <- as.character(utils::unzip(sirius_zip, list = TRUE)$Name)
+  if (!is.na(info$size)) {
+    assign(cache_key, zip_names, envir = .SIRIUS_ZIP_LIST_CACHE)
+  }
+  zip_names
+}
+
 #' @title Read file from SIRIUS zip archive
 #'
 #' @description Reads specific files from a compressed SIRIUS workspace
@@ -46,23 +67,12 @@ read_from_sirius_zip <- function(sirius_zip, file) {
   }
 
   # List archive contents and filter
-  matching_file <- sirius_zip |>
-    utils::unzip(list = TRUE) |>
-    tidytable::filter(
-      Name |>
-        grepl(pattern = file, perl = TRUE)
-    ) |>
-    tidytable::arrange(Name, decreasing = TRUE) |>
-    # Avoid empty files (those starting with underscore)
-    tidytable::filter(
-      !Name |>
-        startsWith("_")
-    ) |>
-    tidytable::pull(Name) |>
-    # Take first match (handles structures and denovo sharing names)
-    utils::head(n = 1L)
-
-  if (length(matching_file) == 0L) {
+  zip_names <- .get_sirius_zip_names(sirius_zip)
+  keep_idx <- which(
+    grepl(pattern = file, x = zip_names, perl = TRUE) &
+      !startsWith(zip_names, "_")
+  )
+  if (length(keep_idx) == 0L) {
     cli::cli_abort(
       c(
         "No matching file found in archive",
@@ -73,19 +83,17 @@ read_from_sirius_zip <- function(sirius_zip, file) {
       call = NULL
     )
   }
+  matched_names <- zip_names[keep_idx]
+  if (length(matched_names) > 1L) {
+    matched_names <- sort(matched_names, method = "radix")
+  }
+  matching_file <- matched_names[[1L]]
 
   log_debug("Extracting file: %s", matching_file)
 
   # Read and parse the file from archive
   con <- unz(description = sirius_zip, filename = matching_file)
-  result <- utils::read.delim(
-    con,
-    quote = "",
-    na.strings = c("", "NA"),
-    colClasses = "character",
-    stringsAsFactors = FALSE
-  ) |>
-    tidytable::tidytable()
+  result <- .read_sirius_tabular(con)
 
   result
 }

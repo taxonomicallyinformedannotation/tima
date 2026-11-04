@@ -35,12 +35,18 @@ pre_harmonize_names_sirius <- function(x) {
 
   # Remove everything from the first forward slash onwards
   # This strips SIRIUS suffix information from column names
-  cleaned_name <- stri_replace_all_regex(
-    str = x,
+  n <- length(x)
+  if (n > 256L) {
+    ux <- unique(x)
+    if (length(ux) * 2L < n) {
+      u_clean <- sub(pattern = "/.*", replacement = "", x = ux, perl = TRUE)
+      return(u_clean[fastmatch::fmatch(x, ux)])
+    }
+  }
+  sub(
     pattern = "/.*",
     replacement = "",
-    vectorize_all = FALSE
+    x = x,
+    perl = TRUE
   )
-
-  cleaned_name
 }

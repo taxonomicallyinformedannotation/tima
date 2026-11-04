@@ -250,3 +250,10 @@ test_that("harmonize_names_sirius scales linearly", {
   ratio <- time_large["elapsed"] / time_small["elapsed"]
   expect_lt(ratio, 20)
 })
+
+test_that("harmonize_names_sirius deduplicated fast-path (>256 elements) preserves NA and duplicates", {
+  base_vals <- c("1_alpha", "2_beta_gamma", "no_underscore", NA_character_, "")
+  large_vec <- rep(base_vals, 60L)
+  expected <- sub(".*_", "", large_vec, perl = TRUE)
+  expect_identical(harmonize_names_sirius(large_vec), expected)
+})
