@@ -578,3 +578,23 @@ test_that("calculate_entropy_and_similarity falls back to per-pair GNPS when bat
     tolerance = 1e-6
   )
 })
+
+test_that("calculate_entropy_and_similarity handles NA query precursors and empty library windows cleanly", {
+  out <- calculate_entropy_and_similarity(
+    lib_ids = c(10L, 20L),
+    lib_precursors = c(61.0, 73.0),
+    lib_spectra = list(sp_acetic, sp_propane),
+    query_ids = c(1L, 2L, 3L),
+    query_precursors = c(NA_real_, 500.0, 61.0),
+    query_spectra = list(sp_acetic, sp_acetic, sp_acetic),
+    method = "gnps",
+    dalton = 0.01,
+    ppm = 10,
+    threshold = 0.5,
+    approx = FALSE
+  )
+
+  expect_equal(nrow(out), 1L)
+  expect_equal(out$feature_id[[1L]], 3L)
+  expect_equal(out$target_id[[1L]], 10L)
+})

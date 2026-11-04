@@ -1337,3 +1337,23 @@ test_that("enrich_taxonomy_from_cache parses headerless TSV ClassyFire cache (.c
   )
   expect_equal(added$structure_tax_cla_04dirpar, "N-benzylbenzamides")
 })
+
+test_that("apply_taxonomic_filter matches organisms without expanding non-matching keys", {
+  keys <- tidytable::tidytable(
+    structure_inchikey = c(
+      "IK1-UHFFFAOYSA-N",
+      "IK2-UHFFFAOYSA-N",
+      "IK1-UHFFFAOYSA-N"
+    ),
+    structure_smiles_no_stereo = c("C", "CC", "C"),
+    organism_name = c("Rosa canina", "Pinus sylvestris", "Rosa canina"),
+    reference_doi = c("10.1/a", "10.1/b", "10.1/a")
+  )
+  tax <- tidytable::tidytable(
+    organism_name = c("Rosa canina", "Pinus sylvestris"),
+    organism_taxonomy_06family = c("Rosaceae", "Pinaceae")
+  )
+  out <- apply_taxonomic_filter(keys, tax, level = "family", value = "Rosaceae")
+  expect_equal(nrow(out), 1L)
+  expect_equal(out$organism_name, "Rosa canina")
+})

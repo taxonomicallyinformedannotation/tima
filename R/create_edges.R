@@ -190,8 +190,39 @@ create_edges <- function(
         res_mat <- matrix(nrow = 0L, ncol = 4)
       }
 
-      sc_vec <- res_mat[, 1]
-      mp_vec <- as.integer(res_mat[, 2])
+      sc_vec <- res_mat[, 1L]
+      if (!anyNA(sc_vec) && !any(is.infinite(sc_vec))) {
+        bins <- pmin(9L, pmax(0L, as.integer(sc_vec * 10)))
+        bin_counts <- bin_counts + tabulate(bins + 1L, nbins = 10L)
+      } else {
+        finite_sc <- is.finite(sc_vec)
+        if (any(finite_sc)) {
+          bins <- pmin(9L, pmax(0L, as.integer(sc_vec[finite_sc] * 10)))
+          bin_counts <- bin_counts + tabulate(bins + 1L, nbins = 10L)
+        }
+      }
+
+      kept_idx <- if (!is.null(threshold)) {
+        which(!is.na(sc_vec) & sc_vec >= threshold)
+      } else {
+        seq_along(targets)
+      }
+
+      if (length(kept_idx) > 0L) {
+        mp_sub <- res_mat[kept_idx, 2L]
+        if (!is.null(matched_peaks)) {
+          mp_ok <- !is.na(mp_sub) & mp_sub >= matched_peaks
+          kept_idx <- kept_idx[mp_ok]
+          mp_sub <- mp_sub[mp_ok]
+        }
+        if (length(kept_idx) > 0L) {
+          t_kept <- targets[kept_idx]
+          res_f[[i]] <- rep.int(i, length(t_kept))
+          res_t[[i]] <- t_kept
+          res_s[[i]] <- sc_vec[kept_idx]
+          res_m[[i]] <- as.integer(mp_sub)
+        }
+      }
     } else {
       sc_vec <- numeric(length(targets))
       mp_vec <- integer(length(targets))
@@ -216,29 +247,29 @@ create_edges <- function(
           mp_vec[k] <- 0L
         }
       }
-    }
 
-    finite_sc <- is.finite(sc_vec)
-    if (any(finite_sc)) {
-      bins <- pmin(9L, pmax(0L, as.integer(sc_vec[finite_sc] * 10)))
-      bin_counts <- bin_counts + tabulate(bins + 1L, nbins = 10L)
-    }
+      finite_sc <- is.finite(sc_vec)
+      if (any(finite_sc)) {
+        bins <- pmin(9L, pmax(0L, as.integer(sc_vec[finite_sc] * 10)))
+        bin_counts <- bin_counts + tabulate(bins + 1L, nbins = 10L)
+      }
 
-    keep <- rep(TRUE, length(targets))
-    if (!is.null(threshold)) {
-      keep <- keep & (sc_vec >= threshold)
-    }
-    if (!is.null(matched_peaks)) {
-      keep <- keep & (mp_vec >= matched_peaks)
-    }
-    keep[is.na(keep)] <- FALSE
+      keep <- rep(TRUE, length(targets))
+      if (!is.null(threshold)) {
+        keep <- keep & (sc_vec >= threshold)
+      }
+      if (!is.null(matched_peaks)) {
+        keep <- keep & (mp_vec >= matched_peaks)
+      }
+      keep[is.na(keep)] <- FALSE
 
-    if (any(keep)) {
-      t_kept <- targets[keep]
-      res_f[[i]] <- rep.int(i, length(t_kept))
-      res_t[[i]] <- t_kept
-      res_s[[i]] <- sc_vec[keep]
-      res_m[[i]] <- mp_vec[keep]
+      if (any(keep)) {
+        t_kept <- targets[keep]
+        res_f[[i]] <- rep.int(i, length(t_kept))
+        res_t[[i]] <- t_kept
+        res_s[[i]] <- sc_vec[keep]
+        res_m[[i]] <- mp_vec[keep]
+      }
     }
   }
 

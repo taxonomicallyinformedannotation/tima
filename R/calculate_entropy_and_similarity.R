@@ -164,11 +164,50 @@ calculate_entropy_and_similarity <- function(
   # ~45-60s per library pass even when only a small subset of library spectra
   # matched above `threshold` and when `lib_mz_sorted_list` was completely
   # unused on the default GNPS batch path.
-  need_mz_sorted <- !(method == "gnps" && compute_forward_reverse)
+  use_gnps <- (method == "gnps")
+  use_gnps_batch <- use_gnps && compute_forward_reverse
+  need_mz_sorted <- !use_gnps_batch
   lib_mz_sorted_list <- if (need_mz_sorted) {
     vector("list", n_lib)
   } else {
     NULL
+  }
+
+  # Vectorize precursor window binary search across all queries upfront
+  if (!approx) {
+    low_vals_all <- pmin(
+      query_precursors_used - dalton,
+      query_precursors_used * (1 - (1E-6 * ppm))
+    )
+    high_vals_all <- pmax(
+      query_precursors_used + dalton,
+      query_precursors_used * (1 + (1E-6 * ppm))
+    )
+    low_indices_all <- integer(n_queries)
+    high_indices_all <- integer(n_queries)
+    valid_q_prec <- !is.na(query_precursors_used) &
+      is.finite(query_precursors_used)
+    if (any(valid_q_prec) && length(lib_precursors_sorted_vals) > 0L) {
+      vq_idx <- which(valid_q_prec)
+      low_indices_all[vq_idx] <- findInterval(
+        low_vals_all[vq_idx],
+        lib_precursors_sorted_vals,
+        left.open = TRUE
+      ) +
+        1L
+      high_indices_all[vq_idx] <- findInterval(
+        high_vals_all[vq_idx],
+        lib_precursors_sorted_vals,
+        left.open = FALSE
+      )
+    } else {
+      low_indices_all[] <- 1L
+      high_indices_all[] <- 0L
+    }
+    low_indices_all[!valid_q_prec] <- 1L
+    high_indices_all[!valid_q_prec] <- 0L
+  } else {
+    all_lib_indices <- seq_along(lib_spectra)
   }
 
   # Progress counter and query batch size for efficient C calls
@@ -181,61 +220,32 @@ calculate_entropy_and_similarity <- function(
         log_info("Processed %d / %d queries", spectrum_idx, n_queries)
       }
 
+      # Filter library spectra by precursor mass if not approximating
+      if (!approx) {
+        low_idx <- low_indices_all[spectrum_idx]
+        high_idx <- high_indices_all[spectrum_idx]
+        if (low_idx > high_idx) {
+          return(NULL)
+        }
+        lib_indices_sub <- lib_precursors_sorted_idx[low_idx:high_idx]
+      } else {
+        lib_indices_sub <- all_lib_indices
+        if (length(lib_indices_sub) == 0L) {
+          return(NULL)
+        }
+      }
+
       current_spectrum <- query_spectra[[spectrum_idx]]
       current_precursor <- query_precursors_used[spectrum_idx]
       current_id <- query_ids[spectrum_idx]
-
-      # Filter library spectra by precursor mass if not approximating
-      if (!approx) {
-        low_val <- min(
-          current_precursor - dalton,
-          current_precursor * (1 - (1E-6 * ppm))
-        )
-        high_val <- max(
-          current_precursor + dalton,
-          current_precursor * (1 + (1E-6 * ppm))
-        )
-        # Closed window [low_val, high_val], as in reduce_library_by_precursor()
-        low_idx <- findInterval(
-          low_val,
-          lib_precursors_sorted_vals,
-          left.open = TRUE
-        ) +
-          1L
-        high_idx <- findInterval(
-          high_val,
-          lib_precursors_sorted_vals,
-          left.open = FALSE
-        )
-        if (low_idx <= high_idx) {
-          lib_indices_sub <- lib_precursors_sorted_idx[low_idx:high_idx]
-        } else {
-          lib_indices_sub <- integer(0)
-        }
-      } else {
-        lib_indices_sub <- seq_along(lib_spectra)
-      }
-
-      if (length(lib_indices_sub) == 0) {
-        return(NULL)
-      }
-
-      # Pre-allocate result vectors once
       n_candidates <- length(lib_indices_sub)
-      scores <- rep(NA_real_, n_candidates)
-      matched_counts <- integer(n_candidates)
-      scores_forward <- rep(NA_real_, n_candidates)
-      scores_reverse <- rep(NA_real_, n_candidates)
-      use_gnps <- (method == "gnps")
-      q_mz <- current_spectrum[, 1L]
 
       # Process library batch using vectorized C call when possible
       # (reduces per-pair R↔C overhead vs. individual wrapper calls)
-      if (use_gnps && compute_forward_reverse) {
+      if (use_gnps_batch) {
         # For GNPS: use batch call if available, falls back to individual calls
-        lib_batch_indices <- lib_indices_sub
-        lib_batch_precursors <- lib_precursors_used[lib_batch_indices]
-        lib_batch_spectra <- lib_spectra[lib_batch_indices]
+        lib_batch_precursors <- lib_precursors_used[lib_indices_sub]
+        lib_batch_spectra <- lib_spectra[lib_indices_sub]
 
         # Try fused batch call; falls back to per-pair if it fails
         batch_result <- tryCatch(
@@ -253,43 +263,73 @@ calculate_entropy_and_similarity <- function(
         )
 
         if (!is.null(batch_result) && is.matrix(batch_result)) {
-          # Batch call succeeded: unpack results
-          scores <- as.numeric(batch_result[, 1L])
-          matched_counts <- as.integer(batch_result[, 2L])
-          scores_forward <- as.numeric(batch_result[, 3L])
-          scores_reverse <- as.numeric(batch_result[, 4L])
-        } else {
-          # Batch call failed or returned NULL: fall back to per-pair loop
-          for (pos_idx in seq_len(n_candidates)) {
-            lib_idx <- lib_indices_sub[[pos_idx]]
-            lib_spectrum <- lib_spectra[[lib_idx]]
-
-            if (
-              !is.matrix(lib_spectrum) ||
-                nrow(lib_spectrum) == 0L ||
-                ncol(lib_spectrum) < 2L
-            ) {
-              next
-            }
-
-            target_precursor <- lib_precursors_used[[lib_idx]]
-            res <- gnps_chain_dp_wrapper(
-              current_spectrum,
-              lib_spectrum,
-              current_precursor,
-              target_precursor,
-              dalton,
-              ppm,
-              matchedPeaksCount = TRUE
-            )
-            scores[[pos_idx]] <- as.numeric(res[[1L]])
-            matched_counts[[pos_idx]] <- as.integer(res[[2L]])
-            scores_forward[[pos_idx]] <- as.numeric(res[[3L]])
-            scores_reverse[[pos_idx]] <- as.numeric(res[[4L]])
+          # Batch call succeeded: filter scores before unpacking other columns
+          scores_col <- batch_result[, 1L]
+          valid_indices <- which(!is.na(scores_col) & scores_col >= threshold)
+          if (length(valid_indices) == 0L) {
+            return(NULL)
           }
+          n_v <- length(valid_indices)
+          return(
+            list(
+              feature_id = rep(current_id, n_v),
+              precursorMz = rep.int(current_precursor, n_v),
+              lib_pos = lib_indices_sub[valid_indices],
+              candidate_score_similarity = as.numeric(
+                scores_col[valid_indices]
+              ),
+              candidate_score_similarity_forward = as.numeric(
+                batch_result[valid_indices, 3L]
+              ),
+              candidate_score_similarity_reverse = as.numeric(
+                batch_result[valid_indices, 4L]
+              ),
+              candidate_count_similarity_peaks_matched = as.integer(
+                batch_result[valid_indices, 2L]
+              )
+            )
+          )
+        }
+
+        # Batch call failed or returned NULL: fall back to per-pair loop
+        scores <- rep(NA_real_, n_candidates)
+        matched_counts <- integer(n_candidates)
+        scores_forward <- rep(NA_real_, n_candidates)
+        scores_reverse <- rep(NA_real_, n_candidates)
+        for (pos_idx in seq_len(n_candidates)) {
+          lib_idx <- lib_indices_sub[[pos_idx]]
+          lib_spectrum <- lib_spectra[[lib_idx]]
+
+          if (
+            !is.matrix(lib_spectrum) ||
+              nrow(lib_spectrum) == 0L ||
+              ncol(lib_spectrum) < 2L
+          ) {
+            next
+          }
+
+          target_precursor <- lib_precursors_used[[lib_idx]]
+          res <- gnps_chain_dp_wrapper(
+            current_spectrum,
+            lib_spectrum,
+            current_precursor,
+            target_precursor,
+            dalton,
+            ppm,
+            matchedPeaksCount = TRUE
+          )
+          scores[[pos_idx]] <- as.numeric(res[[1L]])
+          matched_counts[[pos_idx]] <- as.integer(res[[2L]])
+          scores_forward[[pos_idx]] <- as.numeric(res[[3L]])
+          scores_reverse[[pos_idx]] <- as.numeric(res[[4L]])
         }
       } else {
         # Non-GNPS path or forward/reverse not needed: use per-pair calls
+        scores <- rep(NA_real_, n_candidates)
+        matched_counts <- integer(n_candidates)
+        scores_forward <- rep(NA_real_, n_candidates)
+        scores_reverse <- rep(NA_real_, n_candidates)
+        q_mz <- current_spectrum[, 1L]
         for (pos_idx in seq_len(n_candidates)) {
           lib_idx <- lib_indices_sub[[pos_idx]]
           lib_spectrum <- lib_spectra[[lib_idx]]

@@ -455,3 +455,26 @@ test_that("create_edges_spectra degrades gracefully on MS1-only MGF", {
   expect_s3_class(df, "data.frame")
   expect_equal(nrow(df), 0L)
 })
+
+test_that("create_edges GNPS path filters by threshold and matched_peaks accurately", {
+  sp1 <- cbind(mz = c(50, 100, 150, 200), intensity = c(0.1, 0.2, 0.3, 0.4))
+  sp2 <- cbind(mz = c(50, 100, 150, 200), intensity = c(0.1, 0.2, 0.3, 0.4))
+  sp3 <- cbind(mz = c(50, 300), intensity = c(0.5, 0.5))
+
+  res_strict <- create_edges(
+    frags = list(sp1, sp2, sp3),
+    nspecs = 3L,
+    precs = c(250, 250, 250),
+    method = "gnps",
+    ms2_tolerance = 0.02,
+    ppm_tolerance = 10,
+    threshold = 0.9,
+    matched_peaks = 3L,
+    assume_sanitized = TRUE
+  )
+
+  expect_equal(nrow(res_strict), 1L)
+  expect_equal(res_strict$feature_id, 1L)
+  expect_equal(res_strict$target_id, 2L)
+  expect_equal(res_strict$matched_peaks, 4L)
+})

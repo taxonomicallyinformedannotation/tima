@@ -750,13 +750,21 @@ build_library_metadata <- function(
 ) {
   target_ids <- as.integer(target_ids)
   lib_len <- length(lib_sp)
-  adducts_full <- target_adduct_raw %||%
+  adducts_sub <- if (is.null(target_adduct_raw)) {
     extract_vector(
       lib_sp,
       c("adduct", "precursor_type"),
       lib_len,
       NA_character_
-    )
+    )[target_ids]
+  } else if (
+    length(target_adduct_raw) == length(target_ids) &&
+      length(target_ids) != lib_len
+  ) {
+    as.character(target_adduct_raw)
+  } else {
+    as.character(target_adduct_raw[target_ids])
+  }
   spectrum_id_full <- extract_vector(
     lib_sp,
     c("spectrum_id", "spectrumid", "id"),
@@ -801,7 +809,7 @@ build_library_metadata <- function(
   )
   out <- tidytable::tidytable(
     target_id = target_ids,
-    target_adduct = adducts_full[target_ids],
+    target_adduct = adducts_sub,
     target_spectrum_id = spectrum_id_full[target_ids],
     target_smiles = smiles_full[target_ids],
     target_smiles_no_stereo = smiles_no_stereo_full[target_ids],
@@ -1253,12 +1261,24 @@ compute_similarity_safe <- function(
         space_label = "precursor_mz"
       )
 
-      query_adducts <- if (
-        !is.null(query_meta) && "query_adduct" %in% names(query_meta)
+      query_neutral <- if (
+        !is.null(query_meta) &&
+          "query_neutral_mass" %in% names(query_meta) &&
+          length(query_meta$query_neutral_mass) == length(query_prec_match)
       ) {
-        query_meta$query_adduct
+        as.numeric(query_meta$query_neutral_mass)
       } else {
-        rep(NA_character_, length(query_prec_match))
+        query_adducts <- if (
+          !is.null(query_meta) && "query_adduct" %in% names(query_meta)
+        ) {
+          query_meta$query_adduct
+        } else {
+          rep(NA_character_, length(query_prec_match))
+        }
+        convert_precursor_to_neutral_if_possible(
+          precursors = query_prec_match,
+          adducts = query_adducts
+        )
       }
       lib_adducts_raw <- extract_vector(
         lib_sp,
@@ -1269,11 +1289,6 @@ compute_similarity_safe <- function(
       lib_adducts <- harmonize_adduct_vector(
         lib_adducts_raw,
         colname = "target_adduct"
-      )
-
-      query_neutral <- convert_precursor_to_neutral_if_possible(
-        precursors = query_prec_match,
-        adducts = query_adducts
       )
       lib_neutral <- convert_precursor_to_neutral_if_possible(
         precursors = lib_prec_match,

@@ -199,39 +199,54 @@ prepare_libraries_rt <- function(
 
   # Polishing utilities ----
   polish_df <- function(df, type = "experimental", unit = unit_rt) {
-    # Ensure columns exist even if missing from sources
-    if (!"inchikey" %in% colnames(df)) {
-      df$inchikey <- NA_character_
+    df_tmp <- tidytable::as_tidytable(df)
+    if (!"inchikey" %in% colnames(df_tmp)) {
+      data.table::set(df_tmp, j = "inchikey", value = NA_character_)
     }
-    if (!"smiles" %in% colnames(df)) {
-      df$smiles <- NA_character_
+    if (!"smiles" %in% colnames(df_tmp)) {
+      data.table::set(df_tmp, j = "smiles", value = NA_character_)
     }
-    if (!"structure_name" %in% colnames(df)) {
-      df$structure_name <- NA_character_
+    if (!"structure_name" %in% colnames(df_tmp)) {
+      data.table::set(df_tmp, j = "structure_name", value = NA_character_)
+    }
+    if (!"rt" %in% colnames(df_tmp)) {
+      data.table::set(df_tmp, j = "rt", value = NA_real_)
     }
 
-    df_tmp <- df |>
-      data.frame() |>
-      tidytable::mutate(type = type) |>
-      tidytable::mutate(rt = as.numeric(rt)) |>
-      tidytable::filter(!is.na(rt)) |>
-      tidytable::filter(!is.na(smiles)) |>
-      tidytable::distinct()
+    rt_num <- suppressWarnings(as.numeric(df_tmp$rt))
+    data.table::set(df_tmp, j = "rt", value = rt_num)
+    data.table::set(df_tmp, j = "type", value = type)
 
-    # Normalize RT to minutes using centralized utility
-    df_tmp <- df_tmp |>
-      tidytable::mutate(
-        rt = normalize_rt_to_minutes(rt, unit = unit, quiet = TRUE)
+    keep <- !is.na(rt_num) & !is.na(df_tmp$smiles)
+    df_tmp <- if (all(keep)) df_tmp else df_tmp[keep, ]
+    df_tmp <- tidytable::distinct(df_tmp)
+
+    if (nrow(df_tmp) > 0L) {
+      data.table::set(
+        df_tmp,
+        j = "rt",
+        value = normalize_rt_to_minutes(df_tmp$rt, unit = unit, quiet = TRUE)
       )
+    }
 
     df_tmp
   }
 
   complete_df <- function(df) {
-    df_full <- df |>
-      tidytable::filter(!is.na(inchikey) & inchikey != "")
-    df_missing <- df |>
-      tidytable::filter(is.na(inchikey) | inchikey == "")
+    if (nrow(df) == 0L) {
+      return(tidytable::tidytable(
+        rt = numeric(0),
+        structure_smiles = character(0),
+        structure_inchikey = character(0),
+        structure_name = character(0),
+        type = character(0)
+      ))
+    }
+
+    ik_col <- df$inchikey
+    has_ik <- !is.na(ik_col) & nzchar(ik_col)
+    df_full <- df[has_ik, ]
+    df_missing <- df[!has_ik, ]
     missing_n <- nrow(df_missing)
 
     if (missing_n > 0L) {
@@ -241,56 +256,50 @@ prepare_libraries_rt <- function(
         We will query them on the fly, this might take some time.",
         missing_n
       )
-    }
 
-    smiles <- unique(df_missing$smiles)
-
-    # Use process_smiles to get InChIKeys from SMILES
-    smiles_df <- tidytable::tidytable(
-      structure_smiles_initial = smiles
-    )
-
-    processed <- process_smiles(smiles_df, cache = NULL)
-
-    # Extract the InChIKeys from processed results
-    # Handle case where process_smiles might return empty or different columns
-    if (nrow(processed) > 0 && "structure_inchikey" %in% names(processed)) {
-      smiles_to_inchikey <- processed |>
-        tidytable::select(
-          smiles = structure_smiles_initial,
-          inchikey = structure_inchikey
-        ) |>
-        tidytable::distinct()
-    } else {
-      # If processing failed, create empty mapping
-      smiles_to_inchikey <- tidytable::tidytable(
-        smiles = character(0),
-        inchikey = character(0)
+      smiles <- unique(df_missing$smiles)
+      smiles_df <- tidytable::tidytable(
+        structure_smiles_initial = smiles
       )
+      processed <- process_smiles(smiles_df, cache = NULL)
+
+      if (nrow(processed) > 0 && "structure_inchikey" %in% names(processed)) {
+        m_idx <- fastmatch::fmatch(
+          df_missing$smiles,
+          processed$structure_smiles_initial
+        )
+        data.table::set(
+          df_missing,
+          j = "inchikey",
+          value = processed$structure_inchikey[m_idx]
+        )
+      } else {
+        data.table::set(df_missing, j = "inchikey", value = NA_character_)
+      }
+      df_completed <- tidytable::bind_rows(df_full, df_missing)
+    } else {
+      df_completed <- df_full
     }
 
-    df_missing <- df_missing |>
-      tidytable::select(-inchikey) |>
-      tidytable::left_join(y = smiles_to_inchikey, by = "smiles")
+    char_cols <- c("smiles", "inchikey", "structure_name", "type")
+    for (col in intersect(char_cols, names(df_completed))) {
+      v <- df_completed[[col]]
+      if (any(!is.na(v) & v == "NA")) {
+        v[!is.na(v) & v == "NA"] <- NA_character_
+        data.table::set(df_completed, j = col, value = v)
+      }
+    }
 
-    df_completed <- df_full |>
-      tidytable::bind_rows(df_missing) |>
-      tidytable::mutate(tidytable::across(
-        .cols = tidyselect::where(fn = is.character),
-        .fns = function(x) tidytable::na_if(x = x, y = "NA")
-      )) |>
-      tidytable::select(
-        rt,
-        structure_smiles = smiles,
-        structure_inchikey = inchikey,
-        structure_name,
-        type
-      ) |>
+    df_completed <- tidytable::tidytable(
+      rt = df_completed$rt,
+      structure_smiles = df_completed$smiles,
+      structure_inchikey = df_completed$inchikey,
+      structure_name = df_completed$structure_name,
+      type = df_completed$type
+    ) |>
       tidytable::distinct()
 
-    missing_n2 <- df_completed |>
-      tidytable::filter(is.na(structure_inchikey)) |>
-      nrow()
+    missing_n2 <- sum(is.na(df_completed$structure_inchikey))
 
     if (missing_n2 > 0L) {
       log_warn(
@@ -373,11 +382,10 @@ prepare_libraries_rt <- function(
     tidytable::select(-structure_smiles) |>
     tidytable::distinct() |>
     tidytable::mutate(
-      candidate_structure_inchikey_connectivity_layer = gsub(
-        pattern = "-.*",
-        replacement = "",
-        x = structure_inchikey,
-        perl = TRUE
+      candidate_structure_inchikey_connectivity_layer = substr(
+        structure_inchikey,
+        1L,
+        14L
       )
     ) |>
     # Keep only unique RT entries per structure connectivity layer and type

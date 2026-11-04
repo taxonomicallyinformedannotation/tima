@@ -120,16 +120,23 @@ load_and_merge_libraries <- function(files, cache) {
 #'
 #' @keywords internal
 complete_organism_taxonomy <- function(table_keys, table_org_tax_ott) {
-  table_org_tax_ott_2 <- table_keys |>
-    tidytable::anti_join(y = table_org_tax_ott, by = "organism_name") |>
-    tidytable::distinct(organism = organism_name) |>
-    # Filter out NA organism names before querying API
-    tidytable::filter(!is.na(organism)) |>
-    data.frame()
-
-  if (nrow(table_org_tax_ott_2) == 0) {
+  u_orgs <- unique(table_keys$organism_name)
+  u_orgs <- u_orgs[!is.na(u_orgs)]
+  if (length(u_orgs) == 0L) {
     return(table_org_tax_ott)
   }
+  missing_orgs <- u_orgs[
+    fastmatch::fmatch(u_orgs, table_org_tax_ott$organism_name, nomatch = 0L) ==
+      0L
+  ]
+  if (length(missing_orgs) == 0L) {
+    return(table_org_tax_ott)
+  }
+
+  table_org_tax_ott_2 <- data.frame(
+    organism = missing_orgs,
+    stringsAsFactors = FALSE
+  )
 
   table_org_tax_ott_full <- table_org_tax_ott_2 |>
     get_organism_taxonomy_ott(retry = FALSE)
@@ -166,13 +173,10 @@ apply_taxonomic_filter <- function(
   level,
   value
 ) {
-  table_keys_filtered <- table_keys |>
-    tidytable::left_join(y = table_org_tax_ott, by = "organism_name")
-
-  # Find column matching the taxonomic level
-  level_col <- colnames(table_keys_filtered)[grepl(
+  # Find column matching the taxonomic level before joining
+  level_col <- colnames(table_org_tax_ott)[grepl(
     pattern = level,
-    x = colnames(table_keys_filtered),
+    x = colnames(table_org_tax_ott),
     perl = TRUE
   )]
 
@@ -187,21 +191,13 @@ apply_taxonomic_filter <- function(
     )
   }
 
-  table_keys_filtered <- table_keys_filtered |>
-    tidytable::filter(grepl(
-      x = !!as.name(level_col),
-      pattern = value,
-      perl = TRUE
-    )) |>
-    tidytable::select(
-      structure_inchikey,
-      structure_smiles_no_stereo,
-      organism_name,
-      reference_doi
-    ) |>
-    tidytable::distinct()
+  tax_vals <- table_org_tax_ott[[level_col[[1L]]]]
+  match_org_mask <- !is.na(tax_vals) &
+    grepl(pattern = value, x = tax_vals, perl = TRUE)
+  matching_orgs <- unique(table_org_tax_ott$organism_name[match_org_mask])
+  matching_orgs <- matching_orgs[!is.na(matching_orgs)]
 
-  if (nrow(table_keys_filtered) == 0) {
+  if (length(matching_orgs) == 0L) {
     cli::cli_abort(
       c(
         "filter led to no entries",
@@ -214,7 +210,33 @@ apply_taxonomic_filter <- function(
     )
   }
 
-  table_keys_filtered
+  keep_rows <- fastmatch::fmatch(
+    table_keys$organism_name,
+    matching_orgs,
+    nomatch = 0L
+  ) >
+    0L
+  if (!any(keep_rows)) {
+    cli::cli_abort(
+      c(
+        "filter led to no entries",
+        "x" = paste0("level: ", level),
+        "i" = paste0("value: ", value),
+        "i" = "try different filter criteria"
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
+  }
+
+  table_keys[keep_rows, ] |>
+    tidytable::select(
+      structure_inchikey,
+      structure_smiles_no_stereo,
+      organism_name,
+      reference_doi
+    ) |>
+    tidytable::distinct()
 }
 
 #' Export All Library Tables
