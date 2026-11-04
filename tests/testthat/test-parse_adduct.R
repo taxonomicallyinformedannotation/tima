@@ -872,9 +872,7 @@ test_that("parse_adduct internal helpers handle NULL/NA normalization, regex err
 
   rec$msgs <- character(0)
   with_mocked_bindings(
-    process_modifications = function(...) {
-      list(valid = TRUE, total_mass = NA_real_, message = "")
-    },
+    calculate_formula_mass = function(x) NA_real_,
     log_debug = function(fmt, ...) {
       rec$msgs <- c(
         rec$msgs,

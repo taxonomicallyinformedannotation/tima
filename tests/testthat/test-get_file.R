@@ -395,10 +395,11 @@ test_that("get_file offline orchestration validates HTTP status, file content, a
   export_file <- file.path(tmp_dir, "nested", "downloaded.tsv")
 
   local_mocked_bindings(
-    download_with_error_handling = function(url, export) {
-      writeLines(c("col1\tcol2", "1\t2"), export)
+    req_perform = function(req, path = NULL, ...) {
+      writeLines(c("col1\tcol2", "1\t2"), path)
       structure(list(status_code = 200L), class = "httr2_response")
-    }
+    },
+    .package = "httr2"
   )
 
   old_timeout <- getOption("timeout")
@@ -452,9 +453,9 @@ test_that("validate_downloaded_file rejects 0-byte empty file and cleans it up",
 
 test_that("validate_file_content returns TRUE when read_file_header returns empty raw vector", {
   expect_true(
-    validate_file_content(
+    suppressWarnings(validate_file_content(
       "/nonexistent/unreadable/path.bin",
       "https://example.org/path.bin"
-    )
+    ))
   )
 })

@@ -200,7 +200,18 @@ test_that("prepare_libraries_sop_pubchemlite validates arguments, handles missin
   expect_identical(nrow(tbl_no_xlogp), 1L)
   expect_true(is.na(tbl_no_xlogp$structure_xlogp))
 
-  # 4. Existing output file >= 100,000 bytes is reused without overwriting
+  # 4. Existing output file < 100,000 bytes is overwritten
+  out_small <- file.path(tmp_dir, "small_out.tsv")
+  writeLines(paste(rep("s", 50L), collapse = ""), out_small)
+  prepare_libraries_sop_pubchemlite(
+    input = in_no_xlogp,
+    output = out_small
+  )
+  tbl_small <- tidytable::fread(out_small)
+  expect_identical(nrow(tbl_small), 1L)
+  expect_identical(tbl_small$structure_name, "Caffeine")
+
+  # 5. Existing output file >= 100,000 bytes is reused without overwriting
   out_cached <- file.path(tmp_dir, "cached_out.tsv")
   big_content <- paste(rep("x", 100005L), collapse = "")
   writeLines(big_content, out_cached)
