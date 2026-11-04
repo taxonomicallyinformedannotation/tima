@@ -295,4 +295,34 @@ test_that("enforce_graph_adduct_consistency resolves mixed singleton and conflic
   expect_identical(audit$n_input, 4L)
   expect_identical(audit$n_kept, 3L)
   expect_identical(audit$n_dropped, 1L)
+  expect_identical(
+    audit$dropped_reason_counts$drop_reason,
+    "node_state_conflict"
+  )
+  expect_identical(audit$dropped_reason_counts$n, 1L)
+})
+
+test_that("enforce_graph_adduct_consistency tracks pair_dedup_or_conflict and deduplicates identical input edges", {
+  # Same pair (X1, X2) has two candidate adduct transitions:
+  # 1) [M+H]+ -> [M+Na]+ (supported by X1->X3)
+  # 2) [M+K]+ -> [M+NH4]+ (lower score on the same pair -> pair_dedup_or_conflict)
+  # Duplicate row of (X1, [M+H]+, [M+Na]+, X2) should be deduplicated in n_input.
+  df_add <- tidytable::tidytable(
+    feature_id = c("X1", "X1", "X1", "X1"),
+    adduct = c("[M+H]+", "[M+H]+", "[M+H]+", "[M+K]+"),
+    adduct_dest = c("[M+Na]+", "[M+Na]+", "[M+K]+", "[M+NH4]+"),
+    feature_id_dest = c("X2", "X2", "X3", "X2")
+  )
+
+  kept <- enforce_graph_adduct_consistency(df_add)
+  expect_equal(nrow(kept), 2L)
+  audit <- attr(kept, "consistency_audit")
+  expect_identical(audit$n_input, 3L)
+  expect_identical(audit$n_kept, 2L)
+  expect_identical(audit$n_dropped, 1L)
+  expect_identical(
+    audit$dropped_reason_counts$drop_reason,
+    "pair_dedup_or_conflict"
+  )
+  expect_identical(audit$dropped_reason_counts$n, 1L)
 })

@@ -423,9 +423,10 @@ enforce_graph_adduct_consistency <- function(df_add) {
   np_s_id <- nd_s[u_fs_pos]
   np_prior <- as.numeric(rowsum.default(nd_sc, fs_grp, reorder = FALSE))
 
-  # Sort by feature character string (matching tidytable::arrange(feature, desc(prior), .key_len))
+  # Sort by feature character rank (matching tidytable::arrange(feature, desc(prior), .key_len))
+  f_rank <- rank(u_f, ties.method = "first")
   ord_init <- order(
-    u_f[np_f_id],
+    f_rank[np_f_id],
     -np_prior,
     u_state_nchar[np_s_id],
     method = "radix"
@@ -475,19 +476,45 @@ enforce_graph_adduct_consistency <- function(df_add) {
           next
         }
 
-        m_chr <- as.character(multi_nodes)
-        src_split <- split(seq_along(e_idx), e_f1)[m_chr]
-        dst_split <- split(seq_along(e_idx), e_f2)[m_chr]
         n_multi <- length(multi_nodes)
+        s_sp <- split(seq_along(e_idx), e_f1)
+        d_sp <- split(seq_along(e_idx), e_f2)
+        src_split <- s_sp[fastmatch::fmatch(
+          multi_nodes,
+          as.integer(names(s_sp))
+        )]
+        dst_split <- d_sp[fastmatch::fmatch(
+          multi_nodes,
+          as.integer(names(d_sp))
+        )]
+
+        last_eval_step <- integer(n_f)
+        last_change_step <- integer(n_f)
+        step_counter <- 0L
 
         for (iter in seq_len(20L)) {
           changed <- FALSE
           for (mi in seq_len(n_multi)) {
             f <- multi_nodes[[mi]]
-            cands_f <- cand_list[[f]]
-            cand_scores <- prior_list[[f]]
             s_i <- src_split[[mi]]
             d_i <- dst_split[[mi]]
+
+            if (iter > 1L) {
+              my_eval <- last_eval_step[[f]]
+              nb_changed <- (length(s_i) > 0L &&
+                any(last_change_step[e_f2[s_i]] >= my_eval)) ||
+                (length(d_i) > 0L &&
+                  any(last_change_step[e_f1[d_i]] >= my_eval))
+              if (!nb_changed) {
+                next
+              }
+            }
+
+            step_counter <- step_counter + 1L
+            last_eval_step[[f]] <- step_counter
+
+            cands_f <- cand_list[[f]]
+            cand_scores <- prior_list[[f]]
 
             if (length(s_i) > 0L) {
               active_s <- e_s2[s_i] == assign_state_id[e_f2[s_i]]
@@ -523,6 +550,7 @@ enforce_graph_adduct_consistency <- function(df_add) {
             best_cand <- cands_f[[best_idx[[1L]]]]
             if (assign_state_id[[f]] != best_cand) {
               assign_state_id[[f]] <- best_cand
+              last_change_step[[f]] <- step_counter
               changed <- TRUE
             }
           }
@@ -532,82 +560,94 @@ enforce_graph_adduct_consistency <- function(df_add) {
     }
   }
 
-  scored <- tidytable::tidytable(
-    feature_id = df_add$feature_id,
-    adduct = df_add$adduct,
-    adduct_dest = df_add$adduct_dest,
-    feature_id_dest = df_add$feature_id_dest,
-    edge_score = edge_score,
-    edge_complexity = edge_complexity
+  # Deduplicate input rows on (f1_id, a1_id, a2_id, f2_id) since edge_score and
+  # edge_complexity are deterministic functions of (f1_id, a1_id, a2_id, f2_id).
+  pair_key <- as.double(f1_id - 1L) * n_f + f2_id
+  u_pairs <- unique(pair_key)
+  pair_id <- fastmatch::fmatch(pair_key, u_pairs)
+  aa_id <- (a1_id - 1L) * n_a + a2_id
+  n_aa <- n_a * n_a
+  edge_key <- if (as.double(length(u_pairs)) * n_aa < .Machine$integer.max) {
+    (pair_id - 1L) * n_aa + aa_id
+  } else {
+    as.double(pair_id - 1L) * n_aa + aa_id
+  }
+  keep_u_edge <- if (is.integer(edge_key)) {
+    !duplicated(edge_key)
+  } else {
+    fastmatch::fmatch(edge_key, edge_key) == seq_along(edge_key)
+  }
+
+  u_idx <- which(keep_u_edge)
+  n_input <- length(u_idx)
+
+  f1_u <- f1_id[u_idx]
+  f2_u <- f2_id[u_idx]
+  a1_u <- a1_id[u_idx]
+  a2_u <- a2_id[u_idx]
+  p_u <- pair_id[u_idx]
+  sc_u <- edge_score[u_idx]
+  cx_u <- edge_complexity[u_idx]
+  ks_u <- (s1_id[u_idx] == assign_state_id[f1_u]) &
+    (s2_id[u_idx] == assign_state_id[f2_u])
+
+  ord_u <- order(f_rank[f1_u], f_rank[f2_u], -sc_u, cx_u, method = "radix")
+
+  ord_kept <- ord_u[ks_u[ord_u]]
+  win_kept <- ord_kept[!duplicated(p_u[ord_kept])]
+  n_kept <- length(win_kept)
+
+  kept_all <- tidytable::tidytable(
+    feature_id = df_add$feature_id[u_idx[win_kept]],
+    adduct = df_add$adduct[u_idx[win_kept]],
+    adduct_dest = df_add$adduct_dest[u_idx[win_kept]],
+    feature_id_dest = df_add$feature_id_dest[u_idx[win_kept]]
   )
 
-  keep_state <- (s1_id == assign_state_id[f1_id]) &
-    (s2_id == assign_state_id[f2_id])
-  kept_all <- scored[which(keep_state), ] |>
-    tidytable::arrange(
-      feature_id,
-      feature_id_dest,
-      tidytable::desc(edge_score),
-      edge_complexity
-    ) |>
-    tidytable::distinct(feature_id, feature_id_dest, .keep_all = TRUE) |>
-    tidytable::select(feature_id, adduct, adduct_dest, feature_id_dest) |>
-    tidytable::distinct()
+  n_dropped <- n_input - n_kept
+  if (n_dropped > 0L) {
+    is_kept_u <- logical(n_input)
+    is_kept_u[win_kept] <- TRUE
+    drop_u <- which(!is_kept_u)
 
-  scored_min <- scored |>
-    tidytable::select(
-      feature_id,
-      adduct,
-      adduct_dest,
-      feature_id_dest,
-      edge_score,
-      edge_complexity
-    ) |>
-    tidytable::distinct()
-  dropped <- scored_min |>
-    tidytable::anti_join(
-      kept_all,
-      by = c("feature_id", "adduct", "adduct_dest", "feature_id_dest")
+    win_best <- ord_u[!duplicated(p_u[ord_u])]
+    best_a1_by_p <- integer(length(u_pairs))
+    best_a2_by_p <- integer(length(u_pairs))
+    best_a1_by_p[p_u[win_best]] <- a1_u[win_best]
+    best_a2_by_p[p_u[win_best]] <- a2_u[win_best]
+
+    p_dr <- p_u[drop_u]
+    is_node_conflict <- (a1_u[drop_u] == best_a1_by_p[p_dr]) &
+      (a2_u[drop_u] == best_a2_by_p[p_dr])
+    n_nc <- sum(is_node_conflict)
+    n_pdc <- n_dropped - n_nc
+
+    reasons <- character()
+    counts <- integer()
+    if (n_nc > 0L) {
+      reasons <- c(reasons, "node_state_conflict")
+      counts <- c(counts, n_nc)
+    }
+    if (n_pdc > 0L) {
+      reasons <- c(reasons, "pair_dedup_or_conflict")
+      counts <- c(counts, n_pdc)
+    }
+    ord_rc <- order(-counts)
+    dropped_reason_counts <- tidytable::tidytable(
+      drop_reason = reasons[ord_rc],
+      n = counts[ord_rc]
     )
-  if (nrow(dropped) > 0L) {
-    pair_best <- scored_min |>
-      tidytable::arrange(
-        feature_id,
-        feature_id_dest,
-        tidytable::desc(edge_score),
-        edge_complexity
-      ) |>
-      tidytable::distinct(feature_id, feature_id_dest, .keep_all = TRUE) |>
-      tidytable::select(
-        feature_id,
-        feature_id_dest,
-        best_adduct = adduct,
-        best_adduct_dest = adduct_dest
-      )
-    dropped <- dropped |>
-      tidytable::left_join(
-        pair_best,
-        by = c("feature_id", "feature_id_dest")
-      ) |>
-      tidytable::mutate(
-        drop_reason = tidytable::if_else(
-          adduct == best_adduct & adduct_dest == best_adduct_dest,
-          "node_state_conflict",
-          "pair_dedup_or_conflict"
-        )
-      )
-  }
-  dropped_reason_counts <- if (nrow(dropped) > 0L) {
-    dropped |>
-      tidytable::count(drop_reason, name = "n") |>
-      tidytable::arrange(tidytable::desc(n))
   } else {
-    tidytable::tidytable(drop_reason = character(), n = integer())
+    dropped_reason_counts <- tidytable::tidytable(
+      drop_reason = character(),
+      n = integer()
+    )
   }
+
   attr(kept_all, "consistency_audit") <- list(
-    n_input = nrow(scored_min),
-    n_kept = nrow(kept_all),
-    n_dropped = nrow(dropped),
+    n_input = n_input,
+    n_kept = n_kept,
+    n_dropped = n_dropped,
     dropped_reason_counts = dropped_reason_counts
   )
   kept_all

@@ -380,3 +380,34 @@ test_that("build_evidence_edges selects top representative per feature and filte
   expect_equal(edges$feature_id_dest[[1L]], "F2")
   expect_equal(edges$adduct_dest[[1L]], "[M+Na]+")
 })
+
+test_that(".has_library_match_within_tolerance respects exact window bounds and dalton floor", {
+  exact <- c(100.0, 200.0, 500.0)
+  # 10 ppm of query mass m around 100 Da:
+  # Lower bound satisfies m * (1 + 10e-6) >= 100 -> m >= 100 / 1.00001 (~99.99900001)
+  # Upper bound satisfies m * (1 - 10e-6) <= 100 -> m <= 100 / 0.99999 (~100.00100001)
+  masses <- c(
+    99.99901, # inside lower bound -> TRUE
+    100.001, # inside upper bound -> TRUE
+    99.9989, # just below lower bound -> FALSE
+    100.0011, # just above upper bound -> FALSE
+    NA_real_, # non-finite -> FALSE
+    -5.0 # non-positive -> FALSE
+  )
+  res_ppm <- .has_library_match_within_tolerance(
+    masses = masses,
+    exact_masses_sorted = exact,
+    tolerance_ppm = 10,
+    tolerance_dalton = NULL
+  )
+  expect_identical(res_ppm, c(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE))
+
+  # With tolerance_dalton = 0.005 Da (> 0.001 Da at 100 Da), 99.995 and 100.005 match
+  res_da <- .has_library_match_within_tolerance(
+    masses = c(99.995, 100.005, 99.994, -5.0),
+    exact_masses_sorted = exact,
+    tolerance_ppm = 10,
+    tolerance_dalton = 0.005
+  )
+  expect_identical(res_da, c(TRUE, TRUE, FALSE, FALSE))
+})

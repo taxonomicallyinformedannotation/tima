@@ -89,22 +89,29 @@ build_evidence_edges <- function(hyps, tolerance_ppm = 5) {
   cnt_sub[is.na(cnt_sub)] <- 0L
   m_sub <- as.numeric(hyps$implied_M[idx_cl])
 
-  ord1 <- order(cl_sub, f_sub, -cnt_sub, add_sub, method = "radix")
-  cl_sub <- cl_sub[ord1]
-  f_sub <- f_sub[ord1]
+  u_cl <- sort(unique(cl_sub), method = "radix")
+  u_f <- sort(unique(f_sub), method = "radix")
+  u_add <- sort(unique(add_sub), method = "radix")
+  cl_id <- fastmatch::fmatch(cl_sub, u_cl)
+  f_id <- fastmatch::fmatch(f_sub, u_f)
+  add_id <- fastmatch::fmatch(add_sub, u_add)
+
+  ord1 <- order(cl_id, f_id, -cnt_sub, add_id, method = "radix")
+  cl_id <- cl_id[ord1]
+  f_id <- f_id[ord1]
   mz_sub <- mz_sub[ord1]
-  add_sub <- add_sub[ord1]
+  add_id <- add_id[ord1]
   m_sub <- m_sub[ord1]
 
-  n1 <- length(cl_sub)
+  n1 <- length(cl_id)
   keep_rep <- c(
     TRUE,
-    cl_sub[-1L] != cl_sub[-n1] | f_sub[-1L] != f_sub[-n1]
+    cl_id[-1L] != cl_id[-n1] | f_id[-1L] != f_id[-n1]
   )
-  cl_rep <- cl_sub[keep_rep]
-  f_rep <- f_sub[keep_rep]
+  cl_rep <- cl_id[keep_rep]
+  f_rep <- f_id[keep_rep]
   mz_rep <- mz_sub[keep_rep]
-  add_rep <- add_sub[keep_rep]
+  add_rep <- add_id[keep_rep]
   m_rep <- m_sub[keep_rep]
 
   n_rep <- length(cl_rep)
@@ -136,9 +143,10 @@ build_evidence_edges <- function(hyps, tolerance_ppm = 5) {
   m_src <- m_rep[same_cl]
   m_dst <- m_rep[same_cl + 1L]
   m_diff <- abs(m_src - m_dst)
-  m_max <- pmax(m_src, m_dst, na.rm = TRUE)
+  m_max <- pmax.int(m_src, m_dst)
+  na_m <- is.na(m_src) | is.na(m_dst)
   ppm_tol <- tolerance_ppm * 1e-6 * m_max
-  m_ok <- is.na(m_src) | is.na(m_dst) | (m_diff <= ppm_tol)
+  m_ok <- na_m | (m_diff <= ppm_tol)
   keep_idx <- same_cl[m_ok]
   if (length(keep_idx) == 0L) {
     return(tidytable::tidytable(
@@ -149,11 +157,18 @@ build_evidence_edges <- function(hyps, tolerance_ppm = 5) {
     ))
   }
 
+  f1_out <- f_rep[keep_idx]
+  a1_out <- add_rep[keep_idx]
+  f2_out <- f_rep[keep_idx + 1L]
+  a2_out <- add_rep[keep_idx + 1L]
+  attr(u_f, ".match.hash") <- NULL
+  attr(u_add, ".match.hash") <- NULL
+
   tidytable::tidytable(
-    feature_id = f_rep[keep_idx],
-    adduct = add_rep[keep_idx],
-    feature_id_dest = f_rep[keep_idx + 1L],
-    adduct_dest = add_rep[keep_idx + 1L]
+    feature_id = u_f[f1_out],
+    adduct = u_add[a1_out],
+    feature_id_dest = u_f[f2_out],
+    adduct_dest = u_add[a2_out]
   ) |>
     tidytable::distinct()
 }

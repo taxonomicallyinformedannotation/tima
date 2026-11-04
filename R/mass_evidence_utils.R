@@ -75,20 +75,23 @@ implied_neutral_mass <- function(
   tolerance_dalton = NULL
 ) {
   n <- length(masses)
-  if (n == 0L || length(exact_masses_sorted) == 0L) {
+  L <- length(exact_masses_sorted)
+  if (n == 0L || L == 0L) {
     return(rep(FALSE, n))
   }
   # Per-mass combined absolute tolerance: max(dalton, ppm * mass * 1e-6)
   tol <- if (is.null(tolerance_dalton)) {
     tolerance_ppm * 1e-6 * masses
   } else {
-    pmax(tolerance_dalton, tolerance_ppm * 1e-6 * masses)
+    pmax.int(tolerance_dalton, tolerance_ppm * 1e-6 * masses)
   }
   lo <- masses - tol
   hi <- masses + tol
   fi_lo <- findInterval(lo, exact_masses_sorted, left.open = TRUE)
-  fi_hi <- findInterval(hi, exact_masses_sorted, left.open = FALSE)
-  fi_hi > fi_lo
+  next_idx <- fi_lo + 1L
+  in_bounds <- !is.na(fi_lo) & next_idx <= L & masses > 0
+  next_idx[!in_bounds] <- 1L
+  in_bounds & (exact_masses_sorted[next_idx] <= hi)
 }
 
 # Deprecated alias for backward compatibility

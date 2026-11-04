@@ -363,3 +363,38 @@ test_that("loss transitions link the loss ion to its intact parent", {
   expect_identical(hit$loss, "H2O")
   expect_equal(hit$mass, mass_h2o, tolerance = 1e-9)
 })
+
+test_that(".fast_component_count_keys and .fast_single_component_increments match scalar helpers", {
+  comp_list <- list(
+    integer(),
+    c(H2O = 1L),
+    c(H2O = 0L),
+    c(H2O = 1L, CH3OH = 1L),
+    c(CH3OH = 1L, H2O = 2L)
+  )
+  expect_identical(
+    .fast_component_count_keys(comp_list),
+    vapply(comp_list, component_count_key, character(1L))
+  )
+  expect_identical(.fast_component_count_keys(list()), character(0L))
+
+  from_idx <- c(1L, 1L, 2L, 2L, 4L, 2L)
+  to_idx <- c(2L, 3L, 4L, 5L, 5L, 1L)
+  expect_identical(
+    .fast_single_component_increments(comp_list, from_idx, to_idx),
+    vapply(
+      seq_along(from_idx),
+      function(i) {
+        single_component_increment(
+          comp_list[[from_idx[[i]]]],
+          comp_list[[to_idx[[i]]]]
+        )
+      },
+      character(1L)
+    )
+  )
+  expect_identical(
+    .fast_single_component_increments(comp_list, integer(), integer()),
+    character(0L)
+  )
+})

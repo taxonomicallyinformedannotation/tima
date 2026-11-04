@@ -227,21 +227,14 @@ build_evidence_supported_hypotheses <- function(
     ))
   }
 
-  kept_feat_idx <- kept_feat_idx[seq_len(filled)]
-  kept_aidx <- kept_aidx[seq_len(filled)]
-  kept_M <- kept_M[seq_len(filled)]
-
-  hyps <- tidytable::tidytable(
-    feat_idx = unlist(kept_feat_idx, use.names = FALSE),
-    adduct_idx = unlist(kept_aidx, use.names = FALSE),
-    implied_M = unlist(kept_M, use.names = FALSE)
-  )
+  f_idx_vec <- unlist(kept_feat_idx[seq_len(filled)], use.names = FALSE)
+  a_idx_vec <- unlist(kept_aidx[seq_len(filled)], use.names = FALSE)
+  m_vec <- unlist(kept_M[seq_len(filled)], use.names = FALSE)
   rm(kept_feat_idx, kept_aidx, kept_M)
   log_info(
     "Evidence engine candidate materialization: %d rows",
-    nrow(hyps)
+    length(f_idx_vec)
   )
-  hyps <- hyps |> tidytable::mutate(nearest_mass_error_ppm = NA_real_)
 
   # Per-feature cap on compact representation (much cheaper than after join).
   baseline_idx <- which(adduct_v == baseline_adduct)
@@ -251,30 +244,33 @@ build_evidence_supported_hypotheses <- function(
 
   if (is.finite(cap_eff) && cap_eff > 0L && cap_eff < cap_in) {
     t_cap <- Sys.time()
-    tier_col <- tier_v[hyps$adduct_idx]
-    ord_cap <- order(hyps$feat_idx, tier_col, hyps$adduct_idx, method = "radix")
-    f_ord <- hyps$feat_idx[ord_cap]
-    a_ord <- hyps$adduct_idx[ord_cap]
+    tier_col <- tier_v[a_idx_vec]
+    ord_cap <- order(f_idx_vec, tier_col, a_idx_vec, method = "radix")
+    f_ord <- f_idx_vec[ord_cap]
+    a_ord <- a_idx_vec[ord_cap]
     n_h <- length(f_ord)
     new_f <- if (n_h > 1L) c(TRUE, f_ord[-1L] != f_ord[-n_h]) else TRUE
     rank_v <- seq_len(n_h) - cummax(ifelse(new_f, seq_len(n_h), 0L)) + 1L
     keep_cap <- ord_cap[rank_v <= cap_eff | a_ord %in% baseline_idx]
-    hyps <- hyps[keep_cap, ]
+    f_idx_vec <- f_idx_vec[keep_cap]
+    a_idx_vec <- a_idx_vec[keep_cap]
+    m_vec <- m_vec[keep_cap]
     log_debug(
       "Per-feature cap requested=%s effective=%d: %d rows in %.2fs",
       as.character(max_hypotheses_per_feature),
       as.integer(cap_eff),
-      nrow(hyps),
+      length(f_idx_vec),
       as.numeric(Sys.time() - t_cap, units = "secs")
     )
   }
 
   # Ensure baseline per feature even if library prefilter dropped it.
   if (!is.na(baseline_idx)) {
-    have_baseline <- unique(hyps$feat_idx[hyps$adduct_idx == baseline_idx])
-    missing_feats <- setdiff(seq_along(feature_ids), have_baseline)
+    b <- baseline_idx[1L]
+    have_b <- logical(n_feat)
+    have_b[f_idx_vec[a_idx_vec == b]] <- TRUE
+    missing_feats <- which(!have_b)
     if (length(missing_feats) > 0L) {
-      b <- baseline_idx[1L]
       iso_shift_b <- niso_v[b] * EVIDENCE_ISOTOPE_SHIFT_DA
       implied_b <- (abs(z_v[b]) *
         (feature_mzs[missing_feats] - iso_shift_b) -
@@ -282,49 +278,45 @@ build_evidence_supported_hypotheses <- function(
         n_mer_v[b]
       ok_b <- is.finite(implied_b) & implied_b > 0
       if (any(ok_b)) {
-        add_dt <- tidytable::tidytable(
-          feat_idx = as.integer(missing_feats[ok_b]),
-          adduct_idx = b,
-          implied_M = implied_b[ok_b],
-          nearest_mass_error_ppm = NA_real_
-        )
-        hyps <- tidytable::bind_rows(hyps, add_dt)
-        rm(add_dt)
+        f_idx_vec <- c(f_idx_vec, as.integer(missing_feats[ok_b]))
+        a_idx_vec <- c(a_idx_vec, rep.int(b, sum(ok_b)))
+        m_vec <- c(m_vec, implied_b[ok_b])
       }
     }
   }
 
-  if (nrow(hyps) == 0L) {
+  if (length(f_idx_vec) == 0L) {
     return(empty_evidence_table())
   }
 
-  hyps <- tidytable::as_tidytable(hyps) |>
-    tidytable::mutate(
-      rt = feature_rts[feat_idx],
-      sample = feature_samples[feat_idx]
-    )
+  u_samples <- sort(unique(feature_samples), method = "radix")
+  feat_sample_id <- if (anyNA(u_samples)) {
+    match(feature_samples, u_samples)
+  } else {
+    fastmatch::fmatch(feature_samples, u_samples)
+  }
+  s_id_vec <- feat_sample_id[f_idx_vec]
+  rt_vec <- feature_rts[f_idx_vec]
 
   if (use_library_prefilter) {
     t_mc <- Sys.time()
-    masses_q <- hyps$implied_M
-    idx_em <- findInterval(masses_q, exact_masses_sorted, all.inside = FALSE)
+    idx_em <- findInterval(m_vec, exact_masses_sorted, all.inside = FALSE)
     L_em <- length(exact_masses_sorted)
     lo_idx <- pmax.int(1L, idx_em)
     hi_idx <- pmin.int(L_em, idx_em + 1L)
     lo_em <- exact_masses_sorted[lo_idx]
     hi_em <- exact_masses_sorted[hi_idx]
-    d_lo <- abs(masses_q - lo_em)
-    d_hi <- abs(masses_q - hi_em)
+    d_lo <- abs(m_vec - lo_em)
+    d_hi <- abs(m_vec - hi_em)
     use_lo <- d_lo <= d_hi
-    d_min <- ifelse(use_lo, d_lo, d_hi)
-    ref_em <- ifelse(use_lo, lo_em, hi_em)
+    d_min <- pmin.int(d_lo, d_hi)
+    ref_em <- hi_em
+    ref_em[use_lo] <- lo_em[use_lo]
     ppm_err <- d_min / pmax.int(ref_em, 1e-9) * 1e6
-    m_idx <- ifelse(use_lo, lo_idx, hi_idx)
+    m_idx <- hi_idx
+    m_idx[use_lo] <- lo_idx[use_lo]
     m_idx[ppm_err > tol_ppm_num] <- NA_integer_
-    data.table::set(hyps, j = "nearest_mass_error_ppm", value = ppm_err)
-    data.table::set(hyps, j = "matched_exact_mass_idx", value = m_idx)
     rm(
-      masses_q,
       idx_em,
       lo_idx,
       hi_idx,
@@ -334,55 +326,54 @@ build_evidence_supported_hypotheses <- function(
       d_hi,
       use_lo,
       d_min,
-      ref_em,
-      ppm_err
+      ref_em
     )
     log_debug(
       "Exact-mass anchoring: %d matched targets in %.2fs",
       length(unique(m_idx[!is.na(m_idx)])),
       as.numeric(Sys.time() - t_mc, units = "secs")
     )
-    rm(m_idx)
 
     t_rt <- Sys.time()
-    hyps <- hyps |> tidytable::arrange(sample, matched_exact_mass_idx, rt)
-    n_h <- nrow(hyps)
-    s_v <- hyps$sample
-    m_v <- hyps$matched_exact_mass_idx
-    rt_v <- hyps$rt
+    ord_rt <- order(s_id_vec, m_idx, rt_vec, method = "radix")
+    f_idx_vec <- f_idx_vec[ord_rt]
+    a_idx_vec <- a_idx_vec[ord_rt]
+    m_vec <- m_vec[ord_rt]
+    ppm_err <- ppm_err[ord_rt]
+    s_id_vec <- s_id_vec[ord_rt]
+    m_v <- m_idx[ord_rt]
+    rt_vec <- rt_vec[ord_rt]
+    rm(m_idx, ord_rt)
+
+    n_h <- length(f_idx_vec)
     same_sm <- if (n_h > 1L) {
       c(
         FALSE,
-        s_v[-1L] == s_v[-n_h] &
+        s_id_vec[-1L] == s_id_vec[-n_h] &
           ((is.na(m_v[-1L]) & is.na(m_v[-n_h])) |
             (!is.na(m_v[-1L]) & !is.na(m_v[-n_h]) & m_v[-1L] == m_v[-n_h]))
       )
     } else {
       FALSE
     }
-    prev_rt <- if (n_h > 1L) c(NA_real_, rt_v[-n_h]) else NA_real_
+    prev_rt <- if (n_h > 1L) c(NA_real_, rt_vec[-n_h]) else NA_real_
     step_rt <- !same_sm |
       is.na(m_v) |
       is.na(prev_rt) |
-      is.na(rt_v) |
-      (rt_v - prev_rt) > tolerance_rt
+      is.na(rt_vec) |
+      (rt_vec - prev_rt) > tolerance_rt
     cs_step <- cumsum(step_rt)
     grp_base <- cummax(ifelse(!same_sm, cs_step, 0L))
     rt_cl <- cs_step - grp_base + 1L
-    data.table::set(hyps, j = "rt_cluster", value = rt_cl)
     valid_cl <- !is.na(m_v)
     n_clusters <- sum(step_rt & valid_cl)
     cid <- ifelse(valid_cl, cumsum(step_rt & valid_cl), NA_integer_)
     rm(
-      s_v,
-      m_v,
-      rt_v,
       same_sm,
       prev_rt,
       step_rt,
       cs_step,
       grp_base,
-      rt_cl,
       valid_cl
     )
     log_debug(
@@ -393,39 +384,51 @@ build_evidence_supported_hypotheses <- function(
   } else {
     # Fallback without library exact masses: cluster by implied neutral mass.
     t_mc <- Sys.time()
-    hyps <- hyps |> tidytable::arrange(implied_M)
-    mc_v <- .ppm_cluster_sorted(hyps$implied_M, tolerance_ppm)
-    data.table::set(hyps, j = "mass_cluster", value = mc_v)
+    ppm_err <- rep(NA_real_, length(f_idx_vec))
+    ord_m <- order(m_vec, method = "radix")
+    f_idx_vec <- f_idx_vec[ord_m]
+    a_idx_vec <- a_idx_vec[ord_m]
+    m_vec <- m_vec[ord_m]
+    ppm_err <- ppm_err[ord_m]
+    s_id_vec <- s_id_vec[ord_m]
+    rt_vec <- rt_vec[ord_m]
+    rm(ord_m)
+
+    mc_v <- .ppm_cluster_sorted(m_vec, tolerance_ppm)
     log_debug(
       "Mass clustering: %d clusters in %.2fs",
       if (length(mc_v) > 0L) mc_v[length(mc_v)] else 0L,
       as.numeric(Sys.time() - t_mc, units = "secs")
     )
-    rm(mc_v)
 
     t_rt <- Sys.time()
-    hyps <- hyps |> tidytable::arrange(sample, mass_cluster, rt)
-    n_h <- nrow(hyps)
-    s_v <- hyps$sample
-    m_v <- hyps$mass_cluster
-    rt_v <- hyps$rt
+    ord_rt <- order(s_id_vec, mc_v, rt_vec, method = "radix")
+    f_idx_vec <- f_idx_vec[ord_rt]
+    a_idx_vec <- a_idx_vec[ord_rt]
+    m_vec <- m_vec[ord_rt]
+    ppm_err <- ppm_err[ord_rt]
+    s_id_vec <- s_id_vec[ord_rt]
+    m_v <- mc_v[ord_rt]
+    rt_vec <- rt_vec[ord_rt]
+    rm(mc_v, ord_rt)
+
+    n_h <- length(f_idx_vec)
     same_sm <- if (n_h > 1L) {
-      c(FALSE, s_v[-1L] == s_v[-n_h] & m_v[-1L] == m_v[-n_h])
+      c(FALSE, s_id_vec[-1L] == s_id_vec[-n_h] & m_v[-1L] == m_v[-n_h])
     } else {
       FALSE
     }
-    prev_rt <- if (n_h > 1L) c(NA_real_, rt_v[-n_h]) else NA_real_
+    prev_rt <- if (n_h > 1L) c(NA_real_, rt_vec[-n_h]) else NA_real_
     step_rt <- !same_sm |
       is.na(prev_rt) |
-      is.na(rt_v) |
-      (rt_v - prev_rt) > tolerance_rt
+      is.na(rt_vec) |
+      (rt_vec - prev_rt) > tolerance_rt
     cs_step <- cumsum(step_rt)
     grp_base <- cummax(ifelse(!same_sm, cs_step, 0L))
     rt_cl <- cs_step - grp_base + 1L
-    data.table::set(hyps, j = "rt_cluster", value = rt_cl)
     n_clusters <- if (n_h > 0L) cs_step[n_h] else 0L
     cid <- cs_step
-    rm(s_v, m_v, rt_v, same_sm, prev_rt, step_rt, cs_step, grp_base, rt_cl)
+    rm(same_sm, prev_rt, step_rt, cs_step, grp_base)
     log_debug(
       "RT clustering: %d evidence clusters in %.2fs",
       n_clusters,
@@ -440,12 +443,12 @@ build_evidence_supported_hypotheses <- function(
   # and tier/core constraints are met. Set min_degree (in conditional mode) to
   # activate stricter support requirements in high-connectivity regions.
   t_score <- Sys.time()
-  n_h <- nrow(hyps)
+  n_h <- length(f_idx_vec)
   valid_idx <- which(!is.na(cid))
   if (length(valid_idx) > 0L && n_clusters > 0L) {
     c_v <- cid[valid_idx]
-    f_v <- hyps$feat_idx[valid_idx]
-    a_v <- hyps$adduct_idx[valid_idx]
+    f_v <- f_idx_vec[valid_idx]
+    a_v <- a_idx_vec[valid_idx]
 
     cf_key <- as.double(c_v - 1L) * (n_feat + 1) + f_v
     n_feat_lut <- tabulate(c_v[!duplicated(cf_key)], nbins = n_clusters)
@@ -468,73 +471,111 @@ build_evidence_supported_hypotheses <- function(
     cl_has_core <- logical(n_h)
     cl_n_add <- rep(1L, n_h)
   }
-  rm(cid, valid_idx)
+  rm(cid, valid_idx, s_id_vec)
 
   ev_count <- as.integer(pmax.int(0L, n_ev_feat - 1L))
-  data.table::set(
-    hyps,
-    j = "n_evidence_features",
-    value = as.integer(n_ev_feat)
-  )
-  data.table::set(hyps, j = "evidence_count", value = ev_count)
 
-  keep_mask <-
-    adduct_v[hyps$adduct_idx] == baseline_adduct |
-    (ev_count >= 1L &
-      (!req_core_v[hyps$adduct_idx] | cl_has_core) &
-      (tier_v[hyps$adduct_idx] <= 3L | cl_n_add >= 2L))
-  hyps <- hyps |> tidytable::filter(keep_mask)
-  rm(n_ev_feat, cl_has_core, cl_n_add, ev_count, keep_mask)
+  keep_mask <- which(
+    adduct_v[a_idx_vec] == baseline_adduct |
+      (ev_count >= 1L &
+        (!req_core_v[a_idx_vec] | cl_has_core) &
+        (tier_v[a_idx_vec] <= 3L | cl_n_add >= 2L))
+  )
+
+  t_finalize <- Sys.time()
+  f_k <- f_idx_vec[keep_mask]
+  a_k <- a_idx_vec[keep_mask]
+  m_k <- m_vec[keep_mask]
+  ppm_k <- ppm_err[keep_mask]
+  rt_k <- rt_vec[keep_mask]
+  mv_k <- m_v[keep_mask]
+  rtcl_k <- rt_cl[keep_mask]
+  nev_k <- as.integer(n_ev_feat[keep_mask])
+  evc_k <- ev_count[keep_mask]
+  rm(
+    f_idx_vec,
+    a_idx_vec,
+    m_vec,
+    ppm_err,
+    rt_vec,
+    m_v,
+    rt_cl,
+    n_ev_feat,
+    cl_has_core,
+    cl_n_add,
+    ev_count,
+    keep_mask
+  )
+
+  samp_k <- feature_samples[f_k]
+  add_k <- adduct_v[a_k]
+  is_supported <- evc_k >= 1L | add_k != baseline_adduct
+
   if (use_library_prefilter) {
-    ev_cl <- ifelse(
-      is.na(hyps$matched_exact_mass_idx),
-      NA_character_,
-      paste(
-        hyps$sample,
-        hyps$matched_exact_mass_idx,
-        hyps$rt_cluster,
+    ev_cl <- rep(NA_character_, length(f_k))
+    ok_mv <- !is.na(mv_k)
+    if (any(ok_mv)) {
+      ev_cl[ok_mv] <- paste(
+        samp_k[ok_mv],
+        mv_k[ok_mv],
+        rtcl_k[ok_mv],
         sep = "|"
       )
+    }
+    hyps <- tidytable::tidytable(
+      implied_M = m_k,
+      nearest_mass_error_ppm = ppm_k,
+      rt = rt_k,
+      sample = samp_k,
+      matched_exact_mass_idx = mv_k,
+      rt_cluster = rtcl_k,
+      n_evidence_features = nev_k,
+      evidence_count = evc_k,
+      evidence_cluster = ev_cl,
+      feature_id = feature_ids[f_k],
+      mz = feature_mzs[f_k],
+      adduct = add_k,
+      n_mer = n_mer_v[a_k],
+      z = z_v[a_k],
+      adduct_mass = am_v[a_k],
+      n_iso = niso_v[a_k],
+      adduct_tier = tier_v[a_k],
+      candidate_adduct_origin = ifelse(is_supported, "supported", "enforced"),
+      source = ifelse(is_supported, "evidence", "baseline"),
+      # Backward-compatible alias used by some downstream tests/callers.
+      evidence_score = evc_k
     )
   } else {
-    ev_cl <- paste(hyps$sample, hyps$mass_cluster, hyps$rt_cluster, sep = "|")
+    ev_cl <- paste(samp_k, mv_k, rtcl_k, sep = "|")
+    hyps <- tidytable::tidytable(
+      implied_M = m_k,
+      nearest_mass_error_ppm = ppm_k,
+      rt = rt_k,
+      sample = samp_k,
+      mass_cluster = mv_k,
+      rt_cluster = rtcl_k,
+      n_evidence_features = nev_k,
+      evidence_count = evc_k,
+      evidence_cluster = ev_cl,
+      feature_id = feature_ids[f_k],
+      mz = feature_mzs[f_k],
+      adduct = add_k,
+      n_mer = n_mer_v[a_k],
+      z = z_v[a_k],
+      adduct_mass = am_v[a_k],
+      n_iso = niso_v[a_k],
+      adduct_tier = tier_v[a_k],
+      candidate_adduct_origin = ifelse(is_supported, "supported", "enforced"),
+      source = ifelse(is_supported, "evidence", "baseline"),
+      # Backward-compatible alias used by some downstream tests/callers.
+      evidence_score = evc_k
+    )
   }
-  data.table::set(hyps, j = "evidence_cluster", value = as.character(ev_cl))
-  rm(ev_cl)
   log_debug(
     "Evidence counting: max count %d in %.2fs",
     if (nrow(hyps) > 0L) max(hyps$evidence_count, na.rm = TRUE) else 0L,
     as.numeric(Sys.time() - t_score, units = "secs")
   )
-
-  # Finally join the string/derived columns from the compact lookup tables.
-  t_finalize <- Sys.time()
-  hyps <- hyps |>
-    tidytable::mutate(
-      feature_id = feature_ids[feat_idx],
-      mz = feature_mzs[feat_idx],
-      sample = feature_samples[feat_idx],
-      adduct = adduct_v[adduct_idx],
-      n_mer = n_mer_v[adduct_idx],
-      z = z_v[adduct_idx],
-      adduct_mass = am_v[adduct_idx],
-      n_iso = niso_v[adduct_idx],
-      adduct_tier = tier_v[adduct_idx],
-      evidence_cluster = as.character(evidence_cluster),
-      candidate_adduct_origin = ifelse(
-        evidence_count >= 1L | adduct != baseline_adduct,
-        "supported",
-        "enforced"
-      ),
-      source = ifelse(
-        candidate_adduct_origin == "enforced",
-        "baseline",
-        "evidence"
-      ),
-      # Backward-compatible alias used by some downstream tests/callers.
-      evidence_score = as.integer(evidence_count)
-    ) |>
-    tidytable::select(-feat_idx, -adduct_idx)
   log_debug(
     "Finalize join: %d rows in %.2fs",
     nrow(hyps),
