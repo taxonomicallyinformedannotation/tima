@@ -449,6 +449,21 @@ test_that("sanitize_sirius handles ZIP files", {
 
   expect_true(result$valid)
   expect_true(result$is_zip)
+  expect_equal(result$n_features, 3L)
+  expect_equal(result$sirius_version, "6")
+})
+
+test_that("sanitize_mgf supports lowercase headers and mslevel tags", {
+  tf <- write_mgf_file(c(
+    "begin ions",
+    "pepmass=150.2",
+    "mslevel=2",
+    "50.1 100",
+    "end ions"
+  ))
+  res <- sanitize_mgf(tf)
+  expect_true(res$valid)
+  expect_equal(res$n_spectra, 1L)
 })
 
 test_that("sanitize_sirius detects missing files", {

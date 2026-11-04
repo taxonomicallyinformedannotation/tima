@@ -92,3 +92,36 @@ test_that("prepare_libraries_sop_pubchemlite standardizes PubChem Lite rows", {
   expect_true(is.numeric(out$structure_exact_mass))
   expect_true(is.numeric(out$structure_xlogp))
 })
+
+test_that("prepare_libraries_sop_pubchemlite deduplicates identical structures and normalizes empty strings", {
+  input_file <- tempfile(fileext = ".csv")
+  output_file <- tempfile(fileext = ".tsv.gz")
+  on.exit(unlink(c(input_file, output_file)), add = TRUE)
+
+  utils::write.csv(
+    data.frame(
+      Identifier = c("1", "2", "3"),
+      CompoundName = c("CompA", "CompA", ""),
+      InChIKey = c(
+        "INCSWYKICIYAHB-UHFFFAOYSA-N",
+        "INCSWYKICIYAHB-UHFFFAOYSA-N",
+        "HXKKHQJGJAFBHI-UHFFFAOYSA-N"
+      ),
+      SMILES = c("C1=CC=CC=C1", "C1=CC=CC=C1", "CC(CN)O"),
+      MolecularFormula = c("C6H6", "C6H6", "C3H9NO"),
+      MonoisotopicMass = c("78.046950192", "78.046950192", "75.068413911"),
+      XLogP = c("2.1345678", "2.1345678", ""),
+      stringsAsFactors = FALSE
+    ),
+    input_file,
+    row.names = FALSE
+  )
+
+  prepare_libraries_sop_pubchemlite(input = input_file, output = output_file)
+  out <- tidytable::fread(output_file, na.strings = c("", "NA"))
+
+  expect_equal(nrow(out), 2L)
+  expect_equal(out$structure_name, c("CompA", NA_character_))
+  expect_equal(out$structure_exact_mass, c(78.04695, 75.06841))
+  expect_equal(out$structure_xlogp, c(2.13457, NA_real_))
+})

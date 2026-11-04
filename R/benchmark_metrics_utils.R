@@ -30,10 +30,14 @@ NULL
   out[invalid] <- list(NA_character_)
 
   if (!all(invalid)) {
-    out[!invalid] <- lapply(x[!invalid], function(value) {
-      parts <- strsplit(value, "|", fixed = TRUE)[[1L]]
+    valid_idx <- which(!invalid)
+    vx <- x[valid_idx]
+    u_vx <- unique(vx)
+    u_parts <- strsplit(u_vx, "|", fixed = TRUE)
+    u_parts <- lapply(u_parts, function(parts) {
       parts[nzchar(parts) & parts != "null" & parts != "NULL"]
     })
+    out[valid_idx] <- u_parts[fastmatch::fmatch(vx, u_vx)]
   }
 
   out
@@ -67,58 +71,77 @@ NULL
     return(tidytable::tidytable())
   }
 
+  n_df <- nrow(df)
+  if (n_df == 0L) {
+    return(tidytable::tidytable(
+      feature_id = character(0),
+      candidate_ik = character(0),
+      rank_final = character(0),
+      score_final = character(0),
+      prediction = character(0)
+    ))
+  }
+
   ik_parts <- .benchmark_split_values(
     df$candidate_structure_inchikey_connectivity_layer
   )
-  rk_parts <- if ("rank_final" %in% colnames(df)) {
+  has_rk <- "rank_final" %in% colnames(df)
+  rk_parts <- if (has_rk) {
     .benchmark_split_values(df$rank_final)
   } else {
-    rep(list(NA_character_), nrow(df))
+    NULL
   }
-  sc_parts <- if ("score_final" %in% colnames(df)) {
+  has_sc <- "score_final" %in% colnames(df)
+  sc_parts <- if (has_sc) {
     .benchmark_split_values(df$score_final)
   } else {
-    rep(list(NA_character_), nrow(df))
+    NULL
   }
 
-  n_per_row <- pmax(
-    lengths(ik_parts),
-    lengths(rk_parts),
-    lengths(sc_parts),
-    1L
-  )
+  len_ik <- lengths(ik_parts)
+  len_rk <- if (has_rk) lengths(rk_parts) else 1L
+  len_sc <- if (has_sc) lengths(sc_parts) else 1L
+  n_per_row <- pmax(len_ik, len_rk, len_sc, 1L)
+
+  .flatten_padded <- function(parts, lens, target_lens) {
+    if (is.null(parts)) {
+      return(rep(NA_character_, sum(target_lens)))
+    }
+    diff_idx <- which(lens != target_lens)
+    if (length(diff_idx) > 0L) {
+      for (i in diff_idx) {
+        parts[[i]] <- .benchmark_pad_to(parts[[i]], target_lens[[i]])
+      }
+    }
+    res <- unlist(parts, use.names = FALSE)
+    if (is.null(res)) character(0) else as.character(res)
+  }
 
   total_rows <- sum(n_per_row)
   feature_id <- rep(as.character(df$feature_id), times = n_per_row)
-  candidate_ik <- character(total_rows)
-  rank_final <- character(total_rows)
-  score_final <- character(total_rows)
+  candidate_ik <- .flatten_padded(ik_parts, len_ik, n_per_row)
+  rank_final <- .flatten_padded(rk_parts, len_rk, n_per_row)
+  score_final <- .flatten_padded(sc_parts, len_sc, n_per_row)
 
-  pos <- 1L
-  for (i in seq_along(n_per_row)) {
-    n_i <- n_per_row[[i]]
-    rng <- pos:(pos + n_i - 1L)
-    candidate_ik[rng] <- .benchmark_pad_to(ik_parts[[i]], n_i)
-    rank_final[rng] <- .benchmark_pad_to(rk_parts[[i]], n_i)
-    score_final[rng] <- .benchmark_pad_to(sc_parts[[i]], n_i)
-    pos <- pos + n_i
+  rm(df, n_per_row, ik_parts, rk_parts, sc_parts)
+
+  non_na_ik <- which(!is.na(candidate_ik))
+  if (length(non_na_ik) > 0L) {
+    u_ik <- unique(candidate_ik[non_na_ik])
+    u_ik_clean <- gsub("-.*", "", u_ik, perl = TRUE)
+    u_ik_clean[!nzchar(u_ik_clean)] <- NA_character_
+    candidate_ik[non_na_ik] <- u_ik_clean[
+      fastmatch::fmatch(candidate_ik[non_na_ik], u_ik)
+    ]
   }
 
-  out <- tidytable::tidytable(
+  tidytable::tidytable(
     feature_id = feature_id,
     candidate_ik = candidate_ik,
     rank_final = rank_final,
     score_final = score_final,
     prediction = rep(pred_name, total_rows)
   )
-
-  rm(df, n_per_row, ik_parts, rk_parts, sc_parts, pred_name)
-
-  out |>
-    tidytable::mutate(
-      candidate_ik = gsub("-.*", "", candidate_ik, perl = TRUE),
-      candidate_ik = tidytable::na_if(candidate_ik, "")
-    )
 }
 
 #' @keywords internal

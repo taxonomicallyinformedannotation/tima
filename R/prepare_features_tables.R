@@ -402,42 +402,39 @@ prepare_features_tables <- function(
     return(empty_tbl)
   }
 
-  tbl_df <- as.data.frame(tbl)
-  feature_values <- tbl_df[[name_features]]
+  feature_values <- tbl[[name_features]]
   feature_ids <- as.character(feature_values)
   feature_order <- suppressWarnings(as.numeric(feature_ids))
   feature_order_is_numeric <- !all(is.na(feature_order))
 
-  extra_cols <- c()
-  if (name_rt %in% names(tbl_df)) {
-    extra_cols <- c(extra_cols, "rt")
-  }
-  if (name_mz %in% names(tbl_df)) {
-    extra_cols <- c(extra_cols, "mz")
-  }
-  if (name_adduct %in% names(tbl_df)) {
-    extra_cols <- c(extra_cols, "adduct")
-  }
+  tbl_names <- names(tbl)
+  extra_cols <- c(
+    if (name_rt %in% tbl_names) "rt",
+    if (name_mz %in% tbl_names) "mz",
+    if (name_adduct %in% tbl_names) "adduct"
+  )
 
   max_keep <- min(candidates, length(intensity_cols))
   if (max_keep < 1L) {
     return(tidytable::tidytable())
   }
 
-  if (nrow(tbl_df) > 0L && anyDuplicated(feature_ids) == 0L) {
-    n_feat <- nrow(tbl_df)
+  n_feat <- nrow(tbl)
+  if (n_feat > 0L && anyDuplicated(feature_ids) == 0L) {
     n_samp <- length(intensity_cols)
-    num_list <- lapply(tbl_df[intensity_cols], function(col) {
-      if (is.double(col)) col else suppressWarnings(as.numeric(col))
-    })
-    num_mat <- matrix(
-      unlist(num_list, use.names = FALSE),
-      nrow = n_feat,
-      ncol = n_samp
-    )
+    num_mat <- matrix(NA_real_, nrow = n_feat, ncol = n_samp)
+    for (j in seq_len(n_samp)) {
+      col <- tbl[[intensity_cols[[j]]]]
+      num_mat[, j] <- if (is.double(col)) {
+        col
+      } else {
+        suppressWarnings(as.numeric(col))
+      }
+    }
 
     work_mat <- num_mat
-    work_mat[is.na(work_mat) | work_mat <= 0] <- -Inf
+    work_mat[is.na(work_mat)] <- -Inf
+    work_mat[work_mat <= 0] <- -Inf
 
     if (max_keep <= 16L) {
       row_idx_list <- vector("list", max_keep)
@@ -474,6 +471,7 @@ prepare_features_tables <- function(
           active_rows <- kept_r
         }
       }
+      rm(work_mat)
 
       kept_r_all <- unlist(row_idx_list, use.names = FALSE)
       if (length(kept_r_all) == 0L) {
@@ -520,6 +518,7 @@ prepare_features_tables <- function(
       r_id <- (valid_pos - 1L) %% n_feat + 1L
       c_id <- (valid_pos - 1L) %/% n_feat + 1L
       v_val <- work_mat[valid_pos]
+      rm(work_mat)
       ord_v <- order(r_id, -v_val, c_id, method = "radix")
       r_id <- r_id[ord_v]
       c_id <- c_id[ord_v]
@@ -552,12 +551,15 @@ prepare_features_tables <- function(
     n_u_r <- length(u_r)
     samp_ord <- order(intensity_cols)
     mat_t_sorted <- t(num_mat[u_r, samp_ord, drop = FALSE])
+    rm(num_mat)
+    dim(mat_t_sorted) <- NULL
     grp_fac <- structure(
       rep(seq_len(n_u_r), each = n_samp),
-      levels = as.character(seq_len(n_u_r)),
+      levels = character(n_u_r),
       class = "factor"
     )
-    intensity_u_list <- split.default(as.vector(mat_t_sorted), grp_fac)
+    intensity_u_list <- split.default(mat_t_sorted, grp_fac)
+    rm(mat_t_sorted, grp_fac)
     names(intensity_u_list) <- NULL
     r_to_u <- fastmatch::fmatch(kept_r_all, u_r)
 
@@ -569,13 +571,13 @@ prepare_features_tables <- function(
       check.names = FALSE
     )
     if ("rt" %in% extra_cols) {
-      out$rt <- tbl_df[[name_rt]][kept_r_all]
+      out$rt <- tbl[[name_rt]][kept_r_all]
     }
     if ("mz" %in% extra_cols) {
-      out$mz <- tbl_df[[name_mz]][kept_r_all]
+      out$mz <- tbl[[name_mz]][kept_r_all]
     }
     if ("adduct" %in% extra_cols) {
-      out$adduct <- tbl_df[[name_adduct]][kept_r_all]
+      out$adduct <- tbl[[name_adduct]][kept_r_all]
     }
     out$intensity_all <- intensity_u_list[r_to_u]
 
@@ -596,6 +598,7 @@ prepare_features_tables <- function(
     return(out)
   }
 
+  tbl_df <- as.data.frame(tbl)
   long_tbl <- tidytable::as_tidytable(tbl_df) |>
     tidytable::pivot_longer(
       cols = tidyselect::all_of(intensity_cols),

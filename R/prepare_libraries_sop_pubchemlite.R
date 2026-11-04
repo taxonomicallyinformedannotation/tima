@@ -70,51 +70,62 @@ prepare_libraries_sop_pubchemlite <- function(
       if (nrow(pubchemlite) == 0L) {
         pubchemlite_prepared <- fake_sop_columns()
       } else {
-        pubchemlite_prepared <- pubchemlite |>
-          tidytable::mutate(tidytable::across(
-            .cols = tidyselect::everything(),
-            .fns = tidytable::na_if,
-            ""
-          )) |>
-          tidytable::mutate(
-            structure_inchikey_2D = NA_character_,
-            structure_smiles_2D = NA_character_
-          ) |>
-          tidytable::rename(
-            structure_name = CompoundName,
-            structure_inchikey = InChIKey,
-            structure_smiles = SMILES,
-            structure_molecular_formula = MolecularFormula,
-            structure_exact_mass = MonoisotopicMass,
-            structure_xlogp = XLogP
-          ) |>
-          tidytable::mutate(
-            structure_taxonomy_npclassifier_01pathway = NA_character_,
-            structure_taxonomy_npclassifier_02superclass = NA_character_,
-            structure_taxonomy_npclassifier_03class = NA_character_,
-            structure_taxonomy_classyfire_chemontid = NA_character_,
-            structure_taxonomy_classyfire_01kingdom = NA_character_,
-            structure_taxonomy_classyfire_02superclass = NA_character_,
-            structure_taxonomy_classyfire_03class = NA_character_,
-            structure_taxonomy_classyfire_04directparent = NA_character_,
-            structure_tag = "xenobiotic",
-            organism_name = "xenobiotic",
-            organism_taxonomy_ottid = "93302", # complicated placeholder, different from Biota
-            organism_taxonomy_01domain = NA_character_,
-            organism_taxonomy_02kingdom = NA_character_,
-            organism_taxonomy_03phylum = NA_character_,
-            organism_taxonomy_04class = NA_character_,
-            organism_taxonomy_05order = NA_character_,
-            organism_taxonomy_06family = NA_character_,
-            organism_taxonomy_07tribe = NA_character_,
-            organism_taxonomy_08genus = NA_character_,
-            organism_taxonomy_09species = NA_character_,
-            organism_taxonomy_10varietas = NA_character_,
-            reference_doi = NA_character_
-          ) |>
-          select_sop_columns() |>
+        clean_col <- function(col) {
+          if (is.null(col)) {
+            return(rep(NA_character_, nrow(pubchemlite)))
+          }
+          col[!nzchar(col)] <- NA_character_
+          col
+        }
+        pubchemlite_core <- tidytable::tidytable(
+          structure_name = clean_col(pubchemlite[["CompoundName"]]),
+          structure_inchikey = clean_col(pubchemlite[["InChIKey"]]),
+          structure_smiles = clean_col(pubchemlite[["SMILES"]]),
+          structure_molecular_formula = clean_col(
+            pubchemlite[["MolecularFormula"]]
+          ),
+          structure_exact_mass = clean_col(pubchemlite[["MonoisotopicMass"]]),
+          structure_xlogp = clean_col(pubchemlite[["XLogP"]])
+        ) |>
           round_reals() |>
           tidytable::distinct()
+        rm(pubchemlite)
+
+        n_out <- nrow(pubchemlite_core)
+        na_col <- rep(NA_character_, n_out)
+        pubchemlite_prepared <- tidytable::tidytable(
+          structure_name = pubchemlite_core$structure_name,
+          structure_inchikey = pubchemlite_core$structure_inchikey,
+          structure_smiles = pubchemlite_core$structure_smiles,
+          structure_inchikey_2D = na_col,
+          structure_smiles_2D = na_col,
+          structure_molecular_formula = pubchemlite_core$structure_molecular_formula,
+          structure_exact_mass = pubchemlite_core$structure_exact_mass,
+          structure_xlogp = pubchemlite_core$structure_xlogp,
+          structure_taxonomy_npclassifier_01pathway = na_col,
+          structure_taxonomy_npclassifier_02superclass = na_col,
+          structure_taxonomy_npclassifier_03class = na_col,
+          structure_taxonomy_classyfire_chemontid = na_col,
+          structure_taxonomy_classyfire_01kingdom = na_col,
+          structure_taxonomy_classyfire_02superclass = na_col,
+          structure_taxonomy_classyfire_03class = na_col,
+          structure_taxonomy_classyfire_04directparent = na_col,
+          structure_tag = rep("xenobiotic", n_out),
+          organism_name = rep("xenobiotic", n_out),
+          organism_taxonomy_ottid = rep("93302", n_out), # complicated placeholder, different from Biota
+          organism_taxonomy_01domain = na_col,
+          organism_taxonomy_02kingdom = na_col,
+          organism_taxonomy_03phylum = na_col,
+          organism_taxonomy_04class = na_col,
+          organism_taxonomy_05order = na_col,
+          organism_taxonomy_06family = na_col,
+          organism_taxonomy_07tribe = na_col,
+          organism_taxonomy_08genus = na_col,
+          organism_taxonomy_09species = na_col,
+          organism_taxonomy_10varietas = na_col,
+          reference_doi = na_col
+        ) |>
+          select_sop_columns()
       }
     }
 

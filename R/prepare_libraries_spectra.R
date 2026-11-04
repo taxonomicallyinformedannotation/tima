@@ -373,10 +373,6 @@ prepare_libraries_spectra <-
           structure_smiles = smiles,
           structure_smiles_no_stereo = smiles_no_stereo
         ) |>
-        tidytable::distinct(
-          structure_smiles,
-          structure_smiles_no_stereo
-        ) |>
         tidytable::mutate(organism_name = NA_character_)
     }
 

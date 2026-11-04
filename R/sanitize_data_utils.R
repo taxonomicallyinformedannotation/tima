@@ -42,8 +42,12 @@ sanitize_mgf <- function(file, file_type = "MGF file") {
       lines <- readLines(file, warn = FALSE)
       n_lines <- length(lines)
 
-      begin_ions <- grep("^BEGIN IONS", lines, ignore.case = TRUE)
-      end_ions <- grep("^END IONS", lines, ignore.case = TRUE)
+      begin_ions <- which(startsWith(lines, "BEGIN IONS"))
+      end_ions <- which(startsWith(lines, "END IONS"))
+      if (length(begin_ions) == 0L && n_lines > 0L) {
+        begin_ions <- grep("^BEGIN IONS", lines, ignore.case = TRUE)
+        end_ions <- grep("^END IONS", lines, ignore.case = TRUE)
+      }
       total_spectra <- length(begin_ions)
 
       if (total_spectra == 0L) {
@@ -64,7 +68,7 @@ sanitize_mgf <- function(file, file_type = "MGF file") {
       # Build a logical vector "which line belongs to which spectrum" is not
       # necessary: instead, mark lines that carry MSLEVEL=2 or look like peaks
       # (start with a digit), then for each spectrum check presence via
-      # findInterval on pre-computed global grep results.
+      # findInterval on pre-computed global line matches.
       if (total_spectra > 0L) {
         end_ions_capped <- if (length(end_ions) >= total_spectra) {
           end_ions[seq_len(total_spectra)]
@@ -82,9 +86,11 @@ sanitize_mgf <- function(file, file_type = "MGF file") {
           idx[in_range] # spectrum indices that contain a matching line
         }
 
-        has_mslevel_line <- grep("^MSLEVEL=", lines, ignore.case = TRUE)
+        has_mslevel_line <- which(
+          startsWith(lines, "MSLEVEL=") | startsWith(lines, "mslevel=")
+        )
         mslevel2_lines <- has_mslevel_line[
-          grepl("^MSLEVEL=2$", lines[has_mslevel_line], ignore.case = TRUE)
+          toupper(lines[has_mslevel_line]) == "MSLEVEL=2"
         ]
 
         ms2_by_level <- unique(.lines_in_spectrum(
@@ -102,7 +108,8 @@ sanitize_mgf <- function(file, file_type = "MGF file") {
           spectra_with_mslevel
         )
         ms2_by_peaks <- if (length(spectra_without_mslevel) > 0L) {
-          peak_lines <- grep("^[0-9]", lines)
+          c1 <- substr(lines, 1L, 1L)
+          peak_lines <- which(c1 >= "0" & c1 <= "9")
           spectra_with_peaks <- unique(.lines_in_spectrum(
             peak_lines,
             begin_ions,
@@ -213,28 +220,47 @@ sanitize_csv <- function(
   # Try to read and validate
   read_result <- tryCatch(
     {
-      list(
-        data = safe_fread(
+      hdr <- safe_fread(
+        file = file,
+        file_type = file_type,
+        nrows = 0L
+      )
+      cols <- names(hdr)
+      nr <- if (length(cols) > 0L) {
+        col1 <- safe_fread(
           file = file,
           file_type = file_type,
           na.strings = c("", "NA"),
-          colClasses = "character"
-        ),
+          colClasses = "character",
+          select = 1L
+        )
+        nrow(col1)
+      } else {
+        0L
+      }
+      list(
+        n_rows = nr,
+        n_cols = length(cols),
+        columns = cols,
         error = NULL
       )
     },
     error = function(e) {
-      list(data = tidytable::tidytable(), error = conditionMessage(e))
+      list(
+        n_rows = 0L,
+        n_cols = 0L,
+        columns = character(0),
+        error = conditionMessage(e)
+      )
     }
   )
-  df <- read_result$data
   if (!is.null(read_result$error)) {
     issues <- c(issues, paste0("Failed to read file: ", read_result$error))
   }
 
-  n_rows <- nrow(df)
-  n_cols <- ncol(df)
-  columns <- names(df)
+  n_rows <- read_result$n_rows
+  n_cols <- read_result$n_cols
+  columns <- read_result$columns
 
   # Check for empty file
   if (n_rows == 0L && length(issues) == 0L) {
@@ -590,8 +616,6 @@ sanitize_sirius <- function(sirius_dir) {
   has_structure <- FALSE
   n_features <- 0L
   is_zip <- FALSE
-  cleanup_temp <- FALSE
-  temp_dir <- NULL
 
   # Check if input exists (file or directory)
   if (!file.exists(sirius_dir)) {
@@ -613,25 +637,11 @@ sanitize_sirius <- function(sirius_dir) {
       is_zip <- TRUE
       log_debug("SIRIUS input is a ZIP file, will check contents...")
 
-      # Create temp directory for checking
-      temp_dir <- tempfile(pattern = "sirius_check_")
-      dir.create(temp_dir, recursive = TRUE)
-      cleanup_temp <- TRUE
-
+      zip_files <- NULL
       unzip_error <- tryCatch(
         {
-          utils::unzip(sirius_dir, exdir = temp_dir)
-
-          # Find the actual SIRIUS directory (might be nested)
-          extracted_items <- list.files(temp_dir, full.names = TRUE)
-          if (length(extracted_items) == 1 && dir.exists(extracted_items[1])) {
-            # Single directory extracted, use it
-            sirius_dir <- extracted_items[1]
-          } else {
-            # Multiple items or files, use temp_dir
-            sirius_dir <- temp_dir
-          }
-
+          zip_info <- utils::unzip(sirius_dir, list = TRUE)
+          zip_files <- zip_info$Name
           NULL
         },
         error = function(e) {
@@ -640,10 +650,111 @@ sanitize_sirius <- function(sirius_dir) {
       )
       if (!is.null(unzip_error)) {
         issues <- c(issues, paste0("Failed to extract ZIP: ", unzip_error))
-        if (cleanup_temp && dir.exists(temp_dir)) {
-          unlink(temp_dir, recursive = TRUE)
-        }
+        return(list(
+          valid = FALSE,
+          has_formula = FALSE,
+          has_canopus = FALSE,
+          has_structure = FALSE,
+          n_features = 0L,
+          is_zip = is_zip,
+          issues = c(issues, "Could not access SIRIUS directory")
+        ))
       }
+
+      bnames <- basename(zip_files)
+      has_formula_v5 <- "formula_identifications.tsv" %in% bnames
+      has_canopus_v5 <- "canopus_summary.tsv" %in% bnames
+      has_structure_v5 <- "compound_identifications.tsv" %in% bnames
+
+      has_formula_v6 <- "formula_identifications_all.tsv" %in% bnames
+      has_canopus_v6 <- "canopus_formula_summary_all.tsv" %in% bnames
+      has_structure_v6 <- "structure_identifications_all.tsv" %in% bnames
+
+      has_formula <- has_formula_v5 || has_formula_v6
+      has_canopus <- has_canopus_v5 || has_canopus_v6
+      has_structure <- has_structure_v5 || has_structure_v6
+
+      sirius_version <- if (has_formula_v6 || has_canopus_v6) {
+        "6"
+      } else if (has_formula_v5 || has_canopus_v5) {
+        "5"
+      } else {
+        "unknown"
+      }
+
+      if (!has_formula) {
+        issues <- c(
+          issues,
+          "Missing formula identifications file (tried v5 and v6 names)"
+        )
+      }
+      if (!has_canopus) {
+        issues <- c(
+          issues,
+          "Missing CANOPUS summary file (tried v5 and v6 names)"
+        )
+      }
+      if (!has_structure) {
+        issues <- c(
+          issues,
+          "Missing structure identifications file (tried v5 and v6 names)"
+        )
+      }
+
+      if (has_structure) {
+        target_bname <- if (has_structure_v6) {
+          "structure_identifications_all.tsv"
+        } else {
+          "compound_identifications.tsv"
+        }
+        target_in_zip <- zip_files[match(target_bname, bnames)]
+        temp_dir <- tempfile(pattern = "sirius_check_")
+        dir.create(temp_dir, recursive = TRUE)
+        on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
+        tryCatch(
+          {
+            extracted_path <- utils::unzip(
+              sirius_dir,
+              files = target_in_zip,
+              exdir = temp_dir
+            )
+            if (
+              length(extracted_path) == 1L && file.exists(extracted_path[[1L]])
+            ) {
+              structure_data <- safe_fread(
+                file = extracted_path[[1L]],
+                file_type = "SIRIUS structure identifications",
+                na.strings = c("", "NA"),
+                colClasses = "character",
+                select = 1L
+              )
+              n_features <- nrow(structure_data)
+              log_debug(
+                "Counted %d unique annotations from %s",
+                n_features,
+                target_bname
+              )
+            }
+          },
+          error = function(e) {
+            log_debug(
+              "Could not count SIRIUS annotations: %s",
+              conditionMessage(e)
+            )
+          }
+        )
+      }
+
+      return(list(
+        valid = length(issues) == 0L,
+        has_formula = has_formula,
+        has_canopus = has_canopus,
+        has_structure = has_structure,
+        n_features = n_features,
+        is_zip = is_zip,
+        sirius_version = sirius_version,
+        issues = issues
+      ))
     } else {
       return(list(
         valid = FALSE,
@@ -660,11 +771,8 @@ sanitize_sirius <- function(sirius_dir) {
     }
   }
 
-  # Now check directory (either original or extracted from ZIP)
+  # Now check directory
   if (!dir.exists(sirius_dir)) {
-    if (cleanup_temp && !is.null(temp_dir) && dir.exists(temp_dir)) {
-      unlink(temp_dir, recursive = TRUE)
-    }
     return(list(
       valid = FALSE,
       has_formula = FALSE,
@@ -738,12 +846,13 @@ sanitize_sirius <- function(sirius_dir) {
       }
 
       if (!is.null(structure_file_to_read)) {
-        # Read structure identifications and count UNIQUE annotations
+        # Read first column of structure identifications to count rows
         structure_data <- safe_fread(
           file = structure_file_to_read,
           file_type = "SIRIUS structure identifications",
           na.strings = c("", "NA"),
-          colClasses = "character"
+          colClasses = "character",
+          select = 1L
         )
 
         # Count unique structure annotations (unique InChIKeys or structure IDs)
@@ -761,11 +870,6 @@ sanitize_sirius <- function(sirius_dir) {
       log_debug("Could not count SIRIUS annotations: %s", conditionMessage(e))
     }
   )
-
-  # Cleanup temp directory if we created one
-  if (cleanup_temp && !is.null(temp_dir) && dir.exists(temp_dir)) {
-    unlink(temp_dir, recursive = TRUE)
-  }
 
   list(
     valid = length(issues) == 0L,

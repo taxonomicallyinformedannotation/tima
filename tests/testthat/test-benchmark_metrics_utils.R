@@ -64,6 +64,49 @@ test_that("benchmark expand predictions normalizes values and supports scalar ra
   expect_true(any(expanded$rank_final == "2"))
 })
 
+test_that("benchmark expand predictions handles 0-row input, missing optional columns, and mismatched pipe lengths", {
+  empty_df <- tidytable::tidytable(
+    feature_id = character(0),
+    candidate_structure_inchikey_connectivity_layer = character(0)
+  )
+  res_empty <- .benchmark_expand_predictions(empty_df, pred_name = "p0")
+  expect_equal(nrow(res_empty), 0L)
+  expect_equal(
+    names(res_empty),
+    c("feature_id", "candidate_ik", "rank_final", "score_final", "prediction")
+  )
+
+  # Missing rank_final and score_final, plus repeated candidate_ik values
+  df_no_opt <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "AAAAAAAAAAAAAA-UHFFFAOYSA-N|BBBBBBBBBBBBBB-UHFFFAOYSA-N",
+      "AAAAAAAAAAAAAA-UHFFFAOYSA-N"
+    )
+  )
+  res_no_opt <- .benchmark_expand_predictions(df_no_opt, pred_name = "p1")
+  expect_equal(nrow(res_no_opt), 3L)
+  expect_equal(
+    res_no_opt$candidate_ik,
+    c("AAAAAAAAAAAAAA", "BBBBBBBBBBBBBB", "AAAAAAAAAAAAAA")
+  )
+  expect_true(all(is.na(res_no_opt$rank_final)))
+  expect_true(all(is.na(res_no_opt$score_final)))
+
+  # Mismatched pipe lengths (3 IKs, 2 ranks, 1 score) -> padded with NA
+  df_mismatch <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_structure_inchikey_connectivity_layer = "IK1-A|IK2-B|IK3-C",
+    rank_final = "1|2",
+    score_final = "0.9"
+  )
+  res_mm <- .benchmark_expand_predictions(df_mismatch, pred_name = "p2")
+  expect_equal(nrow(res_mm), 3L)
+  expect_equal(res_mm$candidate_ik, c("IK1", "IK2", "IK3"))
+  expect_equal(res_mm$rank_final, c("1", "2", NA_character_))
+  expect_equal(res_mm$score_final, c("0.9", NA_character_, NA_character_))
+})
+
 
 test_that("benchmark evaluate predictions handles missing prediction files", {
   truth_file <- temp_test_path("bench_truth_missing.tsv")
