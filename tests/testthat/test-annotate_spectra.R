@@ -1760,3 +1760,63 @@ test_that("resolve_ms1_query_adduct_map filters to requested feature_ids and bre
   expect_identical(out$feature_id[[1L]], "F1")
   expect_identical(out$ms1_query_adduct[[1L]], "[M+Na]+")
 })
+
+test_that("log_library_stats handles missing/empty library column and computes exact per-library structure counts", {
+  # 1. Missing 'library' column returns NULL silently
+  sp_no_lib <- Spectra::Spectra(data.frame(
+    precursorMz = 100.0,
+    mz = I(list(50.0)),
+    intensity = I(list(10.0))
+  ))
+  expect_null(log_library_stats(sp_no_lib))
+
+  # 2. Empty Spectra with 'library' column returns NULL
+  sp_empty <- Spectra::Spectra(data.frame(
+    precursorMz = numeric(0),
+    library = character(0),
+    mz = I(list()),
+    intensity = I(list())
+  ))
+  expect_null(log_library_stats(sp_empty))
+
+  # 3. All-NA 'library' column returns NULL
+  sp_na_lib <- Spectra::Spectra(data.frame(
+    precursorMz = c(100.0, 200.0),
+    library = c(NA_character_, NA_character_),
+    mz = I(list(50.0, 60.0)),
+    intensity = I(list(10.0, 20.0))
+  ))
+  expect_null(log_library_stats(sp_na_lib))
+
+  # 4. Multi-library with partial NA library and fallback across smiles_no_stereo -> smiles -> inchikey
+  sp_multi <- Spectra::Spectra(data.frame(
+    precursorMz = c(100, 101, 102, 103, 104),
+    library = c("LibB", "LibA", NA_character_, "LibA", "LibA"),
+    smiles_no_stereo = c("CCO", NA_character_, "CCC", "CCO", NA_character_),
+    smiles = c(NA_character_, "CCN", "CCC", NA_character_, NA_character_),
+    inchikey = c(
+      NA_character_,
+      NA_character_,
+      NA_character_,
+      NA_character_,
+      "IK_3"
+    ),
+    mz = I(list(50, 50, 50, 50, 50)),
+    intensity = I(list(10, 10, 10, 10, 10))
+  ))
+
+  rec <- new.env(parent = emptyenv())
+  rec$msg <- NULL
+  local_mocked_bindings(
+    log_info = function(fmt, ...) {
+      rec$msg <- sprintf(fmt, ...)
+      invisible(NULL)
+    }
+  )
+
+  expect_null(log_library_stats(sp_multi))
+  expect_type(rec$msg, "character")
+  # LibA has 3 spectra and 3 unique structures (CCN, CCO, IK_3); LibB has 1 spectrum and 1 unique structure (CCO)
+  expect_match(rec$msg, "LibA\\s+3\\s+3\\s+75\\.00%")
+  expect_match(rec$msg, "LibB\\s+1\\s+1\\s+25\\.00%")
+})

@@ -38,12 +38,52 @@ test_that("create_dir works for deeply nested path", {
   expect_true(dir.exists(file.path(base_dir, "b/c/d/e/f")))
 })
 
-# test_that("create_dir warns on very long path (length heuristic)", {
-#   long_component <- paste(rep("x", MAX_PATH_LENGTH + 5), collapse = "")
-#   long_path <- file.path(long_component, "file.txt")
-#   expect_warning(
-#     create_dir(export = long_path),
-#     "exceeds typical OS maximum",
-#     ignore.case = TRUE
-#   )
-# })
+test_that("extract_directory_path, ensure_directory_exists, verify_directory_writable, and long-path check handle all branches", {
+  # 1. extract_directory_path handles bare filename, nested file, and trailing-slash dir with dot
+  expect_identical(extract_directory_path("bare_file.tsv"), ".")
+  expect_identical(
+    extract_directory_path("parent/child/file.tsv"),
+    "parent/child"
+  )
+  expect_identical(extract_directory_path("dir.with.dot/"), "dir.with.dot/")
+  expect_identical(extract_directory_path("plain_dir"), "plain_dir")
+
+  # 2. ensure_directory_exists aborts with tima_runtime_error when dir.create errors
+  tmp_dir <- withr::local_tempdir()
+  existing <- file.path(tmp_dir, "already_there")
+  dir.create(existing)
+  expect_true(ensure_directory_exists(existing))
+
+  err <- tryCatch(
+    with_mocked_bindings(
+      ensure_directory_exists(file.path(tmp_dir, "cannot_create")),
+      dir.create = function(...) stop("simulated permission denied"),
+      .package = "base"
+    ),
+    error = identity
+  )
+  expect_s3_class(err, "tima_runtime_error")
+  expect_match(conditionMessage(err), "could not create directory")
+
+  # 3. verify_directory_writable returns FALSE for missing dir and when writeLines fails
+  expect_false(verify_directory_writable(file.path(tmp_dir, "missing_dir")))
+  expect_true(verify_directory_writable(existing))
+
+  writable_fail <- with_mocked_bindings(
+    verify_directory_writable(existing),
+    writeLines = function(...) stop("simulated read-only filesystem"),
+    .package = "base"
+  )
+  expect_false(writable_fail)
+})
+
+test_that("create_dir handles paths exceeding MAX_PATH_LENGTH", {
+  tmp_dir <- withr::local_tempdir()
+  withr::local_dir(tmp_dir)
+  # Create a path string > MAX_PATH_LENGTH (260 chars) using short nested segments
+  segs <- rep("abcdefghij", 26L)
+  long_rel <- do.call(file.path, as.list(c(segs, "out.tsv")))
+  expect_gt(nchar(long_rel), MAX_PATH_LENGTH)
+  expect_no_error(create_dir(export = long_rel))
+  expect_true(dir.exists(dirname(long_rel)))
+})
