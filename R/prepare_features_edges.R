@@ -204,23 +204,114 @@ prepare_features_edges <- function(
   entropy_columns <- entropy_columns[entropy_columns %in% names(edges_ms2)]
 
   # Extract entropy information from spectral edges
-  features_entropy <- edges_ms2 |>
-    tidytable::select(tidyselect::any_of(entropy_columns)) |>
-    tidytable::distinct()
+  if (length(entropy_columns) > 0L) {
+    features_entropy <- .fast_distinct_with_key_guard(
+      edges_ms2[, ..entropy_columns],
+      name_source
+    )
+  } else {
+    features_entropy <- tidytable::tidytable()
+  }
 
   # Combine and Format Edges ----
+  extra_ent_cols <- setdiff(entropy_columns, name_source)
+  if (
+    name_source %in%
+      names(edges_ms1) &&
+      name_source %in% names(features_entropy) &&
+      !any(extra_ent_cols %in% names(edges_ms1)) &&
+      !anyDuplicated(features_entropy[[name_source]])
+  ) {
+    step2 <- data.table::copy(edges_ms1)
+    src_ms1 <- step2[[name_source]]
+    src_ent <- features_entropy[[name_source]]
+    m_ent <- if (anyNA(src_ent) || anyNA(src_ms1)) {
+      match(src_ms1, src_ent)
+    } else {
+      fastmatch::fmatch(src_ms1, src_ent)
+    }
+    for (col in extra_ent_cols) {
+      data.table::set(step2, j = col, value = features_entropy[[col]][m_ent])
+    }
+    unmatched_ent <- if (anyNA(src_ent) || anyNA(src_ms1)) {
+      is.na(match(src_ent, src_ms1))
+    } else {
+      fastmatch::fmatch(src_ent, src_ms1, nomatch = 0L) == 0L
+    }
+    if (any(unmatched_ent)) {
+      step2 <- tidytable::bind_rows(
+        step2,
+        features_entropy[which(unmatched_ent), ]
+      )
+    }
+  } else {
+    step2 <- edges_ms1 |>
+      tidytable::full_join(y = features_entropy)
+  }
 
-  edges_table_treated <- edges_ms1 |>
-    tidytable::full_join(y = features_entropy) |>
-    tidytable::full_join(y = edges_ms2) |>
-    tidytable::rename(
-      feature_source = !!as.name(name_source),
-      feature_target = !!as.name(name_target)
-    ) |>
-    tidytable::mutate(
-      feature_target = tidytable::coalesce(feature_target, feature_source)
-    ) |>
-    tidytable::distinct() |>
+  common_cols <- intersect(names(step2), names(edges_ms2))
+  if (
+    nrow(step2) > 0L &&
+      nrow(edges_ms2) > 0L &&
+      length(common_cols) > 0L
+  ) {
+    m12 <- .fast_match_rows(step2, edges_ms2, common_cols)
+    has_match <- !is.na(m12)
+    if (!any(has_match)) {
+      edges_table_treated <- tidytable::bind_rows(step2, edges_ms2)
+    } else {
+      m21 <- .fast_match_rows(edges_ms2, step2, common_cols)
+      idx1_matched <- which(has_match)
+      idx2_matched <- which(!is.na(m21))
+      if (
+        length(idx1_matched) == length(idx2_matched) &&
+          !anyDuplicated(m12[idx1_matched]) &&
+          !anyDuplicated(m21[idx2_matched])
+      ) {
+        ms2_extra_cols <- setdiff(names(edges_ms2), common_cols)
+        y_matched_rows <- m12[idx1_matched]
+        for (col in ms2_extra_cols) {
+          col_val <- rep(NA_character_, nrow(step2))
+          col_val[idx1_matched] <- as.character(edges_ms2[[col]][
+            y_matched_rows
+          ])
+          data.table::set(step2, j = col, value = col_val)
+        }
+        unmatched_ms2 <- which(is.na(m21))
+        if (length(unmatched_ms2) > 0L) {
+          edges_table_treated <- tidytable::bind_rows(
+            step2,
+            edges_ms2[unmatched_ms2, ]
+          )
+        } else {
+          edges_table_treated <- step2
+        }
+      } else {
+        edges_table_treated <- step2 |>
+          tidytable::full_join(y = edges_ms2)
+      }
+    }
+  } else {
+    edges_table_treated <- step2 |>
+      tidytable::full_join(y = edges_ms2)
+  }
+  rm(step2)
+
+  if (name_source != "feature_source" || name_target != "feature_target") {
+    edges_table_treated <- edges_table_treated |>
+      tidytable::rename(
+        feature_source = !!as.name(name_source),
+        feature_target = !!as.name(name_target)
+      )
+  }
+  ft_vec <- edges_table_treated$feature_target
+  na_ft <- is.na(ft_vec)
+  if (any(na_ft)) {
+    ft_vec[na_ft] <- edges_table_treated$feature_source[na_ft]
+    data.table::set(edges_table_treated, j = "feature_target", value = ft_vec)
+  }
+  edges_table_treated <- edges_table_treated |>
+    .fast_distinct_with_key_guard(c("feature_source", "feature_target")) |>
     drop_legacy_similarity_columns()
 
   # Retain p_value from MS1 intensity covariance edges (intensity covariance edges only)

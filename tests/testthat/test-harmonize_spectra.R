@@ -214,3 +214,47 @@ test_that("harmonize_spectra validates column parameters", {
     "Column name parameter\\(s\\) must satisfy validation.*col_ad, col_ce, col_ci"
   )
 })
+
+test_that("harmonize_spectra populates defaults and preserves list columns for matching polarities", {
+  test_spectra <- tidytable::tidytable(
+    polarity = c("Positive", "Negative", "1", "-1"),
+    name_col = c("Caffeine", "NegCmpd", "Aspirin", "Neg2"),
+    smiles_col = c(
+      "CN1C=NC2=C1C(=O)N(C(=O)N2C)C",
+      "CC(=O)O",
+      "CC(=O)OC1=CC=CC=C1C(=O)O",
+      "CCO"
+    ),
+    precursorMz = c(195.088, 60.02, 181.05, 45.03),
+    mz = list(c(100, 195), c(40, 60), c(120, 181), c(30, 45)),
+    intensity = list(c(50, 100), c(20, 80), c(40, 90), c(10, 50))
+  )
+
+  res <- harmonize_spectra(
+    spectra = test_spectra,
+    metad = "TestLib",
+    mode = "pos",
+    col_ad = NULL,
+    col_ce = NULL,
+    col_ci = NULL,
+    col_in = NULL,
+    col_io = NULL,
+    col_ik = NULL,
+    col_il = NULL,
+    col_na = "name_col",
+    col_po = "polarity",
+    col_sm = "smiles_col",
+    col_sn = NULL,
+    col_si = NULL,
+    col_sp = NULL,
+    col_sy = NULL
+  )
+
+  expect_equal(nrow(res), 2L)
+  expect_true(all(res$precursorCharge == 1L))
+  expect_true(all(res$library == "TestLib"))
+  expect_true(is.list(res$mz))
+  expect_true(is.list(res$intensity))
+  expect_setequal(res$compound_id, c("Caffeine", "Aspirin"))
+  expect_setequal(res$spectrum_id, c("1", "2"))
+})

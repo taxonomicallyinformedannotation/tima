@@ -189,7 +189,12 @@ prepare_annotations_spectra <- function(
     table <- non_empty_chunks[[1L]]
   } else {
     table <- tidytable::bind_rows(non_empty_chunks) |>
-      tidytable::distinct(tidyselect::all_of(annotation_cols))
+      .fast_distinct_with_key_guard(c(
+        "feature_id",
+        "candidate_spectrum_id",
+        "candidate_adduct",
+        "candidate_structure_smiles_no_stereo"
+      ))
   }
   rm(non_empty_chunks)
 
@@ -221,30 +226,42 @@ prepare_spectral_annotation_chunk <- function(file, annotation_cols) {
   ))
   selected_cols <- intersect(annotation_cols, selected_cols)
 
-  safe_fread(
+  df <- safe_fread(
     file = file,
     file_type = "spectral annotations",
     na.strings = c("", "NA"),
     colClasses = "character",
     select = selected_cols
   ) |>
-    .ensure_expected_annotation_cols(annotation_cols) |>
-    tidytable::filter(!is.na(feature_id)) |>
-    tidytable::distinct(tidyselect::all_of(annotation_cols))
+    .ensure_expected_annotation_cols(annotation_cols)
+
+  if (anyNA(df$feature_id)) {
+    df <- df[which(!is.na(df$feature_id)), ]
+  }
+  .fast_distinct_with_key_guard(
+    df,
+    c(
+      "feature_id",
+      "candidate_spectrum_id",
+      "candidate_adduct",
+      "candidate_structure_smiles_no_stereo"
+    )
+  )
 }
 
 .ensure_expected_annotation_cols <- function(df, annotation_cols) {
   missing_cols <- setdiff(annotation_cols, names(df))
   if (length(missing_cols) == 0L) {
+    if (!identical(names(df), annotation_cols)) {
+      data.table::setcolorder(df, annotation_cols)
+    }
     return(df)
   }
 
-  df |>
-    tidytable::mutate(
-      !!!stats::setNames(
-        rep(list(NA_character_), length(missing_cols)),
-        missing_cols
-      )
-    ) |>
-    tidytable::select(tidyselect::all_of(annotation_cols))
+  na_col <- rep(NA_character_, nrow(df))
+  for (col in missing_cols) {
+    data.table::set(df, j = col, value = na_col)
+  }
+  data.table::setcolorder(df, annotation_cols)
+  df
 }

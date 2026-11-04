@@ -635,3 +635,61 @@ test_that("prepare_taxa strips known MS file extensions when extension is FALSE"
   expect_true("Org1" %in% df$sample_organism_name)
   expect_true("Org2" %in% df$sample_organism_name)
 })
+
+test_that("prepare_taxa high-volume combination collapse (>256 rows) matches small-table collapse", {
+  input <- temp_test_path("features-high-vol.tsv")
+  ott <- temp_test_path("ott-high-vol.tsv")
+  metadata <- temp_test_path("metadata-high-vol.tsv")
+  output <- temp_test_path("output-high-vol.tsv")
+
+  f_ids <- sprintf("FT%04d", 1:150)
+  feat_df <- tidytable::tidytable(
+    feature_id = rep(f_ids, each = 2L),
+    rt = "2.5",
+    mz = "300.1",
+    sample = rep(c("s1", "s2", "s3"), length.out = 300L)
+  )
+  tidytable::fwrite(feat_df, input, sep = "\t")
+
+  writeLines(
+    paste0(
+      "organism_name\torganism_taxonomy_ottid\torganism_taxonomy_01domain\t",
+      "organism_taxonomy_02kingdom\torganism_taxonomy_03phylum\t",
+      "organism_taxonomy_04class\torganism_taxonomy_05order\t",
+      "organism_taxonomy_06family\torganism_taxonomy_07tribe\t",
+      "organism_taxonomy_08genus\torganism_taxonomy_09species\t",
+      "organism_taxonomy_10varietas\n",
+      "Org1\t1001\tEukaryota\tPlantae\tNA\tNA\tNA\tNA\tNA\tGenus1\tOrg1\tNA\n",
+      "Org2\t1002\tEukaryota\tPlantae\tNA\tNA\tNA\tNA\tNA\tGenus2\tOrg2\tNA"
+    ),
+    ott
+  )
+
+  writeLines(
+    paste(
+      "filename\torganism",
+      "s1\tOrg1|Org2",
+      "s2\tOrg1",
+      "s3\tOrg2",
+      sep = "\n"
+    ),
+    metadata
+  )
+
+  prepare_taxa(
+    input = input,
+    org_tax_ott = ott,
+    taxon = NULL,
+    metadata = metadata,
+    name_filename = "filename",
+    colname = "organism",
+    output = output,
+    extension = TRUE
+  )
+
+  df <- tidytable::fread(output)
+  expect_equal(nrow(df), 150L)
+  expect_identical(df$feature_id, f_ids)
+  expect_true(all(grepl("Org1", df$sample_organism_name)))
+  expect_true(all(grepl("Org2", df$sample_organism_name)))
+})

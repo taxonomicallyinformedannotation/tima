@@ -221,3 +221,15 @@ test_that("test-prepare_annotations_spectra preserves spectral rescue provenance
   expect_equal(df$candidate_adduct_match_mode[[1L]], "m_delta_rescued")
   expect_match(df$annotation_note[[1L]], "neutral-mass space")
 })
+
+test_that(".ensure_expected_annotation_cols adds missing columns and enforces column order", {
+  df <- tidytable::tidytable(
+    candidate_adduct = "[M+H]+",
+    feature_id = "FT1"
+  )
+  expected_cols <- c("feature_id", "candidate_adduct", "annotation_note")
+  out <- .ensure_expected_annotation_cols(data.table::copy(df), expected_cols)
+
+  expect_identical(names(out), expected_cols)
+  expect_identical(out$annotation_note, NA_character_)
+})

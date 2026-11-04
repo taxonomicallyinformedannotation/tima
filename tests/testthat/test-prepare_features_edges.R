@@ -419,3 +419,56 @@ test_that("prepare_features_edges fills missing target with source", {
   # unlink(temp_spectral)
   # unlink(temp_output)
 })
+
+test_that("prepare_features_edges merges shared (source, target) edges and retains unmatched entropy self-loops", {
+  local_test_project(copy = TRUE)
+
+  temp_ms1 <- withr::local_tempfile(fileext = ".tsv")
+  temp_spectral <- withr::local_tempfile(fileext = ".tsv")
+  temp_output <- withr::local_tempfile(fileext = ".tsv")
+
+  ms1_data <- data.frame(
+    ID1 = c("FT001", "FT002"),
+    ID2 = c("FT002", "FT003"),
+    EdgeType = c("adduct", "adduct"),
+    stringsAsFactors = FALSE
+  )
+  write.table(ms1_data, temp_ms1, sep = "\t", row.names = FALSE, quote = FALSE)
+
+  spectral_data <- data.frame(
+    ID1 = c("FT001", "FT004"),
+    ID2 = c("FT002", "FT005"),
+    feature_spectrum_entropy = c("0.85", "0.92"),
+    feature_spectrum_peaks = c("12", "18"),
+    candidate_score_similarity = c("0.95", "0.88"),
+    candidate_count_similarity_peaks_matched = c("6", "9"),
+    stringsAsFactors = FALSE
+  )
+  write.table(
+    spectral_data,
+    temp_spectral,
+    sep = "\t",
+    row.names = FALSE,
+    quote = FALSE
+  )
+
+  prepare_features_edges(
+    input = list("ms1" = temp_ms1, "spectral" = temp_spectral),
+    output = temp_output,
+    name_source = "ID1",
+    name_target = "ID2"
+  )
+
+  output_data <- tidytable::fread(temp_output, na.strings = c("", "NA"))
+  shared_row <- output_data[
+    output_data$feature_source == "FT001" &
+      output_data$feature_target == "FT002",
+  ]
+  expect_equal(nrow(shared_row), 1L)
+  expect_equal(shared_row$EdgeType[[1L]], "adduct")
+  expect_equal(as.numeric(shared_row$candidate_score_similarity[[1L]]), 0.95)
+  expect_true(any(
+    output_data$feature_source == "FT004" &
+      output_data$feature_target == "FT004"
+  ))
+})

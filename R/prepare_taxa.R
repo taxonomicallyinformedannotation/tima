@@ -277,6 +277,14 @@ prepare_taxa <- function(
     )
   }
 
+  ott_match_mask <- fastmatch::fmatch(
+    ott_table$organism_name,
+    organism_table$organism,
+    nomatch = 0L
+  ) >
+    0L
+  ott_table <- ott_table[which(ott_match_mask), ]
+
   organism_table_filled <- organism_table |>
     tidytable::left_join(
       y = ott_table,
@@ -324,105 +332,20 @@ prepare_taxa <- function(
         )
     }
   }
-  if (!is.null(taxon)) {
-    feat_min <- if ("feature_id" %in% names(feature_table_0)) {
-      tidytable::tidytable(feature_id = unique(feature_table_0$feature_id))
-    } else {
-      feature_table_0
-    }
-    metadata_table_joined <- tidytable::inner_join(
-      x = feat_min |>
-        tidytable::mutate(join = "x"),
-      y = biological_metadata |>
-        tidytable::select(organismOriginal = organism_name) |>
-        tidytable::mutate(join = "x")
-    ) |>
-      tidytable::select(-join)
-    rm(feat_min)
-  } else {
-    # Validate join keys exist in their respective tables
-    if (!"sample" %in% names(feature_table_0)) {
-      cli::cli_abort(
-        c(
-          "Features file does not contain the 'sample' column",
-          "i" = sprintf(
-            "Found columns: %s",
-            paste(names(feature_table_0), collapse = ", ")
-          ),
-          "x" = "Features file must have a 'sample' column for metadata mapping"
-        ),
-        class = c("tima_validation_error", "tima_error"),
-        call = NULL
-      )
-    }
+  collapse_cols <- c(
+    "sample_organism_name",
+    "sample_organism_01_domain",
+    "sample_organism_02_kingdom",
+    "sample_organism_03_phylum",
+    "sample_organism_04_class",
+    "sample_organism_05_order",
+    "sample_organism_06_family",
+    "sample_organism_07_tribe",
+    "sample_organism_08_genus",
+    "sample_organism_09_species",
+    "sample_organism_10_varietas"
+  )
 
-    if (!name_filename %in% names(metadata_table)) {
-      cli::cli_abort(
-        c(
-          "Metadata file does not contain the filename column",
-          "i" = sprintf(
-            "Expected column '%s' as specified in 'names$filename' parameter",
-            name_filename
-          ),
-          "x" = sprintf(
-            "Found columns: %s",
-            paste(names(metadata_table), collapse = ", ")
-          ),
-          "!" = "Please ensure the 'names$filename' parameter matches a column in your metadata file"
-        ),
-        class = c("tima_validation_error", "tima_error"),
-        call = NULL
-      )
-    }
-
-    feat_cols_keep <- intersect(
-      c("feature_id", "sample"),
-      names(feature_table_0)
-    )
-    meta_cols_keep <- unique(c(name_filename, colname))
-    metadata_table_joined <-
-      tidytable::left_join(
-        x = feature_table_0[, ..feat_cols_keep] |>
-          tidytable::distinct(),
-        y = metadata_table[, ..meta_cols_keep] |>
-          tidytable::distinct(),
-        by = c("sample" = name_filename)
-      ) |>
-      tidytable::select(
-        tidyselect::any_of("feature_id"),
-        organismOriginal = tidyselect::all_of(x = colname),
-        tidyselect::everything()
-      ) |>
-      tidytable::separate_rows(organismOriginal, sep = "\\|")
-
-    if (nrow(metadata_table_joined) == 0L) {
-      log_warn(
-        "No metadata rows matched features by sample name; exporting ND taxonomy for all features"
-      )
-      taxed_features_table <- .make_nd_taxa_table(feature_table_0$feature_id)
-      log_complete(ctx, n_features = nrow(taxed_features_table))
-      export_params(
-        parameters = get_params(step = "prepare_taxa"),
-        step = "prepare_taxa"
-      )
-      export_output(x = taxed_features_table, file = output)
-      rm(taxed_features_table)
-      return(output)
-    }
-  }
-  rm(feature_table_0, metadata_table)
-
-  # Split organismOriginal to match the split organism_name in
-  # biological_metadata
-  joined_data <- metadata_table_joined |>
-    tidytable::mutate(organismOriginal = trimws(organismOriginal)) |>
-    tidytable::left_join(
-      y = biological_metadata,
-      by = c("organismOriginal" = "organism_name")
-    ) |>
-    tidytable::distinct()
-
-  # Validate that we have the required taxonomy columns for selection
   expected_cols <- c(
     "feature_id",
     "organismOriginal",
@@ -437,66 +360,302 @@ prepare_taxa <- function(
     "organism_taxonomy_09species",
     "organism_taxonomy_10varietas"
   )
-  missing_select_cols <- setdiff(expected_cols, names(joined_data))
-  if (length(missing_select_cols) > 0L) {
-    cli::cli_abort(
-      c(
-        "Failed to prepare taxa: missing expected columns after joining with OTT taxonomy",
-        "x" = sprintf(
-          "Missing columns: %s",
-          paste(missing_select_cols, collapse = ", ")
-        ),
-        "i" = sprintf(
-          "Available columns: %s",
-          paste(names(joined_data), collapse = ", ")
-        ),
-        "!" = "This may indicate: (1) empty organism list, (2) mismatched organism names, or (3) corrupted OTT file"
-      ),
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
-  }
 
-  taxed_features_table <- joined_data |>
-    tidytable::select(
-      feature_id,
-      sample_organism_name = organismOriginal,
-      sample_organism_01_domain = organism_taxonomy_01domain,
-      sample_organism_02_kingdom = organism_taxonomy_02kingdom,
-      sample_organism_03_phylum = organism_taxonomy_03phylum,
-      sample_organism_04_class = organism_taxonomy_04class,
-      sample_organism_05_order = organism_taxonomy_05order,
-      sample_organism_06_family = organism_taxonomy_06family,
-      sample_organism_07_tribe = organism_taxonomy_07tribe,
-      sample_organism_08_genus = organism_taxonomy_08genus,
-      sample_organism_09_species = organism_taxonomy_09species,
-      sample_organism_10_varietas = organism_taxonomy_10varietas
-    ) |>
-    tidytable::mutate(tidytable::across(
-      .cols = tidyselect::everything(),
-      .fns = as.character
-    )) |>
-    tidytable::group_by(feature_id) |>
-    clean_collapse(
-      cols = c(
-        "sample_organism_name",
-        "sample_organism_01_domain",
-        "sample_organism_02_kingdom",
-        "sample_organism_03_phylum",
-        "sample_organism_04_class",
-        "sample_organism_05_order",
-        "sample_organism_06_family",
-        "sample_organism_07_tribe",
-        "sample_organism_08_genus",
-        "sample_organism_09_species",
-        "sample_organism_10_varietas"
+  if (
+    !is.null(taxon) &&
+      "feature_id" %in% names(feature_table_0) &&
+      nrow(feature_table_0) > 0L &&
+      nrow(biological_metadata) > 0L &&
+      all(
+        setdiff(expected_cols, c("feature_id", "organismOriginal")) %in%
+          names(biological_metadata)
       )
-    ) |>
-    tidytable::mutate(tidytable::across(
-      .cols = tidyselect::where(fn = is.character),
-      .fns = ~ tidytable::replace_na(.x = .x, replace = "ND")
+  ) {
+    u_fid <- as.vector(unique(as.character(feature_table_0$feature_id)))
+    rm(feature_table_0, metadata_table)
+
+    one_row <- biological_metadata |>
+      tidytable::distinct(
+        organism_name,
+        organism_taxonomy_01domain,
+        organism_taxonomy_02kingdom,
+        organism_taxonomy_03phylum,
+        organism_taxonomy_04class,
+        organism_taxonomy_05order,
+        organism_taxonomy_06family,
+        organism_taxonomy_07tribe,
+        organism_taxonomy_08genus,
+        organism_taxonomy_09species,
+        organism_taxonomy_10varietas
+      ) |>
+      tidytable::mutate(feature_id = "1") |>
+      tidytable::select(
+        feature_id,
+        sample_organism_name = organism_name,
+        sample_organism_01_domain = organism_taxonomy_01domain,
+        sample_organism_02_kingdom = organism_taxonomy_02kingdom,
+        sample_organism_03_phylum = organism_taxonomy_03phylum,
+        sample_organism_04_class = organism_taxonomy_04class,
+        sample_organism_05_order = organism_taxonomy_05order,
+        sample_organism_06_family = organism_taxonomy_06family,
+        sample_organism_07_tribe = organism_taxonomy_07tribe,
+        sample_organism_08_genus = organism_taxonomy_08genus,
+        sample_organism_09_species = organism_taxonomy_09species,
+        sample_organism_10_varietas = organism_taxonomy_10varietas
+      ) |>
+      tidytable::mutate(tidytable::across(
+        .cols = tidyselect::everything(),
+        .fns = as.character
+      )) |>
+      tidytable::group_by(feature_id) |>
+      clean_collapse(cols = collapse_cols) |>
+      tidytable::mutate(tidytable::across(
+        .cols = tidyselect::where(fn = is.character),
+        .fns = ~ tidytable::replace_na(.x = .x, replace = "ND")
+      ))
+    rm(biological_metadata)
+
+    out_list <- vector("list", length(collapse_cols) + 1L)
+    names(out_list) <- c("feature_id", collapse_cols)
+    out_list[[1L]] <- u_fid
+    n_fid <- length(u_fid)
+    for (col in collapse_cols) {
+      out_list[[col]] <- rep(one_row[[col]][[1L]], n_fid)
+    }
+    taxed_features_table <- tidytable::as_tidytable(out_list)
+  } else {
+    if (!is.null(taxon)) {
+      feat_min <- if ("feature_id" %in% names(feature_table_0)) {
+        tidytable::tidytable(feature_id = unique(feature_table_0$feature_id))
+      } else {
+        feature_table_0
+      }
+      metadata_table_joined <- tidytable::inner_join(
+        x = feat_min |>
+          tidytable::mutate(join = "x"),
+        y = biological_metadata |>
+          tidytable::select(organismOriginal = organism_name) |>
+          tidytable::mutate(join = "x")
+      ) |>
+        tidytable::select(-join)
+      rm(feat_min)
+    } else {
+      # Validate join keys exist in their respective tables
+      if (!"sample" %in% names(feature_table_0)) {
+        cli::cli_abort(
+          c(
+            "Features file does not contain the 'sample' column",
+            "i" = sprintf(
+              "Found columns: %s",
+              paste(names(feature_table_0), collapse = ", ")
+            ),
+            "x" = "Features file must have a 'sample' column for metadata mapping"
+          ),
+          class = c("tima_validation_error", "tima_error"),
+          call = NULL
+        )
+      }
+
+      if (!name_filename %in% names(metadata_table)) {
+        cli::cli_abort(
+          c(
+            "Metadata file does not contain the filename column",
+            "i" = sprintf(
+              "Expected column '%s' as specified in 'names$filename' parameter",
+              name_filename
+            ),
+            "x" = sprintf(
+              "Found columns: %s",
+              paste(names(metadata_table), collapse = ", ")
+            ),
+            "!" = "Please ensure the 'names$filename' parameter matches a column in your metadata file"
+          ),
+          class = c("tima_validation_error", "tima_error"),
+          call = NULL
+        )
+      }
+
+      feat_cols_keep <- intersect(
+        c("feature_id", "sample"),
+        names(feature_table_0)
+      )
+      meta_cols_keep <- unique(c(name_filename, colname))
+      meta_expanded <- metadata_table[, ..meta_cols_keep] |>
+        tidytable::distinct() |>
+        tidytable::select(
+          organismOriginal = tidyselect::all_of(x = colname),
+          tidyselect::everything()
+        ) |>
+        tidytable::separate_rows(organismOriginal, sep = "\\|")
+
+      metadata_table_joined <-
+        tidytable::left_join(
+          x = feature_table_0[, ..feat_cols_keep] |>
+            tidytable::distinct(),
+          y = meta_expanded,
+          by = c("sample" = name_filename)
+        ) |>
+        tidytable::select(
+          tidyselect::any_of("feature_id"),
+          organismOriginal,
+          tidyselect::everything()
+        )
+      rm(meta_expanded)
+
+      if (nrow(metadata_table_joined) == 0L) {
+        log_warn(
+          "No metadata rows matched features by sample name; exporting ND taxonomy for all features"
+        )
+        taxed_features_table <- .make_nd_taxa_table(feature_table_0$feature_id)
+        log_complete(ctx, n_features = nrow(taxed_features_table))
+        export_params(
+          parameters = get_params(step = "prepare_taxa"),
+          step = "prepare_taxa"
+        )
+        export_output(x = taxed_features_table, file = output)
+        rm(taxed_features_table)
+        return(output)
+      }
+    }
+    rm(feature_table_0, metadata_table)
+
+    avail_cols <- unique(c(
+      names(metadata_table_joined),
+      setdiff(names(biological_metadata), "organism_name")
     ))
-  rm(biological_metadata, metadata_table_joined)
+    missing_select_cols <- setdiff(expected_cols, avail_cols)
+    if (length(missing_select_cols) > 0L) {
+      cli::cli_abort(
+        c(
+          "Failed to prepare taxa: missing expected columns after joining with OTT taxonomy",
+          "x" = sprintf(
+            "Missing columns: %s",
+            paste(missing_select_cols, collapse = ", ")
+          ),
+          "i" = sprintf(
+            "Available columns: %s",
+            paste(avail_cols, collapse = ", ")
+          ),
+          "!" = "This may indicate: (1) empty organism list, (2) mismatched organism names, or (3) corrupted OTT file"
+        ),
+        class = c("tima_validation_error", "tima_error"),
+        call = NULL
+      )
+    }
+
+    if (
+      nrow(metadata_table_joined) > 256L &&
+        "feature_id" %in% names(metadata_table_joined)
+    ) {
+      feat_org <- metadata_table_joined[, c(
+        "feature_id",
+        "organismOriginal"
+      )] |>
+        tidytable::mutate(organismOriginal = trimws(organismOriginal)) |>
+        .fast_distinct_with_key_guard(c("feature_id", "organismOriginal"))
+      rm(metadata_table_joined)
+
+      f_vec <- as.character(feat_org$feature_id)
+      o_vec <- as.character(feat_org$organismOriginal)
+      o_key <- ifelse(is.na(o_vec), "<NA>", o_vec)
+      u_f <- as.vector(unique(f_vec))
+      f_id <- fastmatch::fmatch(f_vec, u_f)
+      orgs_by_f <- split(o_key, f_id)
+      combo_sig <- vapply(
+        orgs_by_f,
+        paste,
+        character(1L),
+        collapse = "\r",
+        USE.NAMES = FALSE
+      )
+      u_combos <- as.vector(unique(combo_sig))
+      combo_id_per_f <- as.vector(fastmatch::fmatch(combo_sig, u_combos))
+
+      first_f_for_combo <- match(seq_along(u_combos), combo_id_per_f)
+      rep_orgs_list <- orgs_by_f[first_f_for_combo]
+      rep_lens <- lengths(rep_orgs_list)
+      rep_o_raw <- unlist(rep_orgs_list, use.names = FALSE)
+      rep_o <- ifelse(rep_o_raw == "<NA>", NA_character_, rep_o_raw)
+      rep_dt <- tidytable::tidytable(
+        feature_id = as.character(rep(seq_along(u_combos), rep_lens)),
+        organismOriginal = rep_o
+      )
+
+      joined_rep <- rep_dt |>
+        tidytable::left_join(
+          y = biological_metadata,
+          by = c("organismOriginal" = "organism_name")
+        ) |>
+        tidytable::distinct() |>
+        tidytable::select(
+          feature_id,
+          sample_organism_name = organismOriginal,
+          sample_organism_01_domain = organism_taxonomy_01domain,
+          sample_organism_02_kingdom = organism_taxonomy_02kingdom,
+          sample_organism_03_phylum = organism_taxonomy_03phylum,
+          sample_organism_04_class = organism_taxonomy_04class,
+          sample_organism_05_order = organism_taxonomy_05order,
+          sample_organism_06_family = organism_taxonomy_06family,
+          sample_organism_07_tribe = organism_taxonomy_07tribe,
+          sample_organism_08_genus = organism_taxonomy_08genus,
+          sample_organism_09_species = organism_taxonomy_09species,
+          sample_organism_10_varietas = organism_taxonomy_10varietas
+        ) |>
+        tidytable::mutate(tidytable::across(
+          .cols = tidyselect::everything(),
+          .fns = as.character
+        )) |>
+        tidytable::group_by(feature_id) |>
+        clean_collapse(cols = collapse_cols) |>
+        tidytable::mutate(tidytable::across(
+          .cols = tidyselect::where(fn = is.character),
+          .fns = ~ tidytable::replace_na(.x = .x, replace = "ND")
+        ))
+      rm(biological_metadata, feat_org, rep_dt)
+
+      m_rep <- as.vector(fastmatch::fmatch(
+        as.character(combo_id_per_f),
+        joined_rep$feature_id
+      ))
+      taxed_features_table <- joined_rep[m_rep, ]
+      data.table::set(taxed_features_table, j = "feature_id", value = u_f)
+    } else {
+      joined_data <- metadata_table_joined |>
+        tidytable::mutate(organismOriginal = trimws(organismOriginal)) |>
+        tidytable::left_join(
+          y = biological_metadata,
+          by = c("organismOriginal" = "organism_name")
+        ) |>
+        tidytable::distinct()
+
+      taxed_features_table <- joined_data |>
+        tidytable::select(
+          feature_id,
+          sample_organism_name = organismOriginal,
+          sample_organism_01_domain = organism_taxonomy_01domain,
+          sample_organism_02_kingdom = organism_taxonomy_02kingdom,
+          sample_organism_03_phylum = organism_taxonomy_03phylum,
+          sample_organism_04_class = organism_taxonomy_04class,
+          sample_organism_05_order = organism_taxonomy_05order,
+          sample_organism_06_family = organism_taxonomy_06family,
+          sample_organism_07_tribe = organism_taxonomy_07tribe,
+          sample_organism_08_genus = organism_taxonomy_08genus,
+          sample_organism_09_species = organism_taxonomy_09species,
+          sample_organism_10_varietas = organism_taxonomy_10varietas
+        ) |>
+        tidytable::mutate(tidytable::across(
+          .cols = tidyselect::everything(),
+          .fns = as.character
+        )) |>
+        tidytable::group_by(feature_id) |>
+        clean_collapse(cols = collapse_cols) |>
+        tidytable::mutate(tidytable::across(
+          .cols = tidyselect::where(fn = is.character),
+          .fns = ~ tidytable::replace_na(.x = .x, replace = "ND")
+        ))
+      rm(biological_metadata, metadata_table_joined, joined_data)
+    }
+  }
 
   log_complete(ctx, n_features = nrow(taxed_features_table))
 
