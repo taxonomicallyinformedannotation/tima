@@ -222,3 +222,119 @@ test_that("build_adduct_universe handles structured form", {
   expect_true("[M+Na]+" %in% u$adduct)
   expect_true("[2M+H]+" %in% u$adduct)
 })
+
+test_that("calculate_neutral_mass supports universe lookup, per-monomer mass, and rejects missing params", {
+  u <- tidytable::tidytable(
+    adduct = c("[M+H]+", "[2M+Na]+"),
+    n_mer = c(1L, 2L),
+    z = c(1L, 1L),
+    adduct_mass = c(1.007276, 22.989218),
+    adduct_mass_per_monomer = c(0.0, 18.010565)
+  )
+
+  M <- 150.0
+  mz1 <- calculate_mz_from_neutral_mass(M, 1L, 1L, 1.007276, 0.0)
+  mz2 <- calculate_mz_from_neutral_mass(M, 2L, 1L, 22.989218, 18.010565)
+
+  # Lookup via (universe, adduct) with adduct_mass_per_monomer column present
+  m_lookup <- calculate_neutral_mass(
+    mz = c(mz1, mz2),
+    universe = u,
+    adduct = c("[M+H]+", "[2M+Na]+")
+  )
+  expect_equal(m_lookup, c(M, M), tolerance = 1e-10)
+
+  # Lookup via (universe, adduct) when adduct_mass_per_monomer column is absent
+  u_no_pm <- u[, c("adduct", "n_mer", "z", "adduct_mass")]
+  mz2_no_pm <- calculate_mz_from_neutral_mass(M, 2L, 1L, 22.989218, 0.0)
+  m_no_pm <- calculate_neutral_mass(
+    mz = c(mz1, mz2_no_pm),
+    universe = u_no_pm,
+    adduct = c("[M+H]+", "[2M+Na]+")
+  )
+  expect_equal(m_no_pm, c(M, M), tolerance = 1e-10)
+
+  # Missing n_mer / z / adduct_mass individually aborts with tima_validation_error
+  expect_error(
+    calculate_neutral_mass(mz = 100.0, n_mer = NULL, z = 1L, adduct_mass = 1.0),
+    regexp = "supply \\(n_mer, z, adduct_mass\\) or \\(universe, adduct\\)",
+    class = "tima_validation_error"
+  )
+  expect_error(
+    calculate_neutral_mass(mz = 100.0, n_mer = 1L, z = NULL, adduct_mass = 1.0),
+    regexp = "supply \\(n_mer, z, adduct_mass\\) or \\(universe, adduct\\)",
+    class = "tima_validation_error"
+  )
+  expect_error(
+    calculate_neutral_mass(mz = 100.0, n_mer = 1L, z = 1L, adduct_mass = NULL),
+    regexp = "supply \\(n_mer, z, adduct_mass\\) or \\(universe, adduct\\)",
+    class = "tima_validation_error"
+  )
+})
+
+test_that(".normalize_negative_mode_carrier normalizes +1/+2/+3 cations and preserves signed/anion tokens", {
+  expect_identical(
+    .normalize_negative_mode_carrier(NA_character_),
+    NA_character_
+  )
+  expect_identical(.normalize_negative_mode_carrier(""), "")
+  expect_identical(.normalize_negative_mode_carrier("-H"), "-H")
+  expect_identical(.normalize_negative_mode_carrier("Na-2H"), "Na-2H")
+  expect_identical(.normalize_negative_mode_carrier("Cl"), "Cl")
+  expect_identical(
+    .normalize_negative_mode_carrier("UnknownToken"),
+    "UnknownToken"
+  )
+  expect_identical(.normalize_negative_mode_carrier("H"), "-H")
+  expect_identical(.normalize_negative_mode_carrier("Na"), "Na-2H")
+  expect_identical(.normalize_negative_mode_carrier("Ca"), "Ca-3H")
+  expect_identical(.normalize_negative_mode_carrier("Fe"), "Fe-4H")
+})
+
+test_that("formula token validation and legacy universe edge cases return expected structures", {
+  expect_identical(.validate_formula_tokens(character(0)), character(0))
+  expect_identical(.validate_formula_tokens(c("  ", "")), character(0))
+  expect_identical(
+    .validate_formula_tokens(c("H2O (water)", "C2H3N", "???invalid???")),
+    c("H2O", "C2H3N")
+  )
+
+  expect_null(.parse_single_legacy_adduct_row("not_an_adduct"))
+  expect_null(.parse_single_legacy_adduct_row("[0M+H]+"))
+
+  empty_u <- empty_adduct_universe()
+  expect_identical(.assemble_legacy_universe(list()), empty_u)
+  expect_identical(
+    build_adduct_universe_from_legacy(
+      character(0),
+      character(0),
+      character(0),
+      "pos"
+    ),
+    empty_u
+  )
+  expect_identical(
+    build_adduct_universe_from_legacy(
+      c("invalid1", "[0M+H]+"),
+      "H2O",
+      "CO2",
+      "pos"
+    ),
+    empty_u
+  )
+
+  # Flat clusters_list (not nested by polarity) in build_adduct_universe
+  u_flat <- build_adduct_universe(
+    adducts_list = list(pos = c("[M+H]+")),
+    clusters_list = c("H2O"),
+    neutral_losses_list = character(0),
+    polarity = "pos"
+  )
+  expect_true("[M+H]+" %in% u_flat$adduct)
+  expect_true(any(grepl("H2O", u_flat$adduct, fixed = TRUE)))
+
+  # %||% operator fallback
+  expect_identical(NULL %||% "fallback", "fallback")
+  expect_identical(character(0) %||% "fallback", "fallback")
+  expect_identical("present" %||% "fallback", "present")
+})

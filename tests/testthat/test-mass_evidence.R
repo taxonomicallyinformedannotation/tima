@@ -411,3 +411,54 @@ test_that(".has_library_match_within_tolerance respects exact window bounds and 
   )
   expect_identical(res_da, c(TRUE, TRUE, FALSE, FALSE))
 })
+
+test_that("build_evidence_edges handles singleton clusters, same-feature duplicates, missing implied_M, and all-incompatible M", {
+  # 1. Singleton clusters only (no duplicated evidence_cluster) -> empty edges
+  hyps_single_cl <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    mz = c(100.0, 122.0),
+    adduct = c("[M+H]+", "[M+Na]+"),
+    evidence_cluster = c("CL1", "CL2"),
+    evidence_count = c(2L, 2L),
+    implied_M = c(99.0, 99.0)
+  )
+  expect_identical(nrow(build_evidence_edges(hyps_single_cl)), 0L)
+
+  # 2. Multiple rows in same cluster but all for the SAME feature_id (n_rep < 2L) -> empty edges
+  hyps_same_feat <- tidytable::tidytable(
+    feature_id = c("F1", "F1"),
+    mz = c(100.0, 100.0),
+    adduct = c("[M+H]+", "[M+Na]+"),
+    evidence_cluster = c("CL1", "CL1"),
+    evidence_count = c(2L, 1L),
+    implied_M = c(99.0, 77.0)
+  )
+  expect_identical(nrow(build_evidence_edges(hyps_same_feat)), 0L)
+
+  # 3. All pairs in same cluster have incompatible implied_M (length(keep_idx) == 0L) -> empty edges
+  hyps_incompat <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    mz = c(100.0, 200.0),
+    adduct = c("[M+H]+", "[M+Na]+"),
+    evidence_cluster = c("CL1", "CL1"),
+    evidence_count = c(2L, 2L),
+    implied_M = c(99.0, 177.0)
+  )
+  expect_identical(
+    nrow(build_evidence_edges(hyps_incompat, tolerance_ppm = 5)),
+    0L
+  )
+
+  # 4. Missing implied_M column defaults to NA_real_ and allows linking within cluster
+  hyps_no_m <- tidytable::tidytable(
+    feature_id = c("F2", "F1"),
+    mz = c(122.0, 100.0),
+    adduct = c("[M+Na]+", "[M+H]+"),
+    evidence_cluster = c("CL1", "CL1"),
+    evidence_count = c(NA_integer_, 2L)
+  )
+  edges_no_m <- build_evidence_edges(hyps_no_m)
+  expect_identical(nrow(edges_no_m), 1L)
+  expect_identical(edges_no_m$feature_id, "F1")
+  expect_identical(edges_no_m$feature_id_dest, "F2")
+})
