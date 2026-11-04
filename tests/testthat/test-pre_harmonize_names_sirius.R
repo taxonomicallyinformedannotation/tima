@@ -253,14 +253,13 @@ test_that("pre_harmonize_names_sirius is reasonably fast", {
 })
 
 test_that("pre_harmonize_names_sirius handles large vectors efficiently", {
-  skip_on_cran()
+  # Low-cardinality > 256 elements (triggers ux deduplication fast path)
+  large_low_card <- rep(c("name/suffix", "col/extra", "simple"), 100L)
+  result_low <- pre_harmonize_names_sirius(large_low_card)
+  expect_identical(result_low, rep(c("name", "col", "simple"), 100L))
 
-  # Create large vector
-  large_input <- rep(c("name/suffix", "col/extra", "simple"), 1000)
-
-  # Should complete quickly
-  result <- pre_harmonize_names_sirius(large_input)
-
-  expect_length(result, 3000)
-  expect_true(!any(grepl("/", result)))
+  # Boundary n = 256 vs n = 257 with high cardinality (length(ux) * 2L >= n)
+  high_card_257 <- paste0("col_", seq_len(257L), "/suffix")
+  result_high <- pre_harmonize_names_sirius(high_card_257)
+  expect_identical(result_high, paste0("col_", seq_len(257L)))
 })
