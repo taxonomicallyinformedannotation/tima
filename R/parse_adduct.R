@@ -158,12 +158,10 @@ parse_single_adduct <- function(adduct_string, regex, failed_parse) {
   # Parse adduct string using regex
   parse_result <- match_adduct_regex(adduct_string, regex)
   if (!parse_result$valid) {
-    msg <- paste0(
-      "Invalid adduct format: %s.
-      Expected format: [nM<isotope><modifications>]charge (e.g., [M+H]+)",
+    log_debug(
+      "Invalid adduct format: %s. Expected format: [nM<isotope><modifications>]charge (e.g., [M+H]+)",
       adduct_string
     )
-    log_debug(msg)
     return(failed_parse)
   }
 
@@ -177,12 +175,11 @@ parse_single_adduct <- function(adduct_string, regex, failed_parse) {
   # Process modifications
   modifications <- process_modifications(matches[4L])
   if (!modifications$valid) {
-    msg <- paste0(
+    log_debug(
       "Failed to process modifications in: %s. %s",
       adduct_string,
       modifications$message
     )
-    log_debug(msg)
     return(failed_parse)
   }
 
@@ -196,11 +193,10 @@ parse_single_adduct <- function(adduct_string, regex, failed_parse) {
       charge_info$charge_sign
     ))
   ) {
-    msg <- paste0(
+    log_debug(
       "Unexpected NA values during adduct parsing for: %s",
       adduct_string
     )
-    log_debug(msg)
     return(failed_parse)
   }
 

@@ -630,8 +630,8 @@ install <- function(
 ) {
   lifecycle::deprecate_warn(
     "2.13.0",
-    "install()",
-    "install_tima()"
+    "tima::install()",
+    "tima::install_tima()"
   )
   install_tima(
     package = package,

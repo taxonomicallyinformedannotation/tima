@@ -135,8 +135,8 @@ annotate_spectra <- function(
   if (lifecycle::is_present(qutoff)) {
     lifecycle::deprecate_warn(
       "2.13.0",
-      "annotate_spectra(qutoff)",
-      "annotate_spectra(cutoff)"
+      "tima::annotate_spectra(qutoff)",
+      "tima::annotate_spectra(cutoff)"
     )
     cutoff <- qutoff
   }
