@@ -85,7 +85,7 @@ read_from_sirius_zip <- function(sirius_zip, file) {
   }
   matched_names <- zip_names[keep_idx]
   if (length(matched_names) > 1L) {
-    matched_names <- sort(matched_names, method = "radix")
+    matched_names <- sort(matched_names, decreasing = TRUE, method = "radix")
   }
   matching_file <- matched_names[[1L]]
 
