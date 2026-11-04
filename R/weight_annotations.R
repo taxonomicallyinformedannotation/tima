@@ -530,13 +530,16 @@ weight_annotations <- function(
   # holding an extra full-table reference during decoration. At millions of
   # rows, decorating on the full wide table forces the sort + dedup
   # machinery to operate over all columns rather than just the two needed.
+  bio_dec_cols <- intersect(
+    c(
+      "score_biological",
+      "candidate_structure_inchikey_connectivity_layer"
+    ),
+    names(annot_table_wei_bio_kept)
+  )
   decorate_bio(
-    annot_table_wei_bio = tidytable::select(
-      annot_table_wei_bio_kept,
-      tidyselect::any_of(c(
-        "score_biological",
-        "candidate_structure_inchikey_connectivity_layer"
-      ))
+    annot_table_wei_bio = tidytable::as_tidytable(
+      as.list(annot_table_wei_bio_kept)[bio_dec_cols]
     ),
     score_biological_kingdom = score_biological_kingdom,
     score_biological_phylum = score_biological_phylum,
@@ -620,20 +623,23 @@ weight_annotations <- function(
   # OPTIMIZATION: Only pass the columns needed by decorate_chemo to avoid
   # operating on the full wide table (which at millions of rows means
   # 7 cascading filter+distinct passes over 100+ columns each).
+  chemo_dec_cols <- intersect(
+    c(
+      "score_chemical",
+      "candidate_structure_inchikey_connectivity_layer",
+      "feature_pred_tax_cla_01kin_val",
+      "feature_pred_tax_cla_02sup_val",
+      "feature_pred_tax_cla_03cla_val",
+      "feature_pred_tax_cla_04dirpar_val",
+      "feature_pred_tax_npc_01pat_val",
+      "feature_pred_tax_npc_02sup_val",
+      "feature_pred_tax_npc_03cla_val"
+    ),
+    names(annot_table_wei_chemo_kept)
+  )
   decorate_chemo(
-    annot_table_wei_chemo = tidytable::select(
-      annot_table_wei_chemo_kept,
-      tidyselect::any_of(c(
-        "score_chemical",
-        "candidate_structure_inchikey_connectivity_layer",
-        "feature_pred_tax_cla_01kin_val",
-        "feature_pred_tax_cla_02sup_val",
-        "feature_pred_tax_cla_03cla_val",
-        "feature_pred_tax_cla_04dirpar_val",
-        "feature_pred_tax_npc_01pat_val",
-        "feature_pred_tax_npc_02sup_val",
-        "feature_pred_tax_npc_03cla_val"
-      ))
+    annot_table_wei_chemo = tidytable::as_tidytable(
+      as.list(annot_table_wei_chemo_kept)[chemo_dec_cols]
     ),
     score_chemical_cla_kingdom = score_chemical_cla_kingdom,
     score_chemical_cla_superclass = score_chemical_cla_superclass,

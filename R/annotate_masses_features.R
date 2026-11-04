@@ -165,42 +165,63 @@ load_structural_library <- function(
       for (col in new_cols) {
         data.table::set(joined, j = col, value = st[[col]][m_idx])
       }
+    } else if (
+      length(by_cols) == 2L &&
+        anyDuplicated(st[[by_cols[[1L]]]]) == 0L &&
+        !anyNA(st[[by_cols[[1L]]]])
+    ) {
+      k1 <- by_cols[[1L]]
+      k2 <- by_cols[[2L]]
+      m_idx <- fastmatch::fmatch(joined[[k1]], st[[k1]])
+      v1 <- joined[[k2]]
+      v2 <- st[[k2]][m_idx]
+      ok_k2 <- !is.na(m_idx) &
+        ((is.na(v1) & is.na(v2)) | (!is.na(v1) & !is.na(v2) & v1 == v2))
+      m_idx[!ok_k2] <- NA_integer_
+      new_cols <- setdiff(names(st), by_cols)
+      for (col in new_cols) {
+        data.table::set(joined, j = col, value = st[[col]][m_idx])
+      }
     } else if (length(by_cols) > 0L) {
       joined <- tidytable::left_join(joined, st, by = by_cols)
     }
   }
   rm(library_table, supp_tables)
 
-  structures <- joined |>
-    tidytable::filter(!is.na(structure_exact_mass)) |>
-    tidytable::mutate(
-      structure_exact_mass = as.numeric(structure_exact_mass)
-    )
+  if (anyNA(joined$structure_exact_mass)) {
+    structures <- joined[!is.na(joined$structure_exact_mass), ]
+  } else {
+    structures <- joined
+  }
+  rm(joined)
+  em_col <- structures$structure_exact_mass
+  if (!is.numeric(em_col)) {
+    u_em_chr <- unique(em_col)
+    u_em_num <- as.numeric(u_em_chr)
+    em_col <- u_em_num[fastmatch::fmatch(em_col, u_em_chr)]
+    data.table::set(structures, j = "structure_exact_mass", value = em_col)
+  }
   if (!"structure_inchikey_connectivity_layer" %in% colnames(structures)) {
-    structures <- structures |>
-      tidytable::mutate(
-        structure_inchikey_connectivity_layer = stri_sub(
-          str = structure_inchikey,
-          from = 1L,
-          to = 14L
-        )
-      )
+    u_ik <- unique(structures$structure_inchikey)
+    u_ik14 <- stri_sub(str = u_ik, from = 1L, to = 14L)
+    data.table::set(
+      structures,
+      j = "structure_inchikey_connectivity_layer",
+      value = u_ik14[fastmatch::fmatch(structures$structure_inchikey, u_ik)]
+    )
   }
   structures <- round_reals(structures)
 
-  em_windows <- structures |>
-    tidytable::distinct(exact_mass = structure_exact_mass) |>
-    tidytable::filter(!is.na(exact_mass) & exact_mass > 0) |>
-    tidytable::mutate(
-      # Wider of the ppm and Dalton windows (a match within either tolerance
-      # is accepted, see match_candidates_to_library()).
-      mass_tol = pmax(
-        1E-6 * tolerance_ppm * exact_mass,
-        if (is.null(tolerance_dalton)) 0 else as.numeric(tolerance_dalton)
-      ),
-      value_min = exact_mass - mass_tol,
-      value_max = exact_mass + mass_tol
-    )
+  u_em <- unique(structures$structure_exact_mass)
+  u_em <- u_em[!is.na(u_em) & u_em > 0]
+  tol_da <- if (is.null(tolerance_dalton)) 0 else as.numeric(tolerance_dalton)
+  mass_tol <- pmax(1E-6 * tolerance_ppm * u_em, tol_da)
+  em_windows <- tidytable::tidytable(
+    exact_mass = u_em,
+    mass_tol = mass_tol,
+    value_min = u_em - mass_tol,
+    value_max = u_em + mass_tol
+  )
 
   list(structures = structures, em_windows = em_windows)
 }

@@ -446,6 +446,79 @@ test_that("load_structure_organism_pairs joins optional stereo and taxonomy tabl
   expect_true("organism_name" %in% names(result))
 })
 
+test_that("load_structure_organism_pairs handles 2-key stereo join and verifies second key", {
+  lib_df <- data.frame(
+    structure_inchikey = c(
+      "AAAAAAAAAAAAAA-UHFFFAOYSA-N",
+      "BBBBBBBBBBBBBB-UHFFFAOYSA-N"
+    ),
+    structure_smiles_no_stereo = c("CCO", "MISMATCH"),
+    organism_name = c("Org-A", "Org-B"),
+    stringsAsFactors = FALSE
+  )
+  stereo_df <- data.frame(
+    structure_inchikey = c(
+      "AAAAAAAAAAAAAA-UHFFFAOYSA-N",
+      "BBBBBBBBBBBBBB-UHFFFAOYSA-N"
+    ),
+    structure_smiles_no_stereo = c("CCO", "CCC"),
+    structure_name = c("Ethanol", "Propane"),
+    stringsAsFactors = FALSE
+  )
+  lib <- make_tsv(lib_df)
+  stereo <- make_tsv(stereo_df)
+  on.exit(unlink(c(lib, stereo)))
+
+  result <- load_structure_organism_pairs(
+    lib,
+    str_stereo = stereo,
+    org_tax_ott = NULL
+  )
+  expect_equal(nrow(result), 2L)
+  expect_equal(result$structure_name, c("Ethanol", NA_character_))
+})
+
+test_that("rearrange_annotations merges formula_table via 2-key fast path and duplicate fallback", {
+  ann <- tidytable::tidytable(
+    feature_id = c("F1", "F1", "F2"),
+    candidate_structure_inchikey_connectivity_layer = c("IK1", "IK2", "IK3"),
+    candidate_structure_molecular_formula = c("C6H12O6", "C6H12O6", "C2H6O"),
+    candidate_score_similarity = c("0.9", "0.8", "0.7")
+  )
+  form_unique <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    candidate_structure_molecular_formula = c("C6H12O6", "C99H99"),
+    candidate_score_sirius_zodiac = c("0.95", "0.50")
+  )
+  canopus_empty <- tidytable::tidytable()
+  edges_empty <- tidytable::tidytable()
+
+  res_u <- rearrange_annotations(
+    annotation_table = ann,
+    formula_table = form_unique,
+    canopus_table = canopus_empty,
+    edges_table = edges_empty
+  )
+  expect_equal(nrow(res_u), 3L)
+  expect_equal(
+    res_u$candidate_score_sirius_zodiac,
+    c("0.95", "0.95", NA_character_)
+  )
+
+  form_dup <- tidytable::tidytable(
+    feature_id = c("F1", "F1"),
+    candidate_structure_molecular_formula = c("C6H12O6", "C6H12O6"),
+    candidate_score_sirius_zodiac = c("0.95", "0.85")
+  )
+  res_d <- rearrange_annotations(
+    annotation_table = ann,
+    formula_table = form_dup,
+    canopus_table = canopus_empty,
+    edges_table = edges_empty
+  )
+  expect_equal(nrow(res_d), 5L)
+})
+
 # ── log_annotation_stats ──────────────────────────────────────────────────────
 
 test_that("log_annotation_stats returns invisibly NULL without error", {

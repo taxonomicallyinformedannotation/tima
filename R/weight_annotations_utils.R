@@ -353,17 +353,47 @@ load_structure_organism_pairs <- function(library, str_stereo, org_tax_ott) {
     supp_names
   )
 
-  Reduce(
-    f = function(acc, tbl) {
-      if (nrow(tbl) == 0L) {
-        return(acc)
+  joined <- tidytable::as_tidytable(library_table)
+  rm(library_table)
+  for (tbl in supp_tables) {
+    if (nrow(tbl) == 0L) {
+      next
+    }
+    by_cols <- intersect(names(joined), names(tbl))
+    if (
+      length(by_cols) == 1L &&
+        anyDuplicated(tbl[[by_cols]]) == 0L &&
+        !anyNA(tbl[[by_cols]])
+    ) {
+      key_col <- by_cols[[1L]]
+      m_idx <- fastmatch::fmatch(joined[[key_col]], tbl[[key_col]])
+      new_cols <- setdiff(names(tbl), key_col)
+      for (col in new_cols) {
+        data.table::set(joined, j = col, value = tbl[[col]][m_idx])
       }
-      tidytable::left_join(x = acc, y = tbl)
-    },
-    x = supp_tables,
-    init = library_table
-  ) |>
-    select_structure_organism_pair_columns()
+    } else if (
+      length(by_cols) == 2L &&
+        anyDuplicated(tbl[[by_cols[[1L]]]]) == 0L &&
+        !anyNA(tbl[[by_cols[[1L]]]])
+    ) {
+      k1 <- by_cols[[1L]]
+      k2 <- by_cols[[2L]]
+      m_idx <- fastmatch::fmatch(joined[[k1]], tbl[[k1]])
+      v1 <- joined[[k2]]
+      v2 <- tbl[[k2]][m_idx]
+      ok_k2 <- !is.na(m_idx) &
+        ((is.na(v1) & is.na(v2)) | (!is.na(v1) & !is.na(v2) & v1 == v2))
+      m_idx[!ok_k2] <- NA_integer_
+      new_cols <- setdiff(names(tbl), by_cols)
+      for (col in new_cols) {
+        data.table::set(joined, j = col, value = tbl[[col]][m_idx])
+      }
+    } else if (length(by_cols) > 0L) {
+      joined <- tidytable::left_join(x = joined, y = tbl, by = by_cols)
+    }
+  }
+  rm(supp_tables)
+  select_structure_organism_pair_columns(joined)
 }
 
 #' Load Edges Table with Neighbor Filtering
@@ -780,21 +810,89 @@ rearrange_annotations <- function(
   )
   formula_join_by <- intersect(
     c("feature_id", "candidate_structure_molecular_formula"),
-    names(formula_table)
+    intersect(names(formula_table), names(annotation_table_merged))
   )
   if (
     length(formula_new_cols) > 0L &&
       length(formula_join_by) > 0L &&
       nrow(formula_table) > 0L
   ) {
-    annotation_table_merged <- tidytable::left_join(
-      annotation_table_merged,
-      formula_table |>
-        tidytable::select(
-          tidyselect::any_of(c(formula_join_by, formula_new_cols))
-        ),
-      by = formula_join_by
-    )
+    did_fast_formula <- FALSE
+    if (length(formula_join_by) == 1L) {
+      k_col <- formula_join_by[[1L]]
+      fk <- formula_table[[k_col]]
+      if (anyDuplicated(fk) == 0L) {
+        m_for <- if (anyNA(fk)) {
+          match(annotation_table_merged[[k_col]], fk)
+        } else {
+          fastmatch::fmatch(annotation_table_merged[[k_col]], fk)
+        }
+        for (col in formula_new_cols) {
+          data.table::set(
+            annotation_table_merged,
+            j = col,
+            value = formula_table[[col]][m_for]
+          )
+        }
+        did_fast_formula <- TRUE
+      }
+    } else if (length(formula_join_by) == 2L) {
+      c1 <- formula_join_by[[1L]]
+      c2 <- formula_join_by[[2L]]
+      f_c1 <- formula_table[[c1]]
+      f_c2 <- formula_table[[c2]]
+      u1 <- unique(f_c1)
+      u2 <- unique(f_c2)
+      id1 <- if (anyNA(u1)) match(f_c1, u1) else fastmatch::fmatch(f_c1, u1)
+      id2 <- if (anyNA(u2)) match(f_c2, u2) else fastmatch::fmatch(f_c2, u2)
+      n2 <- max(1L, length(u2))
+      use_int_f <- as.double(length(u1)) * n2 < .Machine$integer.max
+      kf <- if (use_int_f) {
+        (id1 - 1L) * n2 + id2
+      } else {
+        as.double(id1 - 1L) * n2 + id2
+      }
+      if (anyDuplicated(kf) == 0L) {
+        m1 <- if (anyNA(u1)) {
+          match(annotation_table_merged[[c1]], u1)
+        } else {
+          fastmatch::fmatch(annotation_table_merged[[c1]], u1)
+        }
+        m2 <- if (anyNA(u2)) {
+          match(annotation_table_merged[[c2]], u2)
+        } else {
+          fastmatch::fmatch(annotation_table_merged[[c2]], u2)
+        }
+        both_f <- !is.na(m1) & !is.na(m2)
+        m_for <- rep.int(NA_integer_, nrow(annotation_table_merged))
+        if (any(both_f)) {
+          km <- if (use_int_f) {
+            (m1[both_f] - 1L) * n2 + m2[both_f]
+          } else {
+            as.double(m1[both_f] - 1L) * n2 + m2[both_f]
+          }
+          m_for[both_f] <- fastmatch::fmatch(km, kf)
+        }
+        for (col in formula_new_cols) {
+          data.table::set(
+            annotation_table_merged,
+            j = col,
+            value = formula_table[[col]][m_for]
+          )
+        }
+        did_fast_formula <- TRUE
+      }
+    }
+    if (!did_fast_formula) {
+      annotation_table_merged <- tidytable::left_join(
+        annotation_table_merged,
+        formula_table |>
+          tidytable::select(
+            tidyselect::any_of(c(formula_join_by, formula_new_cols))
+          ),
+        by = formula_join_by
+      )
+    }
   }
 
   # Step 3: Add CANOPUS predictions (feature-level).

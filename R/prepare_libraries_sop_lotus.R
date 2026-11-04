@@ -48,21 +48,31 @@ prepare_libraries_sop_lotus <- function(
       format_bytes(file_size)
     )
 
-    lotus_prepared <- input |>
-      safe_fread(
-        file_type = "LOTUS structure-organism pairs",
-        na.strings = c("", "NA"),
-        colClasses = "character"
-      ) |>
-      tidytable::mutate(
-        ## InChIKey connectivity layer is recomputed from SMILES
-        ## via process_smiles() in split_tables_sop().
-        structure_inchikey_2D = NA_character_
-      ) |>
-      tidytable::rename(structure_name = structure_nameTraditional) |>
+    lotus_raw <- safe_fread(
+      file = input,
+      file_type = "LOTUS structure-organism pairs",
+      na.strings = c("", "NA"),
+      colClasses = "character"
+    )
+    ## InChIKey connectivity layer is recomputed from SMILES
+    ## via process_smiles() in split_tables_sop().
+    data.table::set(
+      lotus_raw,
+      j = "structure_inchikey_2D",
+      value = rep.int(NA_character_, nrow(lotus_raw))
+    )
+    if ("structure_nameTraditional" %in% names(lotus_raw)) {
+      data.table::setnames(
+        lotus_raw,
+        old = "structure_nameTraditional",
+        new = "structure_name"
+      )
+    }
+    lotus_prepared <- lotus_raw |>
       select_sop_columns() |>
       round_reals() |>
       tidytable::distinct()
+    rm(lotus_raw)
 
     log_complete(ctx, n_pairs = nrow(lotus_prepared))
   } else {

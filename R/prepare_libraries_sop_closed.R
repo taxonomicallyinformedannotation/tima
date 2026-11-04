@@ -73,12 +73,25 @@ prepare_libraries_sop_closed <- function(
       log_warn("Closed library file is empty")
       closed_prepared <- fake_sop_columns()
     } else {
+      n_closed <- nrow(closed)
+      data.table::set(
+        closed,
+        j = "structure_inchikey_2D",
+        value = rep.int(NA_character_, n_closed)
+      )
+      if ("structure_nameTraditional" %in% names(closed)) {
+        data.table::setnames(
+          closed,
+          old = "structure_nameTraditional",
+          new = "structure_name"
+        )
+      }
+      data.table::set(
+        closed,
+        j = "reference_doi",
+        value = rep.int(NA, n_closed)
+      )
       closed_prepared <- closed |>
-        tidytable::mutate(
-          structure_inchikey_2D = NA_character_
-        ) |>
-        tidytable::rename(structure_name = structure_nameTraditional) |>
-        tidytable::mutate(reference_doi = NA) |>
         select_sop_columns() |>
         round_reals() |>
         tidytable::distinct()
