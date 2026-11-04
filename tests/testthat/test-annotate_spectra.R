@@ -745,6 +745,7 @@ test_that("annotate_spectra validates approx parameter", {
 })
 
 test_that("annotate_spectra maps deprecated qutoff to cutoff", {
+  withr::local_options(lifecycle_verbosity = "warning")
   withr::local_dir(new = temp_test_dir("ann_spe_mock_qutoff"))
   query_file <- tempfile(fileext = ".mgf")
   lib_file <- tempfile(fileext = ".mgf")
@@ -770,14 +771,22 @@ test_that("annotate_spectra maps deprecated qutoff to cutoff", {
   # Also works when evaluated in a non-namespace package environment (e.g. covr)
   fn_pkg_env <- annotate_spectra
   environment(fn_pkg_env) <- new.env(parent = as.environment("package:tima"))
+  caller <- new.env(parent = globalenv())
+  caller$fn_pkg_env <- fn_pkg_env
+  caller$query_file <- query_file
+  caller$lib_file <- lib_file
+  caller$output_file <- output_file
   expect_warning(
-    fn_pkg_env(
-      input = query_file,
-      libraries = lib_file,
-      polarity = "pos",
-      output = output_file,
-      qutoff = 42,
-      approx = TRUE
+    evalq(
+      fn_pkg_env(
+        input = query_file,
+        libraries = lib_file,
+        polarity = "pos",
+        output = output_file,
+        qutoff = 42,
+        approx = TRUE
+      ),
+      caller
     ),
     "deprecated"
   )
@@ -1834,4 +1843,126 @@ test_that("log_library_stats handles missing/empty library column and computes e
   # LibA has 3 spectra and 3 unique structures (CCN, CCO, IK_3); LibB has 1 spectrum and 1 unique structure (CCO)
   expect_match(rec$msg, "LibA\\s+3\\s+3\\s+75\\.00%")
   expect_match(rec$msg, "LibB\\s+1\\s+1\\s+25\\.00%")
+})
+
+test_that("resolve_ms1_query_adduct_map, compute_similarity_safe, and finalize_results cover file, neutral_M, and fallback branches", {
+  tmp_dir <- withr::local_tempdir()
+
+  # 1. resolve_ms1_query_adduct_map: file path with and without required cols, non-df input, missing cols, NA feature_ids, unmatched feature_ids
+  ms1_valid_file <- file.path(tmp_dir, "ms1_valid.tsv")
+  tidytable::fwrite(
+    tidytable::tidytable(
+      feature_id = c("1", "2"),
+      candidate_adduct = c("[M+H]+", "[M+Na]+"),
+      candidate_annotation_level = c("primary", "secondary"),
+      candidate_evidence_tier = c("supported_strong", "supported_weak"),
+      candidate_structure_error_mz = c("0.001", "0.005")
+    ),
+    ms1_valid_file,
+    sep = "\t"
+  )
+  res_file <- resolve_ms1_query_adduct_map(ms1_valid_file, feature_ids = "1")
+  expect_identical(res_file$ms1_query_adduct, "[M+H]+")
+
+  ms1_bad_file <- file.path(tmp_dir, "ms1_bad.tsv")
+  tidytable::fwrite(
+    tidytable::tidytable(other_col = "x"),
+    ms1_bad_file,
+    sep = "\t"
+  )
+  expect_identical(nrow(resolve_ms1_query_adduct_map(ms1_bad_file)), 0L)
+  expect_identical(nrow(resolve_ms1_query_adduct_map(123L)), 0L)
+  expect_identical(
+    nrow(resolve_ms1_query_adduct_map(data.frame(feature_id = "1"))),
+    0L
+  )
+  expect_identical(
+    nrow(resolve_ms1_query_adduct_map(
+      ms1_valid_file,
+      feature_ids = NA_character_
+    )),
+    0L
+  )
+  expect_identical(
+    nrow(resolve_ms1_query_adduct_map(ms1_valid_file, feature_ids = "999")),
+    0L
+  )
+
+  # 2. compute_similarity_safe: non-Spectra guard and neutral_M space rescue
+  expect_identical(nrow(compute_similarity_safe(list(), list())), 0L)
+
+  # Query at [M+Na]+ (mz = 122.989221) and library at [M+H]+ (mz = 101.007276) share neutral mass ~ 100.0
+  qry_mgf <- file.path(tmp_dir, "qry_neutral.mgf")
+  lib_mgf <- file.path(tmp_dir, "lib_neutral.mgf")
+  write_minimal_mgf(qry_mgf, precursors = c(122.989221))
+  write_minimal_mgf(lib_mgf, precursors = c(101.007276))
+  sp_qry <- import_spectra(
+    qry_mgf,
+    cutoff = 0,
+    dalton = 0.05,
+    min_fragments = 1L,
+    polarity = "pos",
+    ppm = 20
+  )
+  sp_lib <- import_spectra(
+    lib_mgf,
+    cutoff = 0,
+    dalton = 0.05,
+    min_fragments = 1L,
+    polarity = "pos",
+    ppm = 20
+  )
+  sp_qry@backend@spectraData$spectrum_id <- "Q1"
+  sp_lib@backend@spectraData$spectrum_id <- "L1"
+  sp_lib@backend@spectraData$adduct <- "[M+H]+"
+  expect_identical(length(remove_empty_peak_spectra(sp_lib)), 1L)
+  sim_res <- compute_similarity_safe(
+    lib_sp = sp_lib,
+    query_sp = sp_qry,
+    query_meta = tidytable::tidytable(
+      feature_id = "Q1",
+      query_adduct = "[M+Na]+",
+      query_neutral_mass = 100.0
+    ),
+    method = "gnps",
+    dalton = 0.05,
+    ppm = 20,
+    threshold = 0.1,
+    approx = FALSE
+  )
+  expect_true("neutral_M" %in% sim_res$.similarity_space)
+
+  # 3. finalize_results with query_meta = NULL (extracting query_adduct / query_neutral_mass from df_sim or defaulting to NA)
+  meta_tbl <- tidytable::tidytable(
+    target_id = 1L,
+    target_adduct = "[M+H]+",
+    target_library = "GNPS",
+    target_smiles = "CCO",
+    target_smiles_no_stereo = "CCO",
+    target_inchikey = "IK1",
+    target_inchikey_no_stereo = "IK1",
+    target_inchikey_connectivity_layer = "IK1",
+    target_formula = "C2H6O",
+    target_exact_mass = 46.04186,
+    target_name = "Ethanol",
+    target_spectrum_id = "SP1",
+    target_spl = NA_character_,
+    target_precursor = 101.0073
+  )
+  fin_no_qmeta <- finalize_results(
+    df_sim = tidytable::tidytable(
+      feature_id = "Q1",
+      target_id = 1L,
+      candidate_score_similarity = 0.95,
+      candidate_spectrum_entropy = 1.2,
+      candidate_count_similarity_peaks_matched = 2L,
+      query_adduct = "[M+Na]+",
+      query_neutral_mass = 100.0,
+      .similarity_space = "neutral_M"
+    ),
+    meta = meta_tbl,
+    query_meta = NULL
+  )
+  expect_identical(nrow(fin_no_qmeta), 1L)
+  expect_identical(fin_no_qmeta$candidate_adduct_match_mode, "m_delta_rescued")
 })

@@ -83,6 +83,15 @@ test_that("build_adduct_pair_differences orders and filters adduct pairs", {
     max_mz = 1000
   )
   expect_equal(nrow(empty), 0L)
+
+  diffs_two <- build_adduct_pair_differences(
+    add_clu_table = add_clu_table[1:2, ],
+    tolerance_ppm = 0,
+    max_mz = 1000
+  )
+  expect_identical(nrow(diffs_two), 1L)
+  expect_identical(diffs_two$Group1, "[M+H]+")
+  expect_identical(diffs_two$Group2, "[M+Na]+")
 })
 
 test_that("compute_feature_adduct_support handles empty and deduplicated neighbors", {
@@ -325,4 +334,222 @@ test_that("enforce_graph_adduct_consistency tracks pair_dedup_or_conflict and de
     "pair_dedup_or_conflict"
   )
   expect_identical(audit$dropped_reason_counts$n, 1L)
+})
+
+test_that("annotate_masses_consistency helpers cover empty, NA, fallback adduct text, and binary-search edge cases", {
+  # 1. build_feature_pairs_within_rt: empty inputs, all-NA sample/rt inputs, and NA feature_ids
+  expect_identical(
+    nrow(build_feature_pairs_within_rt(
+      tidytable::tidytable(),
+      tidytable::tidytable(),
+      tolerance_ppm = 10
+    )),
+    0L
+  )
+  expect_identical(
+    nrow(build_feature_pairs_within_rt(
+      tidytable::tidytable(
+        feature_id = NA_character_,
+        rt = NA_real_,
+        mz = 100,
+        sample = NA_character_,
+        rt_min = NA_real_,
+        rt_max = NA_real_
+      ),
+      tidytable::tidytable(
+        feature_id = NA_character_,
+        rt = NA_real_,
+        mz = 120,
+        sample = NA_character_
+      ),
+      tolerance_ppm = 10
+    )),
+    0L
+  )
+
+  # 2. build_adduct_pair_differences: empty input
+  expect_identical(
+    nrow(build_adduct_pair_differences(tidytable::tidytable(), 10, 500)),
+    0L
+  )
+
+  # 3. compute_feature_adduct_support: NA feature_id and non-overlapping covariance_edges
+  df_add_na <- tidytable::tidytable(
+    feature_id = c("F1", NA_character_),
+    adduct = c("[M+H]+", "[M+Na]+"),
+    feature_id_dest = c("F2", "F1"),
+    adduct_dest = c("[M+Na]+", "[M+H]+")
+  )
+  res_supp_nomatch <- compute_feature_adduct_support(
+    df_add_na,
+    covariance_edges = tidytable::tidytable(
+      feature_id = "Z1",
+      feature_id_dest = "Z2"
+    )
+  )
+  expect_true(nrow(res_supp_nomatch) >= 2L)
+
+  res_supp_disjoint <- compute_feature_adduct_support(
+    tidytable::tidytable(
+      feature_id = c("F1", "F3"),
+      adduct = c("[M+H]+", "[M+H]+"),
+      feature_id_dest = c("F2", "F4"),
+      adduct_dest = c("[M+Na]+", "[M+Na]+")
+    ),
+    covariance_edges = tidytable::tidytable(
+      feature_id = "F1",
+      feature_id_dest = "F4"
+    )
+  )
+  expect_true(all(res_supp_disjoint$adduct_support == 1L))
+
+  # 4. apply_adduct_consistency_filter with NA feature_id and adduct
+  res_acf_na <- apply_adduct_consistency_filter(df_add_na)
+  expect_identical(nrow(res_acf_na), 2L)
+
+  # 5. adduct_to_state_key and calculate_net_mod_mass_from_text edge cases
+  expect_true(is.na(calculate_net_mod_mass_from_text("")))
+  expect_true(is.na(calculate_net_mod_mass_from_text("M+H")))
+  expect_equal(calculate_net_mod_mass_from_text("[M]+"), 0)
+  expect_true(is.na(calculate_net_mod_mass_from_text("[Mfoo]+")))
+  expect_true(is.na(calculate_net_mod_mass_from_text("[M+2]+")))
+  expect_true(is.na(calculate_net_mod_mass_from_text("[M+ BadElem]+")))
+  expect_match(
+    adduct_to_state_key("[M+H2O+H]+"),
+    "^(z:|fallback-d:)"
+  )
+  local_mocked_bindings(
+    parse_adduct = function(...) stop("simulated parse error"),
+    .package = "tima"
+  )
+  expect_match(adduct_to_state_key("[M+H]+"), "^fallback-d:")
+
+  # 6. join_couples_with_neutral_losses: empty inputs and all-NA neutral_losses
+  expect_identical(
+    nrow(join_couples_with_neutral_losses(
+      tidytable::tidytable(),
+      tidytable::tidytable()
+    )),
+    0L
+  )
+  expect_identical(
+    nrow(join_couples_with_neutral_losses(
+      tidytable::tidytable(
+        feature_id = "F1",
+        feature_id_dest = "F2",
+        delta_min = 17.9,
+        delta_max = 18.1
+      ),
+      tidytable::tidytable(loss = NA_character_, mass = 18.0106)
+    )),
+    0L
+  )
+
+  # 7. join_multi_with_addlossed: empty inputs and RT match with non-overlapping mass window
+  expect_identical(
+    nrow(join_multi_with_addlossed(
+      tidytable::tidytable(),
+      tidytable::tidytable()
+    )),
+    0L
+  )
+  expect_identical(
+    nrow(join_multi_with_addlossed(
+      tidytable::tidytable(
+        feature_id = "F1",
+        rt = 5.0,
+        mz = 200.0,
+        adduct = "[2M+H]+",
+        rt_min = 4.5,
+        rt_max = 5.5,
+        mass_min = 99.0,
+        mass_max = 100.0
+      ),
+      tidytable::tidytable(rt = 5.0, mass = 300.0)
+    )),
+    0L
+  )
+
+  # 8. Multi-sample build_feature_pairs_within_rt (multiple hit groups and no-hit sample),
+  # 1-row build_adduct_pair_differences, 0-row and NA-adduct apply_adduct_consistency_filter,
+  # empty build_adduct_state_key_map, no-overlap join_couples_with_neutral_losses / join_multi_with_addlossed,
+  # and multi-iteration enforce_graph_adduct_consistency
+  pairs_multi_smp <- build_feature_pairs_within_rt(
+    df_rt_tol = tidytable::tidytable(
+      feature_id = c("A1", "B1", "C1"),
+      rt = c(5.0, 6.0, 20.0),
+      mz = c(100.0, 100.0, 100.0),
+      sample = c("S1", "S2", "S3"),
+      rt_min = c(4.9, 5.9, 19.9),
+      rt_max = c(5.1, 6.1, 20.1)
+    ),
+    df_fea_min = tidytable::tidytable(
+      feature_id = c("A2", "B2", "C2"),
+      rt = c(5.0, 6.0, 10.0),
+      mz = c(120.0, 120.0, 120.0),
+      sample = c("S1", "S2", "S3")
+    ),
+    tolerance_ppm = 10
+  )
+  expect_identical(nrow(pairs_multi_smp), 2L)
+
+  expect_identical(
+    nrow(build_adduct_pair_differences(
+      tidytable::tidytable(adduct = "[M+H]+", adduct_mass = 1.007276),
+      10,
+      500
+    )),
+    0L
+  )
+  expect_identical(
+    nrow(apply_adduct_consistency_filter(tidytable::tidytable())),
+    0L
+  )
+  expect_identical(
+    nrow(apply_adduct_consistency_filter(tidytable::tidytable(
+      feature_id = c("F1", "F2"),
+      adduct = c("[M+H]+", NA_character_),
+      feature_id_dest = c("F2", "F1"),
+      adduct_dest = c(NA_character_, "[M+Na]+")
+    ))),
+    2L
+  )
+  expect_identical(nrow(build_adduct_state_key_map(character(0))), 0L)
+  expect_identical(
+    nrow(join_couples_with_neutral_losses(
+      tidytable::tidytable(
+        feature_id = "F1",
+        feature_id_dest = "F2",
+        delta_min = 50.0,
+        delta_max = 60.0
+      ),
+      tidytable::tidytable(loss = "H2O", mass = 18.0106)
+    )),
+    0L
+  )
+  expect_identical(
+    nrow(join_multi_with_addlossed(
+      tidytable::tidytable(
+        feature_id = "F1",
+        rt = 15.0,
+        mz = 200.0,
+        adduct = "[2M+H]+",
+        rt_min = 14.5,
+        rt_max = 15.5,
+        mass_min = 99.0,
+        mass_max = 100.0
+      ),
+      tidytable::tidytable(rt = 5.0, mass = 99.5)
+    )),
+    0L
+  )
+
+  # Multi-node ambiguous component where state flips on iter 1 and re-evaluates on iter 2
+  eg_multi <- enforce_graph_adduct_consistency(tidytable::tidytable(
+    feature_id = c("N1", "N1", "N2", "N2", "N2"),
+    adduct = c("raw_long_state", "[M+H]+", "[M+H]+", "[M+Na]+", "[M+Na]+"),
+    feature_id_dest = c("N2", "N2", "N3", "N4", "N5"),
+    adduct_dest = c("[M+H]+", "[M+Na]+", "[M+K]+", "[M+K]+", "[M+NH4]+")
+  ))
+  expect_true(nrow(eg_multi) >= 2L)
 })

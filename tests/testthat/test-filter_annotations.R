@@ -739,3 +739,170 @@ test_that("apply_rt_filter handles mixed single/multi RT entries and pre-existin
   )
   expect_true(is.na(res$candidate_structure_error_rt[res$feature_id == "F3"]))
 })
+
+test_that("validate_filter_annotations_inputs, filter_ms1_redundancy, apply_rt_filter, and enforce_ms1_adduct_semantics cover remaining branches", {
+  tmp_dir <- withr::local_tempdir()
+  valid_file <- file.path(tmp_dir, "valid.tsv")
+  writeLines("feature_id\nF1", valid_file)
+
+  # 1. validate_filter_annotations_inputs error paths
+  expect_error(
+    validate_filter_annotations_inputs(
+      annotations = list(file.path(tmp_dir, "missing_list.tsv")),
+      features = valid_file,
+      rts = NULL,
+      output = "out.tsv",
+      tolerance_rt = 0.5
+    ),
+    "annotation file\\(s\\) not found",
+    class = "tima_validation_error"
+  )
+  expect_error(
+    validate_filter_annotations_inputs(
+      annotations = character(0),
+      features = valid_file,
+      rts = NULL,
+      output = "out.tsv",
+      tolerance_rt = 0.5
+    ),
+    "annotations must be a non-empty character vector or list",
+    class = "tima_validation_error"
+  )
+
+  expect_error(
+    validate_filter_annotations_inputs(
+      annotations = valid_file,
+      features = valid_file,
+      rts = valid_file,
+      output = "out.tsv",
+      tolerance_rt = 0
+    ),
+    "tolerance_rt must be a positive number",
+    class = "tima_validation_error"
+  )
+
+  # 2. filter_ms1_redundancy: exact boundary (sim == 0.3, peaks == 2), inchikey_no_stereo key, NA feature_id in spectral, and 1-col anti_join fallback
+  res_nostereo <- filter_ms1_redundancy(list(
+    ms1 = tidytable::tidytable(
+      feature_id = c("F1", "F2", NA_character_),
+      candidate_structure_inchikey_no_stereo = c("IK1", "IK2", "IK3"),
+      candidate_structure_inchikey_connectivity_layer = c("IK1", "IK2", "IK3")
+    ),
+    spectral = tidytable::tidytable(
+      feature_id = c("F1", NA_character_),
+      candidate_structure_inchikey_no_stereo = c("IK1", NA_character_),
+      candidate_structure_inchikey_connectivity_layer = c("IK1", NA_character_),
+      candidate_score_similarity = c("0.3", "0.9"),
+      candidate_count_similarity_peaks_matched = c("2", "5")
+    )
+  ))
+  expect_identical(nrow(res_nostereo), 4L)
+
+  res_1col_join <- filter_ms1_redundancy(list(
+    ms1 = tidytable::tidytable(feature_id = c("F1", "F2")),
+    spectral = tidytable::tidytable(
+      feature_id = "F1",
+      candidate_score_similarity = "0.9",
+      candidate_count_similarity_peaks_matched = "5"
+    )
+  ))
+  expect_identical(res_1col_join$feature_id, c("F2", "F1"))
+
+  # 3. apply_rt_filter: empty rt_table, single-RT drop_rt_cols, multi-RT drop_rt_cols, and left_join fallback (extra column in rt_table)
+  f_ann_type <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    candidate_structure_inchikey_connectivity_layer = c("A", "B"),
+    candidate_library = c("ms1", "spectral"),
+    rt = c("5.0", "8.0"),
+    type = c("old1", "old2")
+  )
+  res_empty_rt <- apply_rt_filter(
+    f_ann_type,
+    tidytable::tidytable(),
+    tolerance_rt = 0.5
+  )
+  expect_true(all(is.na(res_empty_rt$candidate_structure_error_rt)))
+  expect_false("type" %in% names(res_empty_rt))
+
+  res_single_drop <- apply_rt_filter(
+    f_ann_type,
+    tidytable::tidytable(
+      candidate_structure_inchikey_connectivity_layer = "A",
+      rt_target = "4.5"
+    ),
+    tolerance_rt = 0.5
+  )
+  expect_false("type" %in% names(res_single_drop))
+  expect_equal(res_single_drop$candidate_structure_error_rt, c(0.5, NA_real_))
+
+  res_multi_drop <- apply_rt_filter(
+    f_ann_type,
+    tidytable::tidytable(
+      candidate_structure_inchikey_connectivity_layer = c("A", "A"),
+      rt_target = c(NA_character_, NA_character_)
+    ),
+    tolerance_rt = 0.5
+  )
+  expect_false("type" %in% names(res_multi_drop))
+
+  res_lj_fallback <- apply_rt_filter(
+    tidytable::tidytable(
+      feature_id = c("F1", "F2"),
+      candidate_structure_inchikey_connectivity_layer = c("A", "B"),
+      candidate_library = c("ms1", "spectral"),
+      rt = c("5.0", "8.0")
+    ),
+    tidytable::tidytable(
+      candidate_structure_inchikey_connectivity_layer = c("A", "A", "B"),
+      rt_target = c("4.8", "6.0", "8.5"),
+      extra_rt_col = c("e1", "e2", "e3")
+    ),
+    tolerance_rt = 0.5
+  )
+  expect_identical(nrow(res_lj_fallback), 2L)
+  expect_equal(
+    res_lj_fallback$candidate_structure_error_rt[
+      res_lj_fallback$feature_id == "F1"
+    ],
+    0.2,
+    tolerance = 1e-6
+  )
+
+  # 4. enforce_ms1_adduct_semantics: 0-row, missing library col, missing mz col,
+  # multiple primary strong MS1 adducts per feature, and pre-populated match_mode
+  expect_identical(
+    nrow(enforce_ms1_adduct_semantics(tidytable::tidytable())),
+    0L
+  )
+
+  res_nomz <- enforce_ms1_adduct_semantics(
+    tidytable::tidytable(
+      feature_id = c("F1", "F2"),
+      candidate_adduct = c("[M+H]+", "[M+Na]+")
+    )
+  )
+  expect_identical(
+    res_nomz$candidate_adduct_match_mode,
+    c("unconstrained", "unconstrained")
+  )
+
+  res_multi_strong <- enforce_ms1_adduct_semantics(
+    tidytable::tidytable(
+      feature_id = c("F1", "F1", "F1", "F2"),
+      mz = c(101.0073, 101.0073, 101.0073, 200.0),
+      candidate_adduct = c("[M+H]+", "[M+Na]+", "[M+H]+", "[M+H]+"),
+      candidate_library = c("ms1", "ms1", "spectral", "ms1"),
+      candidate_annotation_level = c("primary", "primary", NA, "primary"),
+      candidate_evidence_tier = c(
+        "supported_strong",
+        "supported_strong",
+        NA,
+        "supported_strong"
+      ),
+      candidate_structure_error_mz = c("0.0001", "0.0050", "0.0002", "0.0001"),
+      candidate_adduct_match_mode = c("preset", NA, NA, NA)
+    )
+  )
+  expect_true("preset" %in% res_multi_strong$candidate_adduct_match_mode)
+  expect_true("exact_adduct" %in% res_multi_strong$candidate_adduct_match_mode)
+})
