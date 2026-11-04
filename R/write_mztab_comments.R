@@ -101,16 +101,18 @@
     return(character(0))
   }
 
-  feature_ids <- as.character(results$feature_id)
-  feature_ids <- feature_ids[
-    !is.na(feature_ids) & nzchar(feature_ids) & feature_ids != "null"
-  ]
+  raw_fids <- as.character(results$feature_id)
+  valid_fid_mask <- !is.na(raw_fids) & nzchar(raw_fids) & raw_fids != "null"
+  feature_ids <- raw_fids[valid_fid_mask]
   if (length(feature_ids) == 0L) {
     return(character(0))
   }
 
+  u_fids <- unique(feature_ids)
+  fid_idx <- fastmatch::fmatch(feature_ids, u_fids)
+  counts <- tabulate(fid_idx, nbins = length(u_fids))
+
   if (!has_multivalue) {
-    counts <- tabulate(factor(feature_ids, levels = unique(feature_ids)))
     n_features <- length(counts)
     bins <- c(
       `1` = sum(counts == 1L),
@@ -134,8 +136,7 @@
       "COM\tTIMA ambiguity\taligned_fields=database_identifier|chemical_formula|smiles|inchi|chemical_name|uri|adduct_ions; cardinality_verified=TRUE"
     ))
   }
-  row_groups <- split(seq_along(feature_ids), feature_ids)
-  counts <- lengths(row_groups)
+
   aligned_cols <- c(
     "database_identifier",
     "chemical_formula",
@@ -146,30 +147,23 @@
     "adduct_ions"
   )
 
-  candidate_counts <- vapply(
-    row_groups,
-    function(idx) {
-      grp <- results[idx, , drop = FALSE]
-      if (!all(aligned_cols %in% colnames(grp))) {
-        return(nrow(grp))
-      }
-
-      norm <- function(x) {
-        x <- as.character(x)
-        x[is.na(x) | !nzchar(x)] <- "null"
-        x
-      }
-      tuple_key <- do.call(
-        paste,
-        c(
-          lapply(aligned_cols, function(col) norm(grp[[col]])),
-          list(sep = "||")
-        )
-      )
-      length(unique(tuple_key))
-    },
-    FUN.VALUE = integer(1L)
-  )
+  if (!all(aligned_cols %in% colnames(results))) {
+    candidate_counts <- counts
+  } else {
+    norm <- function(x) {
+      x <- as.character(x)
+      x[is.na(x) | !nzchar(x)] <- "null"
+      x
+    }
+    cols_norm <- lapply(
+      aligned_cols,
+      function(col) norm(results[[col]][valid_fid_mask])
+    )
+    tuple_key <- do.call(paste, c(cols_norm, list(sep = "||")))
+    comb_key <- paste(fid_idx, tuple_key, sep = "\r")
+    keep_unique <- !duplicated(comb_key)
+    candidate_counts <- tabulate(fid_idx[keep_unique], nbins = length(u_fids))
+  }
 
   bins <- c(
     `1` = sum(counts == 1L),
@@ -228,38 +222,58 @@
 
   df <- as.data.frame(edges, stringsAsFactors = FALSE, check.names = FALSE)
   cols <- colnames(df)
+  n_rows <- nrow(df)
 
   header <- paste0(
     "COM\tTIMA edges\trows=",
-    nrow(df),
+    n_rows,
     "; cols=",
     paste(cols, collapse = "|")
   )
 
-  # Serialize rows as compact JSON objects for robust parsing of arbitrary values.
-  row_lines <- vapply(
-    seq_len(nrow(df)),
-    function(i) {
-      payload <- jsonlite::toJSON(
-        as.list(df[i, , drop = FALSE]),
-        auto_unbox = TRUE,
-        null = "null",
-        na = "null"
-      )
-      paste0("COM\tTIMA edge\t", as.character(payload))
-    },
-    FUN.VALUE = character(1L)
+  encode_json_col <- function(col_name, vec) {
+    key_prefix <- paste0(
+      as.character(jsonlite::toJSON(col_name, auto_unbox = TRUE)),
+      ":"
+    )
+    out <- rep(paste0(key_prefix, "null"), length(vec))
+    valid <- which(!is.na(vec))
+    if (length(valid) > 0L) {
+      v_sub <- vec[valid]
+      u <- unique(v_sub)
+      special <- grepl('["\\\\\\x00-\\x1f]', u, perl = TRUE)
+      u_enc <- paste0('"', u, '"')
+      if (any(special)) {
+        u_enc[special] <- vapply(
+          u[special],
+          function(s) as.character(jsonlite::toJSON(s, auto_unbox = TRUE)),
+          character(1L)
+        )
+      }
+      u_full <- paste0(key_prefix, u_enc)
+      out[valid] <- u_full[fastmatch::fmatch(v_sub, u)]
+    }
+    out
+  }
+
+  col_pieces <- lapply(seq_along(cols), function(j) {
+    encode_json_col(cols[[j]], df[[j]])
+  })
+  row_lines <- paste0(
+    "COM\tTIMA edge\t{",
+    do.call(paste, c(col_pieces, list(sep = ","))),
+    "}"
   )
 
   if (length(row_lines) > as.integer(chunk_size)) {
     log_warn(
       "Embedding %s edges into mzTab COM lines from %s",
-      nrow(df),
+      n_rows,
       basename(edges_file)
     )
   }
 
-  rm(edges, df, cols, chunk_size)
+  rm(edges, df, cols, n_rows, col_pieces, chunk_size)
 
   c(header, row_lines)
 }
@@ -301,13 +315,21 @@
   if (drop_feature_id && "feature_id" %in% colnames(df)) {
     df <- df[, setdiff(colnames(df), "feature_id"), drop = FALSE]
   }
+  if (ncol(df) == 0L) {
+    return(replicate(
+      nrow(df),
+      stats::setNames(list(), character(0)),
+      simplify = FALSE
+    ))
+  }
 
-  result <- lapply(seq_len(nrow(df)), function(i) {
-    row <- lapply(df[i, , drop = FALSE], function(v) .mztab_json_cell(v[[1L]]))
-    names(row) <- colnames(df)
-    row
+  cols_clean <- lapply(df, function(col) {
+    x <- as.character(col)
+    x[is.na(x) | !nzchar(x) | x == "null"] <- NA_character_
+    x
   })
-  rm(tbl, df, drop_feature_id)
+  result <- .mapply(list, cols_clean, NULL)
+  rm(tbl, df, cols_clean, drop_feature_id)
   result
 }
 
@@ -655,7 +677,7 @@
     drop = FALSE
   ]
   xrefs_df <- xrefs_df[
-    !duplicated(xrefs_df[, c("ik14", "prefix", "id")]),
+    !duplicated(paste(xrefs_df$ik14, xrefs_df$prefix, xrefs_df$id, sep = "\r")),
     ,
     drop = FALSE
   ]
@@ -707,27 +729,27 @@
   keys <- .mztab_connectivity_layer_key(inchikeys)
   unique_keys <- unique(keys[valid_idx])
   first_key_idx <- fastmatch::fmatch(unique_keys, keys)
-  uri_lookup <- stats::setNames(rep("null", length(unique_keys)), unique_keys)
-  db_lookup <- stats::setNames(rep("null", length(unique_keys)), unique_keys)
+  idx_match <- fastmatch::fmatch(unique_keys, names(xrefs_index))
+  uri_lookup <- rep("null", length(unique_keys))
+  db_lookup <- rep("null", length(unique_keys))
 
-  for (i in seq_along(unique_keys)) {
-    key <- unique_keys[[i]]
-    rows <- xrefs_index[[key]]
+  for (i in which(!is.na(idx_match))) {
+    rows <- xrefs_index[[idx_match[[i]]]]
     if (is.null(rows) || nrow(rows) == 0L) {
       next
     }
     row_idx <- first_key_idx[[i]]
     fallback_val <- if (!is.na(row_idx)) fallback[[row_idx]] else "null"
-    uri_lookup[[key]] <- .mztab_pick_best_uri(rows)
-    db_lookup[[key]] <- .mztab_pick_best_database_identifier(
+    uri_lookup[[i]] <- .mztab_pick_best_uri(rows)
+    db_lookup[[i]] <- .mztab_pick_best_database_identifier(
       rows,
       fallback = fallback_val
     )
   }
 
   key_match <- fastmatch::fmatch(keys[valid_idx], unique_keys)
-  uri_out[valid_idx] <- unname(uri_lookup[key_match])
-  db_out[valid_idx] <- unname(db_lookup[key_match])
+  uri_out[valid_idx] <- uri_lookup[key_match]
+  db_out[valid_idx] <- db_lookup[key_match]
   list(uri = uri_out, database_identifier = db_out)
 }
 

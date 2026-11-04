@@ -407,42 +407,63 @@
     return(smf)
   }
 
-  # Initialize all references as "null"
-  refs <- stats::setNames(rep("null", nrow(smf)), smf$SMF_ID)
+  smf_target_ids <- as.character(smf$SMF_ID)
+  u_smf_ids <- unique(smf_target_ids)
+  n_u <- length(u_smf_ids)
+  lookup_refs <- rep("null", n_u)
 
-  if (nrow(sml) > 0L) {
-    smf_id_lists <- lapply(sml$SMF_ID_REFS, .mztab_split_ref_ids)
-    row_counts <- lengths(smf_id_lists)
-    if (any(row_counts > 0L)) {
-      row_ids <- rep(seq_len(nrow(sml)), row_counts)
-      smf_ids <- unlist(smf_id_lists, use.names = FALSE)
-      valid_mask <- smf_ids %in% names(refs)
-      if (any(valid_mask)) {
-        valid_smf_ids <- smf_ids[valid_mask]
-        valid_row_ids <- row_ids[valid_mask]
-        grouped_sml_ids <- split(
-          sml$SML_ID[valid_row_ids],
-          factor(valid_smf_ids, levels = unique(valid_smf_ids))
-        )
-        grouped_refs <- vapply(
-          grouped_sml_ids,
-          function(ids) {
-            paste(unique(ids), collapse = "|")
-          },
-          character(1L)
-        )
-        refs[names(grouped_refs)] <- mapply(
-          .mztab_union_ref_ids,
-          refs[names(grouped_refs)],
-          grouped_refs,
-          SIMPLIFY = TRUE,
+  raw_refs <- as.character(sml$SMF_ID_REFS)
+  valid_rows <- which(!is.na(raw_refs) & nzchar(raw_refs) & raw_refs != "null")
+  if (length(valid_rows) > 0L) {
+    rv <- raw_refs[valid_rows]
+    sml_ids_sub <- as.character(sml$SML_ID[valid_rows])
+    has_pipe <- grepl("|", rv, fixed = TRUE)
+
+    if (!any(has_pipe)) {
+      smf_ids <- rv
+      row_sml_ids <- sml_ids_sub
+    } else {
+      split_list <- as.list(rv)
+      pipe_pos <- which(has_pipe)
+      split_list[pipe_pos] <- lapply(
+        strsplit(rv[pipe_pos], "|", fixed = TRUE),
+        function(v) unique(v[nzchar(v) & v != "null"])
+      )
+      row_counts <- lengths(split_list)
+      smf_ids <- unlist(split_list, use.names = FALSE)
+      row_sml_ids <- rep.int(sml_ids_sub, row_counts)
+    }
+
+    m_idx <- fastmatch::fmatch(smf_ids, u_smf_ids)
+    valid_mask <- !is.na(m_idx)
+    if (any(valid_mask)) {
+      v_m <- m_idx[valid_mask]
+      v_sml <- row_sml_ids[valid_mask]
+      counts <- tabulate(v_m, nbins = n_u)
+
+      single_u <- which(counts == 1L)
+      if (length(single_u) > 0L) {
+        s_pos <- fastmatch::fmatch(single_u, v_m)
+        lookup_refs[single_u] <- v_sml[s_pos]
+      }
+
+      if (any(counts > 1L)) {
+        multi_mask <- counts[v_m] > 1L
+        mm_u <- v_m[multi_mask]
+        mm_sml <- v_sml[multi_mask]
+        u_mm <- unique(mm_u)
+        grp <- split(mm_sml, factor(mm_u, levels = u_mm))
+        lookup_refs[u_mm] <- vapply(
+          grp,
+          function(ids) paste(unique(ids), collapse = "|"),
+          character(1L),
           USE.NAMES = FALSE
         )
       }
     }
   }
 
-  smf$SML_ID_REFS <- unname(refs[smf$SMF_ID])
+  smf$SML_ID_REFS <- lookup_refs[fastmatch::fmatch(smf_target_ids, u_smf_ids)]
   smf
 }
 
@@ -599,46 +620,78 @@
     return(character(0))
   }
 
+  x <- as.character(x)
   valid_mask <- !is.na(x) & nzchar(x) & x != "null"
   if (!any(valid_mask)) {
     return(rep("null", length(x)))
   }
 
-  split_ids <- strsplit(x[valid_mask], "|", fixed = TRUE)
-  split_ids <- lapply(split_ids, function(ids) {
-    ids <- ids[nzchar(ids) & ids != "null"]
-    unique(ids)
-  })
-
-  remapped <- lapply(split_ids, function(ids) {
-    if (length(ids) == 0L) {
-      return(character(0))
+  map_keys <- names(id_map)
+  if (!is.null(map_keys) && length(id_map) > 0L) {
+    if (is.atomic(id_map)) {
+      map_vals <- as.character(id_map)
+      keep_m <- !is.na(map_vals) & nzchar(map_vals)
+      map_keys <- map_keys[keep_m]
+      map_vals <- map_vals[keep_m]
+    } else {
+      keep_m <- vapply(
+        id_map,
+        function(v) {
+          !is.null(v) && length(v) == 1L && !is.na(v) && nzchar(as.character(v))
+        },
+        logical(1L)
+      )
+      map_keys <- map_keys[keep_m]
+      map_vals <- as.character(unlist(id_map[keep_m], use.names = FALSE))
     }
-    mapped <- vapply(
-      X = ids,
-      FUN = function(id) {
-        if (!is.null(id_map[[id]]) && nzchar(id_map[[id]])) {
-          id_map[[id]]
-        } else {
-          id
-        }
-      },
-      FUN.VALUE = character(1L)
-    )
-    mapped
-  })
+  } else {
+    map_keys <- character(0)
+    map_vals <- character(0)
+  }
+  has_map <- length(map_keys) > 0L
 
   out <- rep("null", length(x))
-  out[valid_mask] <- vapply(
-    X = remapped,
-    FUN = function(ids) {
-      if (length(ids) == 0L) {
-        return("null")
+  valid_idx <- which(valid_mask)
+  xv <- x[valid_idx]
+  has_pipe <- grepl("|", xv, fixed = TRUE)
+
+  if (!all(has_pipe)) {
+    single_idx <- valid_idx[!has_pipe]
+    single_vals <- xv[!has_pipe]
+    if (has_map) {
+      m <- fastmatch::fmatch(single_vals, map_keys)
+      hit <- !is.na(m)
+      if (any(hit)) {
+        single_vals[hit] <- map_vals[m[hit]]
       }
-      paste(ids, collapse = "|")
-    },
-    FUN.VALUE = character(1L)
-  )
+    }
+    out[single_idx] <- single_vals
+  }
+
+  if (any(has_pipe)) {
+    pipe_idx <- valid_idx[has_pipe]
+    pipe_vals <- xv[has_pipe]
+    split_ids <- strsplit(pipe_vals, "|", fixed = TRUE)
+    out[pipe_idx] <- vapply(
+      split_ids,
+      function(ids) {
+        ids <- unique(ids[nzchar(ids) & ids != "null"])
+        if (length(ids) == 0L) {
+          return("null")
+        }
+        if (has_map) {
+          m <- fastmatch::fmatch(ids, map_keys)
+          hit <- !is.na(m)
+          if (any(hit)) {
+            ids[hit] <- map_vals[m[hit]]
+          }
+        }
+        paste(ids, collapse = "|")
+      },
+      character(1L)
+    )
+  }
+
   out
 }
 

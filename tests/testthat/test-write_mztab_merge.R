@@ -185,3 +185,23 @@ test_that(".mztab_smf_key builds vectorized signatures for opt columns", {
     c("10||100||1||x|null", "20||200||2||null|y")
   )
 })
+
+test_that(".mztab_refresh_smf_sml_refs and .mztab_remap_ref_ids handle single and pipe refs", {
+  refresh_refs <- get(".mztab_refresh_smf_sml_refs", envir = ns)
+  smf <- tidytable::tidytable(
+    SMF_ID = c("1", "2", "3"),
+    SML_ID_REFS = c("null", "null", "null")
+  )
+  sml <- tidytable::tidytable(
+    SML_ID = c("10", "20", "30"),
+    SMF_ID_REFS = c("1|2", "2", "null")
+  )
+  refreshed <- refresh_refs(smf, sml)
+  expect_identical(refreshed$SML_ID_REFS, c("10", "10|20", "null"))
+
+  atomic_map <- c("1" = "100", "2" = "200")
+  expect_identical(
+    mztab_remap_ref_ids(c("1", "1|2|3", "null", NA_character_), atomic_map),
+    c("100", "100|200|3", "null", "null")
+  )
+})

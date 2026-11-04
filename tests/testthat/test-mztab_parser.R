@@ -164,3 +164,24 @@ test_that("read_mztab_tables handles malformed and empty input defensively", {
   expect_identical(malformed_out$metadata$value[[2L]], NA_character_)
   expect_equal(nrow(malformed_out$sml), 2L)
 })
+
+test_that("parse mzTab section table fast-path handles uniform rows and multi-tab metadata", {
+  lines <- c(
+    "\ufeffMTD\tmzTab-version\t2.1.0-M",
+    "MTD\tcustom_tab\tpart1\tpart2",
+    "SFH\tSMF_ID\texp_mass_to_charge\tadduct_ion",
+    "SMF\t1\t150.1234\t[M+H]+",
+    "SMF\t2\tnull\t[M+Na]+"
+  )
+  tmp <- tempfile(fileext = ".mztab")
+  writeLines(lines, tmp)
+  on.exit(unlink(tmp), add = TRUE)
+
+  tabs <- read_mztab_tables(tmp)
+  expect_identical(tabs$metadata$key, c("mzTab-version", "custom_tab"))
+  expect_identical(tabs$metadata$value, c("2.1.0-M", "part1\tpart2"))
+  expect_equal(nrow(tabs$smf), 2L)
+  expect_identical(tabs$smf$SMF_ID, c("1", "2"))
+  expect_identical(tabs$smf$exp_mass_to_charge, c("150.1234", NA_character_))
+  expect_identical(tabs$smf$adduct_ion, c("[M+H]+", "[M+Na]+"))
+})

@@ -59,7 +59,7 @@
   }
   n_vals_per_row[n_vals_per_row < 1L] <- 1L
 
-  row_idx <- rep(seq_len(n_rows), times = n_vals_per_row)
+  row_idx <- rep.int(seq_len(n_rows), n_vals_per_row)
 
   out <- vector("list", length(id_cols) + length(multi_cols))
   names(out) <- c(id_cols, multi_cols)
@@ -69,30 +69,17 @@
     out[[col]] <- results[[col]][row_idx]
   }
 
-  # Expand multi-value columns using mapply (faster than nested loops)
+  # Expand multi-value columns directly (only adjusting rows with mismatched length)
   for (col_idx in seq_along(multi_cols)) {
     parts <- split_values[[col_idx]]
-    expanded_list <- mapply(
-      FUN = function(parts_row, nvals) {
-        if (
-          length(parts_row) == 0L ||
-            (length(parts_row) == 1L && is.na(parts_row[[1L]]))
-        ) {
-          rep(NA_character_, nvals)
-        } else if (length(parts_row) < nvals) {
-          c(parts_row, rep(NA_character_, nvals - length(parts_row)))
-        } else {
-          parts_row[seq_len(nvals)]
-        }
-      },
-      parts,
-      n_vals_per_row,
-      SIMPLIFY = FALSE,
-      USE.NAMES = FALSE
-    )
-
-    out[[multi_cols[[col_idx]]]] <- unlist(expanded_list, use.names = FALSE)
-    rm(expanded_list)
+    col_lens <- lengths_list[[col_idx]]
+    mismatch <- which(col_lens != n_vals_per_row)
+    if (length(mismatch) > 0L) {
+      for (i in mismatch) {
+        parts[[i]] <- parts[[i]][seq_len(n_vals_per_row[[i]])]
+      }
+    }
+    out[[multi_cols[[col_idx]]]] <- unlist(parts, use.names = FALSE)
   }
 
   out_df <- as.data.frame(out, stringsAsFactors = FALSE, check.names = FALSE)

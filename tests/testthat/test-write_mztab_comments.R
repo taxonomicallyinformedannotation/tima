@@ -402,3 +402,61 @@ test_that("xref helpers handle empty and priority selection branches", {
   expect_true(grepl("wikidata", best_uri(rows)))
   expect_true(grepl("CHEBI", best_id(rows)))
 })
+
+test_that("ambiguity, edges JSON escaping, and xref field resolution handle multivalue and special chars", {
+  mv_df <- data.frame(
+    feature_id = c("F1", "F1", "F2"),
+    database_identifier = c("CHEBI:1", "CHEBI:2", "CHEBI:3"),
+    chemical_formula = c("C6H12O6", "C6H12O6", "C2H4O2"),
+    smiles = c("OCC", "OCC", "CC(=O)O"),
+    inchi = c("InChI=1/A", "InChI=1/B", "InChI=1/C"),
+    chemical_name = c("Glucose", "Fructose", "AcOH"),
+    uri = c("http://a", "http://b", "http://c"),
+    adduct_ions = c("[M+H]+|[M+Na]+", "[M+H]+", "[M+H]+"),
+    score_final = c("0.9", "0.8", "0.95"),
+    stringsAsFactors = FALSE
+  )
+  amb <- build_ambiguity_comments(mv_df)
+  expect_true(any(grepl("features=2; candidate_rows=3", amb, fixed = TRUE)))
+  expect_true(any(grepl("max-candidate=2", amb, fixed = TRUE)))
+
+  tmp_edges <- tempfile(fileext = ".tsv")
+  writeLines(
+    c("source\tnote", 'F1\tquote"and\\slash', "F2\t"),
+    tmp_edges
+  )
+  on.exit(unlink(tmp_edges), add = TRUE)
+
+  edg <- build_edges_comments(tmp_edges)
+  expect_length(edg, 3L)
+  parsed1 <- jsonlite::fromJSON(sub("^COM\tTIMA edge\t", "", edg[[2L]]))
+  parsed2 <- jsonlite::fromJSON(sub("^COM\tTIMA edge\t", "", edg[[3L]]))
+  expect_identical(parsed1$note, 'quote"and\\slash')
+  expect_null(parsed2$note)
+
+  resolve_xrefs <- get(
+    ".mztab_resolve_xref_fields",
+    envir = asNamespace("tima")
+  )
+  xrefs_idx <- list(
+    AAAAAAAAAAAAAA = data.frame(
+      prefix = c("wikidata", "chebi"),
+      id = c("Q42", "999"),
+      stringsAsFactors = FALSE
+    )
+  )
+  res <- resolve_xrefs(
+    inchikeys = c(
+      "AAAAAAAAAAAAAA-UHFFFAOYSA-N",
+      "BBBBBBBBBBBBBB-UHFFFAOYSA-N",
+      NA_character_
+    ),
+    xrefs_index = xrefs_idx,
+    fallback = c("FB1", "FB2", "FB3")
+  )
+  expect_identical(
+    res$uri,
+    c("https://www.wikidata.org/wiki/Q42", "null", "null")
+  )
+  expect_identical(res$database_identifier, c("CHEBI:999", "null", "null"))
+})

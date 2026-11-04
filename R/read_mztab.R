@@ -207,41 +207,60 @@ read_mztab <- function(
 
   smf <- tabs$smf
   smf_lookup <- NULL
+  smf_ids <- character(0)
   if (nrow(smf) > 0L && "SMF_ID" %in% names(smf)) {
     smf_ids <- as.character(smf$SMF_ID)
     smf_lookup <- list(
-      mz = stats::setNames(as.character(smf$exp_mass_to_charge), smf_ids),
+      mz = as.character(smf$exp_mass_to_charge),
       rt_s = if ("retention_time_in_seconds" %in% names(smf)) {
-        stats::setNames(as.character(smf$retention_time_in_seconds), smf_ids)
+        as.character(smf$retention_time_in_seconds)
       } else {
         NULL
       },
       rt_m = if ("retention_time_in_minutes" %in% names(smf)) {
-        stats::setNames(as.character(smf$retention_time_in_minutes), smf_ids)
+        as.character(smf$retention_time_in_minutes)
       } else {
         NULL
       },
       adduct = if ("adduct_ion" %in% names(smf)) {
-        stats::setNames(as.character(smf$adduct_ion), smf_ids)
+        as.character(smf$adduct_ion)
       } else {
         NULL
       }
     )
   }
 
-  first_ref <- function(x) {
-    if (is.na(x) || !nzchar(x)) {
-      return(NA_character_)
-    }
-    refs <- strsplit(x, "|", fixed = TRUE)[[1L]]
-    refs <- refs[nzchar(refs) & refs != "null"]
-    if (length(refs) == 0L) NA_character_ else refs[[1L]]
-  }
-
   smf_ref <- if ("SMF_ID_REFS" %in% names(src)) {
-    vapply(as.character(src$SMF_ID_REFS), first_ref, FUN.VALUE = character(1L))
+    raw_refs <- as.character(src$SMF_ID_REFS)
+    out_ref <- rep(NA_character_, n)
+    valid_r <- which(!is.na(raw_refs) & nzchar(raw_refs) & raw_refs != "null")
+    if (length(valid_r) > 0L) {
+      rv <- raw_refs[valid_r]
+      has_pipe <- grepl("|", rv, fixed = TRUE)
+      if (!all(has_pipe)) {
+        out_ref[valid_r[!has_pipe]] <- rv[!has_pipe]
+      }
+      if (any(has_pipe)) {
+        pipe_splits <- strsplit(rv[has_pipe], "|", fixed = TRUE)
+        out_ref[valid_r[has_pipe]] <- vapply(
+          pipe_splits,
+          function(refs) {
+            refs <- refs[nzchar(refs) & refs != "null"]
+            if (length(refs) == 0L) NA_character_ else refs[[1L]]
+          },
+          character(1L)
+        )
+      }
+    }
+    out_ref
   } else {
     rep(NA_character_, n)
+  }
+
+  smf_match_idx <- if (!is.null(smf_lookup)) {
+    fastmatch::fmatch(smf_ref, smf_ids)
+  } else {
+    NULL
   }
 
   pick_with_smf <- function(primary, smf_field = NULL) {
@@ -256,7 +275,7 @@ read_mztab <- function(
         !is.null(smf_field) &&
         !is.null(smf_lookup[[smf_field]])
     ) {
-      smf_vals <- unname(smf_lookup[[smf_field]][smf_ref])
+      smf_vals <- smf_lookup[[smf_field]][smf_match_idx]
       idx <- is.na(vals) |
         (
           # Also replace zero m/z placeholders from SML with SMF values
@@ -647,28 +666,27 @@ read_mztab <- function(
   # masster stores a per-feature comma-separated list of mgf_id values in the
   # optional column "opt_global_mgf_index".  We invert this to get the fast
   # mgf_id → SML_ID lookup used inside the per-spectrum loop.
-  mgf_to_feature <- NULL
+  map_keys <- character(0)
+  map_vals <- character(0)
   if (
     id_col %in% names(features) && "opt_global_mgf_index" %in% names(features)
   ) {
     fids <- as.character(features[[id_col]])
     mgf_idx_raw <- as.character(features[["opt_global_mgf_index"]])
-
-    pairs <- unlist(lapply(seq_along(fids), function(i) {
-      raw <- mgf_idx_raw[[i]]
-      if (is.na(raw) || !nzchar(raw)) {
-        return(character(0))
+    valid_raw <- which(!is.na(mgf_idx_raw) & nzchar(mgf_idx_raw))
+    if (length(valid_raw) > 0L) {
+      splits <- strsplit(mgf_idx_raw[valid_raw], ",", fixed = TRUE)
+      lens <- lengths(splits)
+      all_idxs <- trimws(unlist(splits, use.names = FALSE))
+      all_fids <- rep.int(fids[valid_raw], lens)
+      keep_idx <- nzchar(all_idxs)
+      if (any(keep_idx)) {
+        all_idxs <- all_idxs[keep_idx]
+        all_fids <- all_fids[keep_idx]
+        first_u <- !duplicated(all_idxs)
+        map_keys <- all_idxs[first_u]
+        map_vals <- all_fids[first_u]
       }
-      idxs <- trimws(strsplit(raw, ",", fixed = TRUE)[[1L]])
-      idxs <- idxs[nzchar(idxs)]
-      if (length(idxs) == 0L) {
-        return(character(0))
-      }
-      stats::setNames(rep(fids[[i]], length(idxs)), idxs)
-    }))
-
-    if (length(pairs) > 0L) {
-      mgf_to_feature <- pairs
     }
   }
 
@@ -680,6 +698,9 @@ read_mztab <- function(
   } else {
     character(0)
   }
+
+  has_map <- length(map_keys) > 0L
+  has_fid_set <- length(feature_id_set) > 0L
 
   out_entries <- vector("list", length(mgf_data_lines))
   n_entries <- 0L
@@ -702,12 +723,12 @@ read_mztab <- function(
 
     # ── Resolve FEATURE_ID for this spectrum ────────────────────────────────
     # Priority 1: opt_global_mgf_index reverse lookup
-    feature_id_val <- if (
-      !is.null(mgf_to_feature) && !is.na(mgf_id) && nzchar(mgf_id)
-    ) {
-      mgf_to_feature[[mgf_id]] # NULL if mgf_id not in map
-    } else {
-      NULL
+    feature_id_val <- NULL
+    if (has_map && !is.na(mgf_id) && nzchar(mgf_id)) {
+      m_idx <- fastmatch::fmatch(mgf_id, map_keys)
+      if (!is.na(m_idx)) {
+        feature_id_val <- map_vals[[m_idx]]
+      }
     }
 
     # Priority 2: parse "id:<N>" from TITLE (newer masster, e.g. "id:42, rt:...")
@@ -725,9 +746,10 @@ read_mztab <- function(
     # Priority 3: use mgf_id directly when it matches a known feature ID
     if (
       is.null(feature_id_val) &&
+        has_fid_set &&
         !is.na(mgf_id) &&
         nzchar(mgf_id) &&
-        mgf_id %in% feature_id_set
+        !is.na(fastmatch::fmatch(mgf_id, feature_id_set))
     ) {
       feature_id_val <- mgf_id
     }

@@ -68,46 +68,62 @@ NULL
     return(character(0))
   }
 
-  vapply(
-    lines,
-    function(line) {
-      if (is.na(line) || !nzchar(trimws(line))) {
-        return(line)
-      }
+  out <- as.character(lines)
+  has_escaped_bom <- !is.na(out) & grepl("^\\ufeff", out)
+  if (any(has_escaped_bom)) {
+    out[has_escaped_bom] <- sub("^\\ufeff", "", out[has_escaped_bom])
+  }
 
-      line <- sub("^\\ufeff", "", line)
-      if (
-        !(grepl(
-          "^(COM|MTD|SMH|SML|SFH|SMF|SEH|SME)([[:space:]]|$)",
-          line,
-          perl = TRUE,
-          ignore.case = TRUE
-        ))
-      ) {
-        return(line)
-      }
+  already_ok <- !is.na(out) &
+    grepl(
+      "^(COM|MTD|SMH|SML|SFH|SMF|SEH|SME)\t[^[:space:]]",
+      out,
+      perl = TRUE
+    )
+  need_check <- which(!already_ok & !is.na(out) & nzchar(out))
+  if (length(need_check) == 0L) {
+    return(out)
+  }
 
-      prefix <- sub(
-        "^(COM|MTD|SMH|SML|SFH|SMF|SEH|SME)([[:space:]]+).*$",
-        "\\1",
-        line,
-        perl = TRUE,
-        ignore.case = TRUE
-      )
-      rest <- sub(
-        "^(COM|MTD|SMH|SML|SFH|SMF|SEH|SME)[[:space:]]+",
-        "",
-        line,
-        perl = TRUE,
-        ignore.case = TRUE
-      )
-      if (is.na(rest) || !nzchar(rest)) {
-        return(prefix)
-      }
-      paste0(prefix, "\t", rest)
-    },
-    FUN.VALUE = character(1L)
+  sub_lines <- out[need_check]
+  nonblank <- nzchar(trimws(sub_lines))
+  if (!any(nonblank)) {
+    return(out)
+  }
+
+  idx <- need_check[nonblank]
+  cand <- out[idx]
+  m <- grepl(
+    "^(COM|MTD|SMH|SML|SFH|SMF|SEH|SME)([[:space:]]|$)",
+    cand,
+    perl = TRUE,
+    ignore.case = TRUE
   )
+  if (!any(m)) {
+    return(out)
+  }
+
+  idx_m <- idx[m]
+  cand_m <- cand[m]
+  prefix <- sub(
+    "^(COM|MTD|SMH|SML|SFH|SMF|SEH|SME)([[:space:]]+).*$",
+    "\\1",
+    cand_m,
+    perl = TRUE,
+    ignore.case = TRUE
+  )
+  rest <- sub(
+    "^(COM|MTD|SMH|SML|SFH|SMF|SEH|SME)[[:space:]]+",
+    "",
+    cand_m,
+    perl = TRUE,
+    ignore.case = TRUE
+  )
+  has_rest <- !is.na(rest) & nzchar(rest)
+  res <- prefix
+  res[has_rest] <- paste0(prefix[has_rest], "\t", rest[has_rest])
+  out[idx_m] <- res
+  out
 }
 
 #' @keywords internal
@@ -117,36 +133,40 @@ NULL
     return(tidytable::tidytable(key = character(0), value = character(0)))
   }
 
-  rows <- lapply(mtd_lines, function(line) {
-    parts <- .mztab_split_tsv(line)
-    if (length(parts) < 2L) {
-      return(NULL)
-    }
-
-    key <- trimws(parts[[2L]])
-    if (!nzchar(key)) {
-      return(NULL)
-    }
-
-    value <- if (length(parts) >= 3L) {
-      paste(parts[3:length(parts)], collapse = "\t")
-    } else {
-      NA_character_
-    }
-
-    tidytable::tidytable(key = key, value = value)
-  })
-
-  rows <- Filter(Negate(is.null), rows)
-  if (length(rows) == 0L) {
+  splits <- strsplit(as.character(mtd_lines), "\t", fixed = TRUE)
+  lens <- lengths(splits)
+  keep <- lens >= 2L
+  if (!any(keep)) {
     return(tidytable::tidytable(key = character(0), value = character(0)))
   }
 
-  out <- tidytable::bind_rows(rows)
-  if (nrow(out) > 0L) {
-    out$value <- .normalize_mztab_value(out$value)
+  splits <- splits[keep]
+  lens <- lens[keep]
+  keys <- trimws(vapply(splits, `[[`, character(1L), 2L))
+  valid_k <- nzchar(keys)
+  if (!any(valid_k)) {
+    return(tidytable::tidytable(key = character(0), value = character(0)))
   }
-  out
+
+  splits <- splits[valid_k]
+  lens <- lens[valid_k]
+  keys <- keys[valid_k]
+  vals <- rep(NA_character_, length(splits))
+  exact_3 <- lens == 3L
+  if (any(exact_3)) {
+    vals[exact_3] <- vapply(splits[exact_3], `[[`, character(1L), 3L)
+  }
+  more_3 <- which(lens > 3L)
+  if (length(more_3) > 0L) {
+    vals[more_3] <- vapply(
+      splits[more_3],
+      function(p) paste(p[3:length(p)], collapse = "\t"),
+      character(1L)
+    )
+  }
+
+  vals <- .normalize_mztab_value(vals)
+  tidytable::tidytable(key = keys, value = vals)
 }
 
 #' @keywords internal
@@ -180,15 +200,10 @@ NULL
   }
   col_names <- col_names[-1L]
 
-  row_splits <- lapply(row_lines, function(line) {
-    vals <- .mztab_split_tsv(line)
-    if (length(vals) < 2L) {
-      return(character(0))
-    }
-    vals[-1L]
-  })
+  raw_splits <- strsplit(as.character(row_lines), "\t", fixed = TRUE)
+  raw_lens <- lengths(raw_splits)
+  max_len <- max(raw_lens - 1L, 0L)
 
-  max_len <- max(lengths(row_splits), 0L)
   if (max_len > length(col_names)) {
     col_names <- c(
       col_names,
@@ -203,14 +218,37 @@ NULL
   col_names <- make.unique(col_names, sep = "_dup")
 
   n_cols <- length(col_names)
-  row_matrix <- matrix(NA_character_, nrow = length(row_splits), ncol = n_cols)
-  if (n_cols > 0L) {
-    for (row_idx in seq_along(row_splits)) {
-      vals <- row_splits[[row_idx]]
-      if (length(vals) > 0L) {
-        take_len <- min(length(vals), n_cols)
-        row_matrix[row_idx, seq_len(take_len)] <- vals[seq_len(take_len)]
-      }
+  n_rows <- length(raw_splits)
+  if (n_cols == 0L) {
+    out <- as.data.frame(
+      matrix(NA_character_, nrow = n_rows, ncol = 0L),
+      stringsAsFactors = FALSE,
+      check.names = FALSE
+    )
+    return(tidytable::as_tidytable(out))
+  }
+
+  target_raw_len <- n_cols + 1L
+  if (all(raw_lens == target_raw_len)) {
+    flat <- unlist(raw_splits, use.names = FALSE)
+    mat <- matrix(flat, nrow = target_raw_len, ncol = n_rows)
+    out_list <- vector("list", n_cols)
+    for (j in seq_len(n_cols)) {
+      col_vec <- mat[j + 1L, ]
+      u <- unique(col_vec)
+      u_norm <- .normalize_mztab_value(u)
+      out_list[[j]] <- u_norm[fastmatch::fmatch(col_vec, u)]
+    }
+    names(out_list) <- col_names
+    return(tidytable::as_tidytable(out_list))
+  }
+
+  row_matrix <- matrix(NA_character_, nrow = n_rows, ncol = n_cols)
+  for (row_idx in seq_len(n_rows)) {
+    vals <- raw_splits[[row_idx]]
+    if (length(vals) >= 2L) {
+      take_len <- min(length(vals) - 1L, n_cols)
+      row_matrix[row_idx, seq_len(take_len)] <- vals[seq.int(2L, take_len + 1L)]
     }
   }
 
@@ -432,20 +470,22 @@ read_mztab_tables <- function(input) {
     }
   )
   if (length(lines) > 0L) {
-    lines <- vapply(
-      lines,
-      function(line) {
-        sub("^\ufeff", "", line)
-      },
-      FUN.VALUE = character(1L)
-    )
+    has_bom <- !is.na(lines) & startsWith(lines, "\ufeff")
+    if (any(has_bom)) {
+      lines[has_bom] <- sub("^\ufeff", "", lines[has_bom])
+    }
   }
 
   first_nonblank <- ""
   if (length(lines) > 0L) {
-    nonblank <- which(nzchar(trimws(lines)))
-    if (length(nonblank) > 0L) {
-      first_nonblank <- trimws(lines[[nonblank[[1L]]]])
+    for (line in lines) {
+      if (!is.na(line) && nzchar(line)) {
+        tr <- trimws(line)
+        if (nzchar(tr)) {
+          first_nonblank <- tr
+          break
+        }
+      }
     }
   }
   is_json <- grepl("\\.json$", tolower(input)) ||
