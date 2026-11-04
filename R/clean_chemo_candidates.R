@@ -810,6 +810,7 @@ coerce_score_columns <- function(annot_table_wei_chemo) {
 #' @keywords internal
 select_clean_chemo_working_columns <- function(df) {
   model <- columns_model()
+  nms <- names(df)
 
   projection_cols <- unique(c(
     c("feature_id", "rt", "mz", "feature_rt", "feature_mz"),
@@ -823,26 +824,20 @@ select_clean_chemo_working_columns <- function(df) {
     model$candidates_structures_columns,
     model$rank_columns,
     model$score_columns,
-    "candidate_score_pseudo_initial",
-    "candidate_structure_id_",
-    "cluster_consensus_",
-    "feature_pred_"
+    "candidate_score_pseudo_initial"
   ))
 
-  explicit_cols <- setdiff(
-    projection_cols,
-    c("candidate_structure_id_", "cluster_consensus_", "feature_pred_")
-  )
-  regex_cols <- c(
-    grep("^candidate_structure_id_", names(df), value = TRUE),
-    grep("^cluster_consensus_", names(df), value = TRUE),
-    grep("^feature_pred_", names(df), value = TRUE)
+  prefix_cols <- c(
+    nms[startsWith(nms, "candidate_structure_id_")],
+    nms[startsWith(nms, "cluster_consensus_")],
+    nms[startsWith(nms, "feature_pred_")]
   )
 
-  df |>
-    tidytable::select(
-      tidyselect::any_of(c(explicit_cols, regex_cols))
-    )
+  keep <- intersect(unique(c(projection_cols, prefix_cols)), nms)
+  if (identical(keep, nms) && inherits(df, "tidytable")) {
+    return(df)
+  }
+  tidytable::as_tidytable(as.list(df)[keep])
 }
 
 #' Prepare ranked candidate tables for downstream tiers

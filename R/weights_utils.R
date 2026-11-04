@@ -8,7 +8,7 @@
 #'     missing values as 0) and `coverage` (unused; returned as `NA`).
 #'     Rows where all weights are zero return NA.
 #' @keywords internal
-compute_weighted_components <- function(..., weights) {
+compute_weighted_components <- function(..., weights, include_coverage = TRUE) {
   values <- list(...)
 
   # Input validation
@@ -51,7 +51,7 @@ compute_weighted_components <- function(..., weights) {
   if (weight_sum <= 0 || n == 0L) {
     return(list(
       score = rep(NA_real_, n),
-      coverage = rep(NA_real_, n)
+      coverage = if (include_coverage) rep(NA_real_, n) else NULL
     ))
   }
 
@@ -71,7 +71,7 @@ compute_weighted_components <- function(..., weights) {
     }
   }
   score <- score / weight_sum
-  coverage <- rep(NA_real_, n)
+  coverage <- if (include_coverage) rep(NA_real_, n) else NULL
 
   list(score = score, coverage = coverage)
 }
@@ -89,5 +89,9 @@ compute_weighted_components <- function(..., weights) {
 #' @return Numeric vector of weighted scores, or NA for rows with no evidence.
 #' @keywords internal
 compute_weighted_sum <- function(..., weights) {
-  compute_weighted_components(..., weights = weights)$score
+  compute_weighted_components(
+    ...,
+    weights = weights,
+    include_coverage = FALSE
+  )$score
 }

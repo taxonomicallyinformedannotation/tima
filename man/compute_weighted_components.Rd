@@ -4,7 +4,7 @@
 \alias{compute_weighted_components}
 \title{Compute evidence-aware weighted sum (row-wise for data frames)}
 \usage{
-compute_weighted_components(..., weights)
+compute_weighted_components(..., weights, include_coverage = TRUE)
 }
 \arguments{
 \item{...}{\link{numeric} Numeric columns/vectors of component values (passed as

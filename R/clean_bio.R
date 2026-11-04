@@ -122,6 +122,7 @@ clean_bio <- function(
   )
   non_pred_cols <- setdiff(names(annotations_distinct), pred_tax_cols)
 
+  has_u_fik <- isTRUE(attr(annotations_distinct, ".unique_feature_ik"))
   if (has_pred_col) {
     has_pred_row <- !is.na(annotations_distinct$feature_pred_tax_cla_02sup_val)
     df1 <- annotations_distinct[has_pred_row, ]
@@ -157,6 +158,9 @@ clean_bio <- function(
   )
 
   if (is.null(df1) || nrow(df1) == 0L) {
+    if (has_u_fik) {
+      attr(annot_table_wei_bio_preclean, ".unique_feature_ik") <- TRUE
+    }
     return(annot_table_wei_bio_preclean)
   }
 
@@ -354,6 +358,7 @@ clean_bio <- function(
       as.double(fid - 1L) * nk + kid
     }
     if (anyDuplicated(pk) == 0L) {
+      attr(annot_table, ".unique_feature_ik") <- TRUE
       return(annot_table)
     }
     is_dup_pk <- duplicated(pk) | duplicated(pk, fromLast = TRUE)

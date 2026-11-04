@@ -299,3 +299,37 @@ test_that("weight_bio handles multiple sample organisms and SIRIUS confidence fa
   # Temporary organism columns should be removed
   expect_false(any(grepl("^(candidate_organism|sample_organism)", names(out))))
 })
+
+test_that("weight_bio single_so_fast picks highest score when organism name has multiple OTT entries", {
+  ann <- create_test_annotation(
+    "F1",
+    "IK_MULTI_OTT",
+    sample_organism = "Gentiana lutea",
+    species = "Gentiana lutea"
+  )
+  sop <- tidytable::bind_rows(
+    sop_for(
+      "IK_MULTI_OTT",
+      organism = "Homonym sp",
+      ottid = "111",
+      family = "Asteraceae",
+      genus = "Homonym",
+      species = "Homonym sp"
+    ),
+    sop_for(
+      "IK_MULTI_OTT",
+      organism = "Homonym sp",
+      ottid = "222",
+      family = "Gentianaceae",
+      genus = "Gentiana",
+      species = "Gentiana lutea"
+    )
+  )
+
+  out <- call_wb(ann, sop)
+  expect_equal(out$score_biological, 0.9)
+  expect_equal(
+    out$candidate_structure_organism_occurrence_closest,
+    "Gentiana lutea"
+  )
+})

@@ -30,6 +30,15 @@ extract_chemo_scores <- function(weight_chemo_result) {
     )
   }
 
+  need_cols <- c(
+    "feature_id",
+    "candidate_structure_inchikey_connectivity_layer",
+    "score_chemical",
+    "score_weighted_chemo"
+  )
+  if (all(need_cols %in% names(weight_chemo_result))) {
+    return(tidytable::as_tidytable(as.list(weight_chemo_result)[need_cols]))
+  }
   weight_chemo_result |>
     tidytable::select(
       feature_id,

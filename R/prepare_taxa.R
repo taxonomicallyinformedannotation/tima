@@ -155,12 +155,32 @@ prepare_taxa <- function(
     log_debug("Using metadata for organism assignments")
   }
 
-  feature_table_0 <- safe_fread(
-    file = input,
-    file_type = "features table",
-    na.strings = c("", "NA"),
-    colClasses = "character"
+  hdr_feat <- tryCatch(
+    names(data.table::fread(file = input, nrows = 0L, showProgress = FALSE)),
+    error = function(e) character(0L)
   )
+  wanted_feat_cols <- if (!is.null(taxon)) {
+    intersect("feature_id", hdr_feat)
+  } else {
+    intersect(c("feature_id", "sample"), hdr_feat)
+  }
+
+  feature_table_0 <- if (length(wanted_feat_cols) > 0L) {
+    safe_fread(
+      file = input,
+      file_type = "features table",
+      na.strings = c("", "NA"),
+      colClasses = "character",
+      select = wanted_feat_cols
+    )
+  } else {
+    safe_fread(
+      file = input,
+      file_type = "features table",
+      na.strings = c("", "NA"),
+      colClasses = "character"
+    )
+  }
 
   if (is.null(taxon)) {
     metadata_table <- safe_fread(
@@ -225,12 +245,15 @@ prepare_taxa <- function(
     }
   }
 
-  organism_table <- metadata_table |>
-    tidytable::filter(!is.na(!!as.name(colname))) |>
-    tidytable::distinct(!!as.name(colname)) |>
-    tidytable::select(organism = !!as.name(colname)) |>
-    tidytable::separate_rows(organism, sep = "\\|") |>
-    tidytable::mutate(organism = trimws(organism))
+  raw_org_col <- as.character(metadata_table[[colname]])
+  u_org_raw <- unique(raw_org_col[!is.na(raw_org_col)])
+  if (length(u_org_raw) > 0L && any(grepl("|", u_org_raw, fixed = TRUE))) {
+    u_org_raw <- unlist(
+      strsplit(u_org_raw, "|", fixed = TRUE),
+      use.names = FALSE
+    )
+  }
+  organism_table <- tidytable::tidytable(organism = trimws(u_org_raw))
 
   #  "Retrieving already computed Open Tree of Life Taxonomy"
   # )
@@ -480,27 +503,68 @@ prepare_taxa <- function(
         names(feature_table_0)
       )
       meta_cols_keep <- unique(c(name_filename, colname))
-      meta_expanded <- metadata_table[, ..meta_cols_keep] |>
-        tidytable::distinct() |>
+      meta_distinct <- .fast_distinct_with_key_guard(
+        metadata_table[, ..meta_cols_keep],
+        meta_cols_keep
+      )
+      meta_selected <- meta_distinct |>
         tidytable::select(
           organismOriginal = tidyselect::all_of(x = colname),
           tidyselect::everything()
-        ) |>
-        tidytable::separate_rows(organismOriginal, sep = "\\|")
-
-      metadata_table_joined <-
-        tidytable::left_join(
-          x = feature_table_0[, ..feat_cols_keep] |>
-            tidytable::distinct(),
-          y = meta_expanded,
-          by = c("sample" = name_filename)
-        ) |>
-        tidytable::select(
-          tidyselect::any_of("feature_id"),
-          organismOriginal,
-          tidyselect::everything()
         )
-      rm(meta_expanded)
+      meta_expanded <- if (
+        any(grepl("|", meta_selected$organismOriginal, fixed = TRUE))
+      ) {
+        meta_selected |>
+          tidytable::separate_rows(organismOriginal, sep = "\\|")
+      } else {
+        meta_selected
+      }
+      rm(meta_distinct, meta_selected)
+
+      feat_distinct <- .fast_distinct_with_key_guard(
+        feature_table_0[, ..feat_cols_keep],
+        feat_cols_keep
+      )
+      if (
+        name_filename %in%
+          names(meta_expanded) &&
+          anyDuplicated(meta_expanded[[name_filename]]) == 0L
+      ) {
+        fn_key <- meta_expanded[[name_filename]]
+        s_key <- feat_distinct$sample
+        m_meta <- if (anyNA(fn_key) || anyNA(s_key)) {
+          match(s_key, fn_key)
+        } else {
+          fastmatch::fmatch(s_key, fn_key)
+        }
+        metadata_table_joined <- tidytable::as_tidytable(as.list(feat_distinct))
+        data.table::set(
+          metadata_table_joined,
+          j = "organismOriginal",
+          value = meta_expanded$organismOriginal[m_meta]
+        )
+        col_ord_j <- intersect(
+          c("feature_id", "organismOriginal", "sample"),
+          names(metadata_table_joined)
+        )
+        if (!identical(names(metadata_table_joined), col_ord_j)) {
+          data.table::setcolorder(metadata_table_joined, col_ord_j)
+        }
+      } else {
+        metadata_table_joined <-
+          tidytable::left_join(
+            x = feat_distinct,
+            y = meta_expanded,
+            by = c("sample" = name_filename)
+          ) |>
+          tidytable::select(
+            tidyselect::any_of("feature_id"),
+            organismOriginal,
+            tidyselect::everything()
+          )
+      }
+      rm(meta_expanded, feat_distinct)
 
       if (nrow(metadata_table_joined) == 0L) {
         log_warn(

@@ -263,3 +263,26 @@ test_that("expand_combined_scores_for_filtering rejects non-data-frame inputs", 
     class = "tima_validation_error"
   )
 })
+
+test_that("expand_combined_scores_for_filtering does not mutate wide_bio_table in aligned fast path", {
+  bio <- tidytable::as_tidytable(.bio_narrow())
+  chemo <- tidytable::tidytable(
+    feature_id = bio$feature_id,
+    candidate_structure_inchikey_connectivity_layer = bio$candidate_structure_inchikey_connectivity_layer,
+    score_chemical = c(0.6, 0.9, 0.3),
+    score_weighted_chemo = c(0.5, 0.7, 0.2)
+  )
+  orig_bio_names <- names(bio)
+  comb <- combine_weighted_scores(
+    score_bio_table = extract_bio_scores(bio),
+    score_chemo_table = extract_chemo_scores(chemo),
+    weight_biological = 0.4,
+    weight_chemical = 0.3,
+    weight_spectral = 0.3
+  )
+  expect_true(isTRUE(attr(comb, ".aligned_unique_feature_ik")))
+
+  expanded <- expand_combined_scores_for_filtering(comb, bio, chemo)
+  expect_identical(names(bio), orig_bio_names)
+  expect_equal(expanded$score_weighted_chemo, comb$score_final)
+})

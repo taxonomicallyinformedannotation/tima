@@ -1,4 +1,7 @@
 .has_unique_feature_ik <- function(df) {
+  if (isTRUE(attr(df, ".unique_feature_ik"))) {
+    return(TRUE)
+  }
   n <- nrow(df)
   if (n <= 1L) {
     return(TRUE)
@@ -56,14 +59,29 @@ extract_bio_scores <- function(weight_bio_result) {
     )
   }
 
-  weight_bio_result |>
-    tidytable::select(
-      feature_id,
-      candidate_structure_inchikey_connectivity_layer,
-      score_biological,
-      candidate_score_pseudo_initial,
-      score_weighted_bio
-    )
+  need_cols <- c(
+    "feature_id",
+    "candidate_structure_inchikey_connectivity_layer",
+    "score_biological",
+    "candidate_score_pseudo_initial",
+    "score_weighted_bio"
+  )
+  out <- if (all(need_cols %in% names(weight_bio_result))) {
+    tidytable::as_tidytable(as.list(weight_bio_result)[need_cols])
+  } else {
+    weight_bio_result |>
+      tidytable::select(
+        feature_id,
+        candidate_structure_inchikey_connectivity_layer,
+        score_biological,
+        candidate_score_pseudo_initial,
+        score_weighted_bio
+      )
+  }
+  if (isTRUE(attr(weight_bio_result, ".unique_feature_ik"))) {
+    attr(out, ".unique_feature_ik") <- TRUE
+  }
+  out
 }
 
 #' @title Combine weighted scores from biological and chemical sources
@@ -140,6 +158,7 @@ combine_weighted_scores <- function(
       score_chemical = score_chemo_table$score_chemical,
       score_final = score_final
     )
+    attr(result, ".aligned_unique_feature_ik") <- TRUE
     log_complete(ctx, n_combined = nrow(result))
     return(result)
   }
@@ -226,11 +245,12 @@ expand_combined_scores_for_filtering <- function(
       wide_bio_table$candidate_structure_inchikey_connectivity_layer,
       combined_scores$candidate_structure_inchikey_connectivity_layer
     ) &&
-    .has_unique_feature_ik(wide_bio_table)
+    (isTRUE(attr(combined_scores, ".aligned_unique_feature_ik")) ||
+      .has_unique_feature_ik(wide_bio_table))
 
   if (aligned) {
-    result <- data.table::copy(select_clean_chemo_working_columns(
-      wide_bio_table
+    result <- tidytable::as_tidytable(as.list(
+      select_clean_chemo_working_columns(wide_bio_table)
     ))
     for (col in chemo_cols_to_add) {
       data.table::set(result, j = col, value = wide_chemo_table[[col]])

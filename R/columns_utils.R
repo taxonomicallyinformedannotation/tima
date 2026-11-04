@@ -155,150 +155,157 @@ columns_model <- function() {
 #' Select structure-organism pair columns
 #' @keywords internal
 select_structure_organism_pair_columns <- function(df) {
-  tidytable::select(
-    df,
-    tidyselect::any_of(
-      unique(c(
-        grep("^candidate_structure_", names(df), value = TRUE),
-        grep("^structure_", names(df), value = TRUE),
-        grep("^organism_", names(df), value = TRUE),
-        "reference_doi",
-        "stereo_name"
-      ))
-    )
-  )
+  nms <- names(df)
+  wanted <- unique(c(
+    nms[startsWith(nms, "candidate_structure_")],
+    nms[startsWith(nms, "structure_")],
+    nms[startsWith(nms, "organism_")],
+    "reference_doi",
+    "stereo_name"
+  ))
+  keep <- intersect(wanted, nms)
+  if (identical(keep, nms) && inherits(df, "tidytable")) {
+    return(df)
+  }
+  tidytable::as_tidytable(as.list(df)[keep])
 }
 
 #' Select loading columns for structure-organism pairs
 #' @keywords internal
 select_structure_organism_pair_loading_columns <- function(df) {
-  tidytable::select(
-    df,
-    tidyselect::any_of(
-      unique(c(
-        "inchikey",
-        "structure_inchikey",
-        "candidate_structure_inchikey",
-        "candidate_structure_inchikey_connectivity_layer",
-        grep("^candidate_structure_", names(df), value = TRUE),
-        grep("^structure_", names(df), value = TRUE),
-        grep("^organism_", names(df), value = TRUE),
-        "reference_doi",
-        "stereo_name"
-      ))
-    )
-  )
+  nms <- names(df)
+  wanted <- unique(c(
+    "inchikey",
+    "structure_inchikey",
+    "candidate_structure_inchikey",
+    "candidate_structure_inchikey_connectivity_layer",
+    nms[startsWith(nms, "candidate_structure_")],
+    nms[startsWith(nms, "structure_")],
+    nms[startsWith(nms, "organism_")],
+    "reference_doi",
+    "stereo_name"
+  ))
+  keep <- intersect(wanted, nms)
+  if (identical(keep, nms) && inherits(df, "tidytable")) {
+    return(df)
+  }
+  tidytable::as_tidytable(as.list(df)[keep])
 }
 
 #' Select working columns for cluster consensus in clean_chemo
 #' @keywords internal
 select_clean_chemo_consensus_working_columns <- function(df) {
-  tidytable::select(
-    df,
-    tidyselect::any_of(unique(c(
-      ".row_id",
-      "feature_id",
-      "rank_final",
-      "candidate_adduct",
-      "candidate_structure_inchikey_connectivity_layer",
-      "candidate_structure_exact_mass",
-      "mz",
-      "score_weighted_chemo",
-      "candidate_score_similarity",
-      "candidate_score_sirius_csi",
-      "candidate_score_sirius_confidence",
-      "candidate_score_pseudo_initial",
-      "annotation_note",
-      "cluster_consensus_applied",
-      "cluster_consensus_promoted_from_anchor",
-      "cluster_consensus_group_id",
-      "cluster_consensus_anchor_feature_id",
-      "cluster_consensus_anchor_inchikey"
-    )))
+  nms <- names(df)
+  wanted <- c(
+    ".row_id",
+    "feature_id",
+    "rank_final",
+    "candidate_adduct",
+    "candidate_structure_inchikey_connectivity_layer",
+    "candidate_structure_exact_mass",
+    "mz",
+    "score_weighted_chemo",
+    "candidate_score_similarity",
+    "candidate_score_sirius_csi",
+    "candidate_score_sirius_confidence",
+    "candidate_score_pseudo_initial",
+    "annotation_note",
+    "cluster_consensus_applied",
+    "cluster_consensus_promoted_from_anchor",
+    "cluster_consensus_group_id",
+    "cluster_consensus_anchor_feature_id",
+    "cluster_consensus_anchor_inchikey"
   )
+  keep <- intersect(wanted, nms)
+  if (identical(keep, nms) && inherits(df, "tidytable")) {
+    return(df)
+  }
+  tidytable::as_tidytable(as.list(df)[keep])
 }
 
 #' Select working columns for annotation weighting
 #' @keywords internal
 select_weight_annotations_working_columns <- function(df) {
   model <- columns_model()
-  tidytable::select(
-    df,
-    tidyselect::any_of(
-      unique(c(
-        "feature_id",
-        "rt",
-        "mz",
-        grep("^sample_organism_", names(df), value = TRUE),
-        grep("^candidate_organism_", names(df), value = TRUE),
-        "candidate_structure_inchikey_connectivity_layer",
-        "candidate_structure_inchikey_no_stereo",
-        "candidate_structure_smiles_no_stereo",
-        "candidate_structure_name",
-        "candidate_structure_exact_mass",
-        "candidate_structure_molecular_formula",
-        "candidate_structure_xlogp",
-        "candidate_structure_tag",
-        "candidate_structure_organism_occurrence_closest",
-        "candidate_structure_organism_occurrence_reference",
-        "candidate_structure_error_mz",
-        "candidate_structure_error_rt",
-        "candidate_score_pseudo_initial",
-        "candidate_score_similarity",
-        "candidate_score_similarity_forward",
-        "candidate_score_similarity_reverse",
-        "candidate_score_sirius_confidence",
-        "candidate_score_sirius_csi",
-        "candidate_score_sirius_msnovelist",
-        "candidate_score_sirius_intensity",
-        "candidate_score_sirius_isotope",
-        "candidate_score_sirius_sirius",
-        "candidate_score_sirius_tree",
-        "candidate_score_sirius_zodiac",
-        "candidate_count_similarity_peaks_matched",
-        "candidate_spectrum_entropy",
-        "candidate_library",
-        "candidate_spectrum_id",
-        "candidate_adduct",
-        "candidate_query_adduct",
-        "candidate_adduct_match_mode",
-        "annotation_note",
-        "score_biological",
-        "score_chemical",
-        "score_weighted_bio",
-        "score_weighted_chemo",
-        "rank_initial",
-        "rank_final",
-        model$features_columns,
-        model$features_calculated_columns,
-        model$components_columns,
-        model$candidates_calculated_columns,
-        model$candidates_sirius_for_columns,
-        model$candidates_sirius_str_columns,
-        model$candidates_spectra_columns,
-        model$candidates_structures_columns,
-        grep("^candidate_structure_id_", names(df), value = TRUE),
-        grep("^cluster_consensus_", names(df), value = TRUE),
-        grep("^feature_pred_", names(df), value = TRUE)
-      ))
-    )
-  )
+  nms <- names(df)
+  wanted <- unique(c(
+    "feature_id",
+    "rt",
+    "mz",
+    nms[startsWith(nms, "sample_organism_")],
+    nms[startsWith(nms, "candidate_organism_")],
+    "candidate_structure_inchikey_connectivity_layer",
+    "candidate_structure_inchikey_no_stereo",
+    "candidate_structure_smiles_no_stereo",
+    "candidate_structure_name",
+    "candidate_structure_exact_mass",
+    "candidate_structure_molecular_formula",
+    "candidate_structure_xlogp",
+    "candidate_structure_tag",
+    "candidate_structure_organism_occurrence_closest",
+    "candidate_structure_organism_occurrence_reference",
+    "candidate_structure_error_mz",
+    "candidate_structure_error_rt",
+    "candidate_score_pseudo_initial",
+    "candidate_score_similarity",
+    "candidate_score_similarity_forward",
+    "candidate_score_similarity_reverse",
+    "candidate_score_sirius_confidence",
+    "candidate_score_sirius_csi",
+    "candidate_score_sirius_msnovelist",
+    "candidate_score_sirius_intensity",
+    "candidate_score_sirius_isotope",
+    "candidate_score_sirius_sirius",
+    "candidate_score_sirius_tree",
+    "candidate_score_sirius_zodiac",
+    "candidate_count_similarity_peaks_matched",
+    "candidate_spectrum_entropy",
+    "candidate_library",
+    "candidate_spectrum_id",
+    "candidate_adduct",
+    "candidate_query_adduct",
+    "candidate_adduct_match_mode",
+    "annotation_note",
+    "score_biological",
+    "score_chemical",
+    "score_weighted_bio",
+    "score_weighted_chemo",
+    "rank_initial",
+    "rank_final",
+    model$features_columns,
+    model$features_calculated_columns,
+    model$components_columns,
+    model$candidates_calculated_columns,
+    model$candidates_sirius_for_columns,
+    model$candidates_sirius_str_columns,
+    model$candidates_spectra_columns,
+    model$candidates_structures_columns,
+    nms[startsWith(nms, "candidate_structure_id_")],
+    nms[startsWith(nms, "cluster_consensus_")],
+    nms[startsWith(nms, "feature_pred_")]
+  ))
+  keep <- intersect(wanted, nms)
+  if (identical(keep, nms) && inherits(df, "tidytable")) {
+    return(df)
+  }
+  tidytable::as_tidytable(as.list(df)[keep])
 }
 
 #' Select working columns for annotation complementation
 #' @keywords internal
 select_annotations_complement_working_columns <- function(df) {
   model <- columns_model()
-  tidytable::select(
-    df,
-    tidyselect::any_of(
-      unique(c(
-        "feature_id",
-        "candidate_structure_smiles_no_stereo",
-        model$candidates_structures_columns
-      ))
-    )
-  )
+  nms <- names(df)
+  wanted <- unique(c(
+    "feature_id",
+    "candidate_structure_smiles_no_stereo",
+    model$candidates_structures_columns
+  ))
+  keep <- intersect(wanted, nms)
+  if (identical(keep, nms) && inherits(df, "tidytable")) {
+    return(df)
+  }
+  tidytable::as_tidytable(as.list(df)[keep])
 }
 
 #' @title Collapse and clean grouped data
