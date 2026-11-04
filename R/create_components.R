@@ -152,57 +152,59 @@ EDGE_MATCHED_PEAKS_COLUMNS <- c(
   }
 
   if (label_column %in% names(edges) && !all(is.na(edges[[label_column]]))) {
-    all_features <- unique(c(
-      unique(edges[[name_source]]),
-      unique(edges[[name_target]])
-    ))
-    component_membership <- stats::setNames(
-      rep(NA_character_, length(all_features)),
-      all_features
-    )
-
-    edge_label_values <- as.character(edges[[label_column]])
-    edge_label_values[
-      is.na(edge_label_values) | !nzchar(edge_label_values)
-    ] <- NA_character_
-
-    source_features <- as.character(edges[[name_source]])
-    target_features <- as.character(edges[[name_target]])
-
-    feature_rows <- data.frame(
-      feature = c(source_features, target_features),
-      label = c(edge_label_values, edge_label_values),
-      # Rows are all sources, then all targets
-      edge_order = rep(seq_len(nrow(edges)), times = 2L),
-      side_order = rep(c(1L, 2L), each = nrow(edges)),
-      stringsAsFactors = FALSE,
-      row.names = NULL
-    )
-    feature_rows <- feature_rows[
-      !is.na(feature_rows$feature) & nzchar(feature_rows$feature),
-      ,
-      drop = FALSE
-    ]
-    feature_rows <- feature_rows[
-      !is.na(feature_rows$label) & nzchar(feature_rows$label),
-      ,
-      drop = FALSE
-    ]
-    if (nrow(feature_rows) > 0L) {
-      feature_rows <- feature_rows[
-        order(feature_rows$edge_order, feature_rows$side_order),
-        ,
-        drop = FALSE
-      ]
-      feature_rows <- feature_rows[
-        !duplicated(feature_rows$feature),
-        ,
-        drop = FALSE
-      ]
-      component_membership[feature_rows$feature] <- feature_rows$label
+    sf_col <- edges[[name_source]]
+    tf_col <- edges[[name_target]]
+    source_features <- if (is.character(sf_col)) {
+      sf_col
+    } else {
+      as.character(sf_col)
     }
+    target_features <- if (is.character(tf_col)) {
+      tf_col
+    } else {
+      as.character(tf_col)
+    }
+    all_features <- unique(c(unique(source_features), unique(target_features)))
+    all_features <- all_features[
+      !is.na(all_features) & nzchar(all_features, keepNA = FALSE)
+    ]
 
-    component_membership <- component_membership[!is.na(component_membership)]
+    el_col <- edges[[label_column]]
+    edge_label_values <- if (is.character(el_col)) {
+      el_col
+    } else {
+      as.character(el_col)
+    }
+    valid_lbl <- which(
+      !is.na(edge_label_values) & nzchar(edge_label_values, keepNA = FALSE)
+    )
+    if (length(valid_lbl) > 0L && length(all_features) > 0L) {
+      sf_v <- if (length(valid_lbl) == length(source_features)) {
+        source_features
+      } else {
+        source_features[valid_lbl]
+      }
+      tf_v <- if (length(valid_lbl) == length(target_features)) {
+        target_features
+      } else {
+        target_features[valid_lbl]
+      }
+      lbl_v <- if (length(valid_lbl) == length(edge_label_values)) {
+        edge_label_values
+      } else {
+        edge_label_values[valid_lbl]
+      }
+      e_src <- fastmatch::fmatch(all_features, sf_v)
+      e_tgt <- fastmatch::fmatch(all_features, tf_v)
+      e_min <- pmin(e_src, e_tgt, na.rm = TRUE)
+      keep_f <- which(!is.na(e_min))
+      component_membership <- stats::setNames(
+        lbl_v[e_min[keep_f]],
+        all_features[keep_f]
+      )
+    } else {
+      component_membership <- stats::setNames(character(0L), character(0L))
+    }
     method_used <- "edge labels"
   } else {
     src_col <- as.character(edges[[name_source]])
@@ -417,17 +419,19 @@ EDGE_MATCHED_PEAKS_COLUMNS <- c(
     }
   }
 
-  components_table <- data.frame(
-    "cluster index" = names(component_membership),
-    componentindex = as.character(component_membership),
-    stringsAsFactors = FALSE,
-    check.names = FALSE
+  cm_nms <- names(component_membership)
+  cm_chr <- as.character(component_membership)
+  ord_cm <- order(cm_nms)
+  components_table <- list(
+    "cluster index" = cm_nms[ord_cm],
+    componentindex = cm_chr[ord_cm]
   )
-  components_table <- components_table[
-    order(components_table[["cluster index"]]),
-    ,
-    drop = FALSE
-  ]
+  attr(components_table, "row.names") <- if (length(ord_cm) > 0L) {
+    ord_cm
+  } else {
+    integer(0L)
+  }
+  class(components_table) <- "data.frame"
 
   list(
     components_table = components_table,

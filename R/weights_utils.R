@@ -55,22 +55,27 @@ compute_weighted_components <- function(..., weights, include_coverage = TRUE) {
     ))
   }
 
-  # Accumulate weighted sum directly without allocating an N x K matrix
-  score <- numeric(n)
+  # Accumulate normalized weighted sum directly without allocating an N x K matrix
+  w_norm <- weights / weight_sum
+  score <- NULL
   for (k in seq_along(values)) {
-    w <- weights[[k]]
+    w <- w_norm[[k]]
     if (w != 0) {
       v <- values[[k]]
       if (length(v) != n) {
         v <- rep_len(v, n)
       }
       if (anyNA(v)) {
+        v <- as.double(v)
         v[is.na(v)] <- 0
       }
-      score <- score + v * w
+      term <- if (w == 1) as.double(v) else v * w
+      score <- if (is.null(score)) term else score + term
     }
   }
-  score <- score / weight_sum
+  if (is.null(score)) {
+    score <- numeric(n)
+  }
   coverage <- if (include_coverage) rep(NA_real_, n) else NULL
 
   list(score = score, coverage = coverage)

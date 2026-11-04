@@ -19,9 +19,16 @@ rank_candidates <- function(df) {
     return(df)
   }
 
+  df <- tidytable::as_tidytable(as.list(df))
+  n <- nrow(df)
+
   # Ensure promotion flag exists (optional)
   if (!("cluster_consensus_promoted_from_anchor" %in% names(df))) {
-    df$cluster_consensus_promoted_from_anchor <- FALSE
+    data.table::set(
+      df,
+      j = "cluster_consensus_promoted_from_anchor",
+      value = rep.int(FALSE, n)
+    )
   }
 
   # If no score column found, return with NA ranks
@@ -36,32 +43,42 @@ rank_candidates <- function(df) {
     NULL
   }
   if (is.null(score_col)) {
-    df$rank_final <- NA_integer_
+    data.table::set(df, j = "rank_final", value = rep.int(NA_integer_, n))
     return(df)
   }
 
-  n <- nrow(df)
-  raw_sf <- df[[score_col]]
-  score_final <- if (is.numeric(raw_sf)) {
-    as.double(raw_sf)
-  } else {
-    suppressWarnings(as.numeric(raw_sf))
-  }
-  score_final <- pmax(score_final, 0)
-  score_final[!is.finite(score_final)] <- NA_real_
-
-  score_initial <- if ("candidate_score_pseudo_initial" %in% names(df)) {
-    raw_si <- df[["candidate_score_pseudo_initial"]]
-    if (is.numeric(raw_si)) {
-      as.double(raw_si)
-    } else {
-      suppressWarnings(as.numeric(raw_si))
+  .clean_rank_score <- function(raw_s, n_rows) {
+    if (length(raw_s) > 1000L) {
+      u <- unique(raw_s)
+      u_num <- if (is.numeric(u)) {
+        as.double(u)
+      } else {
+        suppressWarnings(as.numeric(u))
+      }
+      u_num[!is.finite(u_num)] <- NA_real_
+      neg <- !is.na(u_num) & u_num < 0
+      if (any(neg)) {
+        u_num[neg] <- 0
+      }
+      idx <- if (anyNA(u)) match(raw_s, u) else fastmatch::fmatch(raw_s, u)
+      return(u_num[idx])
     }
+    s <- if (is.numeric(raw_s)) {
+      as.double(raw_s)
+    } else {
+      suppressWarnings(as.numeric(raw_s))
+    }
+    s <- pmax(s, 0)
+    s[!is.finite(s)] <- NA_real_
+    s
+  }
+
+  score_final <- .clean_rank_score(df[[score_col]], n)
+  score_initial <- if ("candidate_score_pseudo_initial" %in% names(df)) {
+    .clean_rank_score(df[["candidate_score_pseudo_initial"]], n)
   } else {
     rep.int(NA_real_, n)
   }
-  score_initial <- pmax(score_initial, 0)
-  score_initial[!is.finite(score_initial)] <- NA_real_
 
   # De-duplicate first (keeping each structure's best-scoring row in original
   # row order) so that duplicate rows do not inflate the ranks of the
@@ -81,26 +98,26 @@ rank_candidates <- function(df) {
     fastmatch::fmatch(iks, u_iks)
   }
 
-  row_id <- seq_len(n)
-  ord_dedup <- order(-score_final, row_id, na.last = TRUE, method = "radix")
   n_iks <- length(u_iks)
-  pair_key <- if (as.double(length(u_fids)) * n_iks < .Machine$integer.max) {
-    (fid_id[ord_dedup] - 1L) * n_iks + ik_id[ord_dedup]
+  pair_key_raw <- if (
+    as.double(length(u_fids)) * n_iks < .Machine$integer.max
+  ) {
+    (fid_id - 1L) * n_iks + ik_id
   } else {
     n_iks_stride <- if (bitwAnd(n_iks, 1023L) == 0L) n_iks + 1L else n_iks
-    as.double(fid_id[ord_dedup] - 1L) * n_iks_stride + ik_id[ord_dedup]
+    as.double(fid_id - 1L) * n_iks_stride + ik_id
   }
-  not_dup_pk <- !duplicated(pair_key)
 
-  if (all(not_dup_pk)) {
-    df <- tidytable::as_tidytable(df)
+  if (anyDuplicated(pair_key_raw) == 0L) {
     fid_keep <- fid_id
     sf_keep <- score_final
     si_keep <- score_initial
     n_keep <- n
   } else {
+    ord_dedup <- order(-score_final, na.last = TRUE, method = "radix")
+    not_dup_pk <- !duplicated(pair_key_raw[ord_dedup])
     keep_rows <- sort(ord_dedup[not_dup_pk])
-    df <- tidytable::as_tidytable(df[keep_rows, , drop = FALSE])
+    df <- tidytable::as_tidytable(lapply(as.list(df), `[`, keep_rows))
     fid_keep <- fid_id[keep_rows]
     sf_keep <- score_final[keep_rows]
     si_keep <- score_initial[keep_rows]

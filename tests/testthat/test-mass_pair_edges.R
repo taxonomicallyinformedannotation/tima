@@ -232,3 +232,28 @@ test_that("join_multi_with_addlossed returns empty when outside window", {
   result <- join_multi_with_addlossed(df_multi, df_addlossed)
   expect_equal(nrow(result), 0L)
 })
+
+test_that("build_feature_pairs_within_rt isolates pairs across multiple samples", {
+  df_rt_tol <- tidytable::tidytable(
+    feature_id = c("F1", "F3"),
+    rt = c(1.0, 1.0),
+    mz = c(100.0, 100.0),
+    sample = c("S1", "S2"),
+    rt_min = c(0.9, 0.9),
+    rt_max = c(1.1, 1.1)
+  )
+  df_fea_min <- tidytable::tidytable(
+    feature_id = c("F2", "F4"),
+    rt = c(1.0, 1.0),
+    mz = c(122.0, 138.0),
+    sample = c("S1", "S2")
+  )
+  out <- build_feature_pairs_within_rt(
+    df_rt_tol,
+    df_fea_min,
+    tolerance_ppm = 10
+  )
+  expect_equal(out$feature_id, c("F1", "F3"))
+  expect_equal(out$feature_id_dest, c("F2", "F4"))
+  expect_equal(out$delta, c(22.0, 38.0))
+})

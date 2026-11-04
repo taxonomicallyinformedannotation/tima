@@ -81,8 +81,6 @@ transform_score_sirius_csi <- function(csi_score = NULL, K = 100, scale = 20) {
   # Apply sigmoid transformation: sigmoid((score + K) / scale)
   # This maps the shifted and scaled score to (0, 1)
   # NA values are preserved automatically
-  shifted_score <- as.numeric(csi_score) + K
-  transformed_score <- 1 / (1 + exp(-shifted_score / scale))
-
-  transformed_score
+  score_dbl <- if (is.double(csi_score)) csi_score else as.double(csi_score)
+  1 / (1 + exp(-(score_dbl + K) / scale))
 }

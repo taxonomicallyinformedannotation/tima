@@ -180,3 +180,25 @@ test_that("rank_candidates returns an empty input untouched", {
   expect_equal(nrow(out), 0L)
   expect_named(out, names(d))
 })
+
+test_that("rank_candidates handles large character score vectors via deduplicated coercion", {
+  n <- 1200L
+  d <- tidytable::tidytable(
+    feature_id = rep(c("F1", "F2"), each = n / 2L),
+    candidate_structure_inchikey_connectivity_layer = sprintf(
+      "IK%04d",
+      seq_len(n)
+    ),
+    score_weighted_chemo = rep(
+      c("0.8", "-0.1", "Inf", NA_character_),
+      length.out = n
+    ),
+    candidate_score_pseudo_initial = rep(c("0.5", "0.2"), length.out = n)
+  )
+  out <- rank_candidates(d)
+  expect_equal(nrow(out), n)
+  expect_equal(out$rank_final[[1L]], 1L)
+  expect_equal(out$rank_final[[2L]], (n / 2L) / 4L + 1L)
+  expect_true(is.na(out$rank_final[[3L]]))
+  expect_true(is.na(out$rank_final[[4L]]))
+})

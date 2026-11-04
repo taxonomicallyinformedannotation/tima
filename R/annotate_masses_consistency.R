@@ -25,48 +25,43 @@ build_feature_pairs_within_rt <- function(
     ))
   }
 
-  # Extract source features with RT windows
-  src <- tidytable::as_tidytable(df_rt_tol)[,
-    .(
-      feature_id,
-      rt,
-      mz,
-      sample,
-      rt_min,
-      rt_max
-    )
+  src_fid <- df_rt_tol$feature_id
+  src_rt <- df_rt_tol$rt
+  src_mz <- df_rt_tol$mz
+  src_smp <- df_rt_tol$sample
+  src_rt_min <- df_rt_tol$rt_min
+  src_rt_max <- df_rt_tol$rt_max
+
+  dest_fid <- df_fea_min$feature_id
+  dest_rt <- df_fea_min$rt
+  dest_mz <- df_fea_min$mz
+  dest_smp <- df_fea_min$sample
+
+  u_fids <- unique(c(src_fid, dest_fid))
+  src_fid_int <- if (anyNA(u_fids)) {
+    match(src_fid, u_fids)
+  } else {
+    fastmatch::fmatch(src_fid, u_fids)
+  }
+  dest_fid_int <- if (anyNA(u_fids)) {
+    match(dest_fid, u_fids)
+  } else {
+    fastmatch::fmatch(dest_fid, u_fids)
+  }
+
+  dest_ord <- order(dest_smp, dest_rt, method = "radix")
+  src_ord <- order(src_smp, src_rt_min, method = "radix")
+
+  dest_ord <- dest_ord[
+    !is.na(dest_smp[dest_ord]) & !is.na(dest_rt[dest_ord])
+  ]
+  src_ord <- src_ord[
+    !is.na(src_smp[src_ord]) &
+      !is.na(src_rt_min[src_ord]) &
+      !is.na(src_rt_max[src_ord])
   ]
 
-  # Extract destination features
-  dest <- tidytable::as_tidytable(df_fea_min)[,
-    .(
-      feature_id_dest = feature_id,
-      rt_dest = rt,
-      mz_dest = mz,
-      sample
-    )
-  ]
-
-  # Sweep-line: sort by sample, then rt_dest
-  dest <- dest[order(sample, rt_dest)]
-  src <- src[order(sample, rt_min)]
-
-  # For each sample, use rolling join with pre-filtering
-  # This replaces the cartesian join with allow.cartesian = TRUE
-  matches <- dest[
-    src,
-    on = .(sample, rt_dest >= rt_min, rt_dest <= rt_max),
-    nomatch = 0L,
-    # Many sources can share one RT window: the result may legitimately
-    # exceed nrow(x) + nrow(i), which data.table rejects without this
-    allow.cartesian = TRUE
-  ][
-    feature_id != feature_id_dest & mz_dest >= mz
-  ][,
-    .(feature_id, rt, mz, feature_id_dest, mz_dest)
-  ]
-
-  if (nrow(matches) == 0L) {
+  if (length(src_ord) == 0L || length(dest_ord) == 0L) {
     return(tidytable::tidytable(
       feature_id = character(),
       rt = numeric(),
@@ -79,19 +74,88 @@ build_feature_pairs_within_rt <- function(
     ))
   }
 
-  matches[,
-    `:=`(
-      delta = mz_dest - mz,
-      tolerance_term = (tolerance_ppm * 1e-6 * (mz + mz_dest) / 2)
+  u_smp <- unique(src_smp[src_ord])
+  s_hits_list <- vector("list", length(u_smp))
+  d_hits_list <- vector("list", length(u_smp))
+  n_hit_groups <- 0L
+
+  for (smp_val in u_smp) {
+    s_idx <- if (length(u_smp) == 1L) {
+      src_ord
+    } else {
+      src_ord[src_smp[src_ord] == smp_val]
+    }
+    d_idx <- if (length(u_smp) == 1L && all(dest_smp[dest_ord] == smp_val)) {
+      dest_ord
+    } else {
+      dest_ord[dest_smp[dest_ord] == smp_val]
+    }
+    n_d <- length(d_idx)
+    if (length(s_idx) == 0L || n_d == 0L) {
+      next
+    }
+    d_rt_s <- dest_rt[d_idx]
+    lo <- findInterval(src_rt_min[s_idx], d_rt_s, left.open = TRUE) + 1L
+    hi <- findInterval(src_rt_max[s_idx], d_rt_s, left.open = FALSE)
+    lo <- pmax.int(1L, lo)
+    hi <- pmin.int(n_d, hi)
+    valid <- which(lo <= hi)
+    if (length(valid) == 0L) {
+      next
+    }
+    msz <- hi[valid] - lo[valid] + 1L
+    s_exp <- rep.int(s_idx[valid], msz)
+    d_exp <- d_idx[sequence(msz, from = lo[valid])]
+    keep <- which(
+      dest_mz[d_exp] >= src_mz[s_exp] &
+        dest_fid_int[d_exp] != src_fid_int[s_exp]
     )
-  ][,
-    `:=`(
-      delta_min = delta - tolerance_term,
-      delta_max = delta + tolerance_term,
-      tolerance_term = NULL
-    )
-  ] |>
-    tidytable::as_tidytable()
+    if (length(keep) > 0L) {
+      n_hit_groups <- n_hit_groups + 1L
+      s_hits_list[[n_hit_groups]] <- s_exp[keep]
+      d_hits_list[[n_hit_groups]] <- d_exp[keep]
+    }
+  }
+
+  if (n_hit_groups == 0L) {
+    return(tidytable::tidytable(
+      feature_id = character(),
+      rt = numeric(),
+      mz = numeric(),
+      feature_id_dest = character(),
+      mz_dest = numeric(),
+      delta = numeric(),
+      delta_min = numeric(),
+      delta_max = numeric()
+    ))
+  }
+
+  s_hit <- if (n_hit_groups == 1L) {
+    s_hits_list[[1L]]
+  } else {
+    unlist(s_hits_list[seq_len(n_hit_groups)], use.names = FALSE)
+  }
+  d_hit <- if (n_hit_groups == 1L) {
+    d_hits_list[[1L]]
+  } else {
+    unlist(d_hits_list[seq_len(n_hit_groups)], use.names = FALSE)
+  }
+
+  mz_s <- src_mz[s_hit]
+  mz_d <- dest_mz[d_hit]
+  delta_v <- mz_d - mz_s
+  tol_term <- tolerance_ppm * 1e-6 * (mz_s + mz_d) * 0.5
+
+  tidytable::tidytable(
+    feature_id = src_fid[s_hit],
+    rt = src_rt[s_hit],
+    mz = mz_s,
+    feature_id_dest = dest_fid[d_hit],
+    mz_dest = mz_d,
+    delta = delta_v,
+    delta_min = delta_v - tol_term,
+    delta_max = delta_v + tol_term
+  )
 }
 
 #' Build all ordered adduct-pair differences for single-charge adducts.
@@ -111,25 +175,30 @@ build_adduct_pair_differences <- function(
 
   min_distance <- tolerance_ppm * 1e-6 * max_mz
 
-  add_src <- add_clu_table |>
-    tidytable::distinct(adduct, adduct_mass) |>
-    tidytable::rename(Group1 = adduct, mass1 = adduct_mass)
-
-  add_dest <- add_clu_table |>
-    tidytable::distinct(adduct, adduct_mass) |>
-    tidytable::rename(Group2 = adduct, mass2 = adduct_mass)
-
-  # Direct cross join
-  add_src |>
-    tidytable::cross_join(add_dest) |>
-    tidytable::mutate(Distance = mass2 - mass1) |>
-    tidytable::filter(
-      Group1 != Group2 &
-        mass1 < mass2 &
-        Distance >= min_distance
-    ) |>
-    tidytable::distinct(Group1, Group2, Distance) |>
-    tidytable::select(Distance, Group1, Group2)
+  add_u <- tidytable::distinct(add_clu_table, adduct, adduct_mass)
+  n_a <- nrow(add_u)
+  if (n_a <= 1L) {
+    return(tidytable::tidytable(
+      Distance = numeric(),
+      Group1 = character(),
+      Group2 = character()
+    ))
+  }
+  adds <- add_u$adduct
+  masses <- add_u$adduct_mass
+  i_idx <- rep(seq_len(n_a), each = n_a)
+  j_idx <- rep.int(seq_len(n_a), n_a)
+  dist <- masses[j_idx] - masses[i_idx]
+  keep <- which(
+    adds[i_idx] != adds[j_idx] &
+      masses[i_idx] < masses[j_idx] &
+      dist >= min_distance
+  )
+  tidytable::tidytable(
+    Distance = dist[keep],
+    Group1 = adds[i_idx[keep]],
+    Group2 = adds[j_idx[keep]]
+  )
 }
 
 #' Count, for each (feature, adduct), how many distinct neighbors in the
