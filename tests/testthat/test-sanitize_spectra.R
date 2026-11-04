@@ -391,3 +391,21 @@ test_that("sanitize_spectra works in a pipeline", {
   expect_gte(length(result), 0)
   expect_lte(length(result), 5)
 })
+
+test_that(".clean_noise_peak_matrix removes low-intensity values repeated > 5 times", {
+  pm_noise <- cbind(
+    mz = seq(100, 210, by = 10),
+    intensity = c(rep(10, 6), 50, 100, 200, 300, 400, 500)
+  )
+  cleaned <- .clean_noise_peak_matrix(pm_noise)
+  expect_equal(nrow(cleaned), 6L)
+  expect_equal(sum(cleaned[, 2L]), 1.0, tolerance = 1e-8)
+
+  # Repeated 5 times (not > 5) should be retained
+  pm_keep <- cbind(
+    mz = seq(100, 200, by = 10),
+    intensity = c(rep(10, 5), 50, 100, 200, 300, 400, 500)
+  )
+  kept <- .clean_noise_peak_matrix(pm_keep)
+  expect_equal(nrow(kept), 11L)
+})

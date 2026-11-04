@@ -436,14 +436,6 @@ prepare_features_tables <- function(
       ncol = n_samp
     )
 
-    samp_ord <- order(intensity_cols)
-    mat_t_sorted <- t(num_mat[, samp_ord, drop = FALSE])
-    intensity_all_list <- split(
-      as.vector(mat_t_sorted),
-      rep(seq_len(n_feat), each = n_samp)
-    )
-    names(intensity_all_list) <- NULL
-
     work_mat <- num_mat
     work_mat[is.na(work_mat) | work_mat <= 0] <- -Inf
 
@@ -455,12 +447,17 @@ prepare_features_tables <- function(
       active_rows <- seq_len(n_feat)
 
       for (k in seq_len(max_keep)) {
-        if (length(active_rows) == 0L) {
+        n_act <- length(active_rows)
+        if (n_act == 0L) {
           break
         }
-        sub_m <- work_mat[active_rows, , drop = FALSE]
+        sub_m <- if (n_act == n_feat) {
+          work_mat
+        } else {
+          work_mat[active_rows, , drop = FALSE]
+        }
         best_c <- max.col(sub_m, ties.method = "first")
-        lin_idx <- (best_c - 1L) * length(active_rows) + seq_along(active_rows)
+        lin_idx <- (best_c - 1L) * n_act + seq_len(n_act)
         best_v <- sub_m[lin_idx]
         keep <- is.finite(best_v)
         if (!any(keep)) {
@@ -472,8 +469,10 @@ prepare_features_tables <- function(
         col_idx_list[[k]] <- kept_c
         val_list[[k]] <- best_v[keep]
         rk_list[[k]] <- rep.int(k, length(kept_r))
-        work_mat[(kept_c - 1L) * n_feat + kept_r] <- -Inf
-        active_rows <- kept_r
+        if (k < max_keep) {
+          work_mat[(kept_c - 1L) * n_feat + kept_r] <- -Inf
+          active_rows <- kept_r
+        }
       }
 
       kept_r_all <- unlist(row_idx_list, use.names = FALSE)
@@ -499,7 +498,7 @@ prepare_features_tables <- function(
       kept_v_all <- unlist(val_list, use.names = FALSE)
       kept_rk_all <- unlist(rk_list, use.names = FALSE)
     } else {
-      valid_pos <- which(is.finite(t(work_mat)))
+      valid_pos <- which(is.finite(work_mat))
       if (length(valid_pos) == 0L) {
         empty_tbl <- data.frame(
           feature_id = character(0),
@@ -518,9 +517,9 @@ prepare_features_tables <- function(
         }
         return(empty_tbl)
       }
-      r_id <- (valid_pos - 1L) %/% n_samp + 1L
-      c_id <- (valid_pos - 1L) %% n_samp + 1L
-      v_val <- t(work_mat)[valid_pos]
+      r_id <- (valid_pos - 1L) %% n_feat + 1L
+      c_id <- (valid_pos - 1L) %/% n_feat + 1L
+      v_val <- work_mat[valid_pos]
       ord_v <- order(r_id, -v_val, c_id, method = "radix")
       r_id <- r_id[ord_v]
       c_id <- c_id[ord_v]
@@ -549,6 +548,19 @@ prepare_features_tables <- function(
     kept_c_all <- kept_c_all[ord_final]
     kept_v_all <- kept_v_all[ord_final]
 
+    u_r <- unique(kept_r_all)
+    n_u_r <- length(u_r)
+    samp_ord <- order(intensity_cols)
+    mat_t_sorted <- t(num_mat[u_r, samp_ord, drop = FALSE])
+    grp_fac <- structure(
+      rep(seq_len(n_u_r), each = n_samp),
+      levels = as.character(seq_len(n_u_r)),
+      class = "factor"
+    )
+    intensity_u_list <- split.default(as.vector(mat_t_sorted), grp_fac)
+    names(intensity_u_list) <- NULL
+    r_to_u <- fastmatch::fmatch(kept_r_all, u_r)
+
     out <- data.frame(
       feature_id = feature_ids[kept_r_all],
       sample = intensity_cols[kept_c_all],
@@ -565,7 +577,7 @@ prepare_features_tables <- function(
     if ("adduct" %in% extra_cols) {
       out$adduct <- tbl_df[[name_adduct]][kept_r_all]
     }
-    out$intensity_all <- intensity_all_list[kept_r_all]
+    out$intensity_all <- intensity_u_list[r_to_u]
 
     keep_cols <- intersect(
       c(

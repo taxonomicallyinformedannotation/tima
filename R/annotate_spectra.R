@@ -1168,34 +1168,48 @@ reduce_library_by_precursor <- function(
     ppm = ppm
   )
 
-  # Extract adducts — be tolerant to lib_sp not being a full Spectra object
-  if (inherits(lib_sp, "Spectra")) {
-    lib_adducts <- extract_vector(
-      lib_sp,
-      c("adduct", "precursor_type"),
-      length(lib_sp),
-      NA_character_
-    )
-  } else {
-    lib_adducts <- rep(NA_character_, length(lib_sp))
+  if (all(keep_raw) || is.null(query_adducts)) {
+    return(lib_sp[keep_raw])
   }
-  lib_adducts <- harmonize_adduct_vector(lib_adducts, colname = "target_adduct")
+
   query_neutral <- convert_precursor_to_neutral_if_possible(
     precursors = query_prec_match,
     adducts = query_adducts
   )
-  lib_neutral <- convert_precursor_to_neutral_if_possible(
-    precursors = lib_prec_match,
-    adducts = lib_adducts
+  if (!any(is.finite(query_neutral) & query_neutral > 0)) {
+    return(lib_sp[keep_raw])
+  }
+
+  rem_idx <- which(!keep_raw)
+  # Extract adducts only for remaining unmatched library spectra
+  if (inherits(lib_sp, "Spectra")) {
+    lib_adducts_rem <- extract_vector(
+      lib_sp,
+      c("adduct", "precursor_type"),
+      length(lib_sp),
+      NA_character_
+    )[rem_idx]
+  } else {
+    lib_adducts_rem <- rep(NA_character_, length(rem_idx))
+  }
+  lib_adducts_rem <- harmonize_adduct_vector(
+    lib_adducts_rem,
+    colname = "target_adduct"
   )
-  keep_neutral <- .match_precursor_windows(
-    library_precursors = lib_neutral,
+  lib_neutral_rem <- convert_precursor_to_neutral_if_possible(
+    precursors = lib_prec_match[rem_idx],
+    adducts = lib_adducts_rem
+  )
+  keep_neutral_rem <- .match_precursor_windows(
+    library_precursors = lib_neutral_rem,
     query_precursors = query_neutral,
     dalton = dalton,
     ppm = ppm
   )
+  keep <- keep_raw
+  keep[rem_idx[keep_neutral_rem]] <- TRUE
 
-  lib_sp[keep_raw | keep_neutral]
+  lib_sp[keep]
 }
 
 #' @keywords internal
@@ -1286,41 +1300,44 @@ compute_similarity_safe <- function(
         length(lib_sp),
         NA_character_
       )
-      lib_adducts <- harmonize_adduct_vector(
-        lib_adducts_raw,
-        colname = "target_adduct"
-      )
-      lib_neutral <- convert_precursor_to_neutral_if_possible(
-        precursors = lib_prec_match,
-        adducts = lib_adducts
-      )
       use_query_m <- is.finite(query_neutral) & query_neutral > 0
-      use_lib_m <- is.finite(lib_neutral) & lib_neutral > 0
 
       neutral_out <- tidytable::tidytable()
-      if (any(use_query_m) && any(use_lib_m)) {
-        keep_neutral <- .match_precursor_windows(
-          library_precursors = lib_neutral,
-          query_precursors = query_neutral,
-          dalton = dalton,
-          ppm = ppm
+      if (any(use_query_m)) {
+        lib_adducts <- harmonize_adduct_vector(
+          lib_adducts_raw,
+          colname = "target_adduct"
         )
-
-        neutral_lib_indices <- which(keep_neutral)
-        neutral_query_indices <- which(use_query_m)
-
-        if (
-          length(neutral_lib_indices) > 0L && length(neutral_query_indices) > 0L
-        ) {
-          neutral_out <- run_similarity(
-            lib_ids = neutral_lib_indices,
-            lib_precursors = lib_neutral[neutral_lib_indices],
-            lib_spectra = lib_sp@backend@peaksData[neutral_lib_indices],
-            query_ids = query_ids[neutral_query_indices],
-            query_precursors = query_neutral[neutral_query_indices],
-            query_spectra = query_sp@backend@peaksData[neutral_query_indices],
-            space_label = "neutral_M"
+        lib_neutral <- convert_precursor_to_neutral_if_possible(
+          precursors = lib_prec_match,
+          adducts = lib_adducts
+        )
+        use_lib_m <- is.finite(lib_neutral) & lib_neutral > 0
+        if (any(use_lib_m)) {
+          keep_neutral <- .match_precursor_windows(
+            library_precursors = lib_neutral,
+            query_precursors = query_neutral,
+            dalton = dalton,
+            ppm = ppm
           )
+
+          neutral_lib_indices <- which(keep_neutral)
+          neutral_query_indices <- which(use_query_m)
+
+          if (
+            length(neutral_lib_indices) > 0L &&
+              length(neutral_query_indices) > 0L
+          ) {
+            neutral_out <- run_similarity(
+              lib_ids = neutral_lib_indices,
+              lib_precursors = lib_neutral[neutral_lib_indices],
+              lib_spectra = lib_sp@backend@peaksData[neutral_lib_indices],
+              query_ids = query_ids[neutral_query_indices],
+              query_precursors = query_neutral[neutral_query_indices],
+              query_spectra = query_sp@backend@peaksData[neutral_query_indices],
+              space_label = "neutral_M"
+            )
+          }
         }
       }
 

@@ -700,3 +700,42 @@ test_that("filter_ms1_redundancy handles NA connectivity layer consistently with
   ms1_kept <- res |> tidytable::filter(candidate_library == "ms1")
   expect_equal(ms1_kept$feature_id, "F3")
 })
+
+test_that("apply_rt_filter handles mixed single/multi RT entries and pre-existing duplicates", {
+  features_ann <- tidytable::tidytable(
+    feature_id = c("F1", "F1", "F2", "F3"),
+    candidate_structure_inchikey_connectivity_layer = c("A", "A", "B", "C"),
+    candidate_library = c("ms1", "ms1", "spectral", "sirius"),
+    rt = c("5.0", "5.0", "8.0", NA_character_)
+  )
+  rt_lib <- tidytable::tidytable(
+    candidate_structure_inchikey_connectivity_layer = c(
+      "A",
+      "A",
+      "B",
+      "C",
+      "C"
+    ),
+    rt_target = c("5.5", "4.9", "8.2", "3.0", "4.0"),
+    type = c(
+      "experimental",
+      "predicted",
+      "experimental",
+      "experimental",
+      "predicted"
+    )
+  )
+  res <- apply_rt_filter(features_ann, rt_lib, tolerance_rt = 0.5)
+  expect_equal(nrow(res), 3L)
+  expect_equal(
+    res$candidate_structure_error_rt[res$feature_id == "F1"],
+    0.1,
+    tolerance = 1e-6
+  )
+  expect_equal(
+    res$candidate_structure_error_rt[res$feature_id == "F2"],
+    -0.2,
+    tolerance = 1e-6
+  )
+  expect_true(is.na(res$candidate_structure_error_rt[res$feature_id == "F3"]))
+})

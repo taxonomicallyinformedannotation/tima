@@ -657,14 +657,122 @@ apply_rt_filter <- function(features_annotated_table, rt_table, tolerance_rt) {
     return(features_annotated_table)
   }
 
+  extra_rt_cols <- setdiff(names(rt_table), c(ik_col, "rt_target", "type"))
+  if (length(extra_rt_cols) == 0L && !anyNA(rt_iks)) {
+    ann_iks <- features_annotated_table[[ik_col]]
+    ann_rt_num <- .as_numeric_dedup(features_annotated_table$rt)
+    rt_target_num <- .as_numeric_dedup(rt_table$rt_target)
+
+    dup_iks <- unique(rt_iks[duplicated(rt_iks)])
+    is_dup_rt <- !is.na(fastmatch::fmatch(rt_iks, dup_iks))
+
+    single_iks <- rt_iks[!is_dup_rt]
+    single_targets <- rt_target_num[!is_dup_rt]
+    m_single <- fastmatch::fmatch(ann_iks, single_iks)
+    err_rt <- ann_rt_num - single_targets[m_single]
+
+    m_dup <- fastmatch::fmatch(ann_iks, dup_iks)
+    idx_in_dup <- which(!is.na(m_dup))
+    n_extra_join <- 0L
+    if (length(idx_in_dup) > 0L) {
+      dup_rt_idx <- which(is_dup_rt)
+      dup_grp <- fastmatch::fmatch(rt_iks[dup_rt_idx], dup_iks)
+      targets_by_dup <- split(rt_target_num[dup_rt_idx], dup_grp)
+      counts_by_dup <- lengths(targets_by_dup, use.names = FALSE)
+
+      sub_rt <- ann_rt_num[idx_in_dup]
+      sub_d <- m_dup[idx_in_dup]
+      n_extra_join <- sum(counts_by_dup[sub_d] - 1L)
+
+      u_rt_vals <- unique(sub_rt)
+      rt_id <- match(sub_rt, u_rt_vals)
+      pair_key <- (sub_d - 1L) * length(u_rt_vals) + rt_id
+      u_pos <- which(!duplicated(pair_key))
+      u_grp <- fastmatch::fmatch(pair_key, pair_key[u_pos])
+
+      u_rt <- sub_rt[u_pos]
+      u_d <- sub_d[u_pos]
+      u_err <- vapply(
+        seq_along(u_pos),
+        function(i) {
+          r_val <- u_rt[[i]]
+          if (is.na(r_val)) {
+            return(NA_real_)
+          }
+          t_vec <- targets_by_dup[[u_d[[i]]]]
+          diffs <- r_val - t_vec
+          adiffs <- abs(diffs)
+          if (all(is.na(adiffs))) {
+            return(NA_real_)
+          }
+          diffs[[which.min(adiffs)]]
+        },
+        numeric(1L)
+      )
+      err_rt[idx_in_dup] <- u_err[u_grp]
+    }
+
+    dedup_cols <- intersect(
+      c(
+        "feature_id",
+        "candidate_structure_inchikey_connectivity_layer",
+        "candidate_library"
+      ),
+      names(features_annotated_table)
+    )
+    out <- features_annotated_table
+    out$candidate_structure_error_rt <- err_rt
+    n_pre_dup <- 0L
+    if (length(dedup_cols) > 0L && nrow(out) > 1L) {
+      c1 <- out[[dedup_cols[[1L]]]]
+      u1 <- unique(c1)
+      comp_key <- as.double(
+        (if (anyNA(u1)) match(c1, u1) else fastmatch::fmatch(c1, u1)) - 1L
+      )
+      if (length(dedup_cols) >= 2L) {
+        for (k_i in 2:length(dedup_cols)) {
+          ck <- out[[dedup_cols[[k_i]]]]
+          uk <- unique(ck)
+          idk <- if (anyNA(uk)) match(ck, uk) else fastmatch::fmatch(ck, uk)
+          comp_key <- comp_key * (length(uk) + 1L) + (idk - 1L)
+        }
+      }
+      if (anyDuplicated(comp_key) > 0L) {
+        n_before_out <- nrow(out)
+        ord <- order(abs(err_rt), na.last = TRUE, method = "radix")
+        out <- out[ord, ]
+        comp_key_ord <- comp_key[ord]
+        out <- out[!duplicated(comp_key_ord), ]
+        n_pre_dup <- n_before_out - nrow(out)
+      }
+    }
+    n_dedup <- n_extra_join + n_pre_dup
+    if (n_dedup > 0L) {
+      log_info(
+        "Removed %d duplicate RT library matches (keeping best match per annotation)",
+        n_dedup
+      )
+    }
+    log_info(
+      "RT deltas computed for %d annotations (no hard cutoff applied; scoring handles RT penalty)",
+      sum(!is.na(out$candidate_structure_error_rt))
+    )
+    drop_rt_cols <- intersect(c("rt_target", "type"), names(out))
+    if (length(drop_rt_cols) > 0L) {
+      out <- out |>
+        tidytable::select(-tidyselect::any_of(x = drop_rt_cols))
+    }
+    return(out)
+  }
+
   joined <- features_annotated_table |>
     tidytable::left_join(
       y = rt_table,
       by = "candidate_structure_inchikey_connectivity_layer"
     ) |>
     tidytable::mutate(
-      candidate_structure_error_rt = as.numeric(rt) -
-        as.numeric(rt_target)
+      candidate_structure_error_rt = .as_numeric_dedup(rt) -
+        .as_numeric_dedup(rt_target)
     )
 
   # When a compound has multiple RT library entries, keep only the

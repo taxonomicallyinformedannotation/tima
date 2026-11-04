@@ -72,10 +72,6 @@ sanitize_mgf <- function(file, file_type = "MGF file") {
           c(end_ions, rep(n_lines, total_spectra - length(end_ions)))
         }
 
-        # Global positions of MSLEVEL=2 and digit-starting (peak) lines
-        mslevel2_lines <- grep("^MSLEVEL=2$", lines, ignore.case = TRUE)
-        peak_lines <- grep("^[0-9]", lines)
-
         # For each spectrum i, its line range is [begin_ions[i], end_ions[i]].
         # A line L belongs to spectrum i iff begin_ions[i] <= L <= end_ions[i],
         # i.e., findInterval(L, begin_ions) == i and L <= end_ions[i].
@@ -86,13 +82,17 @@ sanitize_mgf <- function(file, file_type = "MGF file") {
           idx[in_range] # spectrum indices that contain a matching line
         }
 
+        has_mslevel_line <- grep("^MSLEVEL=", lines, ignore.case = TRUE)
+        mslevel2_lines <- has_mslevel_line[
+          grepl("^MSLEVEL=2$", lines[has_mslevel_line], ignore.case = TRUE)
+        ]
+
         ms2_by_level <- unique(.lines_in_spectrum(
           mslevel2_lines,
           begin_ions,
           end_ions_capped
         ))
         # Spectra with no MSLEVEL tag at all (treat as MS2 if they have peaks)
-        has_mslevel_line <- grep("^MSLEVEL=", lines, ignore.case = TRUE)
         spectra_with_mslevel <- unique(findInterval(
           has_mslevel_line,
           begin_ions
@@ -101,12 +101,17 @@ sanitize_mgf <- function(file, file_type = "MGF file") {
           seq_len(total_spectra),
           spectra_with_mslevel
         )
-        spectra_with_peaks <- unique(.lines_in_spectrum(
-          peak_lines,
-          begin_ions,
-          end_ions_capped
-        ))
-        ms2_by_peaks <- intersect(spectra_without_mslevel, spectra_with_peaks)
+        ms2_by_peaks <- if (length(spectra_without_mslevel) > 0L) {
+          peak_lines <- grep("^[0-9]", lines)
+          spectra_with_peaks <- unique(.lines_in_spectrum(
+            peak_lines,
+            begin_ions,
+            end_ions_capped
+          ))
+          intersect(spectra_without_mslevel, spectra_with_peaks)
+        } else {
+          integer(0L)
+        }
 
         ms2_indices <- sort(unique(c(ms2_by_level, ms2_by_peaks)))
         n_ms2 <- length(ms2_indices)
@@ -447,7 +452,8 @@ sanitize_metadata <- function(
       {
         features <- safe_fread(
           file = features_file,
-          file_type = "features table"
+          file_type = "features table",
+          nrows = 0L
         )
 
         feature_cols <- names(features)
@@ -461,14 +467,26 @@ sanitize_metadata <- function(
         metadata_basenames <- gsub("\\.[^.]*$", "", metadata_filenames)
 
         # Check if metadata filenames (without extension) are PART OF feature
-        # column names
-        basename_found <- vapply(
-          X = metadata_basenames,
-          FUN = function(basename) {
-            any(grepl(basename, feature_cols, fixed = TRUE))
-          },
-          FUN.VALUE = logical(1L)
+        # column names; fast-path common stripped sample column patterns first
+        stripped_cols <- sub(
+          "(\\.mzML|\\.mzXML|\\.raw)?([ :_-]*(Peak area|Peak height|area|height))?$",
+          "",
+          sub("^(quant_|datafile:)", "", feature_cols, ignore.case = TRUE),
+          ignore.case = TRUE
         )
+        basename_found <- !is.na(
+          fastmatch::fmatch(metadata_basenames, stripped_cols)
+        )
+        if (!all(basename_found)) {
+          rem_idx <- which(!basename_found)
+          basename_found[rem_idx] <- vapply(
+            X = metadata_basenames[rem_idx],
+            FUN = function(basename) {
+              any(grepl(basename, feature_cols, fixed = TRUE))
+            },
+            FUN.VALUE = logical(1L)
+          )
+        }
 
         matched_files <- metadata_basenames[basename_found]
         missing_files <- metadata_basenames[!basename_found]

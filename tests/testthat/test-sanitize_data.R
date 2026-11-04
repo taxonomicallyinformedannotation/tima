@@ -706,3 +706,26 @@ test_that("validate_inputs accepts custom column names", {
     )
   )
 })
+
+test_that("sanitize_metadata matches custom substring columns via fallback when prefix/suffix differs", {
+  meta_file <- tempfile(fileext = ".tsv")
+  feat_file <- tempfile(fileext = ".tsv")
+  on.exit(unlink(c(meta_file, feat_file)), add = TRUE)
+
+  writeLines(
+    c("filename\tATTRIBUTE_species", "S1.mzML\tTaxon A", "S2.mzML\tTaxon B"),
+    meta_file
+  )
+  writeLines(
+    c(
+      "row_id\tS1.mzML Peak area\tcustom_prefix_S2_custom_suffix",
+      "1\t100\t200"
+    ),
+    feat_file
+  )
+
+  res <- sanitize_metadata(meta_file, features_file = feat_file)
+  expect_true(res$valid)
+  expect_true(res$filenames_match)
+  expect_equal(res$n_matched, 2L)
+})

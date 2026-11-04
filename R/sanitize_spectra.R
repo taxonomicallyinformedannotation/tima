@@ -279,14 +279,23 @@ sanitize_spectra <- function(
 
   intensities <- peak_matrix[, 2L]
   if (length(intensities) >= 10L && anyDuplicated(intensities) > 0L) {
-    u_int <- sort(unique(intensities))
-    smallest_10 <- u_int[seq_len(min(10L, length(u_int)))]
-    noise_vals <- smallest_10[
-      vapply(smallest_10, function(v) sum(intensities == v) > 5L, logical(1L))
-    ]
-    if (length(noise_vals) > 0L) {
-      keep_idx <- !intensities %in% noise_vals
-      peak_matrix <- peak_matrix[keep_idx, , drop = FALSE]
+    dup_mask <- duplicated(intensities)
+    if (sum(dup_mask) >= 5L) {
+      u_int <- sort.int(unique(intensities))
+      smallest_10 <- u_int[seq_len(min(10L, length(u_int)))]
+      dup_vals <- unique(intensities[dup_mask])
+      cand_vals <- smallest_10[smallest_10 %in% dup_vals]
+      if (length(cand_vals) > 0L) {
+        counts <- tabulate(
+          match(intensities, cand_vals),
+          nbins = length(cand_vals)
+        )
+        noise_vals <- cand_vals[counts > 5L]
+        if (length(noise_vals) > 0L) {
+          keep_idx <- !intensities %in% noise_vals
+          peak_matrix <- peak_matrix[keep_idx, , drop = FALSE]
+        }
+      }
     }
   }
 
