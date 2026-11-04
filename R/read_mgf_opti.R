@@ -184,30 +184,60 @@ read_mgf_opti <- function(
     return(make_empty_mgf_df())
   }
 
-  sep1 <- regexpr("[ \t]+", pk_lines, perl = TRUE)
-  sep1_len <- attr(sep1, "match.length")
-  valid_pk_line <- sep1 > 1L & (sep1 + sep1_len) <= nchar(pk_lines)
-  if (!all(valid_pk_line)) {
-    pk_lines <- pk_lines[valid_pk_line]
-    pk_blocks <- pk_blocks[valid_pk_line]
-    sep1_len <- sep1_len[valid_pk_line]
-    sep1 <- sep1[valid_pk_line]
+  sp_pos <- regexpr(" ", pk_lines, fixed = TRUE)
+  tab_pos <- if (all(sp_pos > 1L)) {
+    integer(length(pk_lines))
+  } else {
+    regexpr("\t", pk_lines, fixed = TRUE)
   }
+  has_tab <- tab_pos > 0L
+  if (!any(has_tab) && all(sp_pos > 1L)) {
+    mz_str <- substr(pk_lines, 1L, sp_pos - 1L)
+    rest_str <- substring(pk_lines, sp_pos + 1L)
+    if (any(startsWith(rest_str, " "))) {
+      rest_str <- trimws(rest_str, which = "left")
+    }
+    valid_pk_line <- nzchar(rest_str)
+    if (!all(valid_pk_line)) {
+      mz_str <- mz_str[valid_pk_line]
+      rest_str <- rest_str[valid_pk_line]
+      pk_blocks <- pk_blocks[valid_pk_line]
+    }
+    if (length(mz_str) == 0L) {
+      return(make_empty_mgf_df())
+    }
+    sp2 <- regexpr(" ", rest_str, fixed = TRUE)
+    has_sp2 <- sp2 > 0L
+    if (any(has_sp2)) {
+      rest_str[has_sp2] <- substr(rest_str[has_sp2], 1L, sp2[has_sp2] - 1L)
+    }
+    rm(pk_lines, sp_pos, tab_pos, has_tab, sp2, has_sp2)
+  } else {
+    sep1 <- regexpr("[ \t]+", pk_lines, perl = TRUE)
+    sep1_len <- attr(sep1, "match.length")
+    valid_pk_line <- sep1 > 1L & (sep1 + sep1_len) <= nchar(pk_lines)
+    if (!all(valid_pk_line)) {
+      pk_lines <- pk_lines[valid_pk_line]
+      pk_blocks <- pk_blocks[valid_pk_line]
+      sep1_len <- sep1_len[valid_pk_line]
+      sep1 <- sep1[valid_pk_line]
+    }
 
-  if (length(pk_lines) == 0L) {
-    return(make_empty_mgf_df())
+    if (length(pk_lines) == 0L) {
+      return(make_empty_mgf_df())
+    }
+
+    mz_str <- substr(pk_lines, 1L, sep1 - 1L)
+    rest_str <- substring(pk_lines, sep1 + sep1_len)
+    rm(pk_lines, sep1, sep1_len, sp_pos, tab_pos, has_tab)
+
+    sep2 <- regexpr("[ \t]", rest_str, perl = TRUE)
+    has_sep2 <- sep2 > 0L
+    if (any(has_sep2)) {
+      rest_str[has_sep2] <- substr(rest_str[has_sep2], 1L, sep2[has_sep2] - 1L)
+    }
+    rm(sep2, has_sep2)
   }
-
-  mz_str <- substr(pk_lines, 1L, sep1 - 1L)
-  rest_str <- substring(pk_lines, sep1 + sep1_len)
-  rm(pk_lines, sep1, sep1_len)
-
-  sep2 <- regexpr("[ \t]", rest_str, perl = TRUE)
-  has_sep2 <- sep2 > 0L
-  if (any(has_sep2)) {
-    rest_str[has_sep2] <- substr(rest_str[has_sep2], 1L, sep2[has_sep2] - 1L)
-  }
-  rm(sep2, has_sep2)
 
   valid_blocks <- unique(pk_blocks)
   n_sp <- length(valid_blocks)
@@ -236,12 +266,20 @@ read_mgf_opti <- function(
     }
   }
 
-  mz_list <- methods::as(unname(split(mz_all, pk_sp_id)), Class = "NumericList")
-  int_list <- methods::as(
-    unname(split(int_all, pk_sp_id)),
+  grp_fac <- structure(
+    pk_sp_id,
+    levels = as.character(seq_len(n_sp)),
+    class = "factor"
+  )
+  mz_list <- methods::as(
+    unname(split.default(mz_all, grp_fac)),
     Class = "NumericList"
   )
-  rm(mz_all, int_all, pk_sp_id)
+  int_list <- methods::as(
+    unname(split.default(int_all, grp_fac)),
+    Class = "NumericList"
+  )
+  rm(mz_all, int_all, pk_sp_id, grp_fac)
 
   desc_lines <- inner_lines[is_desc]
   desc_blocks <- block_id[is_desc]
@@ -259,7 +297,7 @@ read_mgf_opti <- function(
   }
   rm(desc_blocks)
 
-  all_nms <- substring(desc_lines, 1L, desc_eq - 1L)
+  all_nms <- substr(desc_lines, 1L, desc_eq - 1L)
   all_vals <- substring(desc_lines, desc_eq + 1L)
   rm(desc_lines, desc_eq)
 
@@ -390,7 +428,8 @@ read_mgf_metadata <- function(f) {
   is_end <- lines == "END IONS"
   block <- cumsum(is_begin)
   inside <- block > cumsum(is_end)
-  is_field <- inside & !is_begin & grepl("=", lines, fixed = TRUE)
+  has_eq <- regexpr("=", lines, fixed = TRUE) > 0L
+  is_field <- inside & !is_begin & has_eq
 
   if (!any(is_field)) {
     return(tidytable::tidytable())
@@ -398,10 +437,10 @@ read_mgf_metadata <- function(f) {
 
   fields <- lines[is_field]
   field_blocks <- block[is_field]
-  rm(lines, is_begin, is_end, block, inside, is_field)
+  rm(lines, is_begin, is_end, block, inside, has_eq, is_field)
 
   eq <- regexpr("=", fields, fixed = TRUE)
-  keys <- toupper(trimws(substring(fields, 1L, eq - 1L)))
+  keys <- toupper(trimws(substr(fields, 1L, eq - 1L)))
   vals <- trimws(substring(fields, eq + 1L))
 
   u_blocks <- unique(field_blocks)

@@ -239,25 +239,32 @@ prepare_features_tables <- function(
 ) {
   core_cols <- c(name_features, name_rt, name_mz, name_adduct)
 
-  # Detect and select columns for mzmine (Peak area/height), SLAW (quant_),
-  # SIRIUS
-  selected <- tbl |>
-    tidytable::select(
-      tidyselect::any_of(x = core_cols),
-      tidyselect::matches(match = " Peak area"),
-      tidyselect::matches(match = ":area"),
-      tidyselect::matches(match = "quant_"),
-      tidyselect::matches(match = " Peak height")
-    ) |>
-    tidytable::select(-tidyselect::matches(match = "quant_peaktable"))
+  all_cols <- colnames(tbl)
+  is_core <- all_cols %in% core_cols
+  is_intensity <- !is_core &
+    (grepl(" Peak area", all_cols, fixed = TRUE) |
+      grepl(":area", all_cols, fixed = TRUE) |
+      grepl("quant_", all_cols, fixed = TRUE) |
+      grepl(" Peak height", all_cols, fixed = TRUE)) &
+    !grepl("quant_peaktable", all_cols, fixed = TRUE)
 
-  # Fallback for mzTab-derived tables where sample columns are plain names.
-  selected_non_core <- setdiff(colnames(selected), core_cols)
-  if (length(selected_non_core) == 0L) {
-    candidate_cols <- setdiff(colnames(tbl), core_cols)
+  if (any(is_intensity)) {
+    # Order matches original tidyselect: core_cols first, then Peak area, :area, quant_, Peak height
+    core_present <- intersect(core_cols, all_cols)
+    int_present <- unique(c(
+      all_cols[is_intensity & grepl(" Peak area", all_cols, fixed = TRUE)],
+      all_cols[is_intensity & grepl(":area", all_cols, fixed = TRUE)],
+      all_cols[is_intensity & grepl("quant_", all_cols, fixed = TRUE)],
+      all_cols[is_intensity & grepl(" Peak height", all_cols, fixed = TRUE)]
+    ))
+    keep_cols <- c(core_present, int_present)
+    selected <- tidytable::as_tidytable(as.list(tbl)[keep_cols])
+  } else {
+    core_present <- intersect(core_cols, all_cols)
+    candidate_cols <- setdiff(all_cols, core_cols)
 
     is_numeric_like <- function(x) {
-      vals <- as.character(x)
+      vals <- if (is.character(x)) x else as.character(x)
       vals <- vals[!is.na(vals) & nzchar(vals)]
       if (length(vals) == 0L) {
         return(FALSE)
@@ -267,7 +274,7 @@ prepare_features_tables <- function(
     }
 
     numeric_like_cols <- candidate_cols[vapply(
-      X = tbl[, ..candidate_cols],
+      X = as.list(tbl)[candidate_cols],
       FUN = is_numeric_like,
       FUN.VALUE = logical(1L)
     )]
@@ -277,23 +284,23 @@ prepare_features_tables <- function(
         "No standard intensity patterns found; using %d numeric-like column(s) as intensities",
         length(numeric_like_cols)
       )
-      selected <- tbl |>
-        tidytable::select(
-          tidyselect::any_of(x = core_cols),
-          tidyselect::all_of(numeric_like_cols)
-        )
+      keep_cols <- c(core_present, numeric_like_cols)
+      selected <- tidytable::as_tidytable(as.list(tbl)[keep_cols])
+    } else {
+      selected <- tidytable::as_tidytable(as.list(tbl)[core_present])
     }
   }
 
   # When both Peak area and Peak height are present for the same samples,
   # prefer Peak area and drop Peak height duplicates
-  area_cols <- grep(" Peak area$", colnames(selected), value = TRUE)
-  height_cols <- grep(" Peak height$", colnames(selected), value = TRUE)
+  sel_cols <- colnames(selected)
+  area_cols <- sel_cols[endsWith(sel_cols, " Peak area")]
+  height_cols <- sel_cols[endsWith(sel_cols, " Peak height")]
 
   if (length(area_cols) > 0L && length(height_cols) > 0L) {
     # Derive sample stems by stripping suffixes
-    area_stems <- sub(" Peak area$", "", area_cols)
-    height_stems <- sub(" Peak height$", "", height_cols)
+    area_stems <- substr(area_cols, 1L, nchar(area_cols) - 10L)
+    height_stems <- substr(height_cols, 1L, nchar(height_cols) - 12L)
     redundant_heights <- height_cols[height_stems %in% area_stems]
 
     if (length(redundant_heights) > 0L) {
@@ -301,8 +308,8 @@ prepare_features_tables <- function(
         "Both Peak area and Peak height detected for %d sample(s); using Peak area",
         length(redundant_heights)
       )
-      selected <- selected |>
-        tidytable::select(-tidyselect::all_of(redundant_heights))
+      keep_after <- setdiff(sel_cols, redundant_heights)
+      selected <- tidytable::as_tidytable(as.list(selected)[keep_after])
     }
   }
 

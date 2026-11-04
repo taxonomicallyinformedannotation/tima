@@ -88,7 +88,9 @@ read_mztab <- function(
 
   ctx <- log_operation("read_mztab", input = basename(input))
 
-  tabs <- read_mztab_tables(input)
+  tabs <- read_mztab_tables(input, include_raw_lines = !is.null(output_spectra))
+  raw_lines <- attr(tabs, ".raw_lines", exact = TRUE)
+  attr(tabs, ".raw_lines") <- NULL
   validate_mztab_tables(tabs, strict = strict)
 
   features <- .mztab_to_features(
@@ -106,7 +108,13 @@ read_mztab <- function(
   spectra_source <- "none"
   if (!is.null(output_spectra)) {
     # Try to extract embedded masster-style COM MGF spectra first
-    embedded <- .extract_embedded_mgf(input, features, name_features)
+    embedded <- .extract_embedded_mgf(
+      input,
+      features,
+      name_features,
+      lines = raw_lines
+    )
+    rm(raw_lines)
     if (!is.null(embedded)) {
       rm(features)
       create_dir(output_spectra)
@@ -276,13 +284,13 @@ read_mztab <- function(
         !is.null(smf_lookup[[smf_field]])
     ) {
       smf_vals <- smf_lookup[[smf_field]][smf_match_idx]
-      idx <- is.na(vals) |
-        (
-          # Also replace zero m/z placeholders from SML with SMF values
-          smf_field == "mz" &
-            !is.na(suppressWarnings(as.numeric(vals))) &
-            suppressWarnings(as.numeric(vals)) == 0
-        )
+      idx <- if (smf_field == "mz") {
+        # Also replace zero m/z placeholders from SML with SMF values
+        vals_num <- suppressWarnings(as.numeric(vals))
+        is.na(vals) | (!is.na(vals_num) & vals_num == 0)
+      } else {
+        is.na(vals)
+      }
       vals[idx] <- smf_vals[idx]
     }
     vals
@@ -410,8 +418,13 @@ read_mztab <- function(
 #' @return Character vector of extracted names (NA where parsing fails).
 #' @keywords internal
 .parse_mztab_cv_name <- function(x) {
-  vapply(
-    x,
+  if (length(x) == 0L) {
+    return(character(0))
+  }
+  x_chr <- if (is.character(x)) x else as.character(x)
+  u <- unique(x_chr)
+  u_out <- vapply(
+    u,
     function(term) {
       if (is.na(term) || !nzchar(term)) {
         return(NA_character_)
@@ -436,6 +449,7 @@ read_mztab <- function(
     FUN.VALUE = character(1L),
     USE.NAMES = FALSE
   )
+  if (length(u) == length(x_chr)) u_out else u_out[fastmatch::fmatch(x_chr, u)]
 }
 
 #' Build a sample-ID to species-name map from mzTab MTD rows.
@@ -627,45 +641,110 @@ read_mztab <- function(
 #'
 #' @return Character vector of MGF lines, or NULL if no embedded spectra found.
 #' @keywords internal
-.extract_embedded_mgf <- function(input, features, id_col) {
-  lines <- readLines(input, warn = FALSE, encoding = "UTF-8")
-  if (length(lines) > 0L) {
-    lines[[1L]] <- sub("^\ufeff", "", lines[[1L]])
+.extract_embedded_mgf <- function(input, features, id_col, lines = NULL) {
+  if (is.null(lines)) {
+    lines <- readLines(input, warn = FALSE, encoding = "UTF-8")
+    if (length(lines) > 0L) {
+      lines[[1L]] <- sub("^\ufeff", "", lines[[1L]])
+    }
+    lines <- .normalize_mztab_prefix_sep(lines)
   }
-  lines <- .normalize_mztab_prefix_sep(lines)
 
   # Detect COM MGH header (masster-specific)
-  mgh_lines <- grep("^COM\t[Mm][Gg][Hh]\t", lines, value = TRUE, perl = TRUE)
+  com_lines <- lines[startsWith(lines, "COM\t")]
+  if (length(com_lines) == 0L) {
+    return(NULL)
+  }
+  mgh_lines <- grep(
+    "^COM\t[Mm][Gg][Hh]\t",
+    com_lines,
+    value = TRUE,
+    perl = TRUE
+  )
   if (length(mgh_lines) == 0L) {
     return(NULL)
   }
 
   # Parse column names from first MGH line
   mgh_cols <- strsplit(mgh_lines[[1L]], "\t", fixed = TRUE)[[1L]]
-  # mgh_cols[1]="COM", mgh_cols[2]="MGH", mgh_cols[3:] = column names
+  if (length(mgh_cols) < 3L) {
+    return(NULL)
+  }
   col_names <- mgh_cols[seq(3L, length(mgh_cols))]
 
   # Parse COM MGF data rows
   mgf_data_lines <- grep(
     "^COM\t[Mm][Gg][Ff]\t",
-    lines,
+    com_lines,
     value = TRUE,
     perl = TRUE
   )
-  if (length(mgf_data_lines) == 0L) {
+  n_spec <- length(mgf_data_lines)
+  if (n_spec == 0L) {
     return(NULL)
   }
 
   col_idx <- stats::setNames(seq_along(col_names), col_names)
-  get_col <- function(vals, name) {
-    i <- col_idx[[name]]
-    if (is.null(i) || i > length(vals)) NA_character_ else vals[[i]]
+
+  # Split all MGF lines at once
+  all_parts <- strsplit(mgf_data_lines, "\t", fixed = TRUE)
+  part_lens <- lengths(all_parts)
+  target_len <- length(col_names) + 2L
+  uniform_len <- all(part_lens == target_len)
+  mat_parts <- if (uniform_len) {
+    matrix(
+      unlist(all_parts, use.names = FALSE),
+      nrow = target_len,
+      ncol = n_spec
+    )
+  } else {
+    NULL
   }
+
+  extract_col_vec <- function(name) {
+    idx <- col_idx[[name]]
+    if (is.null(idx)) {
+      return(rep.int(NA_character_, n_spec))
+    }
+    pos <- idx + 2L
+    if (uniform_len && pos <= target_len) {
+      return(mat_parts[pos, ])
+    }
+    if (all(part_lens >= pos)) {
+      vapply(all_parts, `[[`, character(1L), pos)
+    } else {
+      out <- rep.int(NA_character_, n_spec)
+      ok <- which(part_lens >= pos)
+      if (length(ok) > 0L) {
+        out[ok] <- vapply(all_parts[ok], `[[`, character(1L), pos)
+      }
+      out
+    }
+  }
+
+  prec_mz_raw <- extract_col_vec("prec_mz")
+  prec_mz_all <- suppressWarnings(as.numeric(prec_mz_raw))
+  valid_spec <- which(!is.na(prec_mz_all) & prec_mz_all > 0)
+  n_entries <- length(valid_spec)
+  if (n_entries == 0L) {
+    return(NULL)
+  }
+
+  mgf_id_all <- extract_col_vec("mgf_id")[valid_spec]
+  prec_mz <- prec_mz_all[valid_spec]
+  prec_rt <- suppressWarnings(
+    as.numeric(extract_col_vec("prec_rt")[valid_spec])
+  )
+  ms_level <- extract_col_vec("level")[valid_spec]
+  title <- extract_col_vec("title")[valid_spec]
+  spec_mz_raw <- extract_col_vec("spec_mz")[valid_spec]
+  spec_int_raw <- extract_col_vec("spec_int")[valid_spec]
+  rm(all_parts, mat_parts, prec_mz_raw, prec_mz_all)
 
   # ── Build mgf_id → feature_id reverse lookup ─────────────────────────────
   # masster stores a per-feature comma-separated list of mgf_id values in the
-  # optional column "opt_global_mgf_index".  We invert this to get the fast
-  # mgf_id → SML_ID lookup used inside the per-spectrum loop.
+  # optional column "opt_global_mgf_index". We invert this to get the fast
+  # mgf_id → SML_ID lookup across all spectra.
   map_keys <- character(0)
   map_vals <- character(0)
   if (
@@ -691,142 +770,205 @@ read_mztab <- function(
   }
 
   # ── Build feature_id set for direct mgf_id fallback ─────────────────────
-  # Used when there is no opt_global_mgf_index mapping but mgf_id happens to
-  # equal the feature ID (single-spectrum-per-feature masster style).
   feature_id_set <- if (id_col %in% names(features)) {
     as.character(features[[id_col]])
   } else {
     character(0)
   }
 
-  has_map <- length(map_keys) > 0L
-  has_fid_set <- length(feature_id_set) > 0L
+  # ── Resolve FEATURE_ID across all valid spectra ─────────────────────────
+  feature_id_val <- rep.int(NA_character_, n_entries)
+  valid_mgf_id <- !is.na(mgf_id_all) & nzchar(mgf_id_all)
 
-  out_entries <- vector("list", length(mgf_data_lines))
-  n_entries <- 0L
-  for (line in mgf_data_lines) {
-    parts <- strsplit(line, "\t", fixed = TRUE)[[1L]]
-    # parts[1]="COM", parts[2]="MGF", parts[3:] = values
-    vals <- parts[seq(3L, length(parts))]
-
-    mgf_id <- get_col(vals, "mgf_id")
-    prec_mz <- suppressWarnings(as.numeric(get_col(vals, "prec_mz")))
-    prec_rt <- suppressWarnings(as.numeric(get_col(vals, "prec_rt")))
-    ms_level <- get_col(vals, "level")
-    title <- get_col(vals, "title")
-    spec_mz_raw <- get_col(vals, "spec_mz")
-    spec_int_raw <- get_col(vals, "spec_int")
-
-    if (is.na(prec_mz) || prec_mz <= 0) {
-      next
+  # Priority 1: opt_global_mgf_index reverse lookup
+  if (length(map_keys) > 0L && any(valid_mgf_id)) {
+    idx_p1 <- which(valid_mgf_id)
+    m_idx <- fastmatch::fmatch(mgf_id_all[idx_p1], map_keys)
+    hit_p1 <- !is.na(m_idx)
+    if (any(hit_p1)) {
+      feature_id_val[idx_p1[hit_p1]] <- map_vals[m_idx[hit_p1]]
     }
+  }
 
-    # ── Resolve FEATURE_ID for this spectrum ────────────────────────────────
-    # Priority 1: opt_global_mgf_index reverse lookup
-    feature_id_val <- NULL
-    if (has_map && !is.na(mgf_id) && nzchar(mgf_id)) {
-      m_idx <- fastmatch::fmatch(mgf_id, map_keys)
-      if (!is.na(m_idx)) {
-        feature_id_val <- map_vals[[m_idx]]
+  # Priority 2: parse "id:<N>" from TITLE (newer masster, e.g. "id:42, rt:...")
+  # Note: matches "id:" but NOT "uid:", "scan_id:", "_id:", etc.
+  need_p2 <- which(is.na(feature_id_val) & !is.na(title) & nzchar(title))
+  if (length(need_p2) > 0L) {
+    t_sub <- title[need_p2]
+    rx <- regexpr("(?<![_a-zA-Z])id:(\\d+)", t_sub, perl = TRUE)
+    hit_p2 <- rx > 0L
+    if (any(hit_p2)) {
+      m_str <- substr(
+        t_sub[hit_p2],
+        rx[hit_p2] + 3L,
+        rx[hit_p2] + attr(rx, "match.length")[hit_p2] - 1L
+      )
+      feature_id_val[need_p2[hit_p2]] <- m_str
+    }
+  }
+
+  # Priority 3: use mgf_id directly when it matches a known feature ID
+  if (length(feature_id_set) > 0L) {
+    need_p3 <- which(is.na(feature_id_val) & valid_mgf_id)
+    if (length(need_p3) > 0L) {
+      hit_p3 <- !is.na(fastmatch::fmatch(mgf_id_all[need_p3], feature_id_set))
+      if (any(hit_p3)) {
+        feature_id_val[need_p3[hit_p3]] <- mgf_id_all[need_p3[hit_p3]]
       }
     }
+  }
 
-    # Priority 2: parse "id:<N>" from TITLE (newer masster, e.g. "id:42, rt:...")
-    # Note: matches "id:" but NOT "uid:", "scan_id:", "_id:", etc.
-    if (is.null(feature_id_val) && !is.na(title) && nzchar(title)) {
-      m <- regmatches(
-        title,
-        regexpr("(?<![_a-zA-Z])id:(\\d+)", title, perl = TRUE)
-      )
-      if (length(m) > 0L && nzchar(m)) {
-        feature_id_val <- sub(".*id:", "", m)
-      }
-    }
-
-    # Priority 3: use mgf_id directly when it matches a known feature ID
-    if (
-      is.null(feature_id_val) &&
-        has_fid_set &&
-        !is.na(mgf_id) &&
-        nzchar(mgf_id) &&
-        !is.na(fastmatch::fmatch(mgf_id, feature_id_set))
-    ) {
-      feature_id_val <- mgf_id
-    }
-
-    # ── Build TITLE string ───────────────────────────────────────────────────
-    entry_title <- if (!is.na(title) && nzchar(title) && title != "null") {
-      title
-    } else {
-      feature_id_val %||%
-        if (!is.na(mgf_id) && nzchar(mgf_id)) {
-          paste0("mgf_id:", mgf_id)
-        } else {
-          paste0("mz:", format(prec_mz, scientific = FALSE))
-        }
-    }
-
-    # ── Parse fragment peaks ─────────────────────────────────────────────────
-    mz_parts <- if (
-      !is.na(spec_mz_raw) && nzchar(spec_mz_raw) && spec_mz_raw != "null"
-    ) {
-      strsplit(spec_mz_raw, "|", fixed = TRUE)[[1L]]
-    } else {
-      character(0)
-    }
-    int_parts <- if (
-      !is.na(spec_int_raw) && nzchar(spec_int_raw) && spec_int_raw != "null"
-    ) {
-      strsplit(spec_int_raw, "|", fixed = TRUE)[[1L]]
-    } else {
-      character(0)
-    }
-    n_peaks <- min(length(mz_parts), length(int_parts))
-
-    # ── Assemble MGF entry ───────────────────────────────────────────────────
-    entry <- c(
-      "BEGIN IONS",
-      paste0("TITLE=", entry_title)
-    )
-    if (!is.null(feature_id_val)) {
-      entry <- c(entry, paste0("FEATURE_ID=", feature_id_val))
-    }
-    entry <- c(
-      entry,
-      paste0("PEPMASS=", format(prec_mz, scientific = FALSE, trim = TRUE))
-    )
-    if (!is.na(prec_rt) && is.finite(prec_rt)) {
-      entry <- c(
-        entry,
-        paste0("RTINSECONDS=", format(prec_rt, scientific = FALSE, trim = TRUE))
+  format_num_vec <- function(x) {
+    u <- unique(x)
+    s <- as.character(u)
+    sci <- grep("[eE]", s)
+    if (length(sci) > 0L) {
+      s[sci] <- vapply(
+        u[sci],
+        function(v) format(v, scientific = FALSE, trim = TRUE),
+        character(1L)
       )
     }
-    if (!is.na(ms_level) && nzchar(ms_level) && ms_level != "null") {
-      entry <- c(entry, paste0("MSLEVEL=", ms_level))
-    }
+    if (length(u) == length(x)) s else s[fastmatch::fmatch(x, u)]
+  }
 
-    mz_p <- suppressWarnings(as.numeric(mz_parts[seq_len(n_peaks)]))
-    int_p <- suppressWarnings(as.numeric(int_parts[seq_len(n_peaks)]))
-    valid_p <- !is.na(mz_p) & is.finite(mz_p) & !is.na(int_p) & is.finite(int_p)
-    if (any(valid_p)) {
-      entry <- c(
-        entry,
-        paste(
-          format(mz_p[valid_p], scientific = FALSE, trim = TRUE),
-          format(int_p[valid_p], scientific = FALSE, trim = TRUE)
+  # ── Build TITLE string ───────────────────────────────────────────────────
+  valid_title <- !is.na(title) & nzchar(title) & title != "null"
+  entry_title <- title
+  if (!all(valid_title)) {
+    miss_t <- which(!valid_title)
+    has_fid <- !is.na(feature_id_val[miss_t])
+    if (any(has_fid)) {
+      entry_title[miss_t[has_fid]] <- feature_id_val[miss_t[has_fid]]
+    }
+    still_miss <- miss_t[!has_fid]
+    if (length(still_miss) > 0L) {
+      has_mid <- valid_mgf_id[still_miss]
+      if (any(has_mid)) {
+        entry_title[still_miss[has_mid]] <- paste0(
+          "mgf_id:",
+          mgf_id_all[still_miss[has_mid]]
         )
-      )
+      }
+      no_mid <- still_miss[!has_mid]
+      if (length(no_mid) > 0L) {
+        entry_title[no_mid] <- paste0("mz:", format_num_vec(prec_mz[no_mid]))
+      }
     }
-
-    entry <- c(entry, "END IONS", "")
-    n_entries <- n_entries + 1L
-    out_entries[[n_entries]] <- entry
   }
 
-  out_lines <- if (n_entries == 0L) {
-    NULL
-  } else {
-    unlist(out_entries[seq_len(n_entries)], use.names = FALSE)
+  pepmass_lines <- paste0("PEPMASS=", format_num_vec(prec_mz))
+  valid_rt <- !is.na(prec_rt) & is.finite(prec_rt)
+  rt_lines <- rep.int(NA_character_, n_entries)
+  if (any(valid_rt)) {
+    rt_lines[valid_rt] <- paste0(
+      "RTINSECONDS=",
+      format_num_vec(prec_rt[valid_rt])
+    )
   }
+  valid_mslevel <- !is.na(ms_level) & nzchar(ms_level) & ms_level != "null"
+  mslevel_lines <- rep.int(NA_character_, n_entries)
+  if (any(valid_mslevel)) {
+    mslevel_lines[valid_mslevel] <- paste0("MSLEVEL=", ms_level[valid_mslevel])
+  }
+  has_fid_all <- !is.na(feature_id_val)
+  fid_lines <- rep.int(NA_character_, n_entries)
+  if (any(has_fid_all)) {
+    fid_lines[has_fid_all] <- paste0("FEATURE_ID=", feature_id_val[has_fid_all])
+  }
+  title_lines <- paste0("TITLE=", entry_title)
+
+  # ── Parse and format fragment peaks across all spectra ──────────────────
+  valid_mz_raw <- !is.na(spec_mz_raw) &
+    nzchar(spec_mz_raw) &
+    spec_mz_raw != "null"
+  valid_int_raw <- !is.na(spec_int_raw) &
+    nzchar(spec_int_raw) &
+    spec_int_raw != "null"
+  both_raw <- which(valid_mz_raw & valid_int_raw)
+
+  peak_blocks <- vector("list", n_entries)
+  if (length(both_raw) > 0L) {
+    mz_sp <- strsplit(spec_mz_raw[both_raw], "|", fixed = TRUE)
+    int_sp <- strsplit(spec_int_raw[both_raw], "|", fixed = TRUE)
+    len_mz <- lengths(mz_sp)
+    len_int <- lengths(int_sp)
+    n_peaks_vec <- pmin.int(len_mz, len_int)
+    mismatch_len <- which(len_mz != n_peaks_vec | len_int != n_peaks_vec)
+    if (length(mismatch_len) > 0L) {
+      for (idx_m in mismatch_len) {
+        np <- n_peaks_vec[[idx_m]]
+        mz_sp[[idx_m]] <- if (np > 0L) {
+          mz_sp[[idx_m]][seq_len(np)]
+        } else {
+          character(0)
+        }
+        int_sp[[idx_m]] <- if (np > 0L) {
+          int_sp[[idx_m]][seq_len(np)]
+        } else {
+          character(0)
+        }
+      }
+    }
+    has_peaks <- n_peaks_vec > 0L
+    if (any(has_peaks)) {
+      idx_hp <- both_raw[has_peaks]
+      np_hp <- n_peaks_vec[has_peaks]
+      flat_mz_chr <- unlist(mz_sp[has_peaks], use.names = FALSE)
+      flat_int_chr <- unlist(int_sp[has_peaks], use.names = FALSE)
+      rm(mz_sp, int_sp)
+
+      flat_mz_num <- suppressWarnings(as.numeric(flat_mz_chr))
+      flat_int_num <- suppressWarnings(as.numeric(flat_int_chr))
+      rm(flat_mz_chr, flat_int_chr)
+
+      valid_p <- !is.na(flat_mz_num) &
+        is.finite(flat_mz_num) &
+        !is.na(flat_int_num) &
+        is.finite(flat_int_num)
+
+      if (any(valid_p)) {
+        spec_grp <- rep.int(seq_along(idx_hp), np_hp)
+        if (!all(valid_p)) {
+          flat_mz_num <- flat_mz_num[valid_p]
+          flat_int_num <- flat_int_num[valid_p]
+          spec_grp <- spec_grp[valid_p]
+        }
+        mz_fmt <- format_num_vec(flat_mz_num)
+        int_fmt <- format_num_vec(flat_int_num)
+        rm(flat_mz_num, flat_int_num)
+        peak_str <- paste(mz_fmt, int_fmt)
+        rm(mz_fmt, int_fmt)
+
+        n_hp <- length(idx_hp)
+        grp_fac <- structure(
+          spec_grp,
+          levels = as.character(seq_len(n_hp)),
+          class = "factor"
+        )
+        split_peaks <- split.default(peak_str, grp_fac)
+        names(split_peaks) <- NULL
+        peak_blocks[idx_hp] <- split_peaks
+      }
+    }
+  }
+
+  # ── Assemble MGF entries ─────────────────────────────────────────────────
+  out_entries <- vector("list", n_entries)
+  for (i in seq_len(n_entries)) {
+    out_entries[[i]] <- c(
+      "BEGIN IONS",
+      title_lines[[i]],
+      if (has_fid_all[[i]]) fid_lines[[i]],
+      pepmass_lines[[i]],
+      if (valid_rt[[i]]) rt_lines[[i]],
+      if (valid_mslevel[[i]]) mslevel_lines[[i]],
+      peak_blocks[[i]],
+      "END IONS",
+      ""
+    )
+  }
+
+  out_lines <- unlist(out_entries, use.names = FALSE)
   if (length(out_lines) == 0L) NULL else out_lines
 }

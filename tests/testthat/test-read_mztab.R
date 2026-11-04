@@ -22,6 +22,59 @@ test_that(".parse_mztab_cv_name handles escaped commas in Param values", {
   expect_equal(.parse_mztab_cv_name(x), "Homo sapiens")
 })
 
+test_that(".parse_mztab_cv_name deduplicates repeated terms and handles empty vectors", {
+  expect_identical(.parse_mztab_cv_name(character(0)), character(0))
+  terms <- c(
+    "[NCBITaxon, NCBITaxon:9606, Homo sapiens, ]",
+    "Arabidopsis thaliana",
+    "[NCBITaxon, NCBITaxon:9606, Homo sapiens, ]",
+    NA_character_,
+    ""
+  )
+  expect_identical(
+    .parse_mztab_cv_name(terms),
+    c(
+      "Homo sapiens",
+      "Arabidopsis thaliana",
+      "Homo sapiens",
+      NA_character_,
+      NA_character_
+    )
+  )
+})
+
+test_that(".extract_embedded_mgf handles direct mgf_id fallback, missing titles, and unequal peak lists", {
+  features <- data.frame(
+    feature_id = c("10", "20", "30"),
+    mz = c(150.5, 250.5, 350.5),
+    rt = c(1.0, 2.0, 3.0),
+    adduct = c("[M+H]+", "[M+H]+", "[M+H]+"),
+    stringsAsFactors = FALSE
+  )
+  raw_lines <- c(
+    "COM\tMGH\tmgf_id\tprec_mz\tprec_rt\tlevel\ttitle\tspec_mz\tspec_int",
+    "COM\tMGF\t10\t150.5\t60\t2\tnull\t50.1|75.2|90.3\t100|200",
+    "COM\tMGF\t99\t250.5\t120\tnull\tnull\t80.1\t300|400",
+    "COM\tMGF\t\t350.5\tnull\t2\tnull\tnull\tnull",
+    "COM\tMGF\t30\t-5\t60\t2\tbad_mz\t50\t100"
+  )
+  mgf_out <- .extract_embedded_mgf(
+    input = "unused.mztab",
+    features = features,
+    id_col = "feature_id",
+    lines = raw_lines
+  )
+  expect_true(!is.null(mgf_out))
+  expect_equal(sum(mgf_out == "BEGIN IONS"), 3L)
+  expect_true("TITLE=10" %in% mgf_out)
+  expect_true("FEATURE_ID=10" %in% mgf_out)
+  expect_true("TITLE=mgf_id:99" %in% mgf_out)
+  expect_true("TITLE=mz:350.5" %in% mgf_out)
+  expect_true("50.1 100" %in% mgf_out)
+  expect_true("75.2 200" %in% mgf_out)
+  expect_false(any(grepl("^90\\.3 ", mgf_out)))
+})
+
 test_that(".mztab_sample_species_map extracts Homo sapiens from lipidcompass fixture", {
   mztab_file <- resolve_fixture_path(
     "mztab/lipidcompass-script_226ea96_MTD_SML_LCS-00001-01.mztab"

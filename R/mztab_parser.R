@@ -454,7 +454,7 @@ NULL
 }
 
 #' @keywords internal
-read_mztab_tables <- function(input) {
+read_mztab_tables <- function(input, include_raw_lines = FALSE) {
   validate_character(input, param_name = "input")
   validate_file_exists(input, file_type = "mzTab-M file", param_name = "input")
 
@@ -496,7 +496,7 @@ read_mztab_tables <- function(input) {
 
   lines <- .normalize_mztab_prefix_sep(lines)
 
-  list(
+  out <- list(
     metadata = .parse_mztab_metadata(lines),
     sml = .parse_mztab_section_table(
       lines,
@@ -514,4 +514,8 @@ read_mztab_tables <- function(input) {
       MZTAB_SECTION_PREFIX$small_molecule_evidence
     )
   )
+  if (isTRUE(include_raw_lines)) {
+    attr(out, ".raw_lines") <- lines
+  }
+  out
 }
