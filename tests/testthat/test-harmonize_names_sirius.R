@@ -246,8 +246,9 @@ test_that("harmonize_names_sirius scales linearly", {
   time_small <- system.time(harmonize_names_sirius(small))
   time_large <- system.time(harmonize_names_sirius(large))
 
-  # Should scale roughly linearly (within 20x for 10x data)
-  ratio <- time_large["elapsed"] / time_small["elapsed"]
+  # Should scale roughly linearly (within 20x for 10x data; guard 1ms timer resolution)
+  ratio <- unname(time_large["elapsed"]) /
+    max(unname(time_small["elapsed"]), 1e-3)
   expect_lt(ratio, 20)
 })
 
