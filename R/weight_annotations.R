@@ -458,7 +458,8 @@ weight_annotations <- function(
       "feature_id" %in% names(annotation_table) &&
       !anyDuplicated(taxa_table$feature_id)
   ) {
-    annotation_table_taxed <- tidytable::as_tidytable(as.list(annotation_table))
+    annotation_table_taxed <- annotation_table
+    annotation_table <- NULL
     t_fids <- taxa_table$feature_id
     a_fids <- annotation_table_taxed$feature_id
     m_tax <- if (anyNA(t_fids) || anyNA(a_fids)) {
@@ -475,7 +476,11 @@ weight_annotations <- function(
     }
     rm(t_fids, a_fids, m_tax)
   } else {
-    annotation_table_taxed <- annotation_table |>
+    annotation_table_taxed <- {
+      tmp_ann <- annotation_table
+      annotation_table <- NULL
+      tmp_ann
+    } |>
       tidytable::left_join(
         y = taxa_table,
         by = "feature_id"

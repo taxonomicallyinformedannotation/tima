@@ -400,7 +400,7 @@ annotate_spectra <- function(
     gc(verbose = FALSE)
   }
 
-  if (length(df_chunks) == 0L) {
+  if (n_lib_count == 0L) {
     msg <- if (isFALSE(approx)) {
       "No spectra remain after precursor-based reduction"
     } else {
@@ -416,7 +416,11 @@ annotate_spectra <- function(
   }
 
   # Concatenate all library results at end
-  df_final <- tidytable::bind_rows(df_chunks)
+  df_final <- if (length(df_chunks) > 0L) {
+    tidytable::bind_rows(df_chunks)
+  } else {
+    tidytable::tidytable()
+  }
   rm(df_chunks)
 
   n_query_count <- length(query_sp)
@@ -1244,6 +1248,8 @@ compute_similarity_safe <- function(
   lib_prec_match <- as.numeric(lib_prec)
   query_ids <- get_spectra_ids(query_sp)
 
+  eff_threshold <- max(as.numeric(threshold), .Machine$double.eps)
+
   run_similarity <- function(
     lib_ids,
     lib_precursors,
@@ -1263,11 +1269,26 @@ compute_similarity_safe <- function(
       method = method,
       dalton = dalton,
       ppm = ppm,
-      threshold = threshold,
+      threshold = eff_threshold,
       approx = approx
     )
     if (nrow(out) == 0L) {
       return(tidytable::tidytable())
+    }
+    if ("candidate_score_similarity" %in% names(out)) {
+      keep_pos <- !is.na(out$candidate_score_similarity) &
+        as.numeric(out$candidate_score_similarity) > 0
+      if ("candidate_count_similarity_peaks_matched" %in% names(out)) {
+        keep_pos <- keep_pos &
+          !is.na(out$candidate_count_similarity_peaks_matched) &
+          as.integer(out$candidate_count_similarity_peaks_matched) > 0L
+      }
+      if (!all(keep_pos)) {
+        out <- out[which(keep_pos), , drop = FALSE]
+        if (nrow(out) == 0L) {
+          return(tidytable::tidytable())
+        }
+      }
     }
     out <- tidytable::as_tidytable(out)
     data.table::set(out, j = ".similarity_space", value = space_label)

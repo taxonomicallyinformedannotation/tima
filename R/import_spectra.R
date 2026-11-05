@@ -268,7 +268,7 @@ import_spectra <- function(
     n_removed <- n_before - n_after
     if (n_removed > 0L) {
       n_ms1_skipped <- n_removed
-      log_debug(
+      log_info(
         "Filtered to MS2 spectra: %d -> %d (%d removed)",
         n_before,
         n_after,

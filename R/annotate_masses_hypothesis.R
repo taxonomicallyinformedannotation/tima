@@ -2079,12 +2079,23 @@ prune_candidates_by_network_consensus <- function(
   } else {
     !is.na(add_col) & add_col == baseline_adduct
   }
+  feat_has_baseline_match <- logical(n_f)
+  feat_has_baseline_match[f_id[baseline_match]] <- TRUE
+  has_baseline_match <- feat_has_baseline_match[f_id]
+  is_non_primary_baseline <- !baseline_match &
+    !is.na(src_col) &
+    src_col == "baseline" &
+    has_baseline_match
 
   is_safe <- baseline_match |
     is_pre |
-    (!is.na(src_col) & src_col %in% c("preassigned", "baseline")) |
+    (!is.na(src_col) &
+      src_col %in% c("preassigned", "baseline") &
+      !is_non_primary_baseline) |
     (net_support > 0L) |
-    (max_support_zero & !(!is.na(src_col) & src_col == "multi" & has_non_multi))
+    (max_support_zero &
+      !is_non_primary_baseline &
+      !(!is.na(src_col) & src_col == "multi" & has_non_multi))
 
   drop <- !is_safe & multi_candidates
 

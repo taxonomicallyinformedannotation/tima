@@ -2864,7 +2864,7 @@ enforce_non_conflicting_annotation_states <- function(
       !is.na(src_col) &
         src_col %in% c("pair", "preassigned", "preassigned_propagated")
     ] <- 2L
-    supp_class_rank[has_err] <- 1L
+    supp_class_rank[!has_err] <- supp_class_rank[!has_err] + 10L
 
     # Unconstrained features have keep == TRUE for all their rows; pick best
     # (min supp_class_rank, max supp_strength) per unconstrained feature.

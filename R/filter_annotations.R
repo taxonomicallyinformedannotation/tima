@@ -227,6 +227,7 @@ filter_annotations <- function(
     rts <- NULL
   }
 
+  n_before_rt <- nrow(features_annotated_table_1)
   if (!is.null(rts)) {
     rt_table <- Map(
       function(x, y) {
@@ -258,18 +259,27 @@ filter_annotations <- function(
     log_debug("Loaded %d retention time standards", n_rt_standards)
 
     features_annotated_table_2 <- apply_rt_filter(
-      features_annotated_table_1,
+      {
+        tmp_rt_in <- features_annotated_table_1
+        features_annotated_table_1 <- NULL
+        tmp_rt_in
+      },
       rt_table,
       tolerance_rt
     )
+    rm(rt_table)
   } else {
     log_debug("No RT library provided, skipping RT filtering")
     features_annotated_table_2 <- features_annotated_table_1
-    features_annotated_table_2$candidate_structure_error_rt <- NA_real_
+    features_annotated_table_1 <- NULL
+    data.table::set(
+      features_annotated_table_2,
+      j = "candidate_structure_error_rt",
+      value = NA_real_
+    )
   }
 
-  n_dedup_rt <- nrow(features_annotated_table_1) -
-    nrow(features_annotated_table_2)
+  n_dedup_rt <- n_before_rt - nrow(features_annotated_table_2)
   if (n_dedup_rt > 0L) {
     log_info(
       "Removed %d duplicate RT library matches during join",
@@ -283,20 +293,24 @@ filter_annotations <- function(
   missing_idx <- which(is.na(
     fastmatch::fmatch(features_table$feature_id, u_ann_f)
   ))
+  rm(u_ann_f)
   if (length(missing_idx) > 0L) {
     unannotated <- features_table[missing_idx, ]
+    rm(features_table)
     final_table <- tidytable::bind_rows(
-      features_annotated_table_2,
+      {
+        tmp_ann2 <- features_annotated_table_2
+        features_annotated_table_2 <- NULL
+        tmp_ann2
+      },
       unannotated
     )
+    rm(unannotated, features_annotated_table_2)
   } else {
+    rm(features_table)
     final_table <- features_annotated_table_2
+    rm(features_annotated_table_2)
   }
-
-  rm(
-    features_table,
-    features_annotated_table_2
-  )
 
   export_params(
     parameters = get_params(step = "filter_annotations"),

@@ -1917,6 +1917,7 @@ test_that("resolve_ms1_query_adduct_map, compute_similarity_safe, and finalize_r
   sp_qry@backend@spectraData$spectrum_id <- "Q1"
   sp_lib@backend@spectraData$spectrum_id <- "L1"
   sp_lib@backend@spectraData$adduct <- "[M+H]+"
+  sp_qry@backend@peaksData[[1L]][, 1L] <- sp_lib@backend@peaksData[[1L]][, 1L]
   expect_identical(length(remove_empty_peak_spectra(sp_lib)), 1L)
   sim_res <- compute_similarity_safe(
     lib_sp = sp_lib,
@@ -1933,6 +1934,25 @@ test_that("resolve_ms1_query_adduct_map, compute_similarity_safe, and finalize_r
     approx = FALSE
   )
   expect_true("neutral_M" %in% sim_res$.similarity_space)
+
+  # Zero-similarity / zero-matched-peak pairs are rejected even when threshold = 0
+  sp_qry_disjoint <- sp_qry
+  sp_qry_disjoint@backend@peaksData[[1L]][, 1L] <- c(25.0, 35.0)
+  sim_zero <- compute_similarity_safe(
+    lib_sp = sp_lib,
+    query_sp = sp_qry_disjoint,
+    query_meta = tidytable::tidytable(
+      feature_id = "Q1",
+      query_adduct = "[M+Na]+",
+      query_neutral_mass = 100.0
+    ),
+    method = "gnps",
+    dalton = 0.05,
+    ppm = 20,
+    threshold = 0,
+    approx = FALSE
+  )
+  expect_identical(nrow(sim_zero), 0L)
 
   # 3. finalize_results with query_meta = NULL (extracting query_adduct / query_neutral_mass from df_sim or defaulting to NA)
   meta_tbl <- tidytable::tidytable(

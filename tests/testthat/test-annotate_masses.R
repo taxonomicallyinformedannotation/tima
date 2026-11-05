@@ -1634,6 +1634,73 @@ test_that("best-supported conflict-free mode keeps strongest unconstrained suppo
   expect_identical(iso$adduct[[1L]], "[M+Na]+")
 })
 
+test_that("best-supported conflict-free mode preserves support hierarchy among structure-matched unconstrained rows", {
+  # F_UNC1 has structure matches on primary baseline ([M-H]-) and fallback
+  # baseline adducts ([M-H+CH2O2]-, [2M-H]-): only [M-H]- should be kept.
+  # F_UNC2 has an unmatched [M-H]- row (NA error) and a structure-matched
+  # fallback [M-H+CH2O2]- row: the structure-matched fallback should win.
+  annotations <- tidytable::tidytable(
+    feature_id = c(
+      "F_UNC1",
+      "F_UNC1",
+      "F_UNC1",
+      "F_UNC2",
+      "F_UNC2",
+      "F1",
+      "F2"
+    ),
+    adduct = c(
+      "[M-H]-",
+      "[M-H+CH2O2]-",
+      "[2M-H]-",
+      "[M-H]-",
+      "[M-H+CH2O2]-",
+      "[M-H]-",
+      "[M+Cl]-"
+    ),
+    source = c(
+      "baseline",
+      "baseline",
+      "baseline",
+      "baseline",
+      "baseline",
+      "pair",
+      "pair"
+    ),
+    adduct_support = c(0L, 0L, 0L, 0L, 0L, 1L, 1L),
+    candidate_structure_error_mz = c(
+      0.0005,
+      0.0002,
+      0.0001,
+      NA_real_,
+      0.0004,
+      0.0001,
+      0.0001
+    )
+  )
+  adduct_edges <- tidytable::tidytable(
+    feature_id = "F1",
+    adduct = "[M-H]-",
+    adduct_dest = "[M+Cl]-",
+    feature_id_dest = "F2"
+  )
+
+  out <- enforce_non_conflicting_annotation_states(
+    annotations = annotations,
+    adduct_edges = adduct_edges,
+    baseline_adduct = "[M-H]-",
+    coverage_mode = "best_supported_conflict_free"
+  )
+
+  unc1 <- out |> tidytable::filter(feature_id == "F_UNC1")
+  expect_identical(nrow(unc1), 1L)
+  expect_identical(unc1$adduct[[1L]], "[M-H]-")
+
+  unc2 <- out |> tidytable::filter(feature_id == "F_UNC2")
+  expect_identical(nrow(unc2), 1L)
+  expect_identical(unc2$adduct[[1L]], "[M-H+CH2O2]-")
+})
+
 test_that("annotate_masses recovers doubly charged species through evidence discovery", {
   local_quiet_logging()
 
