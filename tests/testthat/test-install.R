@@ -533,6 +533,7 @@ test_that("install_tima tolerates post-install copy_backbone and tar_destroy err
 })
 
 test_that("install emits lifecycle deprecation warning and delegates to install_tima", {
+  withr::local_options(lifecycle_verbosity = "warning")
   rec <- new.env(parent = emptyenv())
   rec$args <- NULL
 
@@ -568,15 +569,20 @@ test_that("install emits lifecycle deprecation warning and delegates to install_
 
       # Also works when evaluated in a non-namespace package environment (e.g. covr)
       fn_pkg_env <- install
-      environment(fn_pkg_env) <- new.env(
-        parent = as.environment("package:tima")
-      )
+      ns_list <- as.list(asNamespace("tima"), all.names = TRUE)
+      ns_list[[".__NAMESPACE__."]] <- NULL
+      environment(fn_pkg_env) <- list2env(ns_list, parent = globalenv())
+      caller <- new.env(parent = globalenv())
+      caller$fn_pkg_env <- fn_pkg_env
       expect_warning(
-        fn_pkg_env(
-          package = "tima",
-          repos = "https://cran.r-universe.dev",
-          type = "source",
-          dependencies = FALSE
+        evalq(
+          fn_pkg_env(
+            package = "tima",
+            repos = "https://cran.r-universe.dev",
+            type = "source",
+            dependencies = FALSE
+          ),
+          caller
         ),
         "install_tima"
       )

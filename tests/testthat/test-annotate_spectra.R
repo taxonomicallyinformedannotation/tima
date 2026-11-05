@@ -770,7 +770,9 @@ test_that("annotate_spectra maps deprecated qutoff to cutoff", {
 
   # Also works when evaluated in a non-namespace package environment (e.g. covr)
   fn_pkg_env <- annotate_spectra
-  environment(fn_pkg_env) <- new.env(parent = as.environment("package:tima"))
+  ns_list <- as.list(asNamespace("tima"), all.names = TRUE)
+  ns_list[[".__NAMESPACE__."]] <- NULL
+  environment(fn_pkg_env) <- list2env(ns_list, parent = globalenv())
   caller <- new.env(parent = globalenv())
   caller$fn_pkg_env <- fn_pkg_env
   caller$query_file <- query_file
