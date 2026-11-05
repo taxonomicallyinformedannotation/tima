@@ -252,8 +252,9 @@ load_annotation_tables <- function(annotations, ms1_only) {
     nms_ann <- names(annotation_table)
     keep_mask <- rep(TRUE, n_before)
     if ("candidate_score_similarity" %in% nms_ann) {
-      keep_mask <- keep_mask &
-        is.na(annotation_table$candidate_score_similarity)
+      sim_num <- .as_numeric_dedup(annotation_table$candidate_score_similarity)
+      keep_mask <- keep_mask & (is.na(sim_num) | sim_num <= 0)
+      rm(sim_num)
     }
     if ("candidate_score_sirius_csi" %in% nms_ann) {
       keep_mask <- keep_mask &
@@ -810,13 +811,62 @@ rearrange_annotations <- function(
       )
     }
   } else {
-    ord1 <- order(-sim_num, na.last = TRUE, method = "radix")
+    has_zero_sim <- any(!is.na(sim_num) & sim_num <= 0)
+    ord1 <- if (has_zero_sim) {
+      sim_tier <- rep.int(2L, n_in)
+      sim_tier[!is.na(sim_num) & sim_num > 0] <- 1L
+      sim_tier[!is.na(sim_num) & sim_num <= 0] <- 3L
+      order(sim_tier, -sim_num, na.last = TRUE, method = "radix")
+    } else {
+      order(-sim_num, na.last = TRUE, method = "radix")
+    }
     keep1_idx <- .dedup_ordered_tuple_indices(
       annotation_table = annotation_table,
       dedup_cols = dedup_cols,
       ord1 = ord1
     )
     rm(ord1)
+
+    zero_transfer_rows <- integer(0L)
+    if (has_zero_sim && !identical(keep1_idx, seq_len(n_in))) {
+      zero_in_idx <- which(!is.na(sim_num) & sim_num <= 0)
+      kept_na_rel <- which(is.na(sim_num[keep1_idx]))
+      if (length(zero_in_idx) > 0L && length(kept_na_rel) > 0L) {
+        c1 <- dedup_cols[[1L]]
+        c2 <- dedup_cols[[length(dedup_cols)]]
+        z1 <- annotation_table[[c1]][zero_in_idx]
+        z2 <- annotation_table[[c2]][zero_in_idx]
+        k_idx_na <- keep1_idx[kept_na_rel]
+        k1 <- annotation_table[[c1]][k_idx_na]
+        k2 <- annotation_table[[c2]][k_idx_na]
+        u_f <- unique(z1)
+        m_f <- if (anyNA(u_f)) match(k1, u_f) else fastmatch::fmatch(k1, u_f)
+        cand_rel <- which(!is.na(m_f))
+        if (length(cand_rel) > 0L) {
+          u_i <- unique(z2)
+          m_i <- if (anyNA(u_i)) {
+            match(k2[cand_rel], u_i)
+          } else {
+            fastmatch::fmatch(k2[cand_rel], u_i)
+          }
+          both_rel <- cand_rel[!is.na(m_i)]
+          if (length(both_rel) > 0L) {
+            zf <- if (anyNA(u_f)) match(z1, u_f) else fastmatch::fmatch(z1, u_f)
+            zi <- if (anyNA(u_i)) match(z2, u_i) else fastmatch::fmatch(z2, u_i)
+            n_ui <- length(u_i)
+            zk <- as.double(zf - 1L) * n_ui + zi
+            kk <- as.double(m_f[both_rel] - 1L) *
+              n_ui +
+              m_i[!is.na(m_i)]
+            hit_z <- !is.na(fastmatch::fmatch(kk, zk))
+            if (any(hit_z)) {
+              zero_transfer_rows <- kept_na_rel[both_rel[hit_z]]
+              sim_num[keep1_idx[zero_transfer_rows]] <- 0
+            }
+          }
+        }
+      }
+    }
 
     if (isTRUE(consume_input) && data.table::is.data.table(annotation_table)) {
       drop_cols <- setdiff(names(annotation_table), t1_cols)
@@ -863,7 +913,30 @@ rearrange_annotations <- function(
         )
       }
     }
-    rm(keep1_idx)
+    if (length(zero_transfer_rows) > 0L) {
+      for (z_col in intersect(
+        c(
+          "candidate_score_similarity_forward",
+          "candidate_score_similarity_reverse",
+          "candidate_count_similarity_peaks_matched"
+        ),
+        names(annotation_table_merged)
+      )) {
+        zv <- annotation_table_merged[[z_col]]
+        na_z <- zero_transfer_rows[is.na(zv[zero_transfer_rows])]
+        if (length(na_z) > 0L) {
+          zv[na_z] <- if (is.character(zv)) {
+            "0"
+          } else if (is.integer(zv)) {
+            0L
+          } else {
+            0
+          }
+          data.table::set(annotation_table_merged, j = z_col, value = zv)
+        }
+      }
+    }
+    rm(keep1_idx, zero_transfer_rows)
   }
   rm(sim_num)
 

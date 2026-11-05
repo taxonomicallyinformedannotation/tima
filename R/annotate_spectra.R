@@ -297,6 +297,18 @@ annotate_spectra <- function(
   # Process one library at a time: load, compute, finalize, cleanup
   df_chunks <- list()
   n_lib_count <- 0L
+  ms1_zero_tracker <- if (
+    !is.null(ms1_annotations) && is.numeric(threshold) && threshold <= 0
+  ) {
+    init_ms1_zero_tracker(
+      ms1_annotations = ms1_annotations,
+      query_meta = query_meta,
+      dalton = dalton,
+      ppm = ppm
+    )
+  } else {
+    NULL
+  }
 
   for (lib_path in libs_vec) {
     # Reset per-iteration temporaries up front. This matters: previously
@@ -335,6 +347,10 @@ annotate_spectra <- function(
 
     log_library_stats(spectral_library)
     n_lib_count <- n_lib_count + length(spectral_library)
+
+    if (!is.null(ms1_zero_tracker)) {
+      update_ms1_zero_tracker(ms1_zero_tracker, spectral_library)
+    }
 
     # Compute similarities for this library
     # (calculate_entropy_and_similarity handles pre-computation outside hot loop)
@@ -422,6 +438,22 @@ annotate_spectra <- function(
     tidytable::tidytable()
   }
   rm(df_chunks)
+
+  if (!is.null(ms1_zero_tracker)) {
+    zero_df <- finalize_ms1_zero_tracker(
+      tracker = ms1_zero_tracker,
+      df_final = df_final
+    )
+    rm(ms1_zero_tracker)
+    if (nrow(zero_df) > 0L) {
+      df_final <- if (nrow(df_final) > 0L) {
+        tidytable::bind_rows(df_final, zero_df)
+      } else {
+        zero_df
+      }
+    }
+    rm(zero_df)
+  }
 
   n_query_count <- length(query_sp)
   log_info(
@@ -1016,6 +1048,317 @@ resolve_ms1_query_adduct_map <- function(
   tidytable::tidytable(
     feature_id = best_tbl$feature_id,
     ms1_query_adduct = best_tbl$candidate_adduct
+  )
+}
+
+#' @keywords internal
+init_ms1_zero_tracker <- function(
+  ms1_annotations = NULL,
+  query_meta = NULL,
+  dalton = 0.01,
+  ppm = 10
+) {
+  if (
+    is.null(ms1_annotations) || is.null(query_meta) || nrow(query_meta) == 0L
+  ) {
+    return(NULL)
+  }
+
+  needed_cols <- c(
+    "feature_id",
+    "candidate_structure_smiles_no_stereo",
+    "candidate_adduct",
+    "candidate_structure_error_mz",
+    "candidate_structure_name"
+  )
+
+  ms1_tbl <- if (is.character(ms1_annotations)) {
+    header <- names(safe_fread(
+      file = ms1_annotations,
+      file_type = "annotate_masses annotations",
+      nrows = 0L,
+      showProgress = FALSE
+    ))
+    sel_cols <- intersect(needed_cols, header)
+    if (
+      !all(
+        c("feature_id", "candidate_structure_smiles_no_stereo") %in% sel_cols
+      )
+    ) {
+      return(NULL)
+    }
+    safe_fread(
+      file = ms1_annotations,
+      file_type = "annotate_masses annotations",
+      na.strings = c("", "NA"),
+      colClasses = "character",
+      select = sel_cols
+    )
+  } else if (is.data.frame(ms1_annotations)) {
+    tidytable::as_tidytable(ms1_annotations)
+  } else {
+    return(NULL)
+  }
+
+  if (
+    !all(
+      c("feature_id", "candidate_structure_smiles_no_stereo") %in%
+        names(ms1_tbl)
+    )
+  ) {
+    return(NULL)
+  }
+
+  q_fids <- as.character(query_meta$feature_id)
+  q_idx <- fastmatch::fmatch(ms1_tbl$feature_id, q_fids)
+  sm_col <- ms1_tbl$candidate_structure_smiles_no_stereo
+  keep <- !is.na(q_idx) & !is.na(sm_col) & nzchar(sm_col)
+  if (!any(keep)) {
+    return(NULL)
+  }
+  if (!all(keep)) {
+    ms1_tbl <- ms1_tbl[keep, ]
+    q_idx <- q_idx[keep]
+    sm_col <- sm_col[keep]
+  }
+
+  u_sm <- unique(sm_col)
+  sm_id <- fastmatch::fmatch(sm_col, u_sm)
+  pair_key <- as.double(q_idx - 1L) * length(u_sm) + sm_id
+  if (anyDuplicated(pair_key) > 0L) {
+    keep_u <- !duplicated(pair_key)
+    ms1_tbl <- ms1_tbl[keep_u, ]
+    q_idx <- q_idx[keep_u]
+    sm_col <- sm_col[keep_u]
+    sm_id <- sm_id[keep_u]
+  }
+
+  n_pairs <- length(q_idx)
+  q_mz <- as.numeric(query_meta$query_precursorMz[q_idx])
+  q_add <- if ("query_adduct" %in% names(query_meta)) {
+    as.character(query_meta$query_adduct[q_idx])
+  } else if ("candidate_adduct" %in% names(ms1_tbl)) {
+    as.character(ms1_tbl$candidate_adduct)
+  } else {
+    rep.int(NA_character_, n_pairs)
+  }
+
+  env <- new.env(parent = emptyenv())
+  env$feature_id <- as.character(ms1_tbl$feature_id)
+  env$smiles_no_stereo <- as.character(sm_col)
+  env$u_smiles <- u_sm
+  env$pair_sm_id <- sm_id
+  env$pair_q_mz <- q_mz
+  env$pair_tol <- pmax(as.numeric(dalton), q_mz * 1e-6 * as.numeric(ppm))
+  env$query_adduct <- q_add
+  env$error_mz <- if ("candidate_structure_error_mz" %in% names(ms1_tbl)) {
+    suppressWarnings(as.numeric(ms1_tbl$candidate_structure_error_mz))
+  } else {
+    rep.int(NA_real_, n_pairs)
+  }
+  env$structure_name <- if ("candidate_structure_name" %in% names(ms1_tbl)) {
+    as.character(ms1_tbl$candidate_structure_name)
+  } else {
+    rep.int(NA_character_, n_pairs)
+  }
+  env$measured <- logical(n_pairs)
+  env$library <- rep.int(NA_character_, n_pairs)
+  env$spectrum_id <- rep.int(NA_character_, n_pairs)
+  env$target_adduct <- rep.int(NA_character_, n_pairs)
+  env
+}
+
+#' @keywords internal
+update_ms1_zero_tracker <- function(tracker, lib_sp) {
+  if (is.null(tracker) || !inherits(lib_sp, "Spectra")) {
+    return(invisible(NULL))
+  }
+  unm_idx <- which(!tracker$measured)
+  if (length(unm_idx) == 0L) {
+    return(invisible(NULL))
+  }
+
+  n_lib <- length(lib_sp)
+  if (n_lib == 0L) {
+    return(invisible(NULL))
+  }
+
+  lib_sm <- extract_vector(
+    lib_sp,
+    c(
+      "smiles_no_stereo",
+      "structure_smiles_no_stereo",
+      "smiles_2D",
+      "smiles2D",
+      "structure_smiles_2D",
+      "smiles",
+      "structure_smiles",
+      "SMILES"
+    ),
+    n_lib,
+    NA_character_
+  )
+  lib_sm_id <- fastmatch::fmatch(lib_sm, tracker$u_smiles)
+  active_sm <- logical(length(tracker$u_smiles))
+  active_sm[tracker$pair_sm_id[unm_idx]] <- TRUE
+  lib_keep <- which(!is.na(lib_sm_id) & active_sm[lib_sm_id])
+  if (length(lib_keep) == 0L) {
+    return(invisible(NULL))
+  }
+
+  lib_prec <- as.numeric(get_precursors(lib_sp)[lib_keep])
+  valid_lp <- is.finite(lib_prec) & lib_prec > 0
+  if (!any(valid_lp)) {
+    return(invisible(NULL))
+  }
+  if (!all(valid_lp)) {
+    lib_keep <- lib_keep[valid_lp]
+    lib_prec <- lib_prec[valid_lp]
+  }
+  lib_sm_sub <- lib_sm_id[lib_keep]
+
+  pair_sm_unm <- tracker$pair_sm_id[unm_idx]
+  first_pos <- fastmatch::fmatch(pair_sm_unm, lib_sm_sub)
+  has_cand <- !is.na(first_pos)
+  if (!any(has_cand)) {
+    return(invisible(NULL))
+  }
+
+  cand_unm <- unm_idx[has_cand]
+  fp <- first_pos[has_cand]
+  qmz <- tracker$pair_q_mz[cand_unm]
+  tol <- tracker$pair_tol[cand_unm]
+  hit1 <- is.finite(qmz) & abs(lib_prec[fp] - qmz) <= tol
+
+  matched_unm <- cand_unm[hit1]
+  matched_pos <- fp[hit1]
+
+  rem_mask <- !hit1 & is.finite(qmz)
+  if (any(rem_mask) && anyDuplicated(lib_sm_sub) > 0L) {
+    dup_sm <- unique(lib_sm_sub[duplicated(lib_sm_sub)])
+    rem_unm <- cand_unm[rem_mask]
+    rem_sm <- tracker$pair_sm_id[rem_unm]
+    in_dup <- !is.na(fastmatch::fmatch(rem_sm, dup_sm))
+    if (any(in_dup)) {
+      rem_unm <- rem_unm[in_dup]
+      rem_sm <- rem_sm[in_dup]
+      rem_qmz <- tracker$pair_q_mz[rem_unm]
+      rem_tol <- tracker$pair_tol[rem_unm]
+      dup_lib_pos <- which(!is.na(fastmatch::fmatch(lib_sm_sub, dup_sm)))
+      pos_by_sm <- split(dup_lib_pos, lib_sm_sub[dup_lib_pos])
+      extra_pos <- integer(length(rem_unm))
+      for (i in seq_along(rem_unm)) {
+        g_pos <- pos_by_sm[[as.character(rem_sm[[i]])]]
+        diffs <- abs(lib_prec[g_pos] - rem_qmz[[i]])
+        ok <- which(diffs <= rem_tol[[i]])
+        if (length(ok) > 0L) {
+          extra_pos[[i]] <- g_pos[[ok[[1L]]]]
+        }
+      }
+      hit_extra <- extra_pos > 0L
+      if (any(hit_extra)) {
+        matched_unm <- c(matched_unm, rem_unm[hit_extra])
+        matched_pos <- c(matched_pos, extra_pos[hit_extra])
+      }
+    }
+  }
+
+  if (length(matched_unm) == 0L) {
+    return(invisible(NULL))
+  }
+
+  hit_lib_idx <- lib_keep[matched_pos]
+  u_hit_lib <- unique(hit_lib_idx)
+  m_hit <- fastmatch::fmatch(hit_lib_idx, u_hit_lib)
+
+  lib_names <- extract_vector(
+    lib_sp,
+    c("library", "source_library", "database"),
+    n_lib,
+    NA_character_,
+    subset_idx = u_hit_lib
+  )
+  spec_ids <- extract_vector(
+    lib_sp,
+    c("spectrum_id", "spectrumId", "id", "SPECTRUM_ID", "DB_NUMBER"),
+    n_lib,
+    NA_character_,
+    subset_idx = u_hit_lib
+  )
+  adducts_sub <- harmonize_adduct_vector(
+    extract_vector(
+      lib_sp,
+      c("adduct", "precursor_type", "ADDUCT", "PRECURSOR_TYPE"),
+      n_lib,
+      NA_character_,
+      subset_idx = u_hit_lib
+    ),
+    colname = "target_adduct"
+  )
+
+  tracker$measured[matched_unm] <- TRUE
+  tracker$library[matched_unm] <- lib_names[m_hit]
+  tracker$spectrum_id[matched_unm] <- spec_ids[m_hit]
+  tracker$target_adduct[matched_unm] <- adducts_sub[m_hit]
+  invisible(NULL)
+}
+
+#' @keywords internal
+finalize_ms1_zero_tracker <- function(tracker, df_final) {
+  if (is.null(tracker) || !any(tracker$measured)) {
+    return(tidytable::tidytable())
+  }
+  m_idx <- which(tracker$measured)
+  if (
+    nrow(df_final) > 0L &&
+      all(
+        c("feature_id", "candidate_structure_smiles_no_stereo") %in%
+          names(df_final)
+      )
+  ) {
+    f_pos <- df_final$feature_id
+    s_pos <- df_final$candidate_structure_smiles_no_stereo
+    u_f <- unique(c(tracker$feature_id[m_idx], f_pos))
+    u_s <- unique(c(tracker$smiles_no_stereo[m_idx], s_pos))
+    n_s <- length(u_s)
+    pos_k <- as.double(fastmatch::fmatch(f_pos, u_f) - 1L) *
+      n_s +
+      fastmatch::fmatch(s_pos, u_s)
+    trk_k <- as.double(fastmatch::fmatch(tracker$feature_id[m_idx], u_f) - 1L) *
+      n_s +
+      fastmatch::fmatch(tracker$smiles_no_stereo[m_idx], u_s)
+    keep_z <- is.na(fastmatch::fmatch(trk_k, pos_k))
+    m_idx <- m_idx[keep_z]
+  }
+  n_z <- length(m_idx)
+  if (n_z == 0L) {
+    return(tidytable::tidytable())
+  }
+
+  q_add <- tracker$query_adduct[m_idx]
+  t_add <- tracker$target_adduct[m_idx]
+  match_mode <- ifelse(
+    !is.na(q_add) & !is.na(t_add) & q_add == t_add,
+    "exact_adduct",
+    "precursor_mz"
+  )
+
+  tidytable::tidytable(
+    feature_id = tracker$feature_id[m_idx],
+    candidate_adduct = q_add,
+    candidate_query_adduct = ifelse(is.na(t_add), q_add, t_add),
+    candidate_adduct_match_mode = match_mode,
+    annotation_note = rep.int(NA_character_, n_z),
+    candidate_library = tracker$library[m_idx],
+    candidate_spectrum_id = tracker$spectrum_id[m_idx],
+    candidate_structure_error_mz = tracker$error_mz[m_idx],
+    candidate_structure_name = tracker$structure_name[m_idx],
+    candidate_structure_smiles_no_stereo = tracker$smiles_no_stereo[m_idx],
+    candidate_spectrum_entropy = rep.int(0, n_z),
+    candidate_score_similarity = rep.int(0, n_z),
+    candidate_score_similarity_forward = rep.int(0, n_z),
+    candidate_score_similarity_reverse = rep.int(0, n_z),
+    candidate_count_similarity_peaks_matched = rep.int(0L, n_z)
   )
 }
 

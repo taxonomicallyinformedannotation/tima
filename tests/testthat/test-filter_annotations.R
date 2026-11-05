@@ -905,4 +905,55 @@ test_that("validate_filter_annotations_inputs, filter_ms1_redundancy, apply_rt_f
   )
   expect_true("preset" %in% res_multi_strong$candidate_adduct_match_mode)
   expect_true("exact_adduct" %in% res_multi_strong$candidate_adduct_match_mode)
+
+  # 5. filter_ms1_redundancy transfers 0.00 spectral similarity onto MS1 row
+  # in-place without duplicating rows and drops unassociated 0.00 spectral rows
+  res_zero_merge <- filter_ms1_redundancy(list(
+    ms1 = tidytable::tidytable(
+      feature_id = c("F1", "F2"),
+      candidate_structure_inchikey_no_stereo = c(
+        "IK_MEASURED_ZERO",
+        "IK_MS1_ONLY"
+      ),
+      candidate_structure_inchikey_connectivity_layer = c(
+        "IK_MEASURED_ZERO",
+        "IK_MS1_ONLY"
+      ),
+      candidate_library = c("TIMA MS1", "TIMA MS1"),
+      candidate_annotation_level = c("primary", "primary"),
+      candidate_evidence_tier = c("supported_strong", "supported_strong"),
+      candidate_score_similarity = c(NA_character_, NA_character_),
+      candidate_count_similarity_peaks_matched = c(NA_character_, NA_character_)
+    ),
+    spectral = tidytable::tidytable(
+      feature_id = c("F1", "F1"),
+      candidate_structure_inchikey_no_stereo = c(
+        "IK_MEASURED_ZERO",
+        "IK_NON_MS1_ZERO"
+      ),
+      candidate_structure_inchikey_connectivity_layer = c(
+        "IK_MEASURED_ZERO",
+        "IK_NON_MS1_ZERO"
+      ),
+      candidate_library = c("ISDB", "ISDB"),
+      candidate_annotation_level = c(NA_character_, NA_character_),
+      candidate_evidence_tier = c(NA_character_, NA_character_),
+      candidate_score_similarity = c("0", "0"),
+      candidate_count_similarity_peaks_matched = c("0", "0")
+    )
+  ))
+  expect_identical(nrow(res_zero_merge), 2L)
+  expect_identical(res_zero_merge$candidate_library, c("TIMA MS1", "TIMA MS1"))
+  expect_identical(
+    res_zero_merge$candidate_annotation_level,
+    c("primary", "primary")
+  )
+  expect_identical(
+    res_zero_merge$candidate_score_similarity,
+    c("0", NA_character_)
+  )
+  expect_identical(
+    res_zero_merge$candidate_count_similarity_peaks_matched,
+    c("0", NA_character_)
+  )
 })

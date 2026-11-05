@@ -2142,4 +2142,23 @@ test_that("coerce_score_columns and remove_compound_names preserve tidytable sem
   expect_false("candidate_structure_name" %in% names(stripped$mini))
   expect_false("candidate_structure_name" %in% names(stripped$filtered))
   expect_false("candidate_structure_name" %in% names(stripped$full))
+
+  # filter_ms1_annotations does not treat 0.00 similarity as positive MS2 support
+  df_ms1_zero <- tidytable::tidytable(
+    feature_id = c("F_ZERO_LOW_BIO", "F_POS_LOW_BIO", "F_NA_HIGH_BIO"),
+    score_biological = c(0.1, 0.1, 0.8),
+    score_chemical = c(0.1, 0.1, 0.1),
+    candidate_score_similarity = c(0.0, 0.5, NA_real_),
+    candidate_count_similarity_peaks_matched = c(0L, 3L, NA_integer_)
+  )
+  filtered_ms1 <- filter_ms1_annotations(
+    annot_table_wei_chemo = df_ms1_zero,
+    minimal_ms1_bio = 0.5,
+    minimal_ms1_chemo = 0.5,
+    minimal_ms1_condition = "OR"
+  )
+  expect_identical(
+    filtered_ms1$feature_id,
+    c("F_POS_LOW_BIO", "F_NA_HIGH_BIO")
+  )
 })

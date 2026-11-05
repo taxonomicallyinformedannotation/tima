@@ -1987,4 +1987,55 @@ test_that("resolve_ms1_query_adduct_map, compute_similarity_safe, and finalize_r
   )
   expect_identical(nrow(fin_no_qmeta), 1L)
   expect_identical(fin_no_qmeta$candidate_adduct_match_mode, "m_delta_rescued")
+
+  # 4. MS1 zero-similarity tracker records 0.00 only for MS1 candidates whose
+  # structure had a precursor-matching reference spectrum and no positive match
+  sp_lib_zero <- sp_lib
+  sp_lib_zero@backend@spectraData$smiles_no_stereo <- "CCO"
+  sp_lib_zero@backend@spectraData$library <- "ISDB"
+  sp_lib_zero@backend@spectraData$spectrum_id <- "SP_ZERO_1"
+  sp_lib_zero@backend@spectraData$adduct <- "[M+H]+"
+  sp_lib_zero@backend@spectraData$precursorMz <- 101.0073
+
+  qmeta_zero <- tidytable::tidytable(
+    feature_id = c("Q_ZERO", "Q_UNMEASURED"),
+    query_adduct = c("[M+H]+", "[M+H]+"),
+    query_precursorMz = c(101.0073, 250.0000),
+    query_neutral_mass = c(100.0, 249.0)
+  )
+  ms1_zero_df <- tidytable::tidytable(
+    feature_id = c("Q_ZERO", "Q_ZERO", "Q_UNMEASURED"),
+    candidate_structure_smiles_no_stereo = c("CCO", "CCC", "CCO"),
+    candidate_adduct = c("[M+H]+", "[M+H]+", "[M+H]+"),
+    candidate_structure_error_mz = c("0.0001", "0.0002", "0.0001"),
+    candidate_structure_name = c("Ethanol", "Propane", "Ethanol")
+  )
+  trk <- init_ms1_zero_tracker(
+    ms1_annotations = ms1_zero_df,
+    query_meta = qmeta_zero,
+    dalton = 0.01,
+    ppm = 10
+  )
+  update_ms1_zero_tracker(trk, sp_lib_zero)
+  zero_rows <- finalize_ms1_zero_tracker(
+    tracker = trk,
+    df_final = tidytable::tidytable()
+  )
+  expect_identical(nrow(zero_rows), 1L)
+  expect_identical(zero_rows$feature_id, "Q_ZERO")
+  expect_identical(zero_rows$candidate_structure_smiles_no_stereo, "CCO")
+  expect_identical(zero_rows$candidate_score_similarity, 0)
+  expect_identical(zero_rows$candidate_count_similarity_peaks_matched, 0L)
+  expect_identical(zero_rows$candidate_adduct_match_mode, "exact_adduct")
+
+  # When Q_ZERO + CCO already has a positive match in df_final, no 0.00 row is emitted
+  zero_rows_suppressed <- finalize_ms1_zero_tracker(
+    tracker = trk,
+    df_final = tidytable::tidytable(
+      feature_id = "Q_ZERO",
+      candidate_structure_smiles_no_stereo = "CCO",
+      candidate_score_similarity = 0.85
+    )
+  )
+  expect_identical(nrow(zero_rows_suppressed), 0L)
 })

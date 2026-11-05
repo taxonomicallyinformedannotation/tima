@@ -516,18 +516,22 @@ filter_ms1_redundancy <- function(
     names(annotations_tables_spectral)
 
   qual_mask <- rep.int(TRUE, n_spectral)
+  zero_mask <- rep.int(FALSE, n_spectral)
   if (has_similarity && n_spectral > 0L) {
     sim_col <- annotations_tables_spectral$candidate_score_similarity
     sim_num <- .as_numeric_dedup(sim_col)
     qual_mask <- qual_mask &
       (is.na(sim_col) | (!is.na(sim_num) & sim_num >= similarity_threshold))
+    zero_mask <- zero_mask | (!is.na(sim_num) & sim_num <= 0)
   }
   if (has_peaks && n_spectral > 0L) {
     pks_col <- annotations_tables_spectral$candidate_count_similarity_peaks_matched
     pks_num <- .as_numeric_dedup(pks_col)
     qual_mask <- qual_mask &
       (is.na(pks_col) | (!is.na(pks_num) & as.integer(pks_num) >= min_peaks))
+    zero_mask <- zero_mask | (!is.na(pks_num) & as.integer(pks_num) <= 0L)
   }
+  zero_mask <- zero_mask & !qual_mask
 
   qual_idx <- which(qual_mask)
   rm(qual_mask)
@@ -616,6 +620,95 @@ filter_ms1_redundancy <- function(
 
   n_ms1_removed <- n_ms1_before - nrow(ms1_tbl)
   log_info("Removed %d redundant MS1 annotations", n_ms1_removed)
+
+  # Transfer measured zero-similarity (0.00 / 0 peaks) spectral results onto
+  # matching MS1 rows in-place and drop the standalone 0.00 spectral rows so
+  # we preserve the 0.00 vs NA distinction without duplicating rows.
+  if (any(zero_mask)) {
+    zero_idx <- which(zero_mask)
+    if (nrow(ms1_tbl) > 0L && length(join_cols) == 2L) {
+      c1 <- join_cols[[1L]]
+      c2 <- join_cols[[2L]]
+      z1 <- annotations_tables_spectral[[c1]][zero_idx]
+      z2 <- annotations_tables_spectral[[c2]][zero_idx]
+      u_zf <- unique(z1)
+      m_zf <- if (anyNA(u_zf)) {
+        match(ms1_tbl[[c1]], u_zf)
+      } else {
+        fastmatch::fmatch(ms1_tbl[[c1]], u_zf)
+      }
+      z_cand <- which(!is.na(m_zf))
+      if (length(z_cand) > 0L) {
+        u_zi <- unique(z2)
+        m_zi <- if (anyNA(u_zi)) {
+          match(ms1_tbl[[c2]][z_cand], u_zi)
+        } else {
+          fastmatch::fmatch(ms1_tbl[[c2]][z_cand], u_zi)
+        }
+        z_both <- which(!is.na(m_zi))
+        if (length(z_both) > 0L) {
+          z_sub <- z_cand[z_both]
+          zf_m <- m_zf[z_sub]
+          zi_m <- m_zi[z_both]
+          zf_s <- if (anyNA(u_zf)) {
+            match(z1, u_zf)
+          } else {
+            fastmatch::fmatch(z1, u_zf)
+          }
+          zi_s <- if (anyNA(u_zi)) {
+            match(z2, u_zi)
+          } else {
+            fastmatch::fmatch(z2, u_zi)
+          }
+          n_zi <- length(u_zi)
+          z_spec_k <- as.double(zf_s - 1L) * n_zi + zi_s
+          z_ms1_k <- as.double(zf_m - 1L) * n_zi + zi_m
+          z_match <- fastmatch::fmatch(z_ms1_k, z_spec_k)
+          has_z_match <- !is.na(z_match)
+          if (any(has_z_match)) {
+            ms1_hit_rows <- z_sub[has_z_match]
+            spec_hit_rows <- zero_idx[z_match[has_z_match]]
+            ms1_tbl <- tidytable::as_tidytable(as.list(ms1_tbl))
+            for (z_col in intersect(
+              c(
+                "candidate_score_similarity",
+                "candidate_score_similarity_forward",
+                "candidate_score_similarity_reverse",
+                "candidate_count_similarity_peaks_matched",
+                "candidate_spectrum_id",
+                "candidate_spectrum_entropy"
+              ),
+              names(annotations_tables_spectral)
+            )) {
+              spec_v <- annotations_tables_spectral[[z_col]][spec_hit_rows]
+              if (z_col %in% names(ms1_tbl)) {
+                cur_v <- ms1_tbl[[z_col]]
+                na_rel <- is.na(cur_v[ms1_hit_rows])
+                if (any(na_rel)) {
+                  fill_rows <- ms1_hit_rows[na_rel]
+                  fill_vals <- spec_v[na_rel]
+                  if (is.character(cur_v)) {
+                    cur_v[fill_rows] <- as.character(fill_vals)
+                  } else if (is.integer(cur_v)) {
+                    cur_v[fill_rows] <- as.integer(fill_vals)
+                  } else {
+                    cur_v[fill_rows] <- as.numeric(fill_vals)
+                  }
+                  data.table::set(ms1_tbl, j = z_col, value = cur_v)
+                }
+              } else {
+                new_v <- spec_v[rep.int(NA_integer_, nrow(ms1_tbl))]
+                new_v[ms1_hit_rows] <- spec_v
+                data.table::set(ms1_tbl, j = z_col, value = new_v)
+              }
+            }
+          }
+        }
+      }
+    }
+    annotations_tables_spectral <- annotations_tables_spectral[!zero_mask, ]
+  }
+  rm(zero_mask)
 
   tidytable::bind_rows(ms1_tbl, annotations_tables_spectral)
 }

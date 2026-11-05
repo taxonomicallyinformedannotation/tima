@@ -618,4 +618,49 @@ test_that("rearrange_annotations handles 3-column dedup_cols and consume_input =
     ],
     0.95
   )
+
+  # Zero-similarity spectral row paired with an MS1 row preserves MS1 metadata
+  # and transfers 0.00 similarity onto the deduplicated row
+  ann_zero <- tidytable::tidytable(
+    feature_id = c("F1", "F1", "F2"),
+    candidate_structure_inchikey_connectivity_layer = c("IK1", "IK1", "IK2"),
+    candidate_structure_inchikey_no_stereo = c("IK1", "IK1", "IK2"),
+    candidate_library = c("TIMA MS1", "ISDB", "TIMA MS1"),
+    candidate_annotation_level = c("primary", NA_character_, "primary"),
+    candidate_score_similarity = c(NA_character_, "0", NA_character_),
+    candidate_count_similarity_peaks_matched = c(
+      NA_character_,
+      "0",
+      NA_character_
+    )
+  )
+  res_zero <- rearrange_annotations(
+    annotation_table = ann_zero,
+    formula_table = tidytable::tidytable(),
+    canopus_table = tidytable::tidytable(),
+    edges_table = tidytable::tidytable(),
+    consume_input = FALSE
+  )
+  expect_identical(nrow(res_zero), 2L)
+  expect_identical(
+    res_zero$candidate_library[res_zero$feature_id == "F1"],
+    "TIMA MS1"
+  )
+  expect_identical(
+    res_zero$candidate_annotation_level[res_zero$feature_id == "F1"],
+    "primary"
+  )
+  expect_identical(
+    res_zero$candidate_score_similarity[res_zero$feature_id == "F1"],
+    0
+  )
+  expect_identical(
+    res_zero$candidate_count_similarity_peaks_matched[
+      res_zero$feature_id == "F1"
+    ],
+    "0"
+  )
+  expect_true(is.na(
+    res_zero$candidate_score_similarity[res_zero$feature_id == "F2"]
+  ))
 })
