@@ -254,20 +254,7 @@ filter_ms1_annotations <- function(
     sim <- suppressWarnings(
       .as_numeric_dedup(annot_table_wei_chemo$candidate_score_similarity)
     )
-    pks_ok <- if (
-      "candidate_count_similarity_peaks_matched" %in%
-        names(annot_table_wei_chemo)
-    ) {
-      pks <- suppressWarnings(
-        .as_numeric_dedup(
-          annot_table_wei_chemo$candidate_count_similarity_peaks_matched
-        )
-      )
-      is.na(pks) | pks > 0
-    } else {
-      TRUE
-    }
-    !is.na(sim) & sim > 0 & pks_ok
+    !is.na(sim) & sim > 0
   } else {
     rep.int(FALSE, n)
   }

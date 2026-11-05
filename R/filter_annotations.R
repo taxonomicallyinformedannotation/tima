@@ -522,14 +522,13 @@ filter_ms1_redundancy <- function(
     sim_num <- .as_numeric_dedup(sim_col)
     qual_mask <- qual_mask &
       (is.na(sim_col) | (!is.na(sim_num) & sim_num >= similarity_threshold))
-    zero_mask <- zero_mask | (!is.na(sim_num) & sim_num <= 0)
+    zero_mask <- !is.na(sim_num) & sim_num <= 0
   }
   if (has_peaks && n_spectral > 0L) {
     pks_col <- annotations_tables_spectral$candidate_count_similarity_peaks_matched
     pks_num <- .as_numeric_dedup(pks_col)
     qual_mask <- qual_mask &
       (is.na(pks_col) | (!is.na(pks_num) & as.integer(pks_num) >= min_peaks))
-    zero_mask <- zero_mask | (!is.na(pks_num) & as.integer(pks_num) <= 0L)
   }
   zero_mask <- zero_mask & !qual_mask
 

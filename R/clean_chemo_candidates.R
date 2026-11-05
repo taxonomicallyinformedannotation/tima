@@ -1430,17 +1430,7 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
     sim <- suppressWarnings(
       .as_numeric_dedup(df_out$candidate_score_similarity)
     )
-    pks_ok <- if (
-      "candidate_count_similarity_peaks_matched" %in% names(df_out)
-    ) {
-      pks <- suppressWarnings(
-        .as_numeric_dedup(df_out$candidate_count_similarity_peaks_matched)
-      )
-      is.na(pks) | pks > 0
-    } else {
-      TRUE
-    }
-    !is.na(sim) & sim > 0 & pks_ok
+    !is.na(sim) & sim > 0
   } else {
     rep.int(FALSE, n)
   }
