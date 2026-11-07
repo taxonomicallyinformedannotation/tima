@@ -18,40 +18,34 @@ resolve_cross_rt_duplicate_candidates(
 Updated \code{df_ranked} with cross-RT rank-1 duplicates disambiguated.
 }
 \description{
-Disambiguates cross-RT duplicate final candidates using globally
-optimal maximum-weight bipartite matching (Hungarian / Kuhn-Munkres
-algorithm) between retention-time clusters and candidate structures
-(\code{candidate_structure_inchikey_connectivity_layer}), with exact-tie
-preservation so no arbitrary or random choices are ever made.
+Ensures two peaks eluting at different retention times
+(\verb{> rt_tolerance} min apart) do not keep the same planar structure
+(\code{candidate_structure_inchikey_connectivity_layer}) at \code{rank_final = 1}.
 
-Features eluting within \code{rt_tolerance} (default \code{0.05} min) belong to the
-same chromatographic peak (e.g. co-eluting \verb{[M+H]+}, \verb{[M+Na]+}, or in-source
-fragments) and may legitimately share the same final candidate. Features in
-different RT clusters cannot represent the same compound; when they share a
-rank-1 \code{InChIKey}, the bipartite solver computes the exact set of edges
-participating in any globally optimal assignment that maximizes:
+Co-eluting ions within \code{rt_tolerance} (default \code{0.05} min, e.g. \verb{[M+H]+},
+\verb{[M+Na]+}, and in-source fragments) are grouped into the same RT cluster
+and can share the same top candidate. Across distinct RT clusters, TIMA
+finds the best global assignment of candidates to peaks (via the Hungarian
+algorithm), prioritizing:
 \enumerate{
-\item Total number of RT clusters assigned a distinct candidate,
-\item Number of RT clusters assigned an MS2-supported candidate,
-\item Total \code{score_weighted_chemo}, spectral similarity, and
+\item Assigning a distinct candidate to as many RT clusters as possible,
+\item MS2-supported matches over MS1-only matches,
+\item Higher \code{score_weighted_chemo}, spectral similarity, and
 \code{candidate_score_pseudo_initial},
-\item Supermodularly coupled RT and \code{m/z} accuracy (so higher-scoring isomers
-are strictly assigned to the feature with smaller \verb{|error_rt|} or
-\verb{|error_mz|}).
+\item Smaller \verb{|error_rt|} and \verb{|error_mz|} (weighted by candidate score so
+the peak with smaller error gets the higher-scoring isomer).
 }
 
-Exact ties are preserved without randomness or row-order dependence:
+Exact ties are never broken at random:
 \itemize{
-\item If a feature's rank-1 candidate is assigned to a stronger RT cluster and
-multiple alternative candidates on the losing feature are tied, \strong{all}
-tied top alternatives are promoted together to \code{rank_final = 1}.
-\item If two RT clusters have 100\% identical evidence across all scores and
-errors, all candidates participating in any tied global optimum are placed
-at \code{rank_final = 1} rather than picking one arbitrarily.
+\item Tied runner-up candidates on the losing peak are promoted together to
+\code{rank_final = 1}.
+\item If two RT clusters have 100\% identical scores and errors across all
+metrics, all tied optimal candidates are kept at \code{rank_final = 1}.
 }
 
-Whenever a feature promotes an alternative candidate to rank 1, its
-\code{annotation_note} (and \code{note} in \code{mini}) records:
+Every promoted candidate receives an \code{annotation_note} (and \code{note} in
+\code{mini}):
 \code{"Promoted to rank 1: cross-RT duplicate InChIKey <IK> assigned to feature <id>"}
 (or \code{"tied with feature <id>"} on an exact cross-RT tie).
 }

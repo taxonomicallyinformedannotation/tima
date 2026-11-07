@@ -61,82 +61,38 @@ this should be a piece of cake, you deserve it!
 tima::run_tima()
 ```
 
-## Cross-RT duplicate candidate disambiguation
+## Avoiding duplicate final candidates across retention times
 
-After combining spectral, SIRIUS, biological, and chemical consistency scores,
-multiple features eluting at **different chromatographic retention times**
-($\Delta\text{RT} > 0.05\text{ min}$) can sometimes independently rank the same
-planar structure (`candidate_structure_inchikey_connectivity_layer`) at
-`rank_final = 1`---for example, when two eluting isomers share an exact mass or
-a similar MS^2^ spectrum and only one of the isomers is better supported in the
-reference library. Because a single compound cannot elute at two distinct
-retention times on the same chromatographic gradient, TIMA resolves cross-RT
-duplicate `rank_final = 1` assignments using **globally optimal maximum-weight
-bipartite matching** (`resolve_cross_rt_duplicate_candidates()` and
-`drop_cross_rt_duplicate_final_candidates()`):
+A single compound (2D `InChIKey`) cannot elute at two different retention times
+(`> 0.05` min apart) on the same chromatographic gradient. Co-eluting ions of
+the same peak (`[M+H]+`, `[M+Na]+`, or in-source fragments within `0.05` min)
+can share the same top candidate, but distinct chromatographic peaks cannot.
 
-1. **Co-eluting features are grouped into RT clusters:** Features whose
-   retention times differ by at most `rt_tolerance = 0.05` min (such as
-   `[M+H]+`, `[M+Na]+`, `[M+H4N]+`, and in-source fragments of the same analyte)
-   belong to the same RT cluster and legitimately share the same `InChIKey` at
-   `rank_final = 1`.
-2. **Globally optimal bipartite assignment (Hungarian algorithm):** Across
-   distinct RT clusters, TIMA constructs a bipartite graph between RT clusters
-   and candidate `InChIKey`s and solves the exact maximum-weight assignment via
-   the Hungarian (Kuhn--Munkres) algorithm. Edge weights prioritize, in strict
-   hierarchical order:
-   - MS^2^ evidence (`candidate_score_similarity > 0`, SIRIUS CSI, or SIRIUS
-     confidence),
-   - `score_weighted_chemo`,
-   - `candidate_score_similarity`,
-   - `candidate_score_pseudo_initial`, and
-   - smaller `|candidate_structure_error_rt|` and
-     `|candidate_structure_error_mz|` coupled supermodularly with candidate
-     score.
-3. **Promotion reporting (`annotation_note` / `note`):** Whenever a feature's
-   original rank-1 candidate is assigned to a better-supported RT cluster (or
-   tied across symmetric clusters), its promoted candidate is annotated in
-   `annotation_note` (`full` and `filtered` tables) and `note` (`mini` table).
+When two peaks at different retention times initially rank the same structure
+1st---typically isomers sharing an exact mass or a similar MS^2^ spectrum---TIMA
+picks the best overall combination of `(peak, candidate)` pairs across the run:
 
-### Worked examples
-
-- **Example 1 --- MS^2^-supported peak vs. MS^1^-only peak:**
-  - Feature `F1` ($\text{RT} = 2.00\text{ min}$) has an MS^2^ match to Quercetin
-    (`score_weighted_chemo = 0.92`, `rank_final = 1`).
-  - Feature `F2` ($\text{RT} = 8.50\text{ min}$) is an MS^1^-only isomer peak
-    where Quercetin ranks 1st (`0.78`) and Kaempferol ranks 2nd (`0.74`).
-  - **Result:** `F1` keeps Quercetin at `rank_final = 1`. On `F2`, Kaempferol is
-    promoted to `rank_final = 1` with note:
-    `Promoted to rank 1: cross-RT duplicate InChIKey <Quercetin_IK> assigned to feature F1`.
-
-- **Example 2 --- Global bipartite optimum vs. greedy assignment:**
-  - Feature `F1` ($\text{RT} = 2.00\text{ min}$) has rank-1 `IK_A` (`0.90`) and
-    rank-2 `IK_B` (`0.89`).
-  - Feature `F2` ($\text{RT} = 8.50\text{ min}$) has rank-1 `IK_A` (`0.88`) and
-    rank-2 `IK_B` (`0.20`).
-  - A greedy rule would give `IK_A` to `F1` (`0.90`) and force `F2` onto the
-    poorly fitting `IK_B` (`0.20`), yielding a total score of $1.10$.
-  - **Result:** The Hungarian solver assigns `IK_B` to `F1` (`0.89`) and `IK_A`
-    to `F2` (`0.88`) for a globally optimal total score of $1.77$, annotating
-    `F1` with
-    `Promoted to rank 1: cross-RT duplicate InChIKey IK_A assigned to feature F2`.
-
-- **Example 3 --- Deterministic exact-tie handling (zero randomness):**
-  - *Isomer conflict with different mass/RT errors:* When two features share
-    identical candidate scores for two constitutional isomers ($s_A > s_B$),
-    supermodular coupling
-    $(1 + s_{\text{eff}})(10^{-5} q_{\text{rt}} + 10^{-6} q_{\text{mz}})$
-    ensures the feature with smaller $|\Delta\text{RT}|$ or $|\Delta m/z|$
-    strictly wins the higher-scoring isomer, independent of input row order.
-  - *Within-feature tied runner-up candidates:* If `F2` loses its rank-1
-    candidate to `F1` and its runner-up candidates `IK_ALT_1` and `IK_ALT_2` are
-    tied in score (`0.70`), **both** belong to the exact-optimal edge set $E^*$
-    and are promoted together to `rank_final = 1`.
-  - *100% symmetric cross-RT ties:* If two RT clusters have 100% identical
-    scores and errors across every metric, neither feature arbitrarily strips
-    the candidate from the other; all candidates participating in any tied
-    global optimum are placed at `rank_final = 1` with note:
-    `Promoted to rank 1: cross-RT duplicate InChIKey <IK> tied with feature <id>`.
+- **MS^2^ beats MS^1^-only:** Peak `F1` (2.00 min) matches Quercetin by MS^2^
+  (`0.92`), while peak `F2` (8.50 min) only matches Quercetin by MS^1^ (`0.78`)
+  with Kaempferol ranked 2nd (`0.74`). `F1` keeps Quercetin at rank 1, and `F2`
+  promotes Kaempferol to rank 1.
+- **Best overall pair, not first-come-first-served:** Peak `F1` scores `0.90`
+  for `IK_A` and `0.89` for `IK_B`, while peak `F2` scores `0.88` for `IK_A` and
+  `0.20` for `IK_B`. Giving `IK_A` to `F1` would force `F2` onto a poor match
+  (`0.20`, total `1.10`). TIMA instead assigns `IK_B` to `F1` (`0.89`) and
+  `IK_A` to `F2` (`0.88`), giving a much better combined score (`1.77`).
+- **Ties are never broken at random:**
+  - If two peaks have identical candidate scores for two isomers, the peak with
+    the smaller RT or `m/z` error gets the higher-scoring isomer.
+  - If the losing peak has two tied runner-up candidates, both are promoted to
+    rank 1 together.
+  - If two peaks have 100% identical scores and errors across all metrics, both
+    candidates are kept tied at rank 1 on both peaks.
+- **Reported in the output tables:** Every promotion is noted in
+  `annotation_note` (`full` and `filtered` tables) and `note` (`mini` table),
+  for example:
+  `Promoted to rank 1: cross-RT duplicate InChIKey IK_A assigned to feature F2`
+  (or `tied with feature F2` on an exact tie).
 
 The final exported file is formatted in order to be easily imported in
 [Cytoscape](https://cytoscape.org/) to further explore your data!

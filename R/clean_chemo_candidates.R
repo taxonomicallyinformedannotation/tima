@@ -2152,36 +2152,30 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
 
 #' Resolve duplicate rank-1 InChIKeys across distinct retention-time clusters
 #'
-#' @description Disambiguates cross-RT duplicate final candidates using globally
-#'   optimal maximum-weight bipartite matching (Hungarian / Kuhn-Munkres
-#'   algorithm) between retention-time clusters and candidate structures
-#'   (`candidate_structure_inchikey_connectivity_layer`), with exact-tie
-#'   preservation so no arbitrary or random choices are ever made.
+#' @description Ensures two peaks eluting at different retention times
+#'   (`> rt_tolerance` min apart) do not keep the same planar structure
+#'   (`candidate_structure_inchikey_connectivity_layer`) at `rank_final = 1`.
 #'
-#'   Features eluting within `rt_tolerance` (default `0.05` min) belong to the
-#'   same chromatographic peak (e.g. co-eluting `[M+H]+`, `[M+Na]+`, or in-source
-#'   fragments) and may legitimately share the same final candidate. Features in
-#'   different RT clusters cannot represent the same compound; when they share a
-#'   rank-1 `InChIKey`, the bipartite solver computes the exact set of edges
-#'   participating in any globally optimal assignment that maximizes:
-#'   1. Total number of RT clusters assigned a distinct candidate,
-#'   2. Number of RT clusters assigned an MS2-supported candidate,
-#'   3. Total `score_weighted_chemo`, spectral similarity, and
+#'   Co-eluting ions within `rt_tolerance` (default `0.05` min, e.g. `[M+H]+`,
+#'   `[M+Na]+`, and in-source fragments) are grouped into the same RT cluster
+#'   and can share the same top candidate. Across distinct RT clusters, TIMA
+#'   finds the best global assignment of candidates to peaks (via the Hungarian
+#'   algorithm), prioritizing:
+#'   1. Assigning a distinct candidate to as many RT clusters as possible,
+#'   2. MS2-supported matches over MS1-only matches,
+#'   3. Higher `score_weighted_chemo`, spectral similarity, and
 #'      `candidate_score_pseudo_initial`,
-#'   4. Supermodularly coupled RT and `m/z` accuracy (so higher-scoring isomers
-#'      are strictly assigned to the feature with smaller `|error_rt|` or
-#'      `|error_mz|`).
+#'   4. Smaller `|error_rt|` and `|error_mz|` (weighted by candidate score so
+#'      the peak with smaller error gets the higher-scoring isomer).
 #'
-#'   Exact ties are preserved without randomness or row-order dependence:
-#'   - If a feature's rank-1 candidate is assigned to a stronger RT cluster and
-#'     multiple alternative candidates on the losing feature are tied, **all**
-#'     tied top alternatives are promoted together to `rank_final = 1`.
-#'   - If two RT clusters have 100% identical evidence across all scores and
-#'     errors, all candidates participating in any tied global optimum are placed
-#'     at `rank_final = 1` rather than picking one arbitrarily.
+#'   Exact ties are never broken at random:
+#'   - Tied runner-up candidates on the losing peak are promoted together to
+#'     `rank_final = 1`.
+#'   - If two RT clusters have 100% identical scores and errors across all
+#'     metrics, all tied optimal candidates are kept at `rank_final = 1`.
 #'
-#'   Whenever a feature promotes an alternative candidate to rank 1, its
-#'   `annotation_note` (and `note` in `mini`) records:
+#'   Every promoted candidate receives an `annotation_note` (and `note` in
+#'   `mini`):
 #'   `"Promoted to rank 1: cross-RT duplicate InChIKey <IK> assigned to feature <id>"`
 #'   (or `"tied with feature <id>"` on an exact cross-RT tie).
 #'

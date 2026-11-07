@@ -49,7 +49,6 @@ Daltons
 DataFrame
 Deisotoping
 Dervieux
-Disambiguates
 Dounoue
 ECMDB
 Enveda
@@ -115,7 +114,6 @@ MsBackendMgf
 MsBackendMsp
 MsCoreUtils
 MultiMS
-Munkres
 Müller
 NPC
 NPClassifier
@@ -164,7 +162,6 @@ SpectRalLibRaRies
 Spectrometry
 Stodden
 Superdomain
-Supermodularly
 Sys
 Szabolcs
 TIMA's
@@ -191,7 +188,6 @@ Zenodo
 adduct
 adducts
 al
-analyte
 ann
 axonomically
 backoff
@@ -363,8 +359,6 @@ subgraphs
 subscores
 summarization
 superdomain
-supermodular
-supermodularly
 taxo
 taxonomically
 testability
