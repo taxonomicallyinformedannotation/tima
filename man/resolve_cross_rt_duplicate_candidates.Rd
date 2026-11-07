@@ -35,9 +35,9 @@ participating in any globally optimal assignment that maximizes:
 \item Number of RT clusters assigned an MS2-supported candidate,
 \item Total \code{score_weighted_chemo}, spectral similarity, and
 \code{candidate_score_pseudo_initial},
-\item Supermodularly coupled RT and $m/z$ accuracy (so higher-scoring isomers
-are strictly assigned to the feature with smaller $|\Delta\text{RT}|$ or
-$|\Delta m/z|$).
+\item Supermodularly coupled RT and \code{m/z} accuracy (so higher-scoring isomers
+are strictly assigned to the feature with smaller \verb{|error_rt|} or
+\verb{|error_mz|}).
 }
 
 Exact ties are preserved without randomness or row-order dependence:

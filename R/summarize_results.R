@@ -338,19 +338,16 @@ summarize_results <- function(
             names(df_joined) &&
             "annotation_note" %in% names(lkp_ren)
         ) {
-          lkp_ren <- tidytable::rename(
-            lkp_ren,
-            .annotation_note_lkp = annotation_note
-          )
+          names(lkp_ren)[
+            names(lkp_ren) == "annotation_note"
+          ] <- ".annotation_note_lkp"
           df_joined <- df_joined |>
-            tidytable::left_join(y = lkp_ren, by = note_join_cols) |>
-            tidytable::mutate(
-              annotation_note = tidytable::coalesce(
-                annotation_note,
-                .annotation_note_lkp
-              )
-            ) |>
-            tidytable::select(-tidyselect::any_of(".annotation_note_lkp"))
+            tidytable::left_join(y = lkp_ren, by = note_join_cols)
+          df_joined[["annotation_note"]] <- tidytable::coalesce(
+            df_joined[["annotation_note"]],
+            df_joined[[".annotation_note_lkp"]]
+          )
+          df_joined[[".annotation_note_lkp"]] <- NULL
         } else {
           df_joined <- df_joined |>
             tidytable::left_join(

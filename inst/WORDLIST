@@ -13,6 +13,7 @@ Barret
 Behaviour
 Benchmarking
 Bengtsson
+Benjamini
 BiGG
 BiocManager
 BiocVersion
@@ -32,6 +33,7 @@ Canonicalize
 Canonicalizes
 ChEBI
 ChEMBL
+Cheminformatics
 Cheng
 Christophe
 ClassyFire
@@ -45,7 +47,9 @@ DMSO
 Da
 Daltons
 DataFrame
+Deisotoping
 Dervieux
+Disambiguates
 Dounoue
 ECMDB
 Enveda
@@ -62,6 +66,7 @@ Grolemund
 Gábor
 HMDB
 Hadley
+Hochberg
 Horvát
 Httr
 ISDB
@@ -75,6 +80,7 @@ InterJournal
 JJ
 Jeroen
 Jonge
+Kaempferol
 Kalinowski
 Kirill
 Knitr
@@ -109,6 +115,7 @@ MsBackendMgf
 MsBackendMsp
 MsCoreUtils
 MultiMS
+Munkres
 Müller
 NPC
 NPClassifier
@@ -134,6 +141,7 @@ PubChem
 PubMed
 QIDs
 QLever
+Quercetin
 RDKit
 RTs
 Rainer
@@ -145,7 +153,6 @@ SMF
 SML
 SMPDB
 SPARQL
-SSL
 Salzer
 Scalable
 Schloerke
@@ -157,6 +164,7 @@ SpectRalLibRaRies
 Spectrometry
 Stodden
 Superdomain
+Supermodularly
 Sys
 Szabolcs
 TIMA's
@@ -183,6 +191,7 @@ Zenodo
 adduct
 adducts
 al
+analyte
 ann
 axonomically
 backoff
@@ -219,11 +228,15 @@ df
 dimerize
 dimerizes
 dimers
+disambiguated
 docopt
 doi
 dp
 dr
+elute
+eluting
 equi
+errored
 et
 etabolite
 exposomics
@@ -276,6 +289,7 @@ mer
 metabo
 metabolomics
 metaregistry
+mf
 mgf
 modelled
 modularity
@@ -349,6 +363,8 @@ subgraphs
 subscores
 summarization
 superdomain
+supermodular
+supermodularly
 taxo
 taxonomically
 testability

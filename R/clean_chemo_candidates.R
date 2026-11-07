@@ -2168,9 +2168,9 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
 #'   2. Number of RT clusters assigned an MS2-supported candidate,
 #'   3. Total `score_weighted_chemo`, spectral similarity, and
 #'      `candidate_score_pseudo_initial`,
-#'   4. Supermodularly coupled RT and $m/z$ accuracy (so higher-scoring isomers
-#'      are strictly assigned to the feature with smaller $|\Delta\text{RT}|$ or
-#'      $|\Delta m/z|$).
+#'   4. Supermodularly coupled RT and `m/z` accuracy (so higher-scoring isomers
+#'      are strictly assigned to the feature with smaller `|error_rt|` or
+#'      `|error_mz|`).
 #'
 #'   Exact ties are preserved without randomness or row-order dependence:
 #'   - If a feature's rank-1 candidate is assigned to a stronger RT cluster and
