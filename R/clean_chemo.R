@@ -139,8 +139,6 @@ clean_chemo <- function(
     high_evidence = high_evidence
   )
 
-  # Input Validation ----
-
   validate_clean_chemo_inputs(
     annot_table_wei_chemo = annot_table_wei_chemo,
     candidates_final = candidates_final,

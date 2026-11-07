@@ -64,7 +64,6 @@ read_mgf_opti <- function(
     precursorCharge = "CHARGE"
   )
 ) {
-  # Validate inputs
   if (missing(f) || is.null(f) || length(f) == 0L) {
     cli::cli_abort(
       "file path 'f' must be provided",

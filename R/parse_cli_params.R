@@ -32,7 +32,6 @@
 #' )
 #' }
 parse_cli_params <- function(arguments, parameters) {
-  # Input Validation ----
   validate_list_or_vector(arguments, param_name = "arguments", min_length = 0)
   validate_list_or_vector(parameters, param_name = "parameters", min_length = 0)
 

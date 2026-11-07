@@ -99,7 +99,6 @@ dist_get <- function(d, idx1, idx2) {
 #' stats::aggregate(Distance ~ Label, data = result, FUN = mean)
 #' }
 dist_groups <- function(d, g) {
-  # Input Validation ----
   d <- stats::as.dist(m = d)
   g <- as.factor(g)
 

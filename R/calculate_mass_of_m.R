@@ -62,7 +62,6 @@ calculate_mass_of_m <- function(
   adduct_string,
   electron_mass = ELECTRON_MASS_DALTONS
 ) {
-  # Validate required inputs
   if (missing(adduct_string) || missing(mz)) {
     cli::cli_abort(
       c(
@@ -144,27 +143,10 @@ calculate_mass_of_m <- function(
     return(neutral_mass)
   }
 
-  # Fallback: full validation for less-common or un-cached paths
-  # Validate m/z value
   validate_mz(mz)
-
-  # Validate electron mass
   validate_electron_mass(electron_mass)
+  parsed_adduct <- parse_adduct(adduct_string)
 
-  # Parse the adduct string directly
-  parsed_adduct <- NULL
-  if (
-    !is.null(adduct_string) &&
-      length(adduct_string) == 1L &&
-      !is.na(adduct_string) &&
-      nzchar(adduct_string)
-  ) {
-    parsed_adduct <- parse_adduct(adduct_string)
-  } else {
-    parsed_adduct <- parse_adduct(adduct_string)
-  }
-
-  # Check if parsing failed (all zeros returned)
   if (is_parse_failed(parsed_adduct)) {
     msg <- paste0(
       "Failed to parse adduct '",
@@ -177,14 +159,12 @@ calculate_mass_of_m <- function(
     return(0)
   }
 
-  # Extract parsed components with descriptive names
   n_charges <- parsed_adduct["n_charges"][[1L]]
   charge_sign <- parsed_adduct["charge"][[1L]]
   n_mer <- parsed_adduct["n_mer"][[1L]]
   n_iso <- parsed_adduct["n_iso"][[1L]]
   mass_modifications <- parsed_adduct["los_add_clu"][[1L]]
 
-  # Validate critical values to avoid division by zero
   if (n_mer == 0L) {
     log_error(
       "Invalid multimer count (n_mer = 0) in adduct '%s'. %s",
@@ -203,8 +183,6 @@ calculate_mass_of_m <- function(
     return(0)
   }
 
-  # Calculate neutral mass using the adduct formula
-  # Formula: M = (|z| * (m/z - iso_shift) - modifications + z * e_mass) / n_mer
   neutral_mass <- calculate_neutral_mass_formula(
     mz = mz,
     n_charges = n_charges,
@@ -215,7 +193,6 @@ calculate_mass_of_m <- function(
     electron_mass = electron_mass
   )
 
-  # Validate result
   if (is.na(neutral_mass) || !is.finite(neutral_mass)) {
     log_error(
       "Calculated neutral mass is not finite for adduct '%s' and m/z %s",
@@ -224,34 +201,6 @@ calculate_mass_of_m <- function(
     )
     return(0)
   }
-
-  ## COMMENT: This is actually llowed for neutral mass calculations
-  # if (neutral_mass < 0) {
-  #   log_warn(
-  #     "Calculated negative neutral mass (",
-  #     round(neutral_mass, 4),
-  #     " Da) ",
-  #     "for adduct '",
-  #     adduct_string,
-  #     "' and m/z ",
-  #     mz,
-  #     ". ",
-  #     "This is physically impossible. Returning NA."
-  #   )
-  #   return(NA_real_)
-  # }
-
-  # Log successful calculation at trace level
-  ## COMMENT too many logs
-  #   "Calculated neutral mass: ",
-  #   round(neutral_mass, 4),
-  #   " Da ",
-  #   "from m/z ",
-  #   mz,
-  #   " with adduct '",
-  #   adduct_string,
-  #   "'"
-  # )
 
   neutral_mass
 }
@@ -408,7 +357,6 @@ calculate_mz_from_mass_batch <- function(
   out
 }
 
-# Helper Functions ----
 
 #' Validate m/z value
 #'
@@ -455,7 +403,6 @@ validate_mz <- function(mz) {
 #'
 #' @keywords internal
 validate_electron_mass <- function(electron_mass) {
-  # Basic numeric validation
   validate_numeric_range(
     value = electron_mass,
     min_value = 0,
@@ -545,7 +492,6 @@ calculate_mz_from_mass <- function(
   adduct_string,
   electron_mass = ELECTRON_MASS_DALTONS
 ) {
-  # Validate inputs
   if (missing(neutral_mass) || missing(adduct_string)) {
     cli::cli_abort(
       "both neutral_mass and adduct_string must be provided",
@@ -561,7 +507,6 @@ calculate_mz_from_mass <- function(
     param_name = "neutral_mass"
   )
 
-  # Validate electron mass
   validate_electron_mass(electron_mass)
 
   # Parse adduct
@@ -574,7 +519,6 @@ calculate_mz_from_mass <- function(
     return(0)
   }
 
-  # Extract components
   n_charges <- parsed_adduct["n_charges"][[1L]]
   charge_sign <- parsed_adduct["charge"][[1L]]
   n_mer <- parsed_adduct["n_mer"][[1L]]

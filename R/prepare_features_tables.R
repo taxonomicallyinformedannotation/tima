@@ -59,7 +59,6 @@ prepare_features_tables <- function(
     candidates = candidates
   )
 
-  # Input Validation ----
   .validate_prepare_features_inputs(
     features = features,
     output = output,

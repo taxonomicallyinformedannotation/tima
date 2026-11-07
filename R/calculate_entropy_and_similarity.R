@@ -1,5 +1,3 @@
-# Helper Functions ----
-
 #' Count matched peaks between query and sorted library spectra
 #' @keywords internal
 .count_matched_peaks <- function(query_mz, lib_mz_sorted, dalton, ppm) {

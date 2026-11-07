@@ -342,7 +342,6 @@ select_annotations_complement_working_columns <- function(df) {
 #' clean_collapse(grouped, cols = "value")
 #' }
 clean_collapse <- function(grouped_df, cols = NULL, separator = " $ ") {
-  # Input Validation ----
   if (!is.data.frame(grouped_df)) {
     tima_abort(
       problem = "grouped_df must be a data frame or grouped tidytable",
@@ -472,7 +471,6 @@ clean_collapse <- function(grouped_df, cols = NULL, separator = " $ ") {
   out
 }
 
-# Helper Functions ----
 
 #' Determine which columns to process
 #' @keywords internal

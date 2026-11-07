@@ -25,7 +25,6 @@
 #' # Returns correct path whether in dev or installed package
 #' }
 get_path <- function(base_path) {
-  # Input Validation ----
   validate_character(base_path, param_name = "base_path", allow_empty = FALSE)
 
   # Try 1: Check if base path exists as-is

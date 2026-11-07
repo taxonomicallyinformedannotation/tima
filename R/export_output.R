@@ -26,7 +26,6 @@
 #' unlink("output", recursive = TRUE)
 #' }
 export_output <- function(x, file) {
-  # Input Validation ----
   validate_character(file, param_name = "file", allow_empty = FALSE)
   validate_dataframe(x, param_name = "x")
 

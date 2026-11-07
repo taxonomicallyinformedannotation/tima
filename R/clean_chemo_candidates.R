@@ -1850,14 +1850,9 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
   prio_rank <- integer(n)
   prio_rank[ord] <- seq_len(n)
 
-  # Pure, order-independent hierarchical composite weight:
-  # 1. Assigned candidate cardinality (100)
-  # 2. MS2-supported assignments (10)
-  # 3. Sum of score_weighted_chemo (1.0), similarity (1e-2), pseudo_initial (1e-4)
-  # 4. RT and m/z accuracy coupled supermodularly with (1 + s_eff) so that when
-  #    two features share isomer candidates with s_A > s_B, the feature with
-  #    smaller |error_rt| or |error_mz| strictly wins the higher-scoring isomer,
-  #    while truly identical evidence produces an exact tie (zero row-order bias).
+  # Multiply RT/m/z quality by (1 + s_eff) so that when two peaks share the
+  # same two isomer scores (s_A > s_B), the peak with smaller RT/m/z error
+  # gets the higher-scoring isomer instead of the two errors canceling out.
   s_eff <- swc_w + 1e-2 * sim_w + 1e-4 * spi_w
   weights <- 100 +
     10 * as.double(has_ms2) +

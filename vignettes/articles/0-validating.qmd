@@ -42,13 +42,11 @@ knitr::opts_chunk$set(
 )
 ```
 
-## Why Validate Your Data First?
+Before running the pipeline, validate your inputs with `validate_inputs()`.
+Catching a malformed MGF, a missing column, or an incomplete SIRIUS export up
+front avoids failing halfway through library downloads or spectral matching.
 
-Before starting the TIMA pipeline, it's recommended to validate your input data.
-This **pre-flight check** saves you time by catching issues immediately instead
-of discovering them after expensive operations like library downloads.
-
-## Quick Start
+## Quick start
 
 ```{r}
 #| label: validate_example
@@ -56,7 +54,6 @@ of discovering them after expensive operations like library downloads.
 
 library(tima)
 
-# Validate all inputs before starting
 validate_inputs(
   features = "data/features.csv",
   spectra = "data/spectra.mgf",
@@ -65,392 +62,33 @@ validate_inputs(
 )
 ```
 
-### Example Output
-
-```
-============================================================
-Data Sanitizing: Pre-flight Checks
-============================================================
-Checking features file...
-✓ Features file: 1250 rows, 15 columns
-  Columns: feature_id, mz, rt, intensity, ...
-
-Checking MGF file...
-✓ MGF file: 843 spectra found
-
-Checking metadata file...
-✓ Metadata file: 120/120 files found
-
-Checking SIRIUS output...
-✓ SIRIUS output: 843 annotations, all required files present
-  - formula_identifications_all.tsv: ✓
-  - canopus_summary_all.tsv: ✓
-  - compound_identifications_all.tsv: ✓
-============================================================
-✓ All pre-flight checks passed!
-Data validation complete. Ready to proceed.
-============================================================
-```
-
-## What Gets Validated?
-
-### MGF Files (Mass Spectra)
-
-Checks for: - File exists and is readable - Contains valid spectra (BEGIN IONS
-markers) - Each spectrum has PEPMASS field - Peak data is present - BEGIN
-IONS/END IONS are balanced
-
-**Reports:** - Number of spectra found - Specific issues if any
-
-```{r}
-#| label: validate_mgf
-#| eval: false
-
-# Validate just the MGF file
-validate_inputs(spectra = "data/spectra.mgf")
-```
-
-### Features Files (CSV/TSV)
-
-Checks for: - File exists and is readable - Not empty (has rows and columns) -
-Required columns present (e.g., `feature_id`) - Valid CSV/TSV format
-
-**Reports:** - Number of rows (features) - Number of columns - Column names -
-Missing required columns
-
-```{r}
-#| label: validate_features
-#| eval: false
-
-# Validate features file
-validate_inputs(features = "data/features.csv")
-```
-
-### Metadata Consistency
-
-Checks for: - Metadata file exists - Filename column present - Files referenced
-in metadata actually exist - No broken file references
-
-**Reports:** - Number of files in metadata - Number of files found on disk -
-List of missing files
-
-```{r}
-#| label: validate_metadata
-#| eval: false
-
-# Validate metadata consistency
-validate_inputs(
-  metadata = "data/metadata.tsv",
-  metadata_filename_col = "filename",
-  metadata_data_dir = "data/raw"
-)
-```
-
-### SIRIUS Output Completeness
-
-Checks for: - SIRIUS directory exists - Required summary files present: -
-`formula_identifications_all.tsv` - `canopus_formula_summary_all.tsv` -
-`compound/structure_identifications_all.tsv` - Feature directories exist
-
-**Reports:** - Presence of each required file - Number of feature directories -
-Specific missing files
-
-```{r}
-#| label: validate_sirius
-#| eval: false
-
-# Validate SIRIUS output
-validate_inputs(sirius = "output/sirius")
-```
-
-## Integration with Pipeline
-
-The validation functions are **automatically integrated** into the main TIMA
-functions:
-
-### Automatic Validation
-
-```{r}
-#| label: automatic_validation
-#| eval: false
-
-# These functions automatically validate inputs
-annotate_masses(...) # Validates features file first
-annotate_spectra(...) # Validates MGF files first
-```
-
-### Manual Validation
-
-For full control, validate manually before running the pipeline:
-
-```{r}
-#| label: manual_validation
-#| eval: false
-
-# 1. Validate everything first
-validate_inputs(
-  features = "data/features.csv",
-  spectra = "data/spectra.mgf",
-  sirius = "output/sirius"
-)
-
-# 2. If all checks pass, run the pipeline
-run_tima()
-```
-
-## Common Issues Caught
-
-### MGF File Issues
-
-**Issue:** No spectra found
-
-```
-✗ MGF file has issues:
-  - No spectra found (no BEGIN IONS markers)
-```
-
-**Fix:** Check if the file is actually in MGF format and contains spectra.
-
---------------------------------------------------------------------------------
-
-**Issue:** Mismatched markers
-
-```
-✗ MGF file has issues:
-  - Mismatched BEGIN IONS (10) and END IONS (9)
-```
-
-**Fix:** One spectrum is missing an END IONS marker. Check the file structure.
-
---------------------------------------------------------------------------------
-
-**Issue:** Missing required fields
-
-```
-✗ MGF file has issues:
-  - First spectrum missing PEPMASS field
-```
-
-**Fix:** Each spectrum must have a PEPMASS field specifying the precursor m/z.
-
-### Features File Issues
-
-**Issue:** Empty file
-
-```
-✗ Features file has issues:
-  - features table is empty (0 rows)
-```
-
-**Fix:** Ensure the file contains actual feature data, not just a header.
-
---------------------------------------------------------------------------------
-
-**Issue:** Missing columns
-
-```
-✗ Features file has issues:
-  - Missing required columns: feature_id, mz
-```
-
-**Fix:** Add the required columns to your features table.
-
-### Metadata Issues
-
-**Issue:** Files not found
-
-```
-✗ Metadata validation has issues:
-  - Missing 5/120 files referenced in metadata
-  Missing files:
-    - sample_001.mzML
-    - sample_023.mzML
-    - sample_045.mzML
-    - sample_067.mzML
-    - sample_089.mzML
-```
-
-**Fix:** Ensure all files listed in metadata are present in the data directory.
-
---------------------------------------------------------------------------------
-
-**Issue:** Wrong column name
-
-```
-✗ Metadata validation has issues:
-  - Column 'filename' not found in metadata
-```
-
-**Fix:** Rename your column to `filename` or specify the correct column with
-`metadata_filename_col` parameter.
-
-### SIRIUS Issues
-
-**Issue:** Missing output files
-
-```
-✗ SIRIUS output has issues:
-  - Missing formula_identifications_all.tsv
-  - Missing canopus_summary_all.tsv
-```
-
-**Fix:** Re-run SIRIUS with the correct output options enabled, or check that
-the output directory path is correct.
-
---------------------------------------------------------------------------------
-
-**Issue:** Empty output
-
-```
-✗ SIRIUS output has issues:
-  - No feature directories found in SIRIUS output
-```
-
-**Fix:** The SIRIUS job may have failed or not completed. Check SIRIUS logs.
-
-## Advanced Usage
-
-### Programmatic Validation
-
-For scripts and pipelines, you can capture validation results:
-
-```{r}
-#| label: programmatic
-#| eval: false
-
-# The function returns TRUE on success or stops with error
-tryCatch(
-  {
-    validate_inputs(features = "data/features.csv")
-    message("Validation passed - proceeding...")
-    # Continue with pipeline
-  },
-  error = function(e) {
-    message("Validation failed: ", e$message)
-    # Handle error (e.g., send notification, log, exit)
-  }
-)
-```
-
-### Batch Validation
-
-Validate multiple datasets in a loop:
-
-```{r}
-#| label: batch_validation
-#| eval: false
-
-datasets <- c("dataset1", "dataset2", "dataset3")
-
-for (dataset in datasets) {
-  message("Validating ", dataset, "...")
-
-  tryCatch(
-    {
-      validate_inputs(
-        features = file.path(dataset, "features.csv"),
-        spectra = file.path(dataset, "spectra.mgf")
-      )
-      message("  ✓ ", dataset, " is valid")
-    },
-    error = function(e) {
-      message("  ✗ ", dataset, " has issues: ", e$message)
-    }
-  )
-}
-```
-
-## Best Practices
-
-### Always Validate First
-
-Make validation the **first step** in your workflow:
-
-```{r}
-#| label: best_practice_1
-#| eval: false
-
-# Good practice
-validate_inputs(features = "data/features.csv")
-run_tima()
-
-# Bad practice (will waste time if data is invalid)
-run_tima() # Might fail after 10+ minutes
-```
-
-### Validate After Data Conversion
-
-If you convert data formats (e.g., mzML to MGF), validate the output:
-
-```{r}
-#| label: best_practice_2
-#| eval: false
-
-# Convert data
-# convert_mzml_to_mgf("raw_data/", "processed/spectra.mgf")
-
-# Validate immediately
-validate_inputs(spectra = "processed/spectra.mgf")
-```
-
-### Include in Automated Pipelines
-
-Add validation to your automated workflows:
-
-```{r}
-#| label: best_practice_3
-#| eval: false
-
-# Snakemake, Nextflow, or targets pipeline
-validate_inputs(...) # Fails fast if data is bad
-run_tima() # Only runs if validation passes
-```
-
-### Document Your Validation
-
-Keep a record of validation results:
-
-```{r}
-#| label: best_practice_4
-#| eval: false
-
-# Capture output to log file
-sink("validation_log.txt")
-validate_inputs(
-  features = "data/features.csv",
-  spectra = "data/spectra.mgf",
-  sirius = "output/sirius"
-)
-sink()
-```
-
-## Summary
-
-Data validation with `validate_inputs()`:
-
-- **Saves time** - Catches errors in seconds, not minutes
-- **Clear messages** - Shows exactly what's wrong and how to fix it
-- **Comprehensive** - Checks MGF, CSV, metadata, and SIRIUS data
-- **Automatic** - Integrated into main TIMA functions
-- **Preventive** - Stops before expensive operations
-- **Informative** - Reports row counts, spectra counts, file lists
-
-**Always validate your data first!** It's the best way to ensure a smooth TIMA
-experience.
-
-## Next Steps
-
-Now that your data is validated:
+You can also validate a single input at a time (any omitted argument is
+skipped), and `annotate_masses()` / `annotate_spectra()` automatically run the
+relevant checks before starting.
+
+## What is checked and why
+
+- **Features table (`features`):** Must be a non-empty CSV/TSV containing your
+  feature ID, `mz`, and `rt` columns (`feature_col` if not named `feature_id`).
+- **Spectra (`spectra`):** Must be a readable MGF with balanced `BEGIN IONS` /
+  `END IONS` blocks, a precursor `PEPMASS` per spectrum, and non-empty peak
+  lists.
+- **Metadata (`metadata`):** When provided, verifies the sample filename column
+  (`metadata_filename_col`) and checks that referenced files exist in
+  `metadata_data_dir`.
+- **SIRIUS workspace (`sirius`):** Checks that summary files
+  (`formula_identifications_all.tsv`, `canopus_formula_summary_all.tsv`, and
+  `compound_identifications_all.tsv` / `structure_identifications_all.tsv`) were
+  exported (`--full-summary` in the CLI or the summary export button in the
+  GUI).
+
+## Next steps
 
 - [I.
-  Gathering](https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/I-gathering.html) -
-  Collect your data
+  Gathering](https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/I-gathering.html)
 - [II.
-  Preparing](https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/II-preparing.html) -
-  Prepare your libraries
+  Preparing](https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/II-preparing.html)
 - [III.
-  Processing](https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/III-processing.html) -
-  Run the annotation pipeline
+  Processing](https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/III-processing.html)
 - [IV.
-  Benchmarking](https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/IV-benchmarking.html) -
-  Evaluate your results
+  Benchmarking](https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/IV-benchmarking.html)

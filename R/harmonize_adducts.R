@@ -74,7 +74,6 @@ harmonize_adducts <- function(
   adducts_colname = "adduct",
   adducts_translations
 ) {
-  # Input Validation ----
   validate_dataframe(df, param_name = "df")
   validate_character(
     adducts_colname,
@@ -87,9 +86,6 @@ harmonize_adducts <- function(
     ctx <- log_operation("harmonize_adducts", n_rows = nrow(df))
   }
 
-  # Early Exits ----
-
-  # No column to harmonize
   if (!adducts_colname %in% names(df)) {
     log_debug(
       "Column '%s' not found, skipping harmonization",
@@ -98,7 +94,6 @@ harmonize_adducts <- function(
     return(df)
   }
 
-  # No translations provided
   if (missing(adducts_translations) || length(adducts_translations) == 0L) {
     return(df)
   }
@@ -106,7 +101,6 @@ harmonize_adducts <- function(
   if (identical(adducts_translations, .ADDUCTS_TRANSLATIONS_DEFAULT_REF)) {
     adducts_translations <- .ADDUCTS_TRANSLATIONS_DEFAULT_SORTED
   } else {
-    # Validate translations
     validate_adduct_translations(adducts_translations)
 
     # Sort them (important)
@@ -206,7 +200,6 @@ harmonize_adducts <- function(
   df
 }
 
-# Helper Functions ----
 
 #' Validate adduct translations structure
 #' @keywords internal

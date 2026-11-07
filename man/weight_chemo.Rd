@@ -62,11 +62,6 @@ NPClassifier) across molecular network neighbors. Higher chemical
 consistency within network components results in higher chemical scores.
 Internal helper for weight_annotations().
 }
-\details{
-The weights are automatically normalized by dividing by their sum,
-so they do NOT need to sum to 1. For example, weights of (1, 1, 1)
-produce the same result as (0.33, 0.33, 0.33).
-}
 \examples{
 \dontrun{
 # Internal use only - called by weight_annotations()

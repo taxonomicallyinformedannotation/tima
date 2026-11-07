@@ -265,7 +265,6 @@ run_tima <- function(
   clean_old_logs = TRUE,
   log_level = "info"
 ) {
-  # Input Validation ----
   parsed_log_level <- .validate_run_tima_inputs(
     target_pattern = target_pattern,
     log_file = log_file,

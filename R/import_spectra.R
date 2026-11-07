@@ -52,8 +52,6 @@ import_spectra <- function(
   sanitize = TRUE,
   combine = TRUE
 ) {
-  # Input Validation ----
-
   # Validate numeric parameters first (cheapest checks)
   if (!is.numeric(dalton) || dalton <= 0 || !is.numeric(ppm) || ppm <= 0) {
     cli::cli_abort(

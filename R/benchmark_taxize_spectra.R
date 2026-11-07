@@ -34,7 +34,6 @@
 #' )
 #' }
 benchmark_taxize_spectra <- function(input, keys, org_tax_ott, output) {
-  # Input Validation ----
   validate_file_existence(list(
     input = input,
     keys = keys,

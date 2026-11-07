@@ -317,8 +317,6 @@ weight_annotations <- function(
   force = get_params(step = "weight_annotations")$options$force,
   xrefs_file = NULL
 ) {
-  # Input Validation ----
-
   # These sub-rank weights are accepted for YAML config completeness
   # but not yet wired into scoring.
   force(score_biological_infraorder)

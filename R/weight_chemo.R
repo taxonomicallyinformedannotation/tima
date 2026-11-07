@@ -1,13 +1,9 @@
-# Helper Functions ----
-
 #' Validate that a score is between 0 and 1
 #' @keywords internal
 #' @noRd
 .is_valid_score <- function(score) {
   is.numeric(score) && score >= 0 && score <= 1
 }
-
-# Exported Functions ----
 
 #' @title Weight annotations by chemical consistency
 #'
@@ -16,10 +12,6 @@
 #'     NPClassifier) across molecular network neighbors. Higher chemical
 #'     consistency within network components results in higher chemical scores.
 #'     Internal helper for weight_annotations().
-#'
-#' @details The weights are automatically normalized by dividing by their sum,
-#'     so they do NOT need to sum to 1. For example, weights of (1, 1, 1)
-#'     produce the same result as (0.33, 0.33, 0.33).
 #'
 #' @include validations_utils.R
 #' @include weights_utils.R
@@ -89,13 +81,10 @@ weight_chemo <- function(
     n_input = nrow(annot_table_wei_bio_clean)
   )
 
-  # Input Validation ----
   validate_dataframe(
     annot_table_wei_bio_clean,
     param_name = "annot_table_wei_bio_clean"
   )
-
-  # Validate weights
   validate_weights(
     c(
       weight_spectral,
@@ -103,8 +92,6 @@ weight_chemo <- function(
       weight_chemical
     )
   )
-
-  # Validate all chemical score parameters (0-1 range)
   validate_numeric_range(
     score_chemical_cla_kingdom,
     0,
@@ -152,7 +139,6 @@ weight_chemo <- function(
     annot_table_wei_bio_clean
   )
 
-  # Early Exit ----
   n_annotations <- nrow(annot_table_wei_bio_clean)
   if (n_annotations == 0L) {
     log_warn(
@@ -161,7 +147,6 @@ weight_chemo <- function(
     return(annot_table_wei_bio_clean)
   }
 
-  # Validate weights sum to 1 (with tolerance for floating-point precision)
   weight_sum <- weight_spectral + weight_biological + weight_chemical
   if (abs(weight_sum - 1.0) > 0.01) {
     cli::cli_abort(
@@ -171,7 +156,6 @@ weight_chemo <- function(
     )
   }
 
-  # Validate all weights are non-negative
   if (weight_spectral < 0 || weight_biological < 0 || weight_chemical < 0) {
     cli::cli_abort(
       "all weights must be non-negative",
@@ -180,7 +164,6 @@ weight_chemo <- function(
     )
   }
 
-  # Validate chemical scores
   chem_scores <- list(
     cla_kingdom = score_chemical_cla_kingdom,
     cla_superclass = score_chemical_cla_superclass,
@@ -191,7 +174,6 @@ weight_chemo <- function(
     npc_class = score_chemical_npc_class
   )
 
-  # Validate all scores
   invalid_scores <- !vapply(
     X = chem_scores,
     FUN = .is_valid_score,

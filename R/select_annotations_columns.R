@@ -51,7 +51,6 @@ select_annotations_columns <- function(
   cache = NULL,
   recompute_smiles = TRUE
 ) {
-  # Input Validation ----
   validate_dataframe(df, param_name = "df")
 
   # Early exit for empty input. Return a schema-complete (zero-row) frame

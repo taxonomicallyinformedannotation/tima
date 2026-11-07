@@ -25,7 +25,6 @@
 #' )
 #' }
 export_spectra_rds <- function(file, spectra) {
-  # Input Validation ----
   validate_character(file, param_name = "file", allow_empty = FALSE)
 
   if (!inherits(spectra, "Spectra")) {

@@ -40,7 +40,6 @@ prepare_libraries_sop_closed <- function(
     step = "prepare_libraries_sop_closed"
   )$files$libraries$sop$prepared$closed
 ) {
-  # Validate inputs
   if (!is.character(input) || length(input) != 1L) {
     cli::cli_abort(
       "input must be a single character string",

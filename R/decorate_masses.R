@@ -26,7 +26,6 @@ decorate_masses <- function(annotation_table_ms1) {
     n_annotations = nrow(annotation_table_ms1)
   )
 
-  # Input Validation ----
   validate_dataframe(
     annotation_table_ms1,
     param_name = "annotation_table_ms1"

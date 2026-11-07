@@ -59,7 +59,6 @@ decorate_chemo <- function(
     n_annotations = nrow(annot_table_wei_chemo)
   )
 
-  # Input Validation ----
   validate_dataframe(
     annot_table_wei_chemo,
     param_name = "annot_table_wei_chemo"
@@ -124,7 +123,6 @@ decorate_chemo <- function(
     return(annot_table_wei_chemo)
   }
 
-  # Helper Functions ----
   n_rows <- nrow(annot_table_wei_chemo)
   raw_sc <- annot_table_wei_chemo$score_chemical
   sc_col <- if (is.double(raw_sc)) raw_sc else as.numeric(raw_sc)

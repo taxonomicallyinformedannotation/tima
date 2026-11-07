@@ -67,7 +67,6 @@ transform_score_sirius_csi <- function(csi_score = NULL, K = 100, scale = 20) {
     return(NA_real_)
   }
 
-  # Validate inputs
   if (!is.numeric(csi_score)) {
     cli::cli_abort(
       "csi_score must be numeric, NA, or NULL",

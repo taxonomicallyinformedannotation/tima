@@ -18,7 +18,6 @@
   }
 }
 
-# Exported Functions ----
 
 #' Validate Inputs for clean_chemo
 #'

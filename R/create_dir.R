@@ -25,7 +25,6 @@
 #' create_dir(export = "path/to/file.txt")
 #' }
 create_dir <- function(export) {
-  # Input Validation ----
   validate_character(
     value = export,
     param_name = "export",

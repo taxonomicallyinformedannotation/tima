@@ -248,7 +248,6 @@ get_organism_taxonomy_ott <- function(
   url = "https://api.opentreeoflife.org/v3/taxonomy/about",
   retry = TRUE
 ) {
-  # Validate inputs
   if (missing(df) || !is.data.frame(df)) {
     cli::cli_abort(
       "input 'df' must be a data frame",

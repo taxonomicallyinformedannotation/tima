@@ -48,9 +48,6 @@ prepare_features_components <- function(
     step = "prepare_features_components"
   )$files$networks$spectral$components$prepared
 ) {
-  # Input Validation ----
-
-  # Validate inputs
   if (!is.character(input) || length(input) == 0L) {
     cli::cli_abort(
       "input must be a non-empty character vector",

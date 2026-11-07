@@ -54,7 +54,6 @@ process_smiles <- function(
 ) {
   ctx <- log_operation("process_smiles", n_structures = nrow(df))
 
-  # Input Validation ----
   validate_dataframe(df, param_name = "df")
   validate_character(
     smiles_colname,
@@ -317,7 +316,6 @@ process_smiles <- function(
   table_final
 }
 
-# Helper Functions ----
 
 #' Load Python SMILES processor
 #' @keywords internal

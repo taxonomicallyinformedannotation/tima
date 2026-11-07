@@ -38,7 +38,6 @@ prepare_params <- function(
   params_advanced = get_params(step = "prepare_params_advanced"),
   step = NA
 ) {
-  # Input Validation ----
   validate_list_or_vector(
     params_small,
     param_name = "params_small",

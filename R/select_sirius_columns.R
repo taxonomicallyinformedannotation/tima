@@ -38,7 +38,6 @@
 #' )
 #' }
 select_sirius_columns_canopus <- function(df, sirius_version) {
-  # Input Validation ----
   validate_dataframe(df, param_name = "df")
 
   # Early exit for empty data

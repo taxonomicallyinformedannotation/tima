@@ -81,8 +81,6 @@ prepare_annotations_spectra <- function(
     step = "prepare_annotations_spectra"
   )$files$libraries$sop$merged$structures$taxonomies$npc
 ) {
-  # Input Validation ----
-
   # Validate input files
   if (!is.character(input) || length(input) == 0L) {
     cli::cli_abort(

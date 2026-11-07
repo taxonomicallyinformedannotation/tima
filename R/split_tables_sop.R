@@ -42,7 +42,6 @@
 #' organisms <- result$org_tax_ott
 #' }
 split_tables_sop <- function(table, cache) {
-  # Input Validation ----
   validate_dataframe(table, param_name = "table")
 
   # Early exit for empty input
@@ -624,7 +623,6 @@ split_tables_sop <- function(table, cache) {
   tables
 }
 
-# Helper Functions ----
 
 #' Create empty SOP tables structure
 #' @keywords internal

@@ -51,7 +51,6 @@ copy_backbone <- function(
   cache_dir = path.expand("~/.tima"),
   package = "tima"
 ) {
-  # Validate inputs
   if (
     is.null(cache_dir) ||
       !is.character(cache_dir) ||

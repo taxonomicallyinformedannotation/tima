@@ -39,7 +39,6 @@ round_reals <- function(
   dig = 5L,
   cols = c("structure_exact_mass", "structure_xlogp")
 ) {
-  # Input Validation ----
   validate_dataframe(df, param_name = "df")
   validate_list_or_vector(cols, min_length = 0, param_name = "cols")
 

@@ -66,10 +66,8 @@ parse_adduct <- function(
     }
   }
 
-  # Define return value for failed parsing (DRY principle)
   failed_parse <- create_failed_parse_result()
 
-  # Early return for NULL or missing input (guard clause pattern)
   if (
     missing(adduct_string) ||
       is.null(adduct_string) ||
@@ -78,15 +76,12 @@ parse_adduct <- function(
     return(failed_parse)
   }
 
-  # Handle NA values
   if (length(adduct_string) == 1L && is.na(adduct_string)) {
     return(failed_parse)
   }
 
-  # Validate input type and format
   validation_result <- validate_adduct_string(adduct_string)
   if (!validation_result$valid) {
-    # Suppress warnings for empty strings (common edge case)
     if (
       length(adduct_string) == 1L &&
         !is.na(adduct_string) &&
@@ -98,21 +93,15 @@ parse_adduct <- function(
     return(failed_parse)
   }
 
-  # Remove comments in parentheses before checking for alternative notations
-  # This prevents splitting on '/' or '|' inside comments
-  # e.g., "[M-C6H10O4 (methylpentose/desoxyhexose-H2O)+H]+"
+  # Strip parenthetical notes first so '/' inside e.g. "(methylpentose/desoxyhexose)"
+  # is not mistaken for an alternative-adduct separator.
   adduct_no_comments <- remove_comments(adduct_string)
 
-  # Handle alternative adduct notations (e.g., "[M+CH3COO]-/[M-CH3]-")
-  # These are common in databases where multiple adduct possibilities exist
-  # Note: We check the string WITH comments removed to avoid splitting on
-  # delimiters inside parenthetical comments
   if (grepl("[/|]", adduct_no_comments)) {
     alternatives <- strsplit(adduct_no_comments, "[/|]")[[1L]]
     alternatives <- trimws(alternatives)
     alternatives <- alternatives[nchar(alternatives) > 0L]
 
-    # Try each alternative until one parses successfully
     result <- Find(
       f = function(alt) {
         .is_parseable_adduct(
@@ -125,7 +114,6 @@ parse_adduct <- function(
       x = alternatives
     )
 
-    # If we found a valid alternative, parse and return it
     if (!is.null(result)) {
       parsed_alt <- parse_single_adduct(result, regex, failed_parse)
       if (use_cache && !all(parsed_alt == 0)) {
@@ -134,7 +122,6 @@ parse_adduct <- function(
       return(parsed_alt)
     }
 
-    # If none of the alternatives worked, return failed parse silently
     log_debug(
       "Could not parse any alternative from: %s",
       adduct_string
@@ -142,9 +129,6 @@ parse_adduct <- function(
     return(failed_parse)
   }
 
-  # Standard single adduct parsing
-  # Use original string to preserve any comments for logging, but they will
-  # be removed during modification processing
   parsed_res <- parse_single_adduct(adduct_string, regex, failed_parse)
   if (use_cache && !all(parsed_res == 0)) {
     .PARSE_ADDUCT_CACHE[[adduct_string]] <- parsed_res
@@ -155,7 +139,6 @@ parse_adduct <- function(
 #' Parse a single adduct (internal helper)
 #' @keywords internal
 parse_single_adduct <- function(adduct_string, regex, failed_parse) {
-  # Parse adduct string using regex
   parse_result <- match_adduct_regex(adduct_string, regex)
   if (!parse_result$valid) {
     log_debug(
@@ -166,13 +149,10 @@ parse_single_adduct <- function(adduct_string, regex, failed_parse) {
   }
 
   matches <- parse_result$matches
-
-  # Extract basic components
   n_mer <- extract_multimer_count(matches[2L])
   n_iso <- extract_isotope_shift(matches[3L])
   charge_info <- extract_charge_info(matches[5L], matches[6L])
 
-  # Process modifications
   modifications <- process_modifications(matches[4L])
   if (!modifications$valid) {
     log_debug(
@@ -183,7 +163,6 @@ parse_single_adduct <- function(adduct_string, regex, failed_parse) {
     return(failed_parse)
   }
 
-  # Validate all extracted values
   if (
     anyNA(c(
       n_mer,
@@ -200,7 +179,6 @@ parse_single_adduct <- function(adduct_string, regex, failed_parse) {
     return(failed_parse)
   }
 
-  # Return parsed components
   c(
     n_mer = n_mer,
     n_iso = n_iso,
@@ -209,8 +187,6 @@ parse_single_adduct <- function(adduct_string, regex, failed_parse) {
     charge = charge_info$charge_sign
   )
 }
-
-# Helper Functions ----
 
 #' Create failed parse result
 #' @keywords internal
@@ -281,7 +257,6 @@ match_adduct_regex <- function(adduct_string, regex) {
     return(list(valid = FALSE, matches = NULL))
   }
 
-  # Check if matching was successful
   if (is.na(matches[1L, 1L])) {
     return(list(valid = FALSE, matches = NULL))
   }

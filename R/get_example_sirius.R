@@ -23,7 +23,6 @@ get_example_sirius <- function(
   url = get_default_paths()$urls$examples$sirius,
   export = get_default_paths()$data$interim$annotations$example_sirius
 ) {
-  # Validate inputs
   if (!is.list(url) || is.null(url$v5) || is.null(url$v6)) {
     cli::cli_abort(
       "{.arg url} must be a list with {.field v5} and {.field v6} elements",

@@ -79,8 +79,6 @@ filter_annotations <- function(
     tolerance_rt = tolerance_rt
   )
 
-  # Input Validation ----
-
   validate_filter_annotations_inputs(
     annotations = annotations,
     features = features,

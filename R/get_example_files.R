@@ -47,7 +47,6 @@ get_example_files <- function(
     "spectral_lib_with_rt"
   )
 
-  # Validate inputs
   if (!is.character(example) || length(example) == 0L) {
     cli::cli_abort(
       "{.arg example} must be a non-empty character vector",

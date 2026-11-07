@@ -159,7 +159,6 @@ change_params_small <- function(
   summarize = NULL,
   cache_dir = NULL
 ) {
-  # Input Validation ----
   validate_params_small_inputs(ms_pol = ms_pol)
 
   log_info("Updating workflow parameters")

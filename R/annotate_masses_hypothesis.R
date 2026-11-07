@@ -2266,7 +2266,6 @@ propagate_annotations_across_m_cliques <- function(
   tolerance_ppm = 10,
   tolerance_dalton = 0.0025
 ) {
-  # Early exits
   if (nrow(annotations) == 0L) {
     return(annotations)
   }

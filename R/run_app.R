@@ -45,7 +45,6 @@ run_app <- function(
   browser = TRUE,
   reinstall = TRUE
 ) {
-  # Input Validation ----
   validate_character(host, param_name = "host", allow_empty = FALSE)
   validate_numeric_range(
     port,

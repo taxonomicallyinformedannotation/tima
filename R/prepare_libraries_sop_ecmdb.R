@@ -38,7 +38,6 @@ prepare_libraries_sop_ecmdb <- function(
     step = "prepare_libraries_sop_ecmdb"
   )$files$libraries$sop$prepared$ecmdb
 ) {
-  # Validate inputs
   if (!is.character(input) || length(input) != 1L) {
     cli::cli_abort(
       "input must be a single character string",

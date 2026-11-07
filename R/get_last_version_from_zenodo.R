@@ -314,7 +314,6 @@ is_download_needed <- function(path, zenodo_size) {
 #' )
 #' }
 get_last_version_from_zenodo <- function(doi, pattern, path, timeout_s = 90) {
-  # Input Validation ----
   validate_zenodo_inputs(
     doi = doi,
     pattern = pattern,

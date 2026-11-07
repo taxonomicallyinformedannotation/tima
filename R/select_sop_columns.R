@@ -19,7 +19,6 @@
 #' standardized <- select_sop_columns(sop_data)
 #' }
 select_sop_columns <- function(df) {
-  # Input Validation ----
   validate_dataframe(df, param_name = "df", min_rows = 0)
 
   # Early exit for empty data

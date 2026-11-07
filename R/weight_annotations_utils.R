@@ -65,7 +65,6 @@ validate_weight_annotations_inputs <- function(
   candidates_neighbors,
   candidates_final
 ) {
-  # Validate required file existence
   required_files <- list(
     library = library,
     components = components,
@@ -89,7 +88,6 @@ validate_weight_annotations_inputs <- function(
     )
   }
 
-  # Validate annotation files
   missing_annotations <- annotations[!file.exists(annotations)]
   if (length(missing_annotations) > 0L) {
     cli::cli_abort(
@@ -102,7 +100,6 @@ validate_weight_annotations_inputs <- function(
     )
   }
 
-  # Validate optional files (log warnings only)
   optional_files <- list(
     str_stereo = str_stereo,
     org_tax_ott = org_tax_ott,
@@ -116,10 +113,8 @@ validate_weight_annotations_inputs <- function(
     }
   }
 
-  # Validate minimal_ms1_condition
   assert_choice(minimal_ms1_condition, c("OR", "AND"), "minimal_ms1_condition")
 
-  # Validate weights: must be numeric, non-negative, sum to ~1
   weights <- c(
     spectral = weight_spectral,
     chemical = weight_chemical,
@@ -162,7 +157,6 @@ validate_weight_annotations_inputs <- function(
     )
   }
 
-  # Validate score thresholds (0-1)
   assert_scalar_numeric(
     minimal_consistency,
     "minimal_consistency",
@@ -177,7 +171,6 @@ validate_weight_annotations_inputs <- function(
     max = 1
   )
 
-  # Validate logical flags
   assert_flag(ms1_only, "ms1_only")
   assert_flag(compounds_names, "compounds_names")
   assert_flag(high_evidence, "high_evidence")
@@ -185,7 +178,6 @@ validate_weight_annotations_inputs <- function(
   assert_flag(summarize, "summarize")
   assert_flag(force, "force")
 
-  # Validate candidate counts
   assert_positive_integer(candidates_neighbors, "candidates_neighbors")
   assert_positive_integer(candidates_final, "candidates_final")
 

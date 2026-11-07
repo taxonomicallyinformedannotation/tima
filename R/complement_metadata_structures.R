@@ -44,7 +44,6 @@ complement_metadata_structures <- function(
 ) {
   ctx <- log_operation("complement_metadata", n_input = nrow(df))
 
-  # Input Validation ----
   validate_dataframe(df, param_name = "df")
 
   # Early exit for empty input

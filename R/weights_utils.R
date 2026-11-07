@@ -11,7 +11,6 @@
 compute_weighted_components <- function(..., weights, include_coverage = TRUE) {
   values <- list(...)
 
-  # Input validation
   if (length(values) != length(weights)) {
     cli::cli_abort(
       c(

@@ -99,7 +99,6 @@ weight_bio <- function(
     n_annotations = nrow(annotation_table_taxed),
     n_sop = nrow(structure_organism_pairs_table)
   )
-  # Input Validation ----
   validate_dataframe(
     annotation_table_taxed,
     param_name = "annotation_table_taxed"
@@ -109,7 +108,6 @@ weight_bio <- function(
     param_name = "structure_organism_pairs_table"
   )
 
-  # Validate weights
   validate_weights(
     c(
       weight_spectral,
@@ -205,7 +203,6 @@ weight_bio <- function(
     return(annotation_table_taxed)
   }
 
-  # Validate weights
   weights <- list(
     spectral = weight_spectral,
     biological = weight_biological

@@ -1,5 +1,3 @@
-# Helper Functions ----
-
 #' Extract m/z values from peak data matrix
 #' @keywords internal
 .extract_mz_values <- function(peak_data) {
@@ -45,7 +43,6 @@
 #' peaks <- spectra_df$mz[[1L]] # First spectrum peaks
 #' }
 extract_spectra <- function(object) {
-  # Input Validation ----
   if (!inherits(object, "Spectra")) {
     cli::cli_abort(
       "input must be a Spectra object from the Spectra package",

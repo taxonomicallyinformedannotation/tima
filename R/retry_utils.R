@@ -44,7 +44,6 @@ with_retry <- function(
   operation_name = "operation",
   silent = FALSE
 ) {
-  # Validate inputs
   assert_positive_integer(max_attempts, "max_attempts")
   assert_scalar_numeric(backoff, "backoff", min = 0)
 

@@ -45,7 +45,6 @@
 #' )
 #' }
 read_from_sirius_zip <- function(sirius_zip, file) {
-  # Input Validation ----
   validate_character(
     sirius_zip,
     param_name = "sirius_zip",

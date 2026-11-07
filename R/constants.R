@@ -190,7 +190,6 @@ DEFAULT_HE_MAX_RT_ERROR_MIN <- 0.15
 #' @keywords internal
 INCHI_NO_STEREO_PATTERN <- "-UHFFFAOYSA-"
 
-# Helper Functions ----
 
 #' Get a constant value by name with validation
 #'

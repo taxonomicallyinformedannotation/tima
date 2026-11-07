@@ -61,8 +61,6 @@ prepare_features_edges <- function(
   name_source = get_params(step = "prepare_features_edges")$names$source,
   name_target = get_params(step = "prepare_features_edges")$names$target
 ) {
-  # Input Validation ----
-
   # Validate input structure (must have ms1 and spectral)
   input_names <- names(input)
   if (

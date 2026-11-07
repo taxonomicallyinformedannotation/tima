@@ -134,8 +134,6 @@ prepare_libraries_sop_merged <- function(
     filter_level = if (isTRUE(filter)) level else "none"
   )
 
-  # Input Validation ----
-
   validate_sop_merged_inputs(
     files = files,
     filter = filter,

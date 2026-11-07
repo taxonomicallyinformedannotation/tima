@@ -62,7 +62,6 @@ prepare_libraries_sop_bigg <- function(
     step = "prepare_libraries_sop_bigg"
   )$files$libraries$sop$prepared$bigg
 ) {
-  # Validate inputs
   if (!is.character(output) || length(output) != 1L) {
     cli::cli_abort(
       "output must be a single character string",
@@ -79,7 +78,6 @@ prepare_libraries_sop_bigg <- function(
       expr = {
         n_models <- length(bigg_models)
 
-        # Helper functions
         get_bigg_model <- function(model_id) {
           jsonlite::fromJSON(
             txt = paste0(bigg_url, model_id["model_id"], ".json"),

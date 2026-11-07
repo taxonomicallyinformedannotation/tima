@@ -57,7 +57,6 @@ summarize_results <- function(
   # When supplied, annot_table_wei_chemo is not needed for this purpose.
   feature_consensus_table = NULL
 ) {
-  # Input Validation ----
   validate_dataframe(df, param_name = "df")
   validate_dataframe(features_table, param_name = "features_table")
   validate_dataframe(components_table, param_name = "components_table")

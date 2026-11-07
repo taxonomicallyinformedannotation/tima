@@ -206,7 +206,6 @@ sanitize_csv <- function(
   n_cols <- 0L
   columns <- character(0)
 
-  # Basic file validation
   if (!file.exists(file)) {
     return(list(
       valid = FALSE,

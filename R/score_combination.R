@@ -110,7 +110,6 @@ combine_weighted_scores <- function(
   weight_chemical,
   weight_spectral = 0.3
 ) {
-  # Input Validation
   validate_dataframe(score_bio_table, param_name = "score_bio_table")
   validate_dataframe(score_chemo_table, param_name = "score_chemo_table")
 

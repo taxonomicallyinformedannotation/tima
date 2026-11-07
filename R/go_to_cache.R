@@ -41,7 +41,6 @@
 #' cache_path <- go_to_cache()
 #' }
 go_to_cache <- function(dir = ".tima") {
-  # Input Validation ----
   validate_character(dir, param_name = "dir", allow_empty = FALSE)
 
   # Construct and Create Cache Path ----
@@ -56,7 +55,6 @@ go_to_cache <- function(dir = ".tima") {
   invisible(cache)
 }
 
-# Helper Functions ----
 
 #' Ensure cache directory exists
 #' @keywords internal

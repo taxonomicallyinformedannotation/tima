@@ -32,7 +32,6 @@ export_params <- function(
   step,
   directory = get_default_paths()$data$interim$params$path
 ) {
-  # Input Validation ----
   validate_list_or_vector(parameters, param_name = "parameters", min_length = 1)
   validate_character(step, param_name = "step", allow_empty = FALSE)
   validate_character(directory, param_name = "directory", allow_empty = FALSE)

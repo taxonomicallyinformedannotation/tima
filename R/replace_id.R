@@ -42,7 +42,6 @@ replace_id <- function(
   user_gnps = get_params(step = "prepare_params")$gnps$id,
   example_gnps = get_default_paths()$gnps$example
 ) {
-  # Input Validation ----
   validate_character(x, param_name = "x", allow_empty = FALSE)
 
   # Normalize Parameters ----
@@ -72,7 +71,6 @@ replace_id <- function(
   reconstruct_path(dir_path, new_file_name)
 }
 
-# Helper Functions ----
 
 #' Normalize empty values to NULL
 #' @keywords internal

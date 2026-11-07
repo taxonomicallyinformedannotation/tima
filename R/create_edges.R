@@ -1,5 +1,3 @@
-# Helper Functions ----
-
 #' @title Create spectral similarity network edges
 #'
 #' @description Calculates pairwise spectral similarity between all spectra to
@@ -74,7 +72,6 @@ create_edges <- function(
     min_peaks = matched_peaks
   )
 
-  # Input Validation ----
   validate_choice(method, VALID_SIMILARITY_METHODS, param_name = "method")
 
   if (

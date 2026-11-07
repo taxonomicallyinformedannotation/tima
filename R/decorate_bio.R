@@ -62,7 +62,6 @@ decorate_bio <- function(
     n_annotations = nrow(annot_table_wei_bio)
   )
 
-  # Input Validation ----
   validate_dataframe(annot_table_wei_bio, param_name = "annot_table_wei_bio")
 
   # Validate all score parameters (0-1 range)

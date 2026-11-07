@@ -31,7 +31,6 @@
 #' )
 #' }
 get_file <- function(url, export, limit = 3600L) {
-  # Input Validation ----
   validate_character(url, param_name = "url", allow_empty = FALSE)
   validate_character(export, param_name = "export", allow_empty = FALSE)
   assert_positive_integer(limit, "limit")
@@ -67,7 +66,6 @@ get_file <- function(url, export, limit = 3600L) {
   invisible(export)
 }
 
-# Helper Functions ----
 
 #' Download file with error handling and retry
 #' @keywords internal

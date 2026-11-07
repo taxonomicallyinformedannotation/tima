@@ -92,7 +92,6 @@ create_edges_spectra <- function(
     )
   }
 
-  # Input Validation ----
   if (
     !is.numeric(cutoff) ||
       length(cutoff) != 1L ||

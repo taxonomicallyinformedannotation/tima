@@ -69,7 +69,6 @@ harmonize_spectra <- function(
     mode = mode
   )
 
-  # Input Validation ----
   validate_dataframe(spectra, param_name = "spectra")
 
   # Validate mode contains 'pos' or 'neg'
@@ -410,7 +409,6 @@ harmonize_spectra <- function(
   spectra_harmonized
 }
 
-# Helper Functions ----
 
 #' Validate column mapping parameters
 #' @keywords internal

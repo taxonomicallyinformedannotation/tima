@@ -25,7 +25,6 @@
 #' )
 #' }
 parse_yaml_params <- function(def, usr = NULL) {
-  # Input Validation ----
   validate_character(def, param_name = "def", allow_empty = FALSE)
 
   if (!is.null(usr)) {
