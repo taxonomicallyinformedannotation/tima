@@ -608,44 +608,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#why-validate-your-data-first" id="toc-why-validate-your-data-first" class="nav-link active" data-scroll-target="#why-validate-your-data-first">Why Validate Your Data First?</a></li>
-  <li><a href="#quick-start" id="toc-quick-start" class="nav-link" data-scroll-target="#quick-start">Quick Start</a>
-  <ul class="collapse">
-  <li><a href="#example-output" id="toc-example-output" class="nav-link" data-scroll-target="#example-output">Example Output</a></li>
-  </ul></li>
-  <li><a href="#what-gets-validated" id="toc-what-gets-validated" class="nav-link" data-scroll-target="#what-gets-validated">What Gets Validated?</a>
-  <ul class="collapse">
-  <li><a href="#mgf-files-mass-spectra" id="toc-mgf-files-mass-spectra" class="nav-link" data-scroll-target="#mgf-files-mass-spectra">MGF Files (Mass Spectra)</a></li>
-  <li><a href="#features-files-csvtsv" id="toc-features-files-csvtsv" class="nav-link" data-scroll-target="#features-files-csvtsv">Features Files (CSV/TSV)</a></li>
-  <li><a href="#metadata-consistency" id="toc-metadata-consistency" class="nav-link" data-scroll-target="#metadata-consistency">Metadata Consistency</a></li>
-  <li><a href="#sirius-output-completeness" id="toc-sirius-output-completeness" class="nav-link" data-scroll-target="#sirius-output-completeness">SIRIUS Output Completeness</a></li>
-  </ul></li>
-  <li><a href="#integration-with-pipeline" id="toc-integration-with-pipeline" class="nav-link" data-scroll-target="#integration-with-pipeline">Integration with Pipeline</a>
-  <ul class="collapse">
-  <li><a href="#automatic-validation" id="toc-automatic-validation" class="nav-link" data-scroll-target="#automatic-validation">Automatic Validation</a></li>
-  <li><a href="#manual-validation" id="toc-manual-validation" class="nav-link" data-scroll-target="#manual-validation">Manual Validation</a></li>
-  </ul></li>
-  <li><a href="#common-issues-caught" id="toc-common-issues-caught" class="nav-link" data-scroll-target="#common-issues-caught">Common Issues Caught</a>
-  <ul class="collapse">
-  <li><a href="#mgf-file-issues" id="toc-mgf-file-issues" class="nav-link" data-scroll-target="#mgf-file-issues">MGF File Issues</a></li>
-  <li><a href="#features-file-issues" id="toc-features-file-issues" class="nav-link" data-scroll-target="#features-file-issues">Features File Issues</a></li>
-  <li><a href="#metadata-issues" id="toc-metadata-issues" class="nav-link" data-scroll-target="#metadata-issues">Metadata Issues</a></li>
-  <li><a href="#sirius-issues" id="toc-sirius-issues" class="nav-link" data-scroll-target="#sirius-issues">SIRIUS Issues</a></li>
-  </ul></li>
-  <li><a href="#advanced-usage" id="toc-advanced-usage" class="nav-link" data-scroll-target="#advanced-usage">Advanced Usage</a>
-  <ul class="collapse">
-  <li><a href="#programmatic-validation" id="toc-programmatic-validation" class="nav-link" data-scroll-target="#programmatic-validation">Programmatic Validation</a></li>
-  <li><a href="#batch-validation" id="toc-batch-validation" class="nav-link" data-scroll-target="#batch-validation">Batch Validation</a></li>
-  </ul></li>
-  <li><a href="#best-practices" id="toc-best-practices" class="nav-link" data-scroll-target="#best-practices">Best Practices</a>
-  <ul class="collapse">
-  <li><a href="#always-validate-first" id="toc-always-validate-first" class="nav-link" data-scroll-target="#always-validate-first">Always Validate First</a></li>
-  <li><a href="#validate-after-data-conversion" id="toc-validate-after-data-conversion" class="nav-link" data-scroll-target="#validate-after-data-conversion">Validate After Data Conversion</a></li>
-  <li><a href="#include-in-automated-pipelines" id="toc-include-in-automated-pipelines" class="nav-link" data-scroll-target="#include-in-automated-pipelines">Include in Automated Pipelines</a></li>
-  <li><a href="#document-your-validation" id="toc-document-your-validation" class="nav-link" data-scroll-target="#document-your-validation">Document Your Validation</a></li>
-  </ul></li>
-  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
-  <li><a href="#next-steps" id="toc-next-steps" class="nav-link" data-scroll-target="#next-steps">Next Steps</a></li>
+  <li><a href="#quick-start" id="toc-quick-start" class="nav-link active" data-scroll-target="#quick-start">Quick start</a></li>
+  <li><a href="#what-is-checked-and-why" id="toc-what-is-checked-and-why" class="nav-link" data-scroll-target="#what-is-checked-and-why">What is checked and why</a></li>
+  <li><a href="#next-steps" id="toc-next-steps" class="nav-link" data-scroll-target="#next-steps">Next steps</a></li>
   </ul>
 </nav>
     </div>
@@ -683,297 +648,37 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 <script async="" src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
-<section id="why-validate-your-data-first" class="level2">
-<h2 class="anchored" data-anchor-id="why-validate-your-data-first">Why Validate Your Data First?</h2>
-<p>Before starting the TIMA pipeline, it’s recommended to validate your input data. This <strong>pre-flight check</strong> saves you time by catching issues immediately instead of discovering them after expensive operations like library downloads.</p>
-</section>
+<p>Before running the pipeline, validate your inputs with <code>validate_inputs()</code>. Catching a malformed MGF, a missing column, or an incomplete SIRIUS export up front avoids failing halfway through library downloads or spectral matching.</p>
 <section id="quick-start" class="level2">
-<h2 class="anchored" data-anchor-id="quick-start">Quick Start</h2>
+<h2 class="anchored" data-anchor-id="quick-start">Quick start</h2>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tima)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Validate all inputs before starting</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_inputs</span>(</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">features =</span> <span class="st">"data/features.csv"</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">spectra =</span> <span class="st">"data/spectra.mgf"</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">metadata =</span> <span class="st">"data/metadata.tsv"</span>,</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">sirius =</span> <span class="st">"output/sirius"</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_inputs</span>(</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">features =</span> <span class="st">"data/features.csv"</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">spectra =</span> <span class="st">"data/spectra.mgf"</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">metadata =</span> <span class="st">"data/metadata.tsv"</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">sirius =</span> <span class="st">"output/sirius"</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<section id="example-output" class="level3">
-<h3 class="anchored" data-anchor-id="example-output">Example Output</h3>
-<pre><code>============================================================
-Data Sanitizing: Pre-flight Checks
-============================================================
-Checking features file...
-✓ Features file: 1250 rows, 15 columns
-  Columns: feature_id, mz, rt, intensity, ...
-
-Checking MGF file...
-✓ MGF file: 843 spectra found
-
-Checking metadata file...
-✓ Metadata file: 120/120 files found
-
-Checking SIRIUS output...
-✓ SIRIUS output: 843 annotations, all required files present
-  - formula_identifications_all.tsv: ✓
-  - canopus_summary_all.tsv: ✓
-  - compound_identifications_all.tsv: ✓
-============================================================
-✓ All pre-flight checks passed!
-Data validation complete. Ready to proceed.
-============================================================</code></pre>
+<p>You can also validate a single input at a time (any omitted argument is skipped), and <code>annotate_masses()</code> / <code>annotate_spectra()</code> automatically run the relevant checks before starting.</p>
 </section>
-</section>
-<section id="what-gets-validated" class="level2">
-<h2 class="anchored" data-anchor-id="what-gets-validated">What Gets Validated?</h2>
-<section id="mgf-files-mass-spectra" class="level3">
-<h3 class="anchored" data-anchor-id="mgf-files-mass-spectra">MGF Files (Mass Spectra)</h3>
-<p>Checks for: - File exists and is readable - Contains valid spectra (BEGIN IONS markers) - Each spectrum has PEPMASS field - Peak data is present - BEGIN IONS/END IONS are balanced</p>
-<p><strong>Reports:</strong> - Number of spectra found - Specific issues if any</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Validate just the MGF file</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_inputs</span>(<span class="at">spectra =</span> <span class="st">"data/spectra.mgf"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</section>
-<section id="features-files-csvtsv" class="level3">
-<h3 class="anchored" data-anchor-id="features-files-csvtsv">Features Files (CSV/TSV)</h3>
-<p>Checks for: - File exists and is readable - Not empty (has rows and columns) - Required columns present (e.g., <code>feature_id</code>) - Valid CSV/TSV format</p>
-<p><strong>Reports:</strong> - Number of rows (features) - Number of columns - Column names - Missing required columns</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Validate features file</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_inputs</span>(<span class="at">features =</span> <span class="st">"data/features.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</section>
-<section id="metadata-consistency" class="level3">
-<h3 class="anchored" data-anchor-id="metadata-consistency">Metadata Consistency</h3>
-<p>Checks for: - Metadata file exists - Filename column present - Files referenced in metadata actually exist - No broken file references</p>
-<p><strong>Reports:</strong> - Number of files in metadata - Number of files found on disk - List of missing files</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Validate metadata consistency</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_inputs</span>(</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">metadata =</span> <span class="st">"data/metadata.tsv"</span>,</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">metadata_filename_col =</span> <span class="st">"filename"</span>,</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">metadata_data_dir =</span> <span class="st">"data/raw"</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</section>
-<section id="sirius-output-completeness" class="level3">
-<h3 class="anchored" data-anchor-id="sirius-output-completeness">SIRIUS Output Completeness</h3>
-<p>Checks for: - SIRIUS directory exists - Required summary files present: - <code>formula_identifications_all.tsv</code> - <code>canopus_formula_summary_all.tsv</code> - <code>compound/structure_identifications_all.tsv</code> - Feature directories exist</p>
-<p><strong>Reports:</strong> - Presence of each required file - Number of feature directories - Specific missing files</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Validate SIRIUS output</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_inputs</span>(<span class="at">sirius =</span> <span class="st">"output/sirius"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</section>
-</section>
-<section id="integration-with-pipeline" class="level2">
-<h2 class="anchored" data-anchor-id="integration-with-pipeline">Integration with Pipeline</h2>
-<p>The validation functions are <strong>automatically integrated</strong> into the main TIMA functions:</p>
-<section id="automatic-validation" class="level3">
-<h3 class="anchored" data-anchor-id="automatic-validation">Automatic Validation</h3>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># These functions automatically validate inputs</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">annotate_masses</span>(...) <span class="co"># Validates features file first</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">annotate_spectra</span>(...) <span class="co"># Validates MGF files first</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</section>
-<section id="manual-validation" class="level3">
-<h3 class="anchored" data-anchor-id="manual-validation">Manual Validation</h3>
-<p>For full control, validate manually before running the pipeline:</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Validate everything first</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_inputs</span>(</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">features =</span> <span class="st">"data/features.csv"</span>,</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">spectra =</span> <span class="st">"data/spectra.mgf"</span>,</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">sirius =</span> <span class="st">"output/sirius"</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. If all checks pass, run the pipeline</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="fu">run_tima</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</section>
-</section>
-<section id="common-issues-caught" class="level2">
-<h2 class="anchored" data-anchor-id="common-issues-caught">Common Issues Caught</h2>
-<section id="mgf-file-issues" class="level3">
-<h3 class="anchored" data-anchor-id="mgf-file-issues">MGF File Issues</h3>
-<p><strong>Issue:</strong> No spectra found</p>
-<pre><code>✗ MGF file has issues:
-  - No spectra found (no BEGIN IONS markers)</code></pre>
-<p><strong>Fix:</strong> Check if the file is actually in MGF format and contains spectra.</p>
-<hr>
-<p><strong>Issue:</strong> Mismatched markers</p>
-<pre><code>✗ MGF file has issues:
-  - Mismatched BEGIN IONS (10) and END IONS (9)</code></pre>
-<p><strong>Fix:</strong> One spectrum is missing an END IONS marker. Check the file structure.</p>
-<hr>
-<p><strong>Issue:</strong> Missing required fields</p>
-<pre><code>✗ MGF file has issues:
-  - First spectrum missing PEPMASS field</code></pre>
-<p><strong>Fix:</strong> Each spectrum must have a PEPMASS field specifying the precursor m/z.</p>
-</section>
-<section id="features-file-issues" class="level3">
-<h3 class="anchored" data-anchor-id="features-file-issues">Features File Issues</h3>
-<p><strong>Issue:</strong> Empty file</p>
-<pre><code>✗ Features file has issues:
-  - features table is empty (0 rows)</code></pre>
-<p><strong>Fix:</strong> Ensure the file contains actual feature data, not just a header.</p>
-<hr>
-<p><strong>Issue:</strong> Missing columns</p>
-<pre><code>✗ Features file has issues:
-  - Missing required columns: feature_id, mz</code></pre>
-<p><strong>Fix:</strong> Add the required columns to your features table.</p>
-</section>
-<section id="metadata-issues" class="level3">
-<h3 class="anchored" data-anchor-id="metadata-issues">Metadata Issues</h3>
-<p><strong>Issue:</strong> Files not found</p>
-<pre><code>✗ Metadata validation has issues:
-  - Missing 5/120 files referenced in metadata
-  Missing files:
-    - sample_001.mzML
-    - sample_023.mzML
-    - sample_045.mzML
-    - sample_067.mzML
-    - sample_089.mzML</code></pre>
-<p><strong>Fix:</strong> Ensure all files listed in metadata are present in the data directory.</p>
-<hr>
-<p><strong>Issue:</strong> Wrong column name</p>
-<pre><code>✗ Metadata validation has issues:
-  - Column 'filename' not found in metadata</code></pre>
-<p><strong>Fix:</strong> Rename your column to <code>filename</code> or specify the correct column with <code>metadata_filename_col</code> parameter.</p>
-</section>
-<section id="sirius-issues" class="level3">
-<h3 class="anchored" data-anchor-id="sirius-issues">SIRIUS Issues</h3>
-<p><strong>Issue:</strong> Missing output files</p>
-<pre><code>✗ SIRIUS output has issues:
-  - Missing formula_identifications_all.tsv
-  - Missing canopus_summary_all.tsv</code></pre>
-<p><strong>Fix:</strong> Re-run SIRIUS with the correct output options enabled, or check that the output directory path is correct.</p>
-<hr>
-<p><strong>Issue:</strong> Empty output</p>
-<pre><code>✗ SIRIUS output has issues:
-  - No feature directories found in SIRIUS output</code></pre>
-<p><strong>Fix:</strong> The SIRIUS job may have failed or not completed. Check SIRIUS logs.</p>
-</section>
-</section>
-<section id="advanced-usage" class="level2">
-<h2 class="anchored" data-anchor-id="advanced-usage">Advanced Usage</h2>
-<section id="programmatic-validation" class="level3">
-<h3 class="anchored" data-anchor-id="programmatic-validation">Programmatic Validation</h3>
-<p>For scripts and pipelines, you can capture validation results:</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The function returns TRUE on success or stops with error</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tryCatch</span>(</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  {</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">validate_inputs</span>(<span class="at">features =</span> <span class="st">"data/features.csv"</span>)</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">message</span>(<span class="st">"Validation passed - proceeding..."</span>)</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Continue with pipeline</span></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  },</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">message</span>(<span class="st">"Validation failed: "</span>, e<span class="sc">$</span>message)</span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Handle error (e.g., send notification, log, exit)</span></span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</section>
-<section id="batch-validation" class="level3">
-<h3 class="anchored" data-anchor-id="batch-validation">Batch Validation</h3>
-<p>Validate multiple datasets in a loop:</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>datasets <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"dataset1"</span>, <span class="st">"dataset2"</span>, <span class="st">"dataset3"</span>)</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (dataset <span class="cf">in</span> datasets) {</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">message</span>(<span class="st">"Validating "</span>, dataset, <span class="st">"..."</span>)</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tryCatch</span>(</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    {</span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">validate_inputs</span>(</span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">features =</span> <span class="fu">file.path</span>(dataset, <span class="st">"features.csv"</span>),</span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">spectra =</span> <span class="fu">file.path</span>(dataset, <span class="st">"spectra.mgf"</span>)</span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>      )</span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">message</span>(<span class="st">"  ✓ "</span>, dataset, <span class="st">" is valid"</span>)</span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>    },</span>
-<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
-<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>      <span class="fu">message</span>(<span class="st">"  ✗ "</span>, dataset, <span class="st">" has issues: "</span>, e<span class="sc">$</span>message)</span>
-<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</section>
-</section>
-<section id="best-practices" class="level2">
-<h2 class="anchored" data-anchor-id="best-practices">Best Practices</h2>
-<section id="always-validate-first" class="level3">
-<h3 class="anchored" data-anchor-id="always-validate-first">Always Validate First</h3>
-<p>Make validation the <strong>first step</strong> in your workflow:</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Good practice</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_inputs</span>(<span class="at">features =</span> <span class="st">"data/features.csv"</span>)</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="fu">run_tima</span>()</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Bad practice (will waste time if data is invalid)</span></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="fu">run_tima</span>() <span class="co"># Might fail after 10+ minutes</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</section>
-<section id="validate-after-data-conversion" class="level3">
-<h3 class="anchored" data-anchor-id="validate-after-data-conversion">Validate After Data Conversion</h3>
-<p>If you convert data formats (e.g., mzML to MGF), validate the output:</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert data</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co"># convert_mzml_to_mgf("raw_data/", "processed/spectra.mgf")</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Validate immediately</span></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_inputs</span>(<span class="at">spectra =</span> <span class="st">"processed/spectra.mgf"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</section>
-<section id="include-in-automated-pipelines" class="level3">
-<h3 class="anchored" data-anchor-id="include-in-automated-pipelines">Include in Automated Pipelines</h3>
-<p>Add validation to your automated workflows:</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Snakemake, Nextflow, or targets pipeline</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_inputs</span>(...) <span class="co"># Fails fast if data is bad</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="fu">run_tima</span>() <span class="co"># Only runs if validation passes</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</section>
-<section id="document-your-validation" class="level3">
-<h3 class="anchored" data-anchor-id="document-your-validation">Document Your Validation</h3>
-<p>Keep a record of validation results:</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Capture output to log file</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sink</span>(<span class="st">"validation_log.txt"</span>)</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_inputs</span>(</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">features =</span> <span class="st">"data/features.csv"</span>,</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">spectra =</span> <span class="st">"data/spectra.mgf"</span>,</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">sirius =</span> <span class="st">"output/sirius"</span></span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="fu">sink</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</section>
-</section>
-<section id="summary" class="level2">
-<h2 class="anchored" data-anchor-id="summary">Summary</h2>
-<p>Data validation with <code>validate_inputs()</code>:</p>
+<section id="what-is-checked-and-why" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-checked-and-why">What is checked and why</h2>
 <ul>
-<li><strong>Saves time</strong> - Catches errors in seconds, not minutes</li>
-<li><strong>Clear messages</strong> - Shows exactly what’s wrong and how to fix it</li>
-<li><strong>Comprehensive</strong> - Checks MGF, CSV, metadata, and SIRIUS data</li>
-<li><strong>Automatic</strong> - Integrated into main TIMA functions</li>
-<li><strong>Preventive</strong> - Stops before expensive operations</li>
-<li><strong>Informative</strong> - Reports row counts, spectra counts, file lists</li>
+<li><strong>Features table (<code>features</code>):</strong> Must be a non-empty CSV/TSV containing your feature ID, <code>mz</code>, and <code>rt</code> columns (<code>feature_col</code> if not named <code>feature_id</code>).</li>
+<li><strong>Spectra (<code>spectra</code>):</strong> Must be a readable MGF with balanced <code>BEGIN IONS</code> / <code>END IONS</code> blocks, a precursor <code>PEPMASS</code> per spectrum, and non-empty peak lists.</li>
+<li><strong>Metadata (<code>metadata</code>):</strong> When provided, verifies the sample filename column (<code>metadata_filename_col</code>) and checks that referenced files exist in <code>metadata_data_dir</code>.</li>
+<li><strong>SIRIUS workspace (<code>sirius</code>):</strong> Checks that summary files (<code>formula_identifications_all.tsv</code>, <code>canopus_formula_summary_all.tsv</code>, and <code>compound_identifications_all.tsv</code> / <code>structure_identifications_all.tsv</code>) were exported (<code>--full-summary</code> in the CLI or the summary export button in the GUI).</li>
 </ul>
-<p><strong>Always validate your data first!</strong> It’s the best way to ensure a smooth TIMA experience.</p>
 </section>
 <section id="next-steps" class="level2">
-<h2 class="anchored" data-anchor-id="next-steps">Next Steps</h2>
-<p>Now that your data is validated:</p>
+<h2 class="anchored" data-anchor-id="next-steps">Next steps</h2>
 <ul>
-<li><a href="https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/I-gathering.html">I. Gathering</a> - Collect your data</li>
-<li><a href="https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/II-preparing.html">II. Preparing</a> - Prepare your libraries</li>
-<li><a href="https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/III-processing.html">III. Processing</a> - Run the annotation pipeline</li>
-<li><a href="https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/IV-benchmarking.html">IV. Benchmarking</a> - Evaluate your results</li>
+<li><a href="https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/I-gathering.html">I. Gathering</a></li>
+<li><a href="https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/II-preparing.html">II. Preparing</a></li>
+<li><a href="https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/III-processing.html">III. Processing</a></li>
+<li><a href="https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/IV-benchmarking.html">IV. Benchmarking</a></li>
 </ul>
 
 
