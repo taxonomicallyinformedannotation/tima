@@ -27,27 +27,27 @@ prepare_annotations_sirius(
 )
 }
 \arguments{
-\item{input_directory}{\link{character} Character path to directory or zip file
+\item{input_directory}{\link{character} Path to directory or zip file
 containing
 SIRIUS results.}
 
-\item{output_ann}{\link{character} Character path for prepared structure
+\item{output_ann}{\link{character} Path for prepared structure
 annotation output.}
 
-\item{output_can}{\link{character} Character path for prepared CANOPUS output.}
+\item{output_can}{\link{character} Path for prepared CANOPUS output.}
 
-\item{output_for}{\link{character} Character path for prepared formula output.}
+\item{output_for}{\link{character} Path for prepared formula output.}
 
-\item{sirius_version}{\link{character} Character SIRIUS version ("5" or "6").}
+\item{sirius_version}{\link{character} SIRIUS version ("5" or "6").}
 
-\item{str_stereo}{\link{character} Character path to structure stereochemistry
+\item{str_stereo}{\link{character} Path to structure stereochemistry
 file.}
 
-\item{str_met}{\link{character} Character path to structure metadata file.}
+\item{str_met}{\link{character} Path to structure metadata file.}
 
-\item{str_tax_cla}{\link{character} Character path to ClassyFire taxonomy file.}
+\item{str_tax_cla}{\link{character} Path to ClassyFire taxonomy file.}
 
-\item{str_tax_npc}{\link{character} Character path to NPClassifier taxonomy file.}
+\item{str_tax_npc}{\link{character} Path to NPClassifier taxonomy file.}
 
 \item{max_analog_abs_mz_error}{\link{numeric} Maximum allowed absolute m/z
 deviation (Da) for keeping SIRIUS spectral analog hits.}

@@ -11,7 +11,7 @@
 
 \item{taxon_lineage}{\link{list} List of lineage information from rotl}
 
-\item{ott_ids}{\link{integer} Integer vector of OTT IDs}
+\item{ott_ids}{\link{integer} Vector of OTT IDs}
 }
 \value{
 Data frame with complete taxonomy lineage

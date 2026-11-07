@@ -68,7 +68,7 @@ all_single_strings <- function(x_list) {
 #'     check. Stops execution with informative error if any validation fails.
 #'
 #' @param x_list [list] Named list of values to validate
-#' @param error_prefix [character] Character string to prefix error message
+#' @param error_prefix [character] String to prefix error message
 #'
 #' @return NULL (invisible) if validation passes, stops with error otherwise
 #'
@@ -209,7 +209,7 @@ is_numeric_in_range <- function(x, min = -Inf, max = Inf) {
 #' @param x_list [list] Named list of values to check
 #' @param predicate_fn [function] Function taking one element and returning
 #'     logical
-#' @param error_prefix [character] Character prefix for error message
+#' @param error_prefix [character] Prefix for error message
 #' @param ... Additional arguments passed to predicate_fn
 #'
 #' @return NULL (invisible) if all elements pass, stops with error otherwise

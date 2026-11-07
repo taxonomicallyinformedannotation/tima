@@ -31,7 +31,6 @@ decorate_masses <- function(annotation_table_ms1) {
     param_name = "annotation_table_ms1"
   )
 
-  # Check Required Column ----
   if (
     !"candidate_structure_inchikey_connectivity_layer" %in%
       colnames(annotation_table_ms1)
@@ -44,7 +43,6 @@ decorate_masses <- function(annotation_table_ms1) {
     return(annotation_table_ms1)
   }
 
-  # Filter Valid Annotations & Count Statistics (vectorized, zero table copy) ----
   ik_col <- annotation_table_ms1[[
     "candidate_structure_inchikey_connectivity_layer"
   ]]
@@ -56,7 +54,6 @@ decorate_masses <- function(annotation_table_ms1) {
     0L
   }
 
-  # Log Summary ----
   log_info(
     "MS1 annotations: %d unique structures across %d features",
     n_unique_structures,

@@ -27,13 +27,13 @@ prepare_libraries_spectra(
 )
 }
 \arguments{
-\item{input}{\link{character} Character vector of file paths containing spectral
+\item{input}{\link{character} Vector of file paths containing spectral
 data.}
 
 \item{min_fragments}{\link{integer} Minimum number of fragment peaks a spectrum
 must have after cleaning to be retained (default: 2).}
 
-\item{nam_lib}{\link{character} Character library name for metadata.}
+\item{nam_lib}{\link{character} Library name for metadata.}
 
 \item{col_ad}{\link{character} Name of the adduct column in MGF.}
 

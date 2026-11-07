@@ -57,7 +57,6 @@ assert_positive_integer <- function(
     )
   }
 
-  # Check if it's a whole number
   if (x != as.integer(x)) {
     tima_abort(
       problem = paste0(arg_name, " must be an integer, got: ", x),
@@ -91,7 +90,6 @@ assert_positive_integer <- function(
   invisible(TRUE)
 }
 
-# Generic assertion helpers (centralized) ----
 
 assert_choice <- function(value, choices, param_name = "value") {
   if (length(value) != 1L || !is.character(value)) {

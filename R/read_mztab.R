@@ -512,7 +512,6 @@ read_mztab <- function(
     tidytable::mutate(assay_id = sub("-sample_ref$", "", key)) |>
     tidytable::select(assay_id, sample_id = value)
 
-  # Extract species per sample
   species_map <- .mztab_sample_species_map(metadata_df)
 
   # Build TIMA-compatible metadata: filename = sample name, ATTRIBUTE_species

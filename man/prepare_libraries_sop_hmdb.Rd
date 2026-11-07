@@ -11,9 +11,9 @@ prepare_libraries_sop_hmdb(
 )
 }
 \arguments{
-\item{input}{\link{character} Character string path to HMDB SDF zip file}
+\item{input}{\link{character} Path to HMDB SDF zip file}
 
-\item{output}{\link{character} Character string path for prepared HMDB library
+\item{output}{\link{character} Path for prepared HMDB library
 output}
 }
 \value{

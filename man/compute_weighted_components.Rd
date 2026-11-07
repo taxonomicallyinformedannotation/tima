@@ -7,10 +7,10 @@
 compute_weighted_components(..., weights, include_coverage = TRUE)
 }
 \arguments{
-\item{...}{\link{numeric} Numeric columns/vectors of component values (passed as
+\item{...}{\link{numeric} Columns/vectors of component values (passed as
 separate arguments).}
 
-\item{weights}{\link{numeric} Numeric vector of non-negative weights (one per
+\item{weights}{\link{numeric} Vector of non-negative weights (one per
 component).}
 }
 \value{

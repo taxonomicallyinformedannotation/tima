@@ -22,7 +22,6 @@ rank_candidates <- function(df) {
   df <- tidytable::as_tidytable(as.list(df))
   n <- nrow(df)
 
-  # Ensure promotion flag exists (optional)
   if (!("cluster_consensus_promoted_from_anchor" %in% names(df))) {
     data.table::set(
       df,

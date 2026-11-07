@@ -103,9 +103,6 @@ harmonize_spectra <- function(
     )
   )
 
-  # Harmonize Column Names ----
-
-  # Define standard column names
   columns <- c(
     "adduct",
     "collision_energy",
@@ -139,7 +136,6 @@ harmonize_spectra <- function(
     "synonyms" = col_sy
   )
 
-  # Remove NA mappings (columns not provided)
   columns_full <- columns_full[!is.na(columns_full)]
 
   # Identify missing columns that need to be added

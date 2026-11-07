@@ -92,8 +92,6 @@ filter_annotations <- function(
     rts <- NULL
   }
 
-  # Load and Process Data ----
-
   log_info("Filtering annotations")
   if (
     is.numeric(tolerance_rt) &&
@@ -132,8 +130,6 @@ filter_annotations <- function(
     n_features
   )
 
-  # Load and Merge Annotations ----
-
   log_debug("Loading %d annotation file(s)", length(annotations))
   annotation_table <- filter_ms1_redundancy(
     Map(
@@ -155,8 +151,6 @@ filter_annotations <- function(
     "Total annotations after MS1 deduplication: %d",
     n_total_annotations
   )
-
-  # Apply RT Filtering if Library Available ----
 
   extra_feat_cols <- setdiff(names(features_table), "feature_id")
   if (
@@ -360,7 +354,6 @@ validate_filter_annotations_inputs <- function(
     }
   }
 
-  # Validate output path
   if (!is.character(output) || length(output) != 1L) {
     cli::cli_abort(
       "output must be a single character string",
@@ -369,7 +362,6 @@ validate_filter_annotations_inputs <- function(
     )
   }
 
-  # Validate features
   if (!is.character(features) || length(features) != 1L) {
     cli::cli_abort(
       "features must be a single character string",
@@ -441,7 +433,6 @@ validate_filter_annotations_inputs <- function(
     }
   }
 
-  # Validate RT files
   if (length(rts) > 0) {
     rts_exist <- file.exists(unlist(rts))
     if (!all(rts_exist)) {

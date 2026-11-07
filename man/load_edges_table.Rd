@@ -7,9 +7,9 @@
 load_edges_table(edges, candidates_neighbors)
 }
 \arguments{
-\item{edges}{\link{character} Character, path to edges file.}
+\item{edges}{\link{character} Path to edges file.}
 
-\item{candidates_neighbors}{\link{integer} Integer, number of top neighbors to
+\item{candidates_neighbors}{\link{integer} Number of top neighbors to
 keep per feature.}
 }
 \value{

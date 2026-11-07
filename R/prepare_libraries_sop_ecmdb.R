@@ -13,8 +13,8 @@
 #' @include export_params.R
 #' @include export_output.R
 #'
-#' @param input [character] Character string path to ECMDB JSON zip file
-#' @param output [character] Character string path for prepared ECMDB library
+#' @param input [character] Path to ECMDB JSON zip file
+#' @param output [character] Path for prepared ECMDB library
 #'     output
 #'
 #' @return Character string path to prepared ECMDB structure-organism pairs

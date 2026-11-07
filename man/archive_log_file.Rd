@@ -7,7 +7,7 @@
 archive_log_file(log_file, timestamp)
 }
 \arguments{
-\item{log_file}{\link{character} Character path to log file}
+\item{log_file}{\link{character} Path to log file}
 
 \item{timestamp}{\link{POSIXct} POSIXct timestamp for filename}
 }

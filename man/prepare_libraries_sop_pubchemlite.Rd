@@ -12,9 +12,9 @@ prepare_libraries_sop_pubchemlite(
 )
 }
 \arguments{
-\item{input}{\link{character} Character string path to PubChem Lite CSV file}
+\item{input}{\link{character} Path to PubChem Lite CSV file}
 
-\item{output}{\link{character} Character string path for prepared SOP output}
+\item{output}{\link{character} Path for prepared SOP output}
 }
 \value{
 Character string path to prepared SOP file

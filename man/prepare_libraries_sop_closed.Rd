@@ -12,9 +12,9 @@ prepare_libraries_sop_closed(
 )
 }
 \arguments{
-\item{input}{\link{character} Character string path to input closed library file}
+\item{input}{\link{character} Path to input closed library file}
 
-\item{output}{\link{character} Character string path where prepared library should
+\item{output}{\link{character} Path where prepared library should
 be saved}
 }
 \value{

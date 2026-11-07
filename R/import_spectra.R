@@ -61,7 +61,6 @@ import_spectra <- function(
     )
   }
 
-  # Validate polarity
   if (!is.na(polarity) && !polarity %in% c("pos", "neg")) {
     cli::cli_abort(
       "polarity must be 'pos', 'neg', or NA, got {.val {polarity}}",
@@ -97,8 +96,6 @@ import_spectra <- function(
       call = NULL
     )
   }
-
-  # Import Spectra ----
 
   log_info("Importing spectra from: %s", file)
   log_debug(
@@ -190,9 +187,6 @@ import_spectra <- function(
     return(.prepare_rds_spectra_fast(spectra = spectra, polarity = polarity))
   }
 
-  # Harmonize Metadata Fields ----
-
-  # Validate precursor charges
   if (0L %in% spectra@backend@spectraData$precursorCharge) {
     n_unknown <- sum(spectra@backend@spectraData$precursorCharge == 0L)
     log_warn(
@@ -249,8 +243,6 @@ import_spectra <- function(
     # this vector to keep riding along underneath all of that.
     rm(parsed_ids)
   }
-
-  # Filter Spectra ----
 
   # Track how many MS1 (precursor-only) features were dropped during MS2
   # filtering. The count is attached as an attribute on the returned Spectra

@@ -46,7 +46,6 @@ select_sirius_columns_canopus <- function(df, sirius_version) {
     return(df)
   }
 
-  # Validate SIRIUS version
   if (!sirius_version %in% c("5", "6", 5, 6)) {
     cli::cli_abort(
       "sirius_version must be '5' or '6'",

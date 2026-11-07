@@ -9,13 +9,13 @@
 #' @include logs_utils.R
 #' @include export_output.R
 #'
-#' @param input [character] Character string path to SDF zip file
-#' @param output [character] Character string path for prepared SOP output
-#' @param source_name [character] Character label used in logs
-#' @param organism_name [character] Character organism name attached to all rows
+#' @param input [character] Path to SDF zip file
+#' @param output [character] Path for prepared SOP output
+#' @param source_name [character] Label used in logs
+#' @param organism_name [character] Organism name attached to all rows
 #' @param organism_taxonomy [list] Named list containing organism taxonomy
 #'     fields
-#' @param tag [character] Character scalar tag propagated through SOP pipeline
+#' @param tag [character] Tag propagated through SOP pipeline
 #'
 #' @return Character string path to prepared SOP file
 #'

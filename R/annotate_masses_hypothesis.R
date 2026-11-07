@@ -148,7 +148,6 @@ solve_consistent_adduct_assignments <- function(
     ))
   }
 
-  # Add mz values to edges
   features_min <- if (anyDuplicated(features_table$feature_id) == 0L) {
     features_table[, c("feature_id", "mz"), drop = FALSE]
   } else {
@@ -200,7 +199,6 @@ solve_consistent_adduct_assignments <- function(
     ))
   }
 
-  # Calculate implied M for each edge endpoint
   m_src <- calculate_neutral_mass_from_lookup(
     mzs = as.numeric(edges$mz_src),
     adducts = edges$adduct,
@@ -331,7 +329,6 @@ solve_consistent_adduct_assignments <- function(
       )]
     )
 
-  # Build component_membership map (feature_id -> component_id)
   component_membership <- feature_m_map |>
     tidytable::distinct(feature_id, component_id)
 
@@ -368,7 +365,6 @@ enforce_global_m_consistency <- function(
     return(consistent_edges)
   }
 
-  # Build full edge table with M calculations
   features_min <- if (anyDuplicated(features_table$feature_id) == 0L) {
     features_table[, c("feature_id", "mz"), drop = FALSE]
   } else {
@@ -419,7 +415,6 @@ enforce_global_m_consistency <- function(
     adduct_lookup = adduct_lookup
   )
 
-  # Add edge_id column using row numbers
   edge_with_m$edge_id <- seq_len(nrow(edge_with_m))
 
   # Iteratively filter until global consistency achieved
@@ -2439,7 +2434,6 @@ propagate_annotations_across_m_cliques <- function(
     return(annotations)
   }
 
-  # Create propagated annotation rows
   propagated_annotations <- propagation_combined |>
     tidytable::transmute(
       feature_id = target_feature,

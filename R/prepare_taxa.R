@@ -21,20 +21,20 @@
 #' @include export_output.R
 #' @include validations_params.R
 #'
-#' @param input [character] Character string path to features file with
+#' @param input [character] Path to features file with
 #'     intensities
-#' @param extension [logical] Logical whether column names contain file
+#' @param extension [logical] Whether column names contain file
 #'     extensions
-#' @param name_filename [character] Character string name of filename column in
+#' @param name_filename [character] Name of filename column in
 #'     metadata
-#' @param colname [character] Character string name of column with biological
+#' @param colname [character] Name of column with biological
 #'     source info
-#' @param metadata [character] Character string path to metadata file with
+#' @param metadata [character] Path to metadata file with
 #'     organism info
-#' @param org_tax_ott [character] Character string path to Open Tree of Life
+#' @param org_tax_ott [character] Path to Open Tree of Life
 #'     taxonomy file
-#' @param output [character] Character string path for output file
-#' @param taxon [character] Character string organism name to enforce for all
+#' @param output [character] Path for output file
+#' @param taxon [character] Organism name to enforce for all
 #'     features
 #'     (e.g., "Homo sapiens"). If provided, overrides metadata-based assignment.
 #'
@@ -98,7 +98,6 @@ prepare_taxa <- function(
     )
   }
 
-  # Validate file paths
   validate_character(input, param_name = "input", allow_empty = FALSE)
   validate_file_exists(
     path = input,
@@ -125,7 +124,6 @@ prepare_taxa <- function(
     )
   }
 
-  # Validate logical parameter
   if (!is.logical(extension) || length(extension) != 1L) {
     cli::cli_abort(
       "extension must be a single logical value (TRUE/FALSE)",
@@ -264,7 +262,6 @@ prepare_taxa <- function(
     colClasses = "character"
   )
 
-  # Validate OTT table has required columns
   required_ott_cols <- c(
     "organism_name",
     "organism_taxonomy_ottid",
@@ -463,7 +460,6 @@ prepare_taxa <- function(
         tidytable::select(-join)
       rm(feat_min)
     } else {
-      # Validate join keys exist in their respective tables
       if (!"sample" %in% names(feature_table_0)) {
         cli::cli_abort(
           c(

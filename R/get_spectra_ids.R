@@ -32,7 +32,6 @@
 #' spec_ids <- get_spectra_ids(my_spectra)
 #' }
 get_spectra_ids <- function(spectra) {
-  # Validate input
   if (!inherits(spectra, "Spectra")) {
     cli::cli_abort(
       "input must be a Spectra object from the Spectra package",

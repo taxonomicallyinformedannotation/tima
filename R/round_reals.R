@@ -8,10 +8,10 @@
 #' @include validations_params.R
 #'
 #' @param df [data.frame] Data frame or tibble containing columns to round
-#' @param dig [integer] Integer number of decimal digits (default: 5).
+#' @param dig [integer] Number of decimal digits (default: 5).
 #' Must be >= 0.
 #' Use 0 to round to whole numbers.
-#' @param cols [character] Character vector of column name patterns to match
+#' @param cols [character] Vector of column name patterns to match
 #'     (default: c("structure_exact_mass", "structure_xlogp"))
 #'     Uses fixed string matching for performance.
 #'
@@ -62,7 +62,6 @@ round_reals <- function(
     return(df)
   }
 
-  # Find Matching Columns ----
   matching_cols <- find_matching_columns(names(df), cols)
 
   # Early exit if no columns found
@@ -70,7 +69,6 @@ round_reals <- function(
     return(df)
   }
 
-  # Apply Rounding ----
   .round_col <- function(x) {
     if (is.numeric(x)) {
       return(round(x, digits = dig))

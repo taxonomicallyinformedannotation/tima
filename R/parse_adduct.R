@@ -12,10 +12,10 @@
 #' @include validations_utils.R
 #' @include logs_utils.R
 #'
-#' @param adduct_string [character] Character string representing the adduct in
+#' @param adduct_string [character] The adduct in
 #'     standard
 #'     notation (e.g., "\[M+H\]+", "\[2M+Na\]+", "\[M-H2O+H\]+")
-#' @param regex [character] Character string regular expression pattern for
+#' @param regex [character] Regular expression pattern for
 #'     parsing
 #'     (default: uses ADDUCT_REGEX_PATTERN from constants)
 #'
@@ -384,7 +384,6 @@ extract_isotope_shift <- function(match_value) {
   # Isotope shifts are always positive (M+1, M+2, etc.)
   isotope_num <- as.integer(gsub("[+-]", "", match_value))
 
-  # Return 0 if parsing resulted in NA
   if (is.na(isotope_num)) {
     return(0L)
   }
@@ -439,7 +438,6 @@ process_modifications <- function(modifications_raw) {
     ))
   }
 
-  # Calculate masses of modification elements
   mass_result <- calculate_modification_masses(
     mod_components$elements,
     mod_components$signs,
@@ -585,7 +583,6 @@ calculate_modification_masses <- function(elements, signs, multiplicities) {
     ))
   }
 
-  # Calculate total mass change from all modifications
   total_mass_change <- sum(mod_masses * multiplicities * signs)
 
   list(

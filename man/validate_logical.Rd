@@ -7,7 +7,7 @@
 validate_logical(value, param_name = "value", allow_null = FALSE)
 }
 \arguments{
-\item{value}{\link{logical} Logical value to validate}
+\item{value}{\link{logical} Value to validate}
 
 \item{param_name}{\link{character} Name of the parameter (for error messages)}
 

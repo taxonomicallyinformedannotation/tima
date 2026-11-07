@@ -27,7 +27,6 @@ select_sop_columns <- function(df) {
     return(df)
   }
 
-  # Select and Rename Columns ----
   head_map <- c(
     structure_name = "structure_name",
     structure_inchikey = "structure_inchikey",

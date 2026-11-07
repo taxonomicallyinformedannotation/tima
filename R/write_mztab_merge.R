@@ -246,7 +246,6 @@
   id_map <- stats::setNames(character(0), character(0))
   next_id <- .mztab_next_numeric_id(smf_all$SMF_ID)
 
-  # Process all new rows and collect new entries
   new_keys <- .mztab_smf_key(smf_new)
   match_idx <- match(new_keys, base_keys)
 
@@ -262,7 +261,6 @@
   }
 
   if (new_rows_count > 0L) {
-    # Prepare new rows with batch ID assignment
     new_rows <- smf_new[new_row_indices, , drop = FALSE]
     new_rows$SMF_ID <- as.character(next_id + seq_len(new_rows_count) - 1L)
     new_rows$SML_ID_REFS <- "null"
@@ -295,7 +293,6 @@
   id_map <- stats::setNames(character(0), character(0))
   next_id <- .mztab_next_numeric_id(sme_all$SME_ID)
 
-  # Process all new rows and collect new entries
   new_keys <- .mztab_sme_key(sme_new)
   match_idx <- match(new_keys, base_keys)
 
@@ -311,7 +308,6 @@
   }
 
   if (new_rows_count > 0L) {
-    # Prepare new rows with batch ID assignment
     new_rows <- sme_new[new_row_indices, , drop = FALSE]
     new_rows$SME_ID <- as.character(next_id + seq_len(new_rows_count) - 1L)
 
@@ -352,7 +348,6 @@
   new_rows_count <- length(new_row_indices)
 
   if (new_rows_count > 0L) {
-    # Prepare new rows with batch ID assignment
     new_rows <- sml_new[new_row_indices, , drop = FALSE]
     new_rows$SML_ID <- as.character(next_id + seq_len(new_rows_count) - 1L)
     sml_all <- tidytable::bind_rows(sml_all, new_rows)

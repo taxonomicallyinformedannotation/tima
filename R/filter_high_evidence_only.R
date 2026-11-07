@@ -112,7 +112,6 @@ filter_high_evidence_only <- function(
     context = context %||% "default"
   )
 
-  # Validation ----
   validate_dataframe(df, param_name = "df", allow_empty = TRUE)
 
   if (nrow(df) == 0L) {
@@ -182,7 +181,6 @@ filter_high_evidence_only <- function(
     }
   }
 
-  # Prepare safe columns ----
   # IMPORTANT: We do NOT use coalesce() to convert missing values to -Inf
   # because score=NA (MS1-only hits) is a legitimate value, not missing.
   # Instead, we create columns with actual values or NA, and handle NA in
@@ -275,7 +273,6 @@ filter_high_evidence_only <- function(
     if (is.numeric(x)) x else .as_numeric_dedup(x)
   }
 
-  # Core filtering ----
   # At least one of the three score thresholds must be satisfied
   score_bio <- .num_col("score_biological")
   score_ini <- .num_col("candidate_score_pseudo_initial")

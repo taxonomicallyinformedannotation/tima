@@ -10,10 +10,10 @@ is_spectrum_sanitized(spectrum, tolerance = 0.01, ppm = 10)
 \item{spectrum}{\link{matrix} Numeric matrix with at least 2 columns (mz,
 intensity)}
 
-\item{tolerance}{\link{numeric} Numeric absolute tolerance in Daltons (default:
+\item{tolerance}{\link{numeric} Absolute tolerance in Daltons (default:
 0.01)}
 
-\item{ppm}{\link{numeric} Numeric relative tolerance in ppm (default: 10)}
+\item{ppm}{\link{numeric} Relative tolerance in ppm (default: 10)}
 }
 \value{
 Logical scalar: TRUE if the spectrum is sanitized, FALSE otherwise.

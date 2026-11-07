@@ -61,7 +61,6 @@ process_smiles <- function(
     allow_empty = FALSE
   )
 
-  # Validate column exists
   if (!smiles_colname %in% names(df)) {
     cli::cli_abort(
       c(
@@ -75,7 +74,6 @@ process_smiles <- function(
 
   log_info("Processing SMILES with RDKit")
 
-  # Extract Unique SMILES ----
   table_smiles <- extract_unique_smiles(df, smiles_colname)
 
   if (nrow(table_smiles) == 0L) {
@@ -85,7 +83,6 @@ process_smiles <- function(
 
   log_debug("Processing %d unique SMILES", nrow(table_smiles))
 
-  # Load or Initialize Cache ----
   table_processed_1 <- load_smiles_cache(cache, smiles_colname)
   extra_parts <- list()
 

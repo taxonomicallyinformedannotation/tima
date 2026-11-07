@@ -4,8 +4,8 @@
 #' polarity mode, applying column mappings and fixing precursor/inchikey issues.
 #'
 #' @param spectra_extracted [list] List of extracted spectra data frames.
-#' @param mode [character] Character "pos" or "neg".
-#' @param metad [character] Character library metadata name.
+#' @param mode [character] "pos" or "neg".
+#' @param metad [character] Library metadata name.
 #' @param col_ad [character] Adduct field name
 #' @param col_ce [character] Collision energy field name
 #' @param col_ci [character] Compound ID field name
@@ -171,11 +171,11 @@ create_empty_sop_library <- function() {
 #' @include export_params.R
 #' @include export_output.R
 #'
-#' @param input [character] Character vector of file paths containing spectral
+#' @param input [character] Vector of file paths containing spectral
 #'     data.
 #' @param min_fragments [integer] Minimum number of fragment peaks a spectrum
 #'     must have after cleaning to be retained (default: 2).
-#' @param nam_lib [character] Character library name for metadata.
+#' @param nam_lib [character] Library name for metadata.
 #' @param col_ad [character] Name of the adduct column in MGF.
 #' @param col_ce [character] Name of the collision energy column in MGF.
 #' @param col_ci [character] Name of the compound ID column in MGF.
@@ -241,14 +241,12 @@ prepare_libraries_spectra <-
     col_sp = get_params(step = "prepare_libraries_spectra")$names$mgf$splash,
     col_sy = get_params(step = "prepare_libraries_spectra")$names$mgf$synonyms
   ) {
-    # Initialize logging context
     ctx <- log_operation(
       "prepare_libraries_spectra",
       library_name = nam_lib,
       n_input_files = length(input)
     )
 
-    # Define output paths ----
     output_pos <- file.path(
       get_default_paths()$data$interim$libraries$spectra$exp$path,
       paste0(nam_lib, "_pos.rds")
@@ -261,7 +259,6 @@ prepare_libraries_spectra <-
       get_default_paths()$data$interim$libraries$sop$path,
       paste0(nam_lib, "_prepared.tsv.gz")
     )
-    # Check if already prepared (idempotency) ----
     outputs_exist <- all(file.exists(c(output_pos, output_neg, output_sop)))
     if (outputs_exist) {
       log_complete(
@@ -279,7 +276,6 @@ prepare_libraries_spectra <-
         "sop" = output_sop
       )))
     }
-    # Validate input ----
     if (is.null(input)) {
       input <- "fileDoesNotExist"
     }
@@ -292,7 +288,6 @@ prepare_libraries_spectra <-
       spectra_neg <- create_empty_spectral_library()
       sop <- create_empty_sop_library()
     } else {
-      # Import and extract ----
       log_metadata(ctx, phase = "importing", n_files = length(input))
       spectra <- lapply(
         X = input,
@@ -304,7 +299,6 @@ prepare_libraries_spectra <-
       log_metadata(ctx, phase = "extracting")
       spectra_extracted <- lapply(X = spectra, FUN = extract_spectra)
 
-      # Harmonize for both polarities ----
       log_metadata(ctx, phase = "harmonizing", polarity = "positive")
       spectra_harmonized_pos <- harmonize_spectra_polarity(
         spectra_extracted,
@@ -360,7 +354,6 @@ prepare_libraries_spectra <-
       spectra_neg <- Spectra::Spectra(object = spectra_harmonized_neg)
       rm(spectra_harmonized_neg)
 
-      # Extract SOP table ----
       log_metadata(
         ctx,
         phase = "sop_extraction",
@@ -382,7 +375,6 @@ prepare_libraries_spectra <-
       )
     }
 
-    # Export ----
     log_metadata(
       ctx,
       phase = "exporting",

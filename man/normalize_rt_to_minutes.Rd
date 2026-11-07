@@ -11,13 +11,13 @@ normalize_rt_to_minutes(
 )
 }
 \arguments{
-\item{rt_vec}{\link{numeric} Numeric vector (character allowed; will be coerced)
+\item{rt_vec}{\link{numeric} Vector (character allowed; will be coerced)
 of retention times.}
 
-\item{unit}{\link{character} Character scalar: one of 'auto', 'seconds', or
+\item{unit}{\link{character} One of 'auto', 'seconds', or
 'minutes'.}
 
-\item{quiet}{\link{logical} Logical; if FALSE, logs detection/conversion
+\item{quiet}{\link{logical} If FALSE, logs detection/conversion
 decisions.}
 }
 \value{

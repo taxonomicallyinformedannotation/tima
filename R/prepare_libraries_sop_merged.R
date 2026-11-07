@@ -16,17 +16,17 @@
 #' @include export_params.R
 #' @include prepare_libraries_sop_merged_utils.R
 #'
-#' @param files [character] Character vector or list of paths to prepared
+#' @param files [character] Vector or list of paths to prepared
 #'     library files
-#' @param filter [logical] Logical whether to filter the merged library by
+#' @param filter [logical] Whether to filter the merged library by
 #'     taxonomy
-#' @param level [character] Character string taxonomic rank for filtering
+#' @param level [character] Taxonomic rank for filtering
 #'     (kingdom, phylum,
 #'     family, genus, etc.)
-#' @param value [character] Character string taxon name(s) to keep (can use |
+#' @param value [character] Taxon name(s) to keep (can use |
 #'     for multiple,
 #'     e.g., 'Gentianaceae|Apocynaceae')
-#' @param cache [character] Character string path to cache directory for
+#' @param cache [character] Path to cache directory for
 #'     processed SMILES
 #' @param npc_cache [character] Optional path to an additional NPClassifier
 #'   taxonomy cache file (TSV/TSV.gz). Structures present in the merged library
@@ -43,18 +43,18 @@
 #'   `structure_tax_cla_03cla`, `structure_tax_cla_04dirpar`. Alternative column
 #'   names (e.g., `inchikey`, `chemontid`, `kingdom`, `superclass`, `class`,
 #'   `directparent`) are also supported.
-#' @param output_key [character] Character string path for output keys file
-#' @param output_org_tax_ott [character] Character string path for organisms
+#' @param output_key [character] Path for output keys file
+#' @param output_org_tax_ott [character] Path for organisms
 #'     taxonomy (OTT) file
-#' @param output_str_can [character] Character string path for structures
+#' @param output_str_can [character] Path for structures
 #'     canonical SMILES file
-#' @param output_str_stereo [character] Character string path for structures
+#' @param output_str_stereo [character] Path for structures
 #'     stereochemistry file
-#' @param output_str_met [character] Character string path for structures
+#' @param output_str_met [character] Path for structures
 #'     metadata file
-#' @param output_str_tax_cla [character] Character string path for ClassyFire
+#' @param output_str_tax_cla [character] Path for ClassyFire
 #'     taxonomy file
-#' @param output_str_tax_npc [character] Character string path for NPClassifier
+#' @param output_str_tax_npc [character] Path for NPClassifier
 #'     taxonomy file
 #'
 #' @return Character string path to the prepared merged SOP library
@@ -126,7 +126,6 @@ prepare_libraries_sop_merged <- function(
     step = "prepare_libraries_sop_merged"
   )$files$libraries$sop$merged$structures$taxonomies$npc
 ) {
-  # Initialize logging context
   ctx <- log_operation(
     "prepare_libraries_sop_merged",
     n_libraries = length(files),
@@ -148,7 +147,6 @@ prepare_libraries_sop_merged <- function(
     output_str_tax_npc = output_str_tax_npc
   )
 
-  # Load and Process Libraries ----
   log_metadata(ctx, phase = "loading", n_files = length(files))
 
   tables <- load_and_merge_libraries(files, cache)
@@ -159,14 +157,11 @@ prepare_libraries_sop_merged <- function(
   # Complete organism taxonomy
   table_org_tax_ott <- complete_organism_taxonomy(table_keys, table_org_tax_ott)
 
-  # Extract structure tables
   table_structures_canonical <- tables$str_can
   table_structures_stereo <- tables$str_stereo
   table_structures_metadata <- tables$str_met
   table_structures_taxonomy_cla <- tables$str_tax_cla
   table_structures_taxonomy_npc <- tables$str_tax_npc
-
-  # Enrich taxonomy from additional caches (if provided) ----
 
   # NPClassifier: keyed by structure_smiles
   if (
@@ -242,8 +237,6 @@ prepare_libraries_sop_merged <- function(
     )
   }
 
-  # Apply Taxonomic Filter (if enabled) ----
-
   if (filter) {
     n_pre_filter <- nrow(table_keys)
     log_metadata(
@@ -268,7 +261,6 @@ prepare_libraries_sop_merged <- function(
     )
   }
 
-  # Export Results ----
   log_metadata(
     ctx,
     phase = "exporting",

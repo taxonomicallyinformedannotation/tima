@@ -8,11 +8,11 @@
 #' bound for minutes in typical gradients). Otherwise assumes minutes.
 #'
 #' @include logs_utils.R
-#' @param rt_vec [numeric] Numeric vector (character allowed; will be coerced)
+#' @param rt_vec [numeric] Vector (character allowed; will be coerced)
 #'     of retention times.
-#' @param unit [character] Character scalar: one of 'auto', 'seconds', or
+#' @param unit [character] One of 'auto', 'seconds', or
 #'     'minutes'.
-#' @param quiet [logical] Logical; if FALSE, logs detection/conversion
+#' @param quiet [logical] If FALSE, logs detection/conversion
 #'     decisions.
 #'
 #' @return Numeric vector of RTs in minutes.

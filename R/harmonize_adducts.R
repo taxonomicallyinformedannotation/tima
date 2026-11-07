@@ -110,7 +110,6 @@ harmonize_adducts <- function(
     )]
   }
 
-  # Harmonize Adducts ----
   adducts <- df[[adducts_colname]]
   if (is.factor(adducts)) {
     adducts <- as.character(adducts)

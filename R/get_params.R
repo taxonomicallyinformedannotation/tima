@@ -27,8 +27,6 @@
 #' params <- get_params("prepare_params")
 #' }
 get_params <- function(step) {
-  # Input Validation (early check) ----
-
   if (missing(step) || is.null(step)) {
     cli::cli_abort(
       "step name must be provided and non-empty",
@@ -53,12 +51,8 @@ get_params <- function(step) {
     )
   }
 
-  # Get Default Paths and Available Steps ----
-
-  # Get default paths (cached for potential reuse)
   paths <- get_default_paths()
 
-  # Get list of available steps (once)
   available_steps <- list.files(
     path = pkg_system_file("scripts/docopt")
   ) |>
@@ -76,7 +70,6 @@ get_params <- function(step) {
     fixed = TRUE
   )
 
-  # Validate step exists early (before file I/O)
   if (!step_normalized %in% available_steps) {
     cli::cli_abort(
       c(
@@ -88,8 +81,6 @@ get_params <- function(step) {
       call = NULL
     )
   }
-
-  # Determine Parameter File Paths ----
 
   # Determine default parameter file path based on step type
   default_param_path <- if (step == "prepare_params") {
@@ -109,7 +100,6 @@ get_params <- function(step) {
     )
   }
 
-  # Validate default parameter file exists
   if (!file.exists(default_param_path)) {
     cli::cli_abort(
       c(
@@ -122,15 +112,11 @@ get_params <- function(step) {
     )
   }
 
-  # Load Docopt Documentation ----
-
-  # Get docopt documentation path
   docopt_path <- file.path(
     pkg_system_file("scripts/docopt"),
     paste0(step_normalized, ".txt")
   )
 
-  # Validate docopt file exists
   if (!file.exists(docopt_path)) {
     cli::cli_abort(
       c(
@@ -161,8 +147,6 @@ get_params <- function(step) {
     }
   )
 
-  # Load and Merge YAML Parameters ----
-
   # Check for user-specified parameters
   user_param_path <- file.path(
     get_path(paths$params$user$path),
@@ -188,7 +172,6 @@ get_params <- function(step) {
     parse_yaml_params(def = default_param_path, usr = default_param_path)
   }
 
-  # Validate that parameters were successfully loaded
   if (!is.list(params) || length(params) == 0L) {
     cli::cli_abort(
       c(
@@ -199,8 +182,6 @@ get_params <- function(step) {
       call = NULL
     )
   }
-
-  # Parse and Merge CLI Arguments ----
 
   # Parse CLI arguments with error handling
   cli_args <- tryCatch(
@@ -214,7 +195,6 @@ get_params <- function(step) {
     }
   )
 
-  # Merge CLI arguments into parameters
   params <- parse_cli_params(arguments = cli_args, parameters = params)
 
   params

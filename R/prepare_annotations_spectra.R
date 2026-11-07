@@ -13,16 +13,16 @@
 #' @include export_params.R
 #' @include export_output.R
 #'
-#' @param input [character] Character string path to spectral matching results
+#' @param input [character] Path to spectral matching results
 #'     file
-#' @param output [character] Character string path for prepared spectral
+#' @param output [character] Path for prepared spectral
 #'     annotations output
-#' @param str_stereo [character] Character string path to structures
+#' @param str_stereo [character] Path to structures
 #'     stereochemistry file
-#' @param str_met [character] Character string path to structures metadata file
-#' @param str_tax_cla [character] Character string path to ClassyFire taxonomy
+#' @param str_met [character] Path to structures metadata file
+#' @param str_tax_cla [character] Path to ClassyFire taxonomy
 #'     file
-#' @param str_tax_npc [character] Character string path to NPClassifier taxonomy
+#' @param str_tax_npc [character] Path to NPClassifier taxonomy
 #'     file
 #'
 #' @return Character string path to prepared spectral annotations
@@ -103,7 +103,6 @@ prepare_annotations_spectra <- function(
     )
   }
 
-  # Validate output
   if (!is.character(output) || length(output) != 1L) {
     cli::cli_abort(
       "output must be a single character string",
@@ -112,7 +111,6 @@ prepare_annotations_spectra <- function(
     )
   }
 
-  # Validate structure file paths
   str_files <- list(
     str_stereo = str_stereo,
     str_met = str_met,
@@ -136,8 +134,6 @@ prepare_annotations_spectra <- function(
       call = NULL
     )
   }
-
-  # Load and Process Spectral Annotations ----
 
   log_info(
     "Preparing spectral matching annotations from %d file(s)",

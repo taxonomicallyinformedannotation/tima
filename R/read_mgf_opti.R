@@ -28,9 +28,9 @@
 #' @details The function extracts all MGF fields and maps them to standard
 #'     spectra variable names.
 #'
-#' @param f [character] Character string specifying the path to a single MGF
+#' @param f [character] The path to a single MGF
 #'     file
-#' @param msLevel [integer] Integer MS level to assign to spectra (default: 2L
+#' @param msLevel [integer] MS level to assign to spectra (default: 2L
 #'     for MS2)
 #' @param mapping [character] Named character vector mapping MGF field names to
 #'     standard spectra variable names.
@@ -102,7 +102,6 @@ read_mgf_opti <- function(
     )
   }
 
-  # Get file size for progress reporting
   file_size_mb <- file.info(f)$size / 1024^2
   log_info(
     "Reading MGF file (%s MB) with optimized parser: %s",

@@ -13,7 +13,7 @@ validate_character(
 )
 }
 \arguments{
-\item{value}{\link{character} Character value to validate}
+\item{value}{\link{character} Value to validate}
 
 \item{allowed_values}{\link{character} Optional character vector of allowed values}
 

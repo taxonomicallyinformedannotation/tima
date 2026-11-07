@@ -13,9 +13,9 @@ validate_tolerances(
 )
 }
 \arguments{
-\item{tolerance_ppm}{\link{numeric} Numeric mass tolerance in parts per million}
+\item{tolerance_ppm}{\link{numeric} Mass tolerance in parts per million}
 
-\item{tolerance_rt}{\link{numeric} Numeric retention time tolerance in minutes}
+\item{tolerance_rt}{\link{numeric} Retention time tolerance in minutes}
 
 \item{max_ppm}{\link{numeric} Maximum allowed ppm tolerance (default: from
 constants)}
@@ -23,7 +23,7 @@ constants)}
 \item{max_rt}{\link{numeric} Maximum allowed RT tolerance (default: from
 constants)}
 
-\item{context}{\link{character} Character string describing context (for error
+\item{context}{\link{character} Describing context (for error
 messages)}
 }
 \value{

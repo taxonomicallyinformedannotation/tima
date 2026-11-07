@@ -5,16 +5,16 @@
 #'     on library downloads and processing.
 #'
 #' @include sanitize_data.R
-#' @param features [character] Character path to features CSV/TSV file
-#' @param spectra [character] Character path to MGF spectra file
-#' @param metadata [character] Character path to metadata file
-#' @param sirius [character] Character path to SIRIUS output directory or ZIP
+#' @param features [character] Path to features CSV/TSV file
+#' @param spectra [character] Path to MGF spectra file
+#' @param metadata [character] Path to metadata file
+#' @param sirius [character] Path to SIRIUS output directory or ZIP
 #'     file
-#' @param filename_col [character] Character name of filename column (default:
+#' @param filename_col [character] Name of filename column (default:
 #'     "filename")
-#' @param organism_col [character] Character name of organism column (default:
+#' @param organism_col [character] Name of organism column (default:
 #'     "organism")
-#' @param feature_col [character] Character name of feature ID column (default:
+#' @param feature_col [character] Name of feature ID column (default:
 #'     "feature_id")
 #'
 #' @return Invisible TRUE if all checks pass, stops with error otherwise

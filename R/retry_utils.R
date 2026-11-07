@@ -10,11 +10,11 @@
 #' @include assert_utils.R
 #'
 #' @param expr [expression] Expression to evaluate
-#' @param max_attempts [integer] Integer maximum number of attempts (default: 3)
-#' @param backoff [numeric] Numeric base for exponential backoff in seconds
+#' @param max_attempts [integer] Maximum number of attempts (default: 3)
+#' @param backoff [numeric] Base for exponential backoff in seconds
 #'     (default: 2)
-#' @param operation_name [character] Character name of operation for logging
-#' @param silent [logical] Logical whether to suppress retry warnings (default:
+#' @param operation_name [character] Name of operation for logging
+#' @param silent [logical] Whether to suppress retry warnings (default:
 #'     FALSE)
 #'
 #' @return Result of expr if successful

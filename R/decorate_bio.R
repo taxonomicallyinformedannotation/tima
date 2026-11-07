@@ -64,7 +64,6 @@ decorate_bio <- function(
 
   validate_dataframe(annot_table_wei_bio, param_name = "annot_table_wei_bio")
 
-  # Validate all score parameters (0-1 range)
   validate_numeric_range(
     score_biological_kingdom,
     0,
@@ -139,8 +138,6 @@ decorate_bio <- function(
     )
     return(annot_table_wei_bio)
   }
-
-  # Helper Function ----
 
   # Count total candidates and unique structures at a given score threshold.
   # OPTIMIZATION: Pre-sort the data once by score descending, then for each
@@ -226,10 +223,7 @@ decorate_bio <- function(
     }
   }
 
-  # Calculate Counts for Each Taxonomic Level ----
   counts <- lapply(levels, count_stats_at_level, df = annot_table_wei_bio)
-
-  # Log Summary Statistics ----
 
   fmt_level <- function(level_name, width = 8L) {
     level_counts <- counts[[level_name]]

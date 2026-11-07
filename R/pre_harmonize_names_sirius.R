@@ -5,7 +5,7 @@
 #'     additional information after a slash (e.g., "columnName/suffix"), and
 #'     this function removes everything from the slash onwards.
 #'
-#' @param x [character] Character string containing a SIRIUS column name to
+#' @param x [character] A SIRIUS column name to
 #'     pre-harmonize
 #'
 #' @return Character string with everything from and including the first
@@ -20,7 +20,6 @@
 #' pre_harmonize_names_sirius("name/extra/info") # Returns "name"
 #' }
 pre_harmonize_names_sirius <- function(x) {
-  # Validate input
   if (missing(x) || is.null(x)) {
     cli::cli_abort(
       "input 'x' must be provided",

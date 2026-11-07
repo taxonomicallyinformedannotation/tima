@@ -16,11 +16,11 @@
 #' @param input [list] Named list containing paths to edge files. Must have
 #'     "ms1" and
 #'     "spectral" elements pointing to respective edge files.
-#' @param output [character] Character string path where prepared edges should
+#' @param output [character] Path where prepared edges should
 #'     be saved
-#' @param name_source [character] Character string name of the source feature
+#' @param name_source [character] Name of the source feature
 #'     column in input files
-#' @param name_target [character] Character string name of the target feature
+#' @param name_target [character] Name of the target feature
 #'     column in input files
 #'
 #' @return Character string path to the prepared edges file
@@ -117,7 +117,6 @@ prepare_features_edges <- function(
     )
   }
 
-  # Load Edge Tables ----
   log_debug("MS1 edges: %s", input[["ms1"]])
   log_debug("Spectral edges: %s", input[["spectral"]])
 
@@ -158,8 +157,6 @@ prepare_features_edges <- function(
 
   log_debug("MS1 edges: %d rows", nrow(edges_ms1))
   log_debug("Spectral edges: %d rows", nrow(edges_ms2))
-
-  # Extract Entropy Information ----
 
   drop_legacy_similarity_columns <- function(edge_table) {
     legacy_columns <- intersect(c("score", "matched_peaks"), names(edge_table))
@@ -211,7 +208,6 @@ prepare_features_edges <- function(
     features_entropy <- tidytable::tidytable()
   }
 
-  # Combine and Format Edges ----
   extra_ent_cols <- setdiff(entropy_columns, name_source)
   if (
     name_source %in%
@@ -319,8 +315,6 @@ prepare_features_edges <- function(
 
   # Explicit memory cleanup
   rm(edges_ms1, edges_ms2, features_entropy)
-
-  # Export Results ----
 
   # Export parameters and results
   export_params(

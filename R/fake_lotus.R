@@ -20,7 +20,6 @@
 #' fake_lotus(export = "data/source/lotus.tsv.gz")
 #' }
 fake_lotus <- function(export) {
-  # Validate input
   if (missing(export) || !is.character(export) || length(export) != 1L) {
     cli::cli_abort(
       "export path must be a single character string",

@@ -18,7 +18,7 @@
 #' @include logs_utils.R
 #' @include validations_params.R
 #'
-#' @param dir [character] Character string name of cache directory (default:
+#' @param dir [character] Name of cache directory (default:
 #'     ".tima").
 #'     Created in user's home directory. Must be non-empty.
 #'
@@ -43,13 +43,11 @@
 go_to_cache <- function(dir = ".tima") {
   validate_character(dir, param_name = "dir", allow_empty = FALSE)
 
-  # Construct and Create Cache Path ----
   cache <- path.expand(file.path("~", dir))
   log_debug("Cache directory: %s", cache)
 
   ensure_cache_exists(cache)
 
-  # Change Working Directory ----
   change_to_cache(cache)
 
   invisible(cache)

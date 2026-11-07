@@ -35,7 +35,6 @@
 #' fake_ecmdb(export = "data/source/ecmdb.json.zip")
 #' }
 fake_ecmdb <- function(export) {
-  # Validate input
   if (missing(export) || !is.character(export) || length(export) != 1L) {
     cli::cli_abort(
       "export path must be a single character string",
@@ -74,7 +73,6 @@ fake_ecmdb <- function(export) {
   # Write JSON to temporary file
   writeLines(fake_json, fake_export)
 
-  # Create zip archive
   zip_result <- .fake_zip_cmd(export = export, fake_export = fake_export)
 
   if (zip_result != 0) {

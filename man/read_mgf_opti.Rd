@@ -12,10 +12,10 @@ read_mgf_opti(
 )
 }
 \arguments{
-\item{f}{\link{character} Character string specifying the path to a single MGF
+\item{f}{\link{character} The path to a single MGF
 file}
 
-\item{msLevel}{\link{integer} Integer MS level to assign to spectra (default: 2L
+\item{msLevel}{\link{integer} MS level to assign to spectra (default: 2L
 for MS2)}
 
 \item{mapping}{\link{character} Named character vector mapping MGF field names to

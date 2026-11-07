@@ -14,8 +14,8 @@
 #' @include export_params.R
 #' @include export_output.R
 #'
-#' @param input [character] Character string path to input closed library file
-#' @param output [character] Character string path where prepared library should
+#' @param input [character] Path to input closed library file
+#' @param output [character] Path where prepared library should
 #'     be saved
 #'
 #' @return Character string path to the prepared structure-organism pairs

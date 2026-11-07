@@ -15,22 +15,22 @@ validate_inputs(
 )
 }
 \arguments{
-\item{features}{\link{character} Character path to features CSV/TSV file}
+\item{features}{\link{character} Path to features CSV/TSV file}
 
-\item{spectra}{\link{character} Character path to MGF spectra file}
+\item{spectra}{\link{character} Path to MGF spectra file}
 
-\item{metadata}{\link{character} Character path to metadata file}
+\item{metadata}{\link{character} Path to metadata file}
 
-\item{sirius}{\link{character} Character path to SIRIUS output directory or ZIP
+\item{sirius}{\link{character} Path to SIRIUS output directory or ZIP
 file}
 
-\item{filename_col}{\link{character} Character name of filename column (default:
+\item{filename_col}{\link{character} Name of filename column (default:
 "filename")}
 
-\item{organism_col}{\link{character} Character name of organism column (default:
+\item{organism_col}{\link{character} Name of organism column (default:
 "organism")}
 
-\item{feature_col}{\link{character} Character name of feature ID column (default:
+\item{feature_col}{\link{character} Name of feature ID column (default:
 "feature_id")}
 }
 \value{

@@ -30,14 +30,12 @@
 #' dist_get(d, 2, 2)
 #' }
 dist_get <- function(d, idx1, idx2) {
-  # Input Validation and Conversion ----
   if (!inherits(d, "dist")) {
     d <- stats::as.dist(m = d)
   }
 
   n <- attr(d, "Size")
 
-  # Validate indices are within bounds
   if (any(idx1 < 1L | idx1 > n | idx2 < 1L | idx2 > n)) {
     warning(
       "Some indices out of bounds (n=",
@@ -47,7 +45,6 @@ dist_get <- function(d, idx1, idx2) {
     )
   }
 
-  # Calculate Distance ----
   # Map to lower triangle indices
   i <- pmin(idx1, idx2)
   j <- pmax(idx1, idx2)
@@ -115,16 +112,12 @@ dist_groups <- function(d, g) {
     )
   }
 
-  # Generate Pairwise Combinations ----
   idx_pairs <- utils::combn(x = n_obs, m = 2L)
   idx1 <- idx_pairs[1L, ]
   idx2 <- idx_pairs[2L, ]
 
-  # Get group memberships for each pair
   group1 <- g[idx1]
   group2 <- g[idx2]
-
-  # Create Comparison Labels ----
 
   # Create descriptive labels for within/between group comparisons
   # Cache numeric conversions to avoid duplicate conversions
@@ -138,8 +131,6 @@ dist_groups <- function(d, g) {
     yes = paste("Within", level1),
     no = paste("Between", level1, "and", level2)
   )
-
-  # Build Result Data Frame ----
 
   # Build result data frame with all distance information
   data.frame(

@@ -17,7 +17,6 @@
 #'
 #' @keywords internal
 add_xrefs_to_annotations <- function(results_list, xrefs_file) {
-  # Validation ----
   if (
     !is.list(results_list) ||
       !all(c("full", "filtered", "mini") %in% names(results_list))
@@ -41,7 +40,6 @@ add_xrefs_to_annotations <- function(results_list, xrefs_file) {
     return(results_list)
   }
 
-  # Load xrefs ----
   xrefs <- safe_fread(xrefs_file)
 
   if (nrow(xrefs) == 0L) {
@@ -49,7 +47,6 @@ add_xrefs_to_annotations <- function(results_list, xrefs_file) {
     return(results_list)
   }
 
-  # Validate xrefs structure ----
   required_cols <- c("inchikey", "prefix", "id")
   if (!all(required_cols %in% names(xrefs))) {
     cli::cli_abort(
@@ -64,7 +61,6 @@ add_xrefs_to_annotations <- function(results_list, xrefs_file) {
 
   log_info("Enriching %d result tables with xrefs", length(results_list))
 
-  # Process each result tier ----
   results_list <- lapply(
     X = results_list,
     FUN = function(df) {

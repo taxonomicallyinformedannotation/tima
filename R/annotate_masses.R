@@ -2102,7 +2102,6 @@ normalize_modifier_formula_terms <- function(terms) {
   # Separate NA positions for correct NA propagation
   na_mask <- is.na(terms)
 
-  # Get unique non-NA values
   unique_terms <- unique(terms[!na_mask])
 
   # Normalize each unique term exactly once (cached)

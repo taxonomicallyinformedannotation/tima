@@ -27,7 +27,6 @@ create_fake_gnps_files <- function(
     path_metadata <- file.path("data", "source", "metadata.tsv")
   }
 
-  # Create empty data frames
   fake_annotations <- data.frame(
     `#Scan#` = integer(0),
     MassDiff = numeric(0),
@@ -60,7 +59,6 @@ create_fake_gnps_files <- function(
     ATTRIBUTE_species = character(0)
   )
 
-  # Define file paths
   ann_file <- file.path(path_interim_a, paste0(filename, "_gnps.tsv"))
   comp_file <- file.path(path_interim_f, paste0(filename, "_components.tsv"))
   edges_file <- file.path(
@@ -96,13 +94,11 @@ create_fake_gnps_files <- function(
   # Create minimal placeholder files for features and spectra if paths are
   # provided
   if (!is.null(path_features) && nzchar(path_features)) {
-    # Ensure directory exists
     create_dir(export = path_features)
     # Write a minimal TSV header to avoid empty file warnings
     writeLines("feature_id\n", con = path_features)
   }
   if (!is.null(path_spectra) && nzchar(path_spectra)) {
-    # Ensure directory exists
     create_dir(export = path_spectra)
     # Write a minimal valid MGF block
     mgf_stub <- c("BEGIN IONS", "TITLE=placeholder", "END IONS")
@@ -247,7 +243,6 @@ get_gnps_tables <- function(
     ))
   }
 
-  # Validate job ID and workflow
   validate_gnps_job_id(gnps_job_id, gnps_job_example)
 
   if (!workflow %in% c("fbmn", "classical")) {
@@ -274,7 +269,6 @@ get_gnps_tables <- function(
     gnps_job_id
   }
 
-  # Prepare file paths
   features_file <- path_features
   metadata_file <- if (is.list(path_metadata)) {
     unlist(path_metadata)
@@ -354,7 +348,6 @@ get_gnps_tables <- function(
     "edges"
   )
 
-  # Return paths
   c(
     "features" = features_file,
     "metadata" = metadata_file,

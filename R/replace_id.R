@@ -13,13 +13,13 @@
 #' @include validations_utils.R
 #' @include validations_params.R
 #'
-#' @param x [character] Character string containing the file path with default
+#' @param x [character] The file path with default
 #'     ID
-#' @param user_filename [character] Character string for custom filename pattern
+#' @param user_filename [character] String for custom filename pattern
 #'     (used if user_gnps is NULL)
-#' @param user_gnps [character] Character string for GNPS job ID (takes
+#' @param user_gnps [character] String for GNPS job ID (takes
 #'     precedence)
-#' @param example_gnps [character] Character string for example GNPS job ID to
+#' @param example_gnps [character] String for example GNPS job ID to
 #'     detect
 #'
 #' @return Character string with ID replaced
@@ -44,7 +44,6 @@ replace_id <- function(
 ) {
   validate_character(x, param_name = "x", allow_empty = FALSE)
 
-  # Normalize Parameters ----
   # Convert empty strings to NULL for consistent handling
   user_gnps <- normalize_to_null(user_gnps)
 
@@ -53,21 +52,16 @@ replace_id <- function(
     user_gnps <- "example"
   }
 
-  # Extract Path Components ----
   dir_path <- dirname(x)
   file_name <- basename(x)
 
-  # Extract ID (before first underscore)
   old_id <- extract_id_prefix(file_name)
 
-  # Determine Replacement ID ----
   # GNPS ID takes precedence over filename pattern
   new_id <- user_gnps %||% user_filename
 
-  # Replace ID ----
   new_file_name <- replace_id_in_filename(file_name, old_id, new_id)
 
-  # Reconstruct Path ----
   reconstruct_path(dir_path, new_file_name)
 }
 

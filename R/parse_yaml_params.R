@@ -31,7 +31,6 @@ parse_yaml_params <- function(def, usr = NULL) {
     validate_character(usr, param_name = "usr", allow_empty = TRUE)
   }
 
-  # Validate default file exists
   if (!file.exists(def)) {
     cli::cli_abort(
       c(
@@ -58,7 +57,6 @@ parse_yaml_params <- function(def, usr = NULL) {
     }
   )
 
-  # Validate that parameters were successfully loaded
   if (!is.list(params) || length(params) == 0L) {
     cli::cli_abort(
       c(
@@ -100,7 +98,6 @@ parse_yaml_params <- function(def, usr = NULL) {
     }
   }
 
-  # Return the final list of parameters
   params
 }
 

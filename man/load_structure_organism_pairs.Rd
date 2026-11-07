@@ -12,12 +12,12 @@ load_structure_organism_pairs(
 )
 }
 \arguments{
-\item{library}{\link{character} Character, path to main library file (required).}
+\item{library}{\link{character} Path to main library file (required).}
 
-\item{str_stereo}{\link{character} Character, path to stereo structures file
+\item{str_stereo}{\link{character} Path to stereo structures file
 (optional; NULL allowed).}
 
-\item{org_tax_ott}{\link{character} Character, path to organism taxonomy file
+\item{org_tax_ott}{\link{character} Path to organism taxonomy file
 (optional; NULL allowed).}
 
 \item{needed_structures}{\link{character} Optional character vector of candidate

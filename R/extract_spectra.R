@@ -51,8 +51,6 @@ extract_spectra <- function(object) {
     )
   }
 
-  # Define Harmonization Mappings ----
-
   # Define column name mappings for harmonization
   # These handle inconsistencies across different data sources
   incoherent_colnames <- c(
@@ -66,12 +64,9 @@ extract_spectra <- function(object) {
   incoherent_integer <- "spectrum_id"
   incoherent_numeric <- "PrecursorMZ"
 
-  # Extract Spectra Metadata ----
-
   spectra <- as.data.frame(object@backend@spectraData)
   rownames(spectra) <- NULL
 
-  # Harmonize Column Types & Names Before Wrapping ----
   s_names <- names(spectra)
   if (
     incoherent_logical %in%
@@ -108,16 +103,13 @@ extract_spectra <- function(object) {
     names(spectra)[m_pos] <- target_names
   }
 
-  # Extract Peak Data ----
   peaks_data <- object@backend@peaksData
 
-  # Extract m/z values (first column of peak matrices)
   spectra[["mz"]] <- lapply(
     X = peaks_data,
     FUN = .extract_mz_values
   )
 
-  # Extract intensity values (second column of peak matrices)
   spectra[["intensity"]] <- lapply(
     X = peaks_data,
     FUN = .extract_intensity_values

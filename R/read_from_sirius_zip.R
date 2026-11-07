@@ -53,7 +53,6 @@ read_from_sirius_zip <- function(sirius_zip, file) {
 
   validate_character(file, param_name = "file", allow_empty = FALSE)
 
-  # Validate file exists
   if (!file.exists(sirius_zip)) {
     cli::cli_abort(
       c(

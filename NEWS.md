@@ -2,23 +2,24 @@
 
 ## New features
 
-- Expanded MS1 loss defaults for better fluorinated chemistry coverage:
-  - Added PFAS-relevant neutral losses (`HF`, `CF2`, `CF2O`, `CF3`, `CHF2`,
-    `C2F2`, `C2F4`, `C3F6`, `CF2O`, `C2F3O`)
-  - Added common high-value losses (`SO2`, `SO3`)
-- Added PubChem Lite as a new exposomics library, prepared through the same
-  HMDB-like workflow as other SOP sources and flagged as `xenobiotic`
+- Cross-RT duplicate final candidate disambiguation
+  (`resolve_cross_rt_duplicate_candidates()`,
+  `drop_cross_rt_duplicate_final_candidates()`): peaks eluting at distinct
+  retention times (`> 0.05` min apart) no longer keep the same planar structure
+  (`candidate_structure_inchikey_connectivity_layer`) at `rank_final = 1`. TIMA
+  solves the global maximum-weight assignment (Hungarian algorithm) across RT
+  clusters, preserves exact ties without random tie-breaking, and records
+  promotions in `annotation_note` (`full`/`filtered`) and `note` (`mini`)
+- Expanded MS1 neutral-loss defaults with PFAS-relevant losses (`HF`, `CF2`,
+  `CF2O`, `CF3`, `CHF2`, `C2F2`, `C2F4`, `C3F6`, `C2F3O`) and `SO2` / `SO3`
+- Added PubChem Lite as an exposomics library flagged as `xenobiotic`
   (`Q409205`)
 - Flattened `annotate_masses` modifier defaults so `clusters` and `solvents` are
-  now single lists (no mode split), and threaded the flat schema through
-  `prepare_params()`, the Shiny app, CLI parsing, and the annotation targets
-- Refined spectral network construction in `create_edges_spectra()` to build
-  community-aware edge graphs from the full spectral similarity network using
-  weighted Louvain/Leiden-style clustering, retain isolated features, and avoid
-  the old threshold-based edge filtering path.
-- Exposed `build_components_from_edges()` as a public helper for reusable
-  community detection and removed stale edge-threshold settings from the
-  advanced parameter configuration.
+  single lists (no polarity split) across YAML params, CLI, Shiny app, and
+  targets
+- `create_edges_spectra()` now builds community-aware edge graphs via weighted
+  Leiden modularity clustering and retains isolated features; exposed
+  `build_components_from_edges()` as a helper
 
 ## New libraries
 
@@ -27,224 +28,75 @@
 
 ## Bug fixes
 
-- `annotate_spectra()` and `create_edges_spectra()` now degrade gracefully when
-  given MGF input that contains no MS2 (fragment) spectra --- whether an
-  MS1-only file, an empty file, or a mix of MS1 and MS2 features. Previously
-  this hard-aborted with a stack trace (`annotate_spectra` during pre-flight
-  sanitization; `create_edges_spectra` from its post-import empty-spectra
-  guard). An MS1-only or empty input now emits a single actionable warning
-  (`tima_spectra_no_ms2_warning`) and returns a valid empty output (an
-  annotation template or an empty edges file with the correct schema); mixed
-  input processes the MS2 features and warns once with the count of skipped MS1
-  features (`tima_ms1_skipped_warning`). Genuinely malformed MGFs (e.g.
-  mismatched BEGIN/END IONS) still abort as before.
-- Hardened `get_spectra_ids()` against empty `Spectra` objects to avoid
-  "subscript out of bounds" errors on 0-row inputs.
-- **Behaviour changes** (results may differ from earlier versions):
-  - `annotate_masses()` accepts a library match within EITHER the ppm OR the
-    Dalton tolerance (previously both were required, so the stricter one won).
-    The default MS1 Dalton tolerance is now 0.0025 Da (= 10 ppm at m/z 250), so
-    it only widens the 10 ppm window below m/z 250
-  - Intensity co-variance edges now feed annotation: an adduct neighbor whose
-    intensities co-vary significantly across samples counts twice in
-    `adduct_support`. Pairs failing the test are kept, so single-sample runs are
-    unaffected
-  - Intensity co-variance p-values are Benjamini-Hochberg adjusted over all
-    pairs tested, so `ms$tolerances$correlation$p_value` is now a false
-    discovery rate. Edges report the adjusted `p_value` (the raw value is kept
-    as `p_value_raw` internally)
-  - `get_organism_taxonomy_ott()`:
-    - organisms that only matched at genus level on retry now get that genus
-      taxonomy (the matches were fetched, then dropped)
-    - synonyms sharing one OTT id no longer trigger an empty retry, which
-      errored
-    - when nothing matches, it returns the standard empty `organism_*` table
-  - Components from pre-labelled edges: a feature on several labelled edges now
-    takes the label of its first edge (the edge order was misaligned)
-  - `build_universe_transition_tables()` orients each adduct pair lighter to
-    heavier, so transitions are no longer lost when the heavier adduct sorts
-    first alphabetically (all loss transitions were). It also handles a
-    single-adduct universe
-  - Log messages that were built paste- or glue-style are now `sprintf`
-    formatted. They were cut short and raised "arguments not used by format"
-    warnings
+- **Adduct harmonization and MS1 attribution**:
+  - Folded neutral ammonia + proton notations (`[M+NH3+H]+`, `[M+H3N+H]+`,
+    `[nM+H3N+H]+`) into canonical `[M+H4N]+` (`[nM+H4N]+`) and aligned carrier
+    multiplicities (`[M+2H]2+` vs `[M+H2]2+`) with the configured adduct list
+  - Unified canonical modifier order across `adduct_to_string()` and
+    `canonicalize_adduct_notation()`: losses/deprotonations first, then neutral
+    clusters, then positive charge carriers (e.g. `[M-H2O+H]+`, `[M+H2O+H]+`),
+    with ammonium/loss reduction (`[M-H5NO+H4N]+ -> [M-H2O+H]+`)
+  - Loss-based MS1 structure matches now require the candidate's molecular
+    formula to contain the lost atoms (e.g. `[M-H3N+H]+` is rejected on
+    nitrogen-free formulas)
+  - `annotate_masses()` accepts a library match within either `tolerance_ppm` or
+    `tolerance_dalton` (default `0.0025` Da = 10 ppm at `m/z` 250)
+  - Intensity co-variance edges (`p < correlation_p_threshold` after
+    Benjamini-Hochberg adjustment) reinforce `adduct_support` without dropping
+    untested single-sample pairs
+  - `build_universe_transition_tables()` always orients pairs from lighter to
+    heavier adduct and supports single-adduct universes
   - `adduct_support` no longer counts a feature as its own neighbor
-  - Leiden community detection optimises modularity (was igraph's default CPM)
-    with a fixed seed, weighted by spectral similarity
-  - The default Biota biological score is 1.0 (was 1.007276, above the 0-1
-    range)
 - **Ranking and filtering**:
-  - The filtered tier now keeps the `candidates_final` best-ranked candidates
-    (tidytable's `slice_head()` ignored `order_by`)
-  - Ranks are computed after removing duplicate structures, so duplicates no
-    longer push other candidates down
-  - The user-defined spectral weight is used when combining scores (a fixed 0.3
-    was used)
-  - Similarity and entropy columns are compared as numbers, not text
-  - Taxon and chemical class names are matched exactly, not as regex substrings
-    (`Ara` no longer matches `Arabidopsis`)
-  - High-evidence filtering uses the anchor's scores for cluster-promoted rows
-  - The `high_evidence` option is documented as controlling only the full table;
-    the filtered and mini tables always keep high-evidence candidates
-- **Masses**: electron mass included in the spectral neutral mass; a single
-  isotope shift and a single element-mass table (MetaboCoreUtils values); the
-  library precursor window is closed at both ends
-- **Inputs and parameters**:
-  - Retention time libraries from MGF are read from their metadata only, so
-    entries without fragment peaks or `PEPMASS` are no longer dropped, and
-    `RTINSECONDS` is always read as seconds
-  - Polarity filtering no longer matches `-1` or `10` as positive
+  - The filtered tier keeps the `candidates_final` best-ranked candidates
+  - Ranks are computed after deduplicating structures
+  - User-defined spectral weight is respected when combining scores (was
+    hardcoded to `0.3`)
+  - Similarity and entropy columns are compared numerically rather than as
+    strings
+  - Taxon and chemical class names are matched as exact tokens rather than
+    substrings (`Ara` no longer matches `Arabidopsis`)
+  - High-evidence filtering uses anchor scores for cluster-promoted rows and
+    requires sufficient score coverage; `high_evidence` only toggles the `full`
+    table (`filtered` and `mini` always filter to high evidence)
+  - Default Biota biological score is capped at `1.0` (was `1.007276`)
+- **Masses and spectra**:
+  - Applied signed electron-mass correction (`z * m_e`, CODATA 2018
+    `ELECTRON_MASS_DALTONS`) consistently across `calculate_mass_of_m()`,
+    `calculate_mz_from_mass()`, and spectral neutral-mass calculations
+  - `annotate_spectra()` and `create_edges_spectra()` warn once and return valid
+    empty outputs instead of aborting when an MGF has no MS2 spectra; hardened
+    `get_spectra_ids()` on 0-row `Spectra`
+- **Inputs, parameters, and xrefs**:
+  - Restored `feature_mz` and `feature_rt` in the final results tables
+  - Updated `get_compounds_xrefs()` for the Bioregistry `wikidata.property` key
+    rename
+    ([bioregistry#2121](https://github.com/biopragmatics/bioregistry/pull/2121))
+    with fallback to `wikidata`
+  - MGF retention-time libraries read metadata directly so entries without
+    fragment peaks or `PEPMASS` are kept, and `RTINSECONDS` is always converted
+    from seconds
+  - Fixed polarity filtering so `-1` and `10` are not matched as positive
   - `import_spectra()` only filters on `Spectrum_type` when that column exists
-  - `prepare_params()`: the small-YAML mzMine path reaches every step, the BiGG
-    path goes to its own step, and the Biota weight is propagated
-  - CLI `--ann-can-nei` and `--ann-can-sam` set `annotations.candidates.*`
-  - Parameter files are taken per step from `params/user` when present, else
-    from the defaults (leftover user files no longer switch the whole set)
-  - The NPClassifier cache key `n:` is quoted (YAML read it as `FALSE`)
-- **Pipeline robustness**: HMDB download warnings no longer replace the library
-  with a placeholder; an existing LOTUS file is kept when offline;
-  `export_spectra_rds()` always writes its file; `create_edges_spectra()` no
-  longer fails when no community is found; the non-equi join in the MS1
-  consistency step allows many matches per window; `summarize_results()` works
-  without `annot_table_wei_chemo`; `qsort` ties in the C similarity code are
-  ordered deterministically
+  - `prepare_params()` propagates the small-YAML mzMine path, BiGG path, and
+    Biota weight; CLI `--ann-can-nei` and `--ann-can-sam` set
+    `annotations.candidates.*`; step YAML files fall back per-step from
+    `params/user` to `params/default`; quoted NPClassifier cache key `n:`
+  - `get_organism_taxonomy_ott()` retains genus-level retry matches, avoids
+    empty retries on shared OTT IDs, and returns a standard empty table when
+    nothing matches
+  - HMDB download warnings no longer overwrite the library with a placeholder;
+    existing LOTUS files are kept when offline; `export_spectra_rds()` always
+    writes its output; `summarize_results()` works without
+    `annot_table_wei_chemo`; deterministic tie-breaking in C `qsort`
 
 ## Internal / performance
 
-- **MS1 adduct annotation improvements** in `annotate_masses()`:
-  - Enforced tier-aware minimum support thresholds in evidence discovery: exotic
-    adducts (tier 3+) now require stronger peer evidence (≥2 independent
-    supporting neighbors) while common adducts (tier ≤1) are always inferred
-  - Added hybrid evidence recovery fallback: when library exact-mass anchoring
-    is restrictive, supplemental evidence pass recovers supported adduct
-    hypotheses for previously unanchored features, improving coverage without
-    sacrificing specificity
-  - Added adduct-delta match quality metrics (`delta_error_da`,
-    `delta_error_ppm`, `edge_match_score`) in pairwise matching to weight edges
-    by mass accuracy
-  - Replaced single-chain evidence-edge linking with sparse k-nearest m/z
-    linking per cluster, improving triangulation signal while preserving O(n\*k)
-    scalability
-  - Re-enabled structural plausibility filter: loss-based annotations are now
-    demoted to unmatched when the formula cannot satisfy required atoms (e.g.,
-    `[M-H2O]` on a formula lacking oxygen)
-  - Upgraded graph-level consistency enforcement from single-pass greedy to
-    multi-start neighbor-aware optimization: assigns adduct states to maximize
-    coverage-aware objectives (edge satisfaction, neighbor agreement, prior
-    support) and favors states consistent across multiple neighbors over
-    isolated high-scoring alternatives
-  - Added bidirectional cluster and neutral-loss propagation to mirror cluster
-    propagation
-  - Reworked cluster-vs-loss ambiguity resolution to use hypothesis-level
-    scoring (with neighboring-edge fallback tie-breaks) and added compact audit
-    logging of resolved vs unresolved ambiguous modifier pairs
-  - Added assignment-aware modifier-edge pruning so outdated cluster/loss links
-    are removed when they contradict assigned adduct states, while retaining
-    explicitly tagged contaminant edges
-  - **Intensity co-variance edge discovery** (new network-integrated approach):
-    Replaces the previous hard-filter validation with a scientifically sounder
-    approach that leverages the adduct network itself. For each feature, all m/z
-    pairs within the RT window are assessed via Pearson correlation of their
-    intensities across samples (p < 0.05). Edges with statistically significant
-    correlations enter the network alongside rule-based edges (adducts,
-    clusters, losses), and the network consensus process determines which edges
-    are valid (same M) vs. noise (different compounds). This enables discovery
-    of novel adduct patterns not in the rules and naturally filters uncorrelated
-    (spurious) pairs through network topology rather than arbitrary thresholds.
-
-- Reduced avoidable allocations in benchmark and adduct-consistency helpers:
-  `benchmark_metrics_utils:::.benchmark_expand_predictions()` now preallocates
-  its expanded rows, and `join_couples_with_neutral_losses()` now fills a single
-  output buffer instead of binding many temporary tables.
-
-- Narrowed `expand_combined_scores_for_filtering()` and the
-  `summarize_results()` lookup path so the big clean-chemo tables and structure
-  lookups are trimmed earlier.
-
-- **Major memory reductions in clean_chemo pipeline**:
-  - Fixed cartesian join explosions: added explicit `.join_by` keys and
-    `.keep="used"` to all multi-table joins in `clean_chemo_candidates.R` and
-    `summarize_results.R` (previously missing keys caused 5-100x row
-    multiplication in consensus and organism lookup joins)
-  - Optimized organism taxonomy pivot to filter occurrence values BEFORE
-    expanding to long format (reduces intermediate memory by \~15x)
-  - Optimized `sample_candidates_per_group()` to use single-pass categorical
-    column instead of 3× filter() copies (avoids materializing df_remaining
-    three times)
-  - Reworked `rank_candidates()` to use tidytable's `min_rank()` per feature
-    group instead of data.table in-place operations (1M rows now \~3.3s)
-
-- Verified `clean_chemo()` on a 1.6M-row synthetic dataset; with the join
-  optimizations, memory footprint dropped from 18.8GB to \~2-3GB (9x reduction)
-  while maintaining 52s runtime.
-
-- **Adduct canonicalization alignment**:
-  - Unified canonical adduct string ordering across structured universe
-    generation (`adduct_to_string()`) and text harmonization
-    (`canonicalize_adduct_notation()`)
-  - Canonical order is now chemically consistent and deterministic: negative
-    terms first (losses / deprotonations), then neutral cluster additions, then
-    positive charge carriers
-  - Updated regression tests to use canonical forms (e.g., `[M-H2O+H]+`,
-    `[M+H2O+H]+`, `[M+NaCl+K]+`)
-  - Improved ammonium/loss semantic reduction in harmonization (e.g.,
-    `[M-H5NO+H4N]+ -> [M-H2O+H]+`, `[M-H3N+C2H7N+H4N]+ -> [M+C2H7N+H]+`) to
-    reduce duplicated/over-complex carrier notation
-
-- **Electron-mass correctness in legacy neutral-mass math**:
-  - `calculate_mass_of_m()`, `calculate_mz_from_mass()`, and
-    `calculate_mass_of_m_batch()` now apply signed electron-mass correction
-    (`z * m_e`) consistently
-  - Legacy inversion/forward formulas are now physically aligned with
-    typed-universe mass arithmetic
-  - Consolidated electron-mass precision to a single CODATA 2018 value
-    (`ELECTRON_MASS_DALTONS = 0.000548579909065`) and reused it as
-    `ELECTRON_MASS_DA`
-
-- **Metadata enrichment cache robustness**:
-  - `complement_metadata_structures()` reference cache now keys on both file
-    path and file modification time, preventing stale cache reuse when
-    temporary/updated reference files are rewritten during the same R session
-  - Stereo required-column validation now occurs at reference-load time before
-    cache insertion
-
-- **Cross-stage adduct coupling (MS1 ↔ MS2 ↔ reranking)**:
-  - Reinforced the bridge from MS1 adduct attribution to spectral annotation
-    matching and final candidate reranking
-  - Final percentile filtering now preserves rank-1/consensus-promoted entities,
-    so cluster-consensus adduct attribution decisions are not lost when raw
-    chemical scores are lower
-  - This keeps adduct-consistent entities available for downstream spectral
-    agreement and final ranking outputs
-
-- **Weighted ranking semantics**:
-  - Separated raw weighted evidence from coverage in the annotation scoring
-    helpers, so `score_weighted_*` remains the primary ranking signal
-  - Coverage is now emitted separately and used as a secondary confidence/tie-
-    break signal, which prevents sparse candidates from outranking better-
-    supported candidates solely because missing dimensions were discounted into
-    the score
-
-- **High-evidence filtering**:
-  - `filter_high_evidence_only()` now requires sufficient coverage for rows that
-    pass via the weighted final score, so sparse candidates do not qualify as
-    high evidence on score alone
-
-## Fixes
-
-- Brought `feature_mz` and `feature_rt` back into the final results tables
-- Fixed `get_compounds_xrefs()` aborting with "none of the supplied props were
-  found in the Bioregistry" against the current Bioregistry bulk JSON. Upstream
-  renamed the per-entry Wikidata property mapping from the `wikidata` key to
-  `wikidata.property` in
-  [bioregistry#2121](https://github.com/biopragmatics/bioregistry/pull/2121)
-  (merged 2026-09-28), where metaregistry prefixes were renamed to dotted names
-  (`uniprot` -> `uniprot.resource`); the registry JSON mirrors the metaregistry,
-  so the key moved with it. `get_compounds_xrefs()` now reads the new key with a
-  fallback to the old one. Preferred-prefix resolution now also consults the
-  registry `preferred_prefix` field when `banana` is absent or null. Symptoms
-  appeared as pipeline failures 24 h after upstream rolled out the new JSON,
-  since the cached xrefs are refreshed daily
+- Eliminated cartesian join explosions and intermediate table copies in
+  `clean_chemo()`, `summarize_results()`, and `annotate_masses()`, reducing peak
+  memory ~9x on large feature tables
+- Keyed `complement_metadata_structures()` reference cache on both file path and
+  modification time
 
 # tima 2.13.0
 

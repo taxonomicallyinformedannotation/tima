@@ -41,13 +41,10 @@ create_dir <- function(export) {
     )
   }
 
-  # Extract Directory Path ----
   dirname_path <- extract_directory_path(export)
 
-  # Create Directory ----
   ensure_directory_exists(dirname_path)
 
-  # Verify Write Permissions ----
   verify_directory_writable(dirname_path)
 
   invisible(NULL)

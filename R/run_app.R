@@ -54,10 +54,8 @@ run_app <- function(
   )
   validate_logical(browser, param_name = "browser")
 
-  # Ensure port is integer
   port <- as.integer(port)
 
-  # Detect Docker Environment ----
   if (is_docker_env()) {
     log_info("Docker environment detected - adjusting settings")
     browser <- FALSE
@@ -68,12 +66,10 @@ run_app <- function(
 
   log_info("Starting TIMA Shiny app on %s:%d", host, port)
 
-  # Ensure Dependencies ----
   if (reinstall) {
     install_tima()
   }
 
-  # Launch Shiny App ----
   app_path <- get_app_path()
 
   if (!nzchar(app_path) || !app_path_exists(app_path)) {

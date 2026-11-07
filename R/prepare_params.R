@@ -55,7 +55,6 @@ prepare_params <- function(
   yaml_data <- load_yaml_files()
   yamls_params <- yaml_data$yamls_params
 
-  # Extract annotation parameters
   ann_can_bes <- params_advanced$annotations$candidates$best_percentile
   ann_can_fin <- params_advanced$annotations$candidates$final
   ann_can_nei <- params_advanced$annotations$candidates$neighbors
@@ -69,7 +68,6 @@ prepare_params <- function(
 
   # fil_pat <- params_advanced$files$pattern
 
-  # Extract file paths - annotations
   fil_ann_raw_spe_gnp <- params_advanced$files$annotations$raw$spectral$gnps
   fil_ann_raw_spe_mzm <- params_advanced$files$annotations$raw$spectral$mzmine
   fil_ann_raw_spe_spe <- params_advanced$files$annotations$raw$spectral$spectral
@@ -92,11 +90,9 @@ prepare_params <- function(
   fil_ann_fil <- params_advanced$files$annotations$filtered
   fil_ann_pro <- params_advanced$files$annotations$processed
 
-  # Extract file paths - features
   # fil_fea_raw <- params_advanced$files$features$raw
   fil_fea_pre <- params_advanced$files$features$prepared
 
-  # Extract file paths - libraries (structure-organism pairs)
   fil_lib_sop_raw_clo <- params_advanced$files$libraries$sop$raw$closed
   fil_lib_sop_raw_ecm <- params_advanced$files$libraries$sop$raw$ecmdb
   fil_lib_sop_raw_hmd <- params_advanced$files$libraries$sop$raw$hmdb
@@ -134,7 +130,6 @@ prepare_params <- function(
   fil_lib_sop_mer_str_tax_add_npc <-
     params_advanced$files$libraries$sop$merged$structures$taxonomies$n
 
-  # Extract file paths - spectral libraries
   fil_lib_spe_neg <- params_advanced$files$libraries$spectral$neg
   fil_lib_spe_pos <- params_advanced$files$libraries$spectral$pos
   fil_lib_spe_raw <- params_advanced$files$libraries$spectral$raw
@@ -149,7 +144,6 @@ prepare_params <- function(
   fil_lib_tem_pre <- params_advanced$files$libraries$temporal$prepared
   # fil_net_spe_edg_raw <- params_advanced$files$networks$spectral$edges$raw
 
-  # Extract file paths - networks
   fil_net_spe_edg_raw_ms1 <-
     params_advanced$files$networks$spectral$edges$raw$ms1
   fil_net_spe_edg_raw_spe <-
@@ -159,14 +153,12 @@ prepare_params <- function(
   fil_net_spe_com_pre <-
     params_advanced$files$networks$spectral$components$prepared
 
-  # Extract file paths - metadata
   # fil_met_raw <- params_advanced$files$metadata$raw
   fil_met_pre <- params_advanced$files$metadata$prepared
 
   # gnps_id <- params_advanced$gnps$id
   # gnps_workflow <- params_advanced$gnps$workflow
 
-  # Extract MS parameters
   ms_add_neg <- params_advanced$ms$adducts$neg
   ms_add_pos <- params_advanced$ms$adducts$pos
   ms_clu <- unique(as.character(params_advanced$ms$clusters))

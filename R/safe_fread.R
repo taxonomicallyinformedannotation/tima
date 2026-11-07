@@ -7,10 +7,10 @@
 #' @include validations_utils.R
 #' @include validations_params.R
 #'
-#' @param file [character] Character path to file
-#' @param file_type [character] Character description of file type for error
+#' @param file [character] Path to file
+#' @param file_type [character] Description of file type for error
 #'     messages
-#' @param required_cols [character] Character vector of required column names
+#' @param required_cols [character] Vector of required column names
 #'     (optional)
 #' @param .reader [function] Function used to perform the actual read, called
 #'     as `.reader(file = file, ...)`. Defaults to `tidytable::fread()`.
@@ -35,7 +35,6 @@ safe_fread <- function(
   .reader = .safe_fread_read,
   ...
 ) {
-  # Validate file exists first
   validate_file_exists(
     path = file,
     file_type = file_type,
@@ -121,7 +120,6 @@ safe_fread <- function(
     }
   )
 
-  # Validate columns if specified
   if (!is.null(required_cols)) {
     validate_dataframe(
       df = df,

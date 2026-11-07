@@ -114,7 +114,6 @@ calculate_similarity <- function(
   return_matched_peaks = FALSE,
   ...
 ) {
-  # ---- Input Validation ----
   assert_choice(method, VALID_SIMILARITY_METHODS, "method")
   if (!is.matrix(query_spectrum) || !is.matrix(target_spectrum)) {
     cli::cli_abort(
@@ -138,7 +137,6 @@ calculate_similarity <- function(
     )
   }
 
-  # ---- Method: Entropy ----
   if (method == "entropy") {
     result <- tryCatch(
       .entropy_similarity_call(query_spectrum, target_spectrum, dalton, ppm),
@@ -150,7 +148,6 @@ calculate_similarity <- function(
     return(result)
   }
 
-  # ---- Methods: GNPS / Cosine ----
   if (method == "gnps") {
     # Fused join + score in a single C call, O(n+m) chain-DP.
     result <- tryCatch(

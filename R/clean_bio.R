@@ -42,8 +42,6 @@ clean_bio <- function(
     minimal_consistency = minimal_consistency
   )
 
-  # Input Validation (using centralized validators) ----
-
   validate_dataframe(
     annot_table_wei_bio,
     param_name = "annot_table_wei_bio",
@@ -74,12 +72,7 @@ clean_bio <- function(
     return(.add_default_prediction_columns(annot_table_wei_bio))
   }
 
-  # Extract Distinct Structure-Taxonomy Pairs ----
-
-  # Extract unique structure-taxonomy combinations
   annotations_distinct <- .extract_distinct_taxonomy_pairs(annot_table_wei_bio)
-
-  # Filter Edges for Consistency Calculation ----
 
   edges_filtered <- .filter_edges_for_consistency(edges_table)
 
@@ -98,8 +91,6 @@ clean_bio <- function(
     )
     return(.add_default_prediction_columns(annot_table_wei_bio))
   }
-
-  # Calculate Consistency Scores ----
 
   # Pass edges and annotations separately to avoid materializing a huge
   # (edges × all_annotations) join that causes OOM on memory-limited runners.
@@ -182,7 +173,6 @@ clean_bio <- function(
   annot_table_wei_bio_clean
 }
 
-# Internal Helper Functions ----
 
 #' Merge consistency tables efficiently for large datasets
 #'
@@ -480,7 +470,6 @@ clean_bio <- function(
   annotations_for_join,
   minimal_consistency
 ) {
-  # Define taxonomic levels to process
   levels <- list(
     list(
       col = "candidate_structure_tax_cla_01kin",

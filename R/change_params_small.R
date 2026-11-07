@@ -7,7 +7,6 @@
 #' @return NULL (stops on validation error)
 #' @keywords internal
 validate_params_small_inputs <- function(ms_pol) {
-  # Validate polarity if provided
   if (!is.null(ms_pol) && !ms_pol %in% c("pos", "neg")) {
     cli::cli_abort(
       c(
@@ -163,7 +162,6 @@ change_params_small <- function(
 
   log_info("Updating workflow parameters")
 
-  # Setup Environment ----
   # Use provided cache_dir or go to cache directory
   if (is.null(cache_dir)) {
     go_to_cache()
@@ -181,17 +179,14 @@ change_params_small <- function(
   create_dir(paths_data_source)
   create_dir(paths_data_interim_annotations)
 
-  # Load Current Configuration ----
   yaml_data <- load_yaml_files()
   yaml_small <- yaml_data$yamls_params$prepare_params
 
-  # Update File Pattern ----
   if (!is.null(fil_pat)) {
     log_debug("Setting file pattern to: %s", fil_pat)
     yaml_small$files$pattern <- fil_pat
   }
 
-  # Process and Copy Input Files ----
   if (!is.null(fil_fea_raw)) {
     yaml_small$files$features$raw <- copy_file_to_target(
       file_path = fil_fea_raw,
@@ -246,7 +241,6 @@ change_params_small <- function(
     )
   }
 
-  # Update Configuration Parameters ----
   if (!is.null(ms_pol)) {
     log_debug("Setting MS polarity to: %s", ms_pol)
     yaml_small$ms$polarity <- ms_pol
@@ -269,7 +263,6 @@ change_params_small <- function(
     yaml_small$options$summarize <- summarize
   }
 
-  # Write Updated Configuration ----
   output_path <- paths$params$prepare_params
   log_info("Writing updated parameters to: %s", output_path)
 

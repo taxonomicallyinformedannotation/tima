@@ -10,7 +10,6 @@ ELECTRON_MASS_DALTONS <- 0.000548579909065
 #' @keywords internal
 ISOTOPE_MASS_SHIFT_DALTONS <- 1.0033548378
 
-# Logging Configuration ----
 
 #' Default log level
 #' @description Default logging level if TIMA_LOG_LEVEL environment variable
@@ -18,7 +17,6 @@ ISOTOPE_MASS_SHIFT_DALTONS <- 1.0033548378
 #' @keywords internal
 DEFAULT_LOG_LEVEL <- "INFO"
 
-# Validation Thresholds ----
 
 #' Maximum allowed mass tolerance in ppm
 #' Tolerances above this value may produce excessive false positives
@@ -57,7 +55,6 @@ NEUTRAL_MASS_GROUP_DECIMALS <- 4L
 #' @keywords internal
 NEUTRAL_MASS_MATCH_TOLERANCE_DA <- 5E-3
 
-# Regular Expression Patterns ----
 
 #' Regular expression pattern for parsing adduct notation
 #'
@@ -104,7 +101,6 @@ ADDUCT_REGEX_PATTERN <- "^\\[(\\d*)M(?![a-z])((?:[+-]?\\d+(?!\\d*[A-Za-z]))?)([+
 MODIFICATION_REGEX_PATTERN <-
   "([+-])(\\d*)([A-Z][a-z]?\\d*(?:[A-Z][a-z]?\\d*)*)"
 
-# File System Constants ----
 
 #' Temporary file prefix for write tests
 #' @keywords internal
@@ -114,32 +110,27 @@ TEMP_FILE_PREFIX <- ".tima_write_test_"
 #' @keywords internal
 MAX_PATH_LENGTH <- 260L
 
-# Statistical Thresholds ----
 
 #' Tolerance for floating point weight sum comparisons
 #' Used when validating that weights sum to 1.0
 #' @keywords internal
 WEIGHT_SUM_TOLERANCE <- 0.01
 
-# Ionization Modes ----
 
 #' Valid ionization mode values
 #' @keywords internal
 VALID_MS_MODES <- c("pos", "neg")
 
-# Similarity Methods ----
 
 #' Valid similarity method values
 #' @keywords internal
 VALID_SIMILARITY_METHODS <- c("entropy", "cosine", "gnps")
 
-# Logging Configuration ----
 
 #' Log levels available (in order of severity)
 #' @keywords internal
 LOG_LEVELS <- c("TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL")
 
-# Performance Settings ----
 
 #' Default batch size for parallel processing
 #' @keywords internal
@@ -149,7 +140,6 @@ DEFAULT_BATCH_SIZE <- 1000
 #' @keywords internal
 DEFAULT_PROGRESS_INTERVAL <- 10000
 
-# High-Evidence Filtering Defaults ----
 
 #' Default minimum biological score threshold for high-evidence filter
 #' @keywords internal
@@ -182,7 +172,6 @@ DEFAULT_HE_SCORE_MIN_PEAKS <- 2L
 #' @keywords internal
 DEFAULT_HE_MAX_RT_ERROR_MIN <- 0.15
 
-# InChI Patterns ----
 
 #' InChI stereochemistry layer pattern indicating no stereochemistry
 #' Structures with "-UHFFFAOYSA-" in their InChIKey have no defined

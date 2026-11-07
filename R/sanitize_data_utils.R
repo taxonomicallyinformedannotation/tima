@@ -16,8 +16,8 @@ NULL
 #'
 #' @include logs_utils.R
 #' @include safe_fread.R
-#' @param file [character] Character path to MGF file
-#' @param file_type [character] Character description for error messages
+#' @param file [character] Path to MGF file
+#' @param file_type [character] Description for error messages
 #'
 #' @return List with validation results:
 #'   - valid: Logical, TRUE if file is valid
@@ -180,11 +180,11 @@ sanitize_mgf <- function(file, file_type = "MGF file") {
 #'
 #' @description Validates CSV/TSV file structure and reports record count.
 #'
-#' @param file [character] Character path to CSV/TSV file
-#' @param file_type [character] Character description for error messages
-#' @param required_cols [character] Character vector of required column names
+#' @param file [character] Path to CSV/TSV file
+#' @param file_type [character] Description for error messages
+#' @param required_cols [character] Vector of required column names
 #'     (optional)
-#' @param feature_col [character] Character name of feature ID column (default:
+#' @param feature_col [character] Name of feature ID column (default:
 #'     "feature_id")
 #'
 #' @return List with validation results:
@@ -300,11 +300,11 @@ sanitize_csv <- function(
 #' @description Checks that filenames in feature table match those in metadata,
 #'     and validates that metadata contains organism information.
 #'
-#' @param metadata_file [character] Character path to metadata file
-#' @param features_file [character] Character path to features file (optional)
-#' @param filename_col [character] Character name of column containing filenames
+#' @param metadata_file [character] Path to metadata file
+#' @param features_file [character] Path to features file (optional)
+#' @param filename_col [character] Name of column containing filenames
 #'     in both files
-#' @param organism_col [character] Character name of organism column in metadata
+#' @param organism_col [character] Name of organism column in metadata
 #'     (default: "organism")
 #'
 #' @return List with validation results:
@@ -332,7 +332,6 @@ sanitize_metadata <- function(
   n_unmatched <- 0L
   unmatched_files <- character(0)
 
-  # Validate metadata file exists
   if (!file.exists(metadata_file)) {
     return(list(
       valid = FALSE,
@@ -483,7 +482,6 @@ sanitize_metadata <- function(
 
         feature_cols <- names(features)
 
-        # Get metadata filenames
         metadata_filenames <- unique(metadata[[filename_col_actual]])
         metadata_filenames <- metadata_filenames[!is.na(metadata_filenames)]
         metadata_filenames <- as.character(metadata_filenames)
@@ -594,7 +592,7 @@ sanitize_metadata <- function(
 #'     necessary files for TIMA processing. Handles both extracted directories
 #'     and ZIP archives. Supports SIRIUS v5 and v6 formats.
 #'
-#' @param sirius_dir [character] Character path to SIRIUS output directory or
+#' @param sirius_dir [character] Path to SIRIUS output directory or
 #'     ZIP file
 #'
 #' @return List with validation results:

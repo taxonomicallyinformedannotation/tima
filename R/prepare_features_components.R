@@ -13,10 +13,10 @@
 #' @include export_output.R
 #' @include validations_params.R
 #'
-#' @param input [character] Character vector of paths to input component files.
+#' @param input [character] Vector of paths to input component files.
 #'     Can be
 #'     a single file or multiple files that will be combined.
-#' @param output [character] Character string path where prepared components
+#' @param output [character] Path where prepared components
 #'     should be saved
 #'
 #' @return Character string path to the prepared features' components file
@@ -79,7 +79,6 @@ prepare_features_components <- function(
     )
   }
 
-  # Load Component Data ----
   log_debug(
     "Loading molecular network components from %d file(s)",
     length(input)
@@ -114,8 +113,6 @@ prepare_features_components <- function(
     }
   )
 
-  # Process Component Assignments ----
-
   # Early exit for empty data
   if (nrow(table) == 0L) {
     log_warn("No component data found in input files")
@@ -139,8 +136,6 @@ prepare_features_components <- function(
 
     log_complete(ctx, n_assignments = nrow(table))
   }
-
-  # Export Results ----
 
   export_params(
     parameters = get_params(step = "prepare_features_components"),

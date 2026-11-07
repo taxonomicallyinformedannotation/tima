@@ -35,8 +35,6 @@ load_yaml_files_from_paths <- function(
   list_files_fn = list.files,
   read_yaml_fn = yaml::read_yaml
 ) {
-  # Get Paths and List Files ----
-
   # Resolve paths using get_path() to handle inst/ prefix properly
   default_path <- path_resolver(paths$params$default$path)
   user_path <- path_resolver(paths$params$user$path)
@@ -54,8 +52,6 @@ load_yaml_files_from_paths <- function(
     full.names = TRUE
   )
 
-  # Determine Which Parameter Set to Use ----
-
   # Per step, use the user file when one exists and the default otherwise.
   # Choosing one whole set by file count made the result depend on leftover
   # files in the user directory.
@@ -65,8 +61,6 @@ load_yaml_files_from_paths <- function(
     default_files,
     user_files[user_match]
   )
-
-  # Combine with Prepare Params Files ----
 
   # Combine with prepare_params files (also need to resolve these paths)
   yaml_files <- c(
@@ -83,8 +77,6 @@ load_yaml_files_from_paths <- function(
       replacement = "",
       vectorize_all = FALSE
     )
-
-  # Load All YAML Files ----
 
   # Load all YAML files with error handling
   yamls_parsed <- tryCatch(

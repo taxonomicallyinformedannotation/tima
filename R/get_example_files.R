@@ -37,7 +37,6 @@ get_example_files <- function(
   example = c("features", "metadata", "sirius", "spectra"),
   in_cache = TRUE
 ) {
-  # Define valid example types
   valid_examples <- c(
     "features",
     # "hmdb_is",

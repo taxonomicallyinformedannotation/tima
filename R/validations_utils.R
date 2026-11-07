@@ -7,7 +7,6 @@
 #' @name validation_utils
 NULL
 
-# Core Validation Functions ----
 
 #' Choice validation with fuzzy matching
 #'
@@ -15,7 +14,7 @@ NULL
 #'     intelligent suggestions for typos
 #'
 #' @param value [character] Value to validate
-#' @param valid_values [character] Character vector of allowed values
+#' @param valid_values [character] Vector of allowed values
 #' @param param_name [character] Parameter name for error messages
 #' @param context [character] Optional context (e.g., "Found in:
 #'     params$annotate_masses$ms_mode")
@@ -192,8 +191,8 @@ validate_file_exists <- function(
 #' @description Validates dataframe with helpful column name suggestions
 #'
 #' @param df [data.frame] Data frame to validate
-#' @param required_cols [character] Character vector of required column names
-#' @param optional_cols [character] Character vector of optional column names
+#' @param required_cols [character] Vector of required column names
+#' @param optional_cols [character] Vector of optional column names
 #' @param df_name [character] Name of the data frame for error messages
 #' @param min_rows [integer] Minimum number of rows required
 #'
@@ -311,7 +310,7 @@ validate_dataframe_structure <- function(
 #'
 #' @description Validates numeric values with contextual guidance
 #'
-#' @param value [numeric] Numeric value to validate
+#' @param value [numeric] Value to validate
 #' @param min_value [numeric] Minimum allowed value
 #' @param max_value [numeric] Maximum allowed value
 #' @param param_name [character] Parameter name for error messages
@@ -488,7 +487,6 @@ validate_tolerance_ppm <- function(
   invisible(TRUE)
 }
 
-# TIMA-Specific Validation Functions ----
 
 #' Validate a single file path
 #' @keywords internal
@@ -498,7 +496,6 @@ validate_tolerance_ppm <- function(
   file_name,
   allow_null = FALSE
 ) {
-  # Handle NULL values
   if (is.null(file_path)) {
     if (!allow_null) {
       return(list(
@@ -509,7 +506,6 @@ validate_tolerance_ppm <- function(
     return(NULL)
   }
 
-  # Validate type
   if (!is.character(file_path) || length(file_path) != 1L) {
     return(list(
       type = "invalid",

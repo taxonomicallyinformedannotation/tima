@@ -64,7 +64,6 @@ decorate_chemo <- function(
     param_name = "annot_table_wei_chemo"
   )
 
-  # Validate all score parameters are numeric
   validate_numeric_range(
     score_chemical_cla_kingdom,
     min_value = 0,
@@ -108,7 +107,6 @@ decorate_chemo <- function(
     param_name = "score_chemical_npc_class"
   )
 
-  # Check Required Columns ----
   required_cols <- c(
     "score_chemical",
     "candidate_structure_inchikey_connectivity_layer"
@@ -151,7 +149,6 @@ decorate_chemo <- function(
   )
   base_idx <- which(!is.na(sc_col) & sc_col >= min_thresh)
 
-  # Classyfire Hierarchy (cascading filters) ----
   idx_cla_kingdom <- filter_cascade_idx(
     base_idx,
     score_chemical_cla_kingdom,
@@ -173,7 +170,6 @@ decorate_chemo <- function(
     "feature_pred_tax_cla_04dirpar_val"
   )
 
-  # NPClassifier Hierarchy (cascading filters, independent of Classyfire) ----
   idx_npc_pathway <- filter_cascade_idx(
     base_idx,
     score_chemical_npc_pathway,
@@ -213,7 +209,6 @@ decorate_chemo <- function(
     c(n_candidates = n_cand, n_unique_structures = n_uniq)
   }
 
-  # Count total candidates and unique structures ----
   cla_masks <- list(
     kingdom = idx_cla_kingdom,
     superclass = idx_cla_superclass,
@@ -242,8 +237,6 @@ decorate_chemo <- function(
   )
   rownames(npc_counts) <- c("n_candidates", "n_unique_structures")
   colnames(npc_counts) <- names(npc_masks)
-
-  # Log Summary Statistics ----
 
   log_info(
     "Chemically informed metabolite annotation reranked:

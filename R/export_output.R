@@ -10,7 +10,7 @@
 #' @include validations_params.R
 #'
 #' @param x [data.frame] Data frame or tibble to export
-#' @param file [character] Character string path to the output file. File
+#' @param file [character] Path to the output file. File
 #'     extension
 #'     determines compression (.gz for gzip compression).
 #'
@@ -29,7 +29,6 @@ export_output <- function(x, file) {
   validate_character(file, param_name = "file", allow_empty = FALSE)
   validate_dataframe(x, param_name = "x")
 
-  # Prepare Export ----
   create_dir(export = file)
 
   # Cache dimensions for logging
@@ -55,7 +54,6 @@ export_output <- function(x, file) {
     log_debug("Large dataset - export may take time")
   }
 
-  # Write Data with Error Handling ----
   ctx <- log_operation("export_output", file = file, n_rows = nrows)
 
   tryCatch(

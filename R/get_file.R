@@ -35,7 +35,6 @@ get_file <- function(url, export, limit = 3600L) {
   validate_character(export, param_name = "export", allow_empty = FALSE)
   assert_positive_integer(limit, "limit")
 
-  # Check if file already exists
   if (file.exists(export)) {
     log_debug(
       "File already exists, skipping download: %s",
@@ -44,22 +43,18 @@ get_file <- function(url, export, limit = 3600L) {
     return(invisible(export))
   }
 
-  # Prepare for Download ----
   create_dir(export = export)
   op <- options(timeout = limit)
   on.exit(options(op), add = TRUE)
   log_debug("Downloading from: %s", url)
 
-  # Download File ----
   ctx <- log_operation("download_file", url = url, destination = export)
 
   resp <- download_with_error_handling(url, export)
   validate_http_response(resp, url, export)
 
-  # Validate Downloaded File ----
   validate_downloaded_file(export, url)
 
-  # Log Success ----
   file_size <- file.info(export)$size
   log_complete(ctx, size_bytes = file_size)
 

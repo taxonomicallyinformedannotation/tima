@@ -18,11 +18,11 @@ validate_dataframe(
 
 \item{param_name}{\link{character} Name of the parameter (for error messages)}
 
-\item{required_cols}{\link{character} Character vector of required column names}
+\item{required_cols}{\link{character} Vector of required column names}
 
 \item{min_rows}{\link{integer} Minimum number of rows required (default: 0)}
 
-\item{allow_empty}{\link{logical} Logical, whether empty data frames are allowed}
+\item{allow_empty}{\link{logical} Whether empty data frames are allowed}
 
 \item{optional_cols}{\link{character} Optional character vector of expected
 optional columns}

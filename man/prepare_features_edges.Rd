@@ -17,13 +17,13 @@ prepare_features_edges(
 "ms1" and
 "spectral" elements pointing to respective edge files.}
 
-\item{output}{\link{character} Character string path where prepared edges should
+\item{output}{\link{character} Path where prepared edges should
 be saved}
 
-\item{name_source}{\link{character} Character string name of the source feature
+\item{name_source}{\link{character} Name of the source feature
 column in input files}
 
-\item{name_target}{\link{character} Character string name of the target feature
+\item{name_target}{\link{character} Name of the target feature
 column in input files}
 }
 \value{

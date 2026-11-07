@@ -4,15 +4,15 @@
 #'     prepare_annotations_sirius.
 #'     Checks version, output paths, and structure file existence.
 #'
-#' @param sirius_version [character] Character SIRIUS version ("5", "6", or
+#' @param sirius_version [character] SIRIUS version ("5", "6", or
 #'     coercible to those).
-#' @param output_ann [character] Character output path for annotations.
-#' @param output_can [character] Character output path for CANOPUS.
-#' @param output_for [character] Character output path for formulas.
-#' @param str_stereo [character] Character path to stereo file.
-#' @param str_met [character] Character path to metadata file.
-#' @param str_tax_cla [character] Character path to ClassyFire taxonomy.
-#' @param str_tax_npc [character] Character path to NPClassifier taxonomy.
+#' @param output_ann [character] Output path for annotations.
+#' @param output_can [character] Output path for CANOPUS.
+#' @param output_for [character] Output path for formulas.
+#' @param str_stereo [character] Path to stereo file.
+#' @param str_met [character] Path to metadata file.
+#' @param str_tax_cla [character] Path to ClassyFire taxonomy.
+#' @param str_tax_npc [character] Path to NPClassifier taxonomy.
 #' @param max_analog_abs_mz_error [numeric] Maximum allowed absolute m/z
 #'     deviation (Da) for keeping SIRIUS spectral analog hits.
 #'
@@ -37,7 +37,6 @@ validate_sirius_inputs <- function(
     )
   }
 
-  # Validate output paths
   output_paths <- list(
     output_ann = output_ann,
     output_can = output_can,
@@ -46,7 +45,6 @@ validate_sirius_inputs <- function(
 
   validate_all_single_strings(output_paths, "Output path(s)")
 
-  # Validate structure files exist
   validate_file_existence(
     file_list = list(
       str_stereo = str_stereo,
@@ -78,7 +76,7 @@ validate_sirius_inputs <- function(
 #'     accept any suffix after the base name (e.g. \code{_all.tsv},
 #'     \code{-15.tsv}, \code{_analog_top-15.tsv}).
 #'
-#' @param version [character] Character "5" or "6".
+#' @param version [character] "5" or "6".
 #'
 #' @return Named list with keys: canopus, formulas, structures, denovo,
 #'     spectral.
@@ -111,9 +109,9 @@ get_sirius_filenames <- function(version) {
 #' @description Internal helper to load CANOPUS, formulas, structures, and
 #'     denovo tables from a SIRIUS output directory/zip.
 #'
-#' @param input_directory [character] Character path to SIRIUS output (directory
+#' @param input_directory [character] Path to SIRIUS output (directory
 #'     or zip).
-#' @param version [character] Character "5" or "6".
+#' @param version [character] "5" or "6".
 #'
 #' @return Named list with canopus, formulas, structures, denovo, spectral data
 #'     frames.
@@ -193,7 +191,7 @@ load_sirius_tables <- function(input_directory, version) {
 #' @description Internal helper to load per-feature structure candidate
 #'     summaries.
 #'
-#' @param input_directory [character] Character path to SIRIUS output.
+#' @param input_directory [character] Path to SIRIUS output.
 #'
 #' @return Data frame with structure summaries (bound rows), or empty tidytable.
 #' @keywords internal

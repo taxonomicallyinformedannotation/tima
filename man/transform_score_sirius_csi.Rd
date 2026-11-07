@@ -7,13 +7,13 @@
 transform_score_sirius_csi(csi_score = NULL, K = 100, scale = 20)
 }
 \arguments{
-\item{csi_score}{\link{numeric} Numeric SIRIUS CSI score (expected mostly <= 0;
+\item{csi_score}{\link{numeric} SIRIUS CSI score (expected mostly <= 0;
 can be negative, NA, NULL, or absent)}
 
-\item{K}{\link{numeric} Numeric shift parameter to adjust the sigmoid center
+\item{K}{\link{numeric} Shift parameter to adjust the sigmoid center
 (default: 100, midpoint at score = -100)}
 
-\item{scale}{\link{numeric} Numeric scale parameter controlling sigmoid steepness
+\item{scale}{\link{numeric} Scale parameter controlling sigmoid steepness
 (default: 20)}
 }
 \value{

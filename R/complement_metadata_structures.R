@@ -52,7 +52,6 @@ complement_metadata_structures <- function(
     return(df)
   }
 
-  # Validate all file paths exist
   validate_file_existence(list(
     str_stereo = str_stereo,
     str_met = str_met,

@@ -19,7 +19,6 @@
 #' harmonize_names_sirius("score") # Returns "score" (no underscore)
 #' }
 harmonize_names_sirius <- function(x) {
-  # Validate input
   if (missing(x) || is.null(x)) {
     cli::cli_abort(
       "input {.arg x} must be provided",

@@ -106,7 +106,6 @@ tima::get_example_files()
 debugging time:
 
 ```r
-# Check if your data is matches expectations before processing
 validate_inputs(
   features = "data/source/example_features.csv",
   spectra = "data/source/example_spectra.mgf",
@@ -115,7 +114,7 @@ validate_inputs(
   feature_col = "row ID",
   filename_col = "filename",
   organism_col = "ATTRIBUTE_species"
-  )
+)
 ```
 
 This will:

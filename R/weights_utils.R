@@ -1,8 +1,8 @@
 #' Compute evidence-aware weighted sum (row-wise for data frames)
 #'
-#' @param ... [numeric] Numeric columns/vectors of component values (passed as
+#' @param ... [numeric] Columns/vectors of component values (passed as
 #'     separate arguments).
-#' @param weights [numeric] Numeric vector of non-negative weights (one per
+#' @param weights [numeric] Vector of non-negative weights (one per
 #'     component).
 #' @return List with `score` (weighted average over all components, treating
 #'     missing values as 0) and `coverage` (unused; returned as `NA`).
@@ -85,9 +85,9 @@ compute_weighted_components <- function(..., weights, include_coverage = TRUE) {
 #' @description Convenience wrapper around [compute_weighted_components()] that
 #'   returns only the weighted score vector.
 #'
-#' @param ... [numeric] Numeric columns/vectors of component values (passed as
+#' @param ... [numeric] Columns/vectors of component values (passed as
 #'   separate arguments).
-#' @param weights [numeric] Numeric vector of non-negative weights (one per
+#' @param weights [numeric] Vector of non-negative weights (one per
 #'   component).
 #'
 #' @return Numeric vector of weighted scores, or NA for rows with no evidence.

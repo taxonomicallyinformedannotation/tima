@@ -11,8 +11,8 @@
 #' @include logs_utils.R
 #' @include export_output.R
 #'
-#' @param input [character] Character string path to PubChem Lite CSV file
-#' @param output [character] Character string path for prepared SOP output
+#' @param input [character] Path to PubChem Lite CSV file
+#' @param output [character] Path for prepared SOP output
 #'
 #' @return Character string path to prepared SOP file
 #'

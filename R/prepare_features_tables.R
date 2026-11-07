@@ -69,7 +69,6 @@ prepare_features_tables <- function(
     name_mz = name_mz
   )
 
-  # Load Features Table ----
   log_debug("Retaining top %d intensity samples per feature", candidates)
 
   features_raw <- .load_features_file(features)
@@ -88,7 +87,6 @@ prepare_features_tables <- function(
   name_mz <- resolved_names$name_mz
   name_adduct <- resolved_names$name_adduct
 
-  # Format and Filter ----
   features_selected <- .select_intensity_columns(
     features_raw,
     name_features = name_features,
@@ -106,7 +104,6 @@ prepare_features_tables <- function(
   # Standardize column names (remove format-specific prefixes/suffixes)
   features_std <- .standardize_column_names(features_selected)
 
-  # Filter to top intensity samples per feature
   features_prepared <- .filter_top_intensity_samples(
     features_std,
     candidates = candidates,
@@ -118,7 +115,6 @@ prepare_features_tables <- function(
 
   log_info("Prepared %d feature-sample pairs", nrow(features_prepared))
 
-  # Export Results ----
   log_complete(ctx, n_features = nrow(features_prepared))
 
   export_params(
@@ -144,7 +140,6 @@ prepare_features_tables <- function(
   name_rt,
   name_mz
 ) {
-  # Validate file paths
   validate_character(features, param_name = "features", allow_empty = FALSE)
   validate_file_exists(
     path = features,
@@ -180,7 +175,6 @@ prepare_features_tables <- function(
     name_rt = name_rt,
     name_mz = name_mz
   )
-  # Validate all parameters
   Map(.validate_column_name_param, col_params, names(col_params))
 
   invisible(NULL)
@@ -630,7 +624,6 @@ prepare_features_tables <- function(
   long_tbl_ranked <- long_tbl |>
     tidytable::filter(!is.na(value_num) & value_num > 0)
 
-  # Apply top-N filtering based on non-zero values
   long_tbl_filtered <- long_tbl_ranked |>
     tidytable::mutate(
       rank = rank(-value_num, ties.method = "first"),
@@ -676,7 +669,6 @@ prepare_features_tables <- function(
     out$adduct <- long_tbl_filtered[[name_adduct]]
   }
 
-  # Add all-intensities column (one list per feature)
   out <- out |>
     tidytable::left_join(all_intensities, by = "feature_id") |>
     as.data.frame()

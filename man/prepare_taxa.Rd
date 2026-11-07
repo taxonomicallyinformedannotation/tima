@@ -17,27 +17,27 @@ prepare_taxa(
 )
 }
 \arguments{
-\item{input}{\link{character} Character string path to features file with
+\item{input}{\link{character} Path to features file with
 intensities}
 
-\item{extension}{\link{logical} Logical whether column names contain file
+\item{extension}{\link{logical} Whether column names contain file
 extensions}
 
-\item{name_filename}{\link{character} Character string name of filename column in
+\item{name_filename}{\link{character} Name of filename column in
 metadata}
 
-\item{colname}{\link{character} Character string name of column with biological
+\item{colname}{\link{character} Name of column with biological
 source info}
 
-\item{metadata}{\link{character} Character string path to metadata file with
+\item{metadata}{\link{character} Path to metadata file with
 organism info}
 
-\item{org_tax_ott}{\link{character} Character string path to Open Tree of Life
+\item{org_tax_ott}{\link{character} Path to Open Tree of Life
 taxonomy file}
 
-\item{output}{\link{character} Character string path for output file}
+\item{output}{\link{character} Path for output file}
 
-\item{taxon}{\link{character} Character string organism name to enforce for all
+\item{taxon}{\link{character} Organism name to enforce for all
 features
 (e.g., "Homo sapiens"). If provided, overrides metadata-based assignment.}
 }

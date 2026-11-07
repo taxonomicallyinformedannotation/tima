@@ -32,10 +32,10 @@ structure-organism pairs}
 annotations. Used to build feature-level consensus metadata for features
 without candidate structures.}
 
-\item{remove_ties}{\link{logical} Logical whether to remove tied scores (keep only
+\item{remove_ties}{\link{logical} Whether to remove tied scores (keep only
 highest)}
 
-\item{summarize}{\link{logical} Logical whether to collapse to 1 row per feature}
+\item{summarize}{\link{logical} Whether to collapse to 1 row per feature}
 }
 \value{
 Data frame containing summarized annotation results

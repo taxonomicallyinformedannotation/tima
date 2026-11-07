@@ -13,12 +13,12 @@ safe_fread(
 )
 }
 \arguments{
-\item{file}{\link{character} Character path to file}
+\item{file}{\link{character} Path to file}
 
-\item{file_type}{\link{character} Character description of file type for error
+\item{file_type}{\link{character} Description of file type for error
 messages}
 
-\item{required_cols}{\link{character} Character vector of required column names
+\item{required_cols}{\link{character} Vector of required column names
 (optional)}
 
 \item{.reader}{\link{function} Function used to perform the actual read, called

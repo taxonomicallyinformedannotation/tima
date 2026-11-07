@@ -35,7 +35,6 @@ parse_cli_params <- function(arguments, parameters) {
   validate_list_or_vector(arguments, param_name = "arguments", min_length = 0)
   validate_list_or_vector(parameters, param_name = "parameters", min_length = 0)
 
-  # Define mappings from CLI argument names to parameter paths
   # Each mapping specifies: path (nested list location) and type (conversion
   # function)
   mappings <- list(

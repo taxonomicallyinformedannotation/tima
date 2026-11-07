@@ -63,7 +63,6 @@ create_edges <- function(
     matched_peaks = NA_integer_
   )
 
-  # Initialize logging context
   ctx <- log_operation(
     "create_edges",
     n_spectra = nspecs,
@@ -148,8 +147,6 @@ create_edges <- function(
       }
     }
   }
-
-  # Calculate Pairwise Similarities ----
 
   n_queries <- nspecs - 1L
   n_comparisons <- as.double(nspecs) * (nspecs - 1L) / 2
@@ -278,7 +275,6 @@ create_edges <- function(
     )
   }
 
-  # Score distribution logging ----
   bin_labels <- c(
     "[0,0.1]",
     "(0.1,0.2]",
@@ -297,7 +293,6 @@ create_edges <- function(
     title = "Here is the distribution of edge similarity scores (0.1 bins):"
   )
 
-  # Combine all query results into one tidytable ----
   f_vec <- unlist(res_f, use.names = FALSE)
   if (length(f_vec) > 0L) {
     result <- tidytable::tidytable(

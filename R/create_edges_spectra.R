@@ -84,7 +84,6 @@ create_edges_spectra <- function(
     n_input_files = length(input)
   )
 
-  # Validate similarity method early
   if (!method %in% VALID_SIMILARITY_METHODS) {
     cli::cli_abort(
       "{.arg method} must be one of {.or {.val {VALID_SIMILARITY_METHODS}}}, not {.val {method}}",
@@ -152,7 +151,6 @@ create_edges_spectra <- function(
     )
   }
 
-  # Validate output path
   if (!is.character(output) || length(output) != 1L) {
     cli::cli_abort(
       "output must be a single character string",
@@ -223,8 +221,6 @@ create_edges_spectra <- function(
       )
     }
   }
-
-  # Import and Process Spectra ----
 
   log_info("Creating spectral similarity network edges")
   log_debug("Parameters - Method: %s", method)
@@ -300,13 +296,10 @@ create_edges_spectra <- function(
     return(output)
   }
 
-  # Compute Spectral Similarities ----
-
   log_info("======================================")
   log_info("Take yourself a break, you deserve it.")
   log_info("======================================")
 
-  # Extract data (cache for reuse)
   nspecz <- length(spectra)
   fragz <- spectra@backend@peaksData
   precz <- get_precursors(spectra)
@@ -326,7 +319,6 @@ create_edges_spectra <- function(
   edges <- all_edges
   rm(all_edges)
 
-  # Calculate spectral entropy
   entropy <- vapply(
     X = fragz,
     FUN = msentropy::calculate_spectral_entropy,

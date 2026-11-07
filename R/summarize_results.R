@@ -20,9 +20,9 @@
 #' @param annot_table_wei_chemo [data.frame] Data frame with chemically weighted
 #'     annotations. Used to build feature-level consensus metadata for features
 #'     without candidate structures.
-#' @param remove_ties [logical] Logical whether to remove tied scores (keep only
+#' @param remove_ties [logical] Whether to remove tied scores (keep only
 #'     highest)
-#' @param summarize [logical] Logical whether to collapse to 1 row per feature
+#' @param summarize [logical] Whether to collapse to 1 row per feature
 #'
 #' @return Data frame containing summarized annotation results
 #'
@@ -128,7 +128,6 @@ summarize_results <- function(
       )
   }
 
-  # Define columns to select
   select_cols <- c(
     "feature_id",
     "feature_rt" = "rt",
@@ -360,7 +359,6 @@ summarize_results <- function(
 
   rm(df, organism_lookup)
 
-  # Remove ties if requested
   if (remove_ties) {
     log_info("Removing ties")
     if (
@@ -671,7 +669,6 @@ summarize_results <- function(
 }
 
 .build_organism_lookup <- function(structure_organism_pairs_table, df) {
-  # Check if the required columns exist in df
   has_organism_col <- "candidate_structure_organism_occurrence_closest" %in%
     names(df)
 

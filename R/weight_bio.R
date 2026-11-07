@@ -115,7 +115,6 @@ weight_bio <- function(
     )
   )
 
-  # Validate all biological score parameters (0-1 range)
   validate_numeric_range(
     score_biological_domain,
     0,
@@ -184,8 +183,6 @@ weight_bio <- function(
     structure_organism_pairs_table
   )
 
-  # Check Data Frames ----
-
   if (!is.data.frame(structure_organism_pairs_table)) {
     cli::cli_abort(
       "structure_organism_pairs_table must be a data frame",
@@ -226,7 +223,6 @@ weight_bio <- function(
     )
   }
 
-  # Validate biological scores
   bio_scores <- list(
     domain = score_biological_domain,
     kingdom = score_biological_kingdom,
@@ -261,16 +257,12 @@ weight_bio <- function(
     )
   }
 
-  # Log Processing Information ----
-
   log_info("Weighting %d annotations by biological source", n_annotations)
   log_debug(
     "Weights - Spectral: %.2f, Biological: %.2f",
     weight_spectral,
     weight_biological
   )
-
-  # Filter Structure-Organism Pairs ----
 
   # Predicate pushdown optimization: Filter structure-organism pairs to only
   # those present in the annotation table before joining. This can reduce the

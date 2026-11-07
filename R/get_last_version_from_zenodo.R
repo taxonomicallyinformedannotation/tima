@@ -47,7 +47,6 @@ validate_zenodo_inputs <- function(doi, pattern, path, timeout_s) {
     )
   }
 
-  # Validate DOI format
   if (!grepl("^10\\.[0-9]+/zenodo\\.[0-9]+$", doi, perl = TRUE)) {
     cli::cli_abort(
       c(
@@ -323,18 +322,15 @@ get_last_version_from_zenodo <- function(doi, pattern, path, timeout_s = 90) {
 
   log_info("Retrieving latest version from Zenodo: %s", doi)
 
-  # Extract Record ID ----
   record <- extract_zenodo_record_id(doi)
   log_debug("Record ID: %s", record)
 
-  # Fetch Record Metadata ----
   record_response <- fetch_zenodo_record(
     record = record,
     doi = doi,
     timeout_s = timeout_s
   )
 
-  # Parse API Response ----
   content <- tryCatch(
     httr2::resp_body_json(record_response),
     error = function(e) {
@@ -350,7 +346,6 @@ get_last_version_from_zenodo <- function(doi, pattern, path, timeout_s = 90) {
     }
   )
 
-  # Find Matching File ----
   files <- content$files
   resolved_record <- if (!is.null(content$recid) && nzchar(content$recid)) {
     content$recid
@@ -428,7 +423,6 @@ get_last_version_from_zenodo <- function(doi, pattern, path, timeout_s = 90) {
 
   log_debug("Found file: %s (%.0f bytes)", filename, zenodo_size)
 
-  # Download if Needed ----
   if (is_download_needed(path = path, zenodo_size = zenodo_size)) {
     # Remove existing file if present (may be corrupted or wrong size)
     if (file.exists(path)) {
@@ -452,7 +446,6 @@ get_last_version_from_zenodo <- function(doi, pattern, path, timeout_s = 90) {
       zenodo_size / 1024^2
     )
 
-    # Create directory and download
     create_dir(export = path)
     get_file(url = file_url, export = path)
 

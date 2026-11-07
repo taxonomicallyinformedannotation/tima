@@ -15,23 +15,23 @@ sanitize_all_inputs(
 )
 }
 \arguments{
-\item{features_file}{\link{character} Character path to features CSV/TSV
+\item{features_file}{\link{character} Path to features CSV/TSV
 (optional)}
 
-\item{mgf_file}{\link{character} Character path to MGF file (optional)}
+\item{mgf_file}{\link{character} Path to MGF file (optional)}
 
-\item{metadata_file}{\link{character} Character path to metadata file (optional)}
+\item{metadata_file}{\link{character} Path to metadata file (optional)}
 
-\item{sirius_dir}{\link{character} Character path to SIRIUS output directory or
+\item{sirius_dir}{\link{character} Path to SIRIUS output directory or
 ZIP (optional)}
 
-\item{filename_col}{\link{character} Character name of filename column (default:
+\item{filename_col}{\link{character} Name of filename column (default:
 "filename")}
 
-\item{organism_col}{\link{character} Character name of organism column (default:
+\item{organism_col}{\link{character} Name of organism column (default:
 "organism")}
 
-\item{feature_col}{\link{character} Character name of feature ID column (default:
+\item{feature_col}{\link{character} Name of feature ID column (default:
 "feature_id")}
 }
 \value{

@@ -131,7 +131,6 @@ clean_chemo <- function(
   xrefs_table = NULL,
   enforce_cluster_consensus = TRUE
 ) {
-  # Initialize logging context
   ctx <- log_operation(
     "clean_chemo",
     n_annotations = nrow(annot_table_wei_chemo),
@@ -176,8 +175,6 @@ clean_chemo <- function(
     )
   }
 
-  # Ensure Score Columns are Numeric ----
-
   annot_table_wei_chemo <- select_clean_chemo_working_columns(
     annot_table_wei_chemo
   )
@@ -209,7 +206,6 @@ clean_chemo <- function(
     }
   }
 
-  # Core Filtering Pipeline ----
   log_metadata(
     ctx,
     phase = "filtering",
@@ -249,10 +245,6 @@ clean_chemo <- function(
     annot_table_wei_chemo = annot_table_wei_chemo,
     model = model
   )
-
-  # Three-Tier Output Generation ----
-
-  # Apply High-Evidence Filter for Filtered and Full Tiers ----
 
   # The filtered tier (and the mini tier built from it) is always restricted
   # to high-evidence candidates; `high_evidence` only governs the full tier
@@ -337,16 +329,12 @@ clean_chemo <- function(
 
   rm(df_full, df_ranked, feature_consensus_table)
 
-  # Optionally Remove Compound Names (After All Processing) ----
-
-  # Build results list
   results_list <- list(
     full = results_full,
     filtered = results_filtered,
     mini = results_mini
   )
 
-  # Remove compound names from outputs if requested
   results_list <- remove_compound_names(results_list, compounds_names)
 
   log_complete(

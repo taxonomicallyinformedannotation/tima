@@ -8,7 +8,7 @@
 #' @include validations_utils.R
 #' @param file_list [list] Named list of file paths to validate. Names are used
 #'     in error messages to identify which file is missing.
-#' @param allow_null [logical] Logical, if TRUE, NULL values are allowed
+#' @param allow_null [logical] If TRUE, NULL values are allowed
 #'     (default: FALSE)
 #'
 #' @return Invisible TRUE if all files exist, stops with error otherwise
@@ -47,7 +47,6 @@ validate_file_existence <- function(file_list, allow_null = FALSE) {
     nms
   )
 
-  # Filter and categorize results
   validation_results <- Filter(Negate(is.null), validation_results)
   invalid_files <- vapply(
     Filter(function(x) x$type == "invalid", validation_results),
@@ -100,7 +99,7 @@ validate_file_existence <- function(file_list, allow_null = FALSE) {
 #'
 #' @description Ensures the MS mode is valid ('pos' or 'neg')
 #'
-#' @param ms_mode [character] Character string indicating ionization mode
+#' @param ms_mode [character] Ionization mode
 #'
 #' @return Invisible TRUE if valid, stops with error otherwise
 #'
@@ -136,13 +135,13 @@ validate_ms_mode <- function(ms_mode) {
 #'
 #' @description Validates that tolerance values are within acceptable ranges
 #'
-#' @param tolerance_ppm [numeric] Numeric mass tolerance in parts per million
-#' @param tolerance_rt [numeric] Numeric retention time tolerance in minutes
+#' @param tolerance_ppm [numeric] Mass tolerance in parts per million
+#' @param tolerance_rt [numeric] Retention time tolerance in minutes
 #' @param max_ppm [numeric] Maximum allowed ppm tolerance (default: from
 #'     constants)
 #' @param max_rt [numeric] Maximum allowed RT tolerance (default: from
 #'     constants)
-#' @param context [character] Character string describing context (for error
+#' @param context [character] Describing context (for error
 #'     messages)
 #'
 #' @return Invisible TRUE if valid, stops with error otherwise
@@ -160,7 +159,6 @@ validate_tolerances <- function(
   max_rt = MAX_TOLERANCE_RT_ADDUCTS,
   context = "annotation"
 ) {
-  # Validate PPM tolerance
   if (!is.null(tolerance_ppm)) {
     validate_tolerance_ppm(
       tolerance_ppm = tolerance_ppm,
@@ -170,7 +168,6 @@ validate_tolerances <- function(
     )
   }
 
-  # Validate RT tolerance
   if (!is.null(tolerance_rt)) {
     validate_numeric_range(
       value = tolerance_rt,
@@ -359,9 +356,9 @@ validate_adduct_list <- function(
 #'
 #' @param df Input to validate
 #' @param param_name [character] Name of the parameter (for error messages)
-#' @param required_cols [character] Character vector of required column names
+#' @param required_cols [character] Vector of required column names
 #' @param min_rows [integer] Minimum number of rows required (default: 0)
-#' @param allow_empty [logical] Logical, whether empty data frames are allowed
+#' @param allow_empty [logical] Whether empty data frames are allowed
 #' @param optional_cols [character] Optional character vector of expected
 #'     optional columns
 #'
@@ -471,7 +468,7 @@ validate_weights <- function(weights, param_name = "weights") {
 #'
 #' @description Generic validator for character string parameters
 #'
-#' @param value [character] Character value to validate
+#' @param value [character] Value to validate
 #' @param allowed_values [character] Optional character vector of allowed values
 #' @param param_name [character] Name of the parameter (for error messages)
 #' @param allow_null [logical] Allow NULL values (default: FALSE)
@@ -529,7 +526,7 @@ validate_character <- function(
 #'
 #' @description Generic validator for logical (boolean) parameters
 #'
-#' @param value [logical] Logical value to validate
+#' @param value [logical] Value to validate
 #' @param param_name [character] Name of the parameter (for error messages)
 #' @param allow_null [logical] Allow NULL values (default: FALSE)
 #'

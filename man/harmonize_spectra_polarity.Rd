@@ -27,9 +27,9 @@ harmonize_spectra_polarity(
 \arguments{
 \item{spectra_extracted}{\link{list} List of extracted spectra data frames.}
 
-\item{mode}{\link{character} Character "pos" or "neg".}
+\item{mode}{\link{character} "pos" or "neg".}
 
-\item{metad}{\link{character} Character library metadata name.}
+\item{metad}{\link{character} Library metadata name.}
 
 \item{col_ad}{\link{character} Adduct field name}
 

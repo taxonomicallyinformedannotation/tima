@@ -28,7 +28,6 @@
 get_default_paths <- function(
   yaml = system.file("paths.yaml", package = "tima")
 ) {
-  # Validate that YAML file exists
   if (!file.exists(yaml)) {
     cli::cli_abort(
       c(

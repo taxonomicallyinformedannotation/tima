@@ -36,10 +36,8 @@ export_params <- function(
   validate_character(step, param_name = "step", allow_empty = FALSE)
   validate_character(directory, param_name = "directory", allow_empty = FALSE)
 
-  # Create Directory ----
   create_dir(export = directory)
 
-  # Generate Timestamped Filename ----
   timestamp <- format(Sys.time(), "%y%m%d_%H%M%OS")
   filename <- paste0(timestamp, "_", step, ".yaml")
   filepath <- file.path(directory, filename)

@@ -7,7 +7,7 @@
 pre_harmonize_names_sirius(x)
 }
 \arguments{
-\item{x}{\link{character} Character string containing a SIRIUS column name to
+\item{x}{\link{character} A SIRIUS column name to
 pre-harmonize}
 }
 \value{

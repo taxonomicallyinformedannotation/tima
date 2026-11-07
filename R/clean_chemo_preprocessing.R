@@ -1,5 +1,3 @@
-## Helper Functions ----
-
 #' Validate data frame with feature_id column
 #' @keywords internal
 #' @noRd
@@ -62,7 +60,6 @@ validate_clean_chemo_inputs <- function(
   score_chemical_npc_superclass,
   score_chemical_npc_class
 ) {
-  # Validate data frame
   if (!is.data.frame(annot_table_wei_chemo)) {
     tima_abort(
       problem = "annot_table_wei_chemo must be a data frame",
@@ -90,7 +87,6 @@ validate_clean_chemo_inputs <- function(
     )
   }
 
-  # Validate numeric parameters
   if (!is.numeric(candidates_final) || candidates_final < 1) {
     tima_abort(
       problem = paste0(
@@ -139,7 +135,6 @@ validate_clean_chemo_inputs <- function(
     )
   }
 
-  # Validate condition
   if (!minimal_ms1_condition %in% c("OR", "AND")) {
     tima_abort(
       problem = paste0(
@@ -150,7 +145,6 @@ validate_clean_chemo_inputs <- function(
     )
   }
 
-  # Validate logical parameters
   logical_params <- list(
     compounds_names = compounds_names,
     high_evidence = high_evidence,
@@ -170,7 +164,6 @@ validate_clean_chemo_inputs <- function(
     )
   }
 
-  # Validate max_per_score
   if (!is.numeric(max_per_score) || max_per_score < 1) {
     tima_abort(
       problem = paste0(
@@ -181,7 +174,6 @@ validate_clean_chemo_inputs <- function(
     )
   }
 
-  # Validate taxonomy weights if provided
   weights <- c(
     score_chemical_cla_kingdom,
     score_chemical_cla_superclass,
@@ -296,7 +288,6 @@ rank_and_deduplicate <- function(df) {
   #   - Combines all evidence into ONE clear score
   #   - Mathematically sound: highest combined score = best candidate
 
-  # Handle empty input
   if (nrow(df) == 0L) {
     df <- tidytable::as_tidytable(df)
     if (!("rank_initial" %in% names(df))) {
@@ -327,7 +318,6 @@ rank_and_deduplicate <- function(df) {
     }
   }
 
-  # Ensure match mode is character
   if (!("candidate_adduct_match_mode" %in% names(df))) {
     df[["candidate_adduct_match_mode"]] <- rep(NA_character_, nrow(df))
   }

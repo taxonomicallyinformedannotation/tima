@@ -15,31 +15,31 @@
 #' @include export_output.R
 #' @include rts_utils.R
 #'
-#' @param mgf_exp [character] Character vector of paths to MGF files with
+#' @param mgf_exp [character] Vector of paths to MGF files with
 #'     experimental RT
-#' @param mgf_is [character] Character vector of paths to MGF files with in
+#' @param mgf_is [character] Vector of paths to MGF files with in
 #'     silico predicted RT
-#' @param temp_exp [character] Character vector of paths to CSV files with
+#' @param temp_exp [character] Vector of paths to CSV files with
 #'     experimental RT
-#' @param temp_is [character] Character vector of paths to CSV files with in
+#' @param temp_is [character] Vector of paths to CSV files with in
 #'     silico predicted RT
-#' @param output_rt [character] Character string path for prepared RT library
+#' @param output_rt [character] Path for prepared RT library
 #'     output
-#' @param output_sop [character] Character string path for pseudo SOP output
-#' @param col_ik [character] Character string name of InChIKey column in MGF
-#' @param col_na [character] Character string name of compound name column in
+#' @param output_sop [character] Path for pseudo SOP output
+#' @param col_ik [character] Name of InChIKey column in MGF
+#' @param col_na [character] Name of compound name column in
 #'     MGF
-#' @param col_rt [character] Character string name of retention time column in
+#' @param col_rt [character] Name of retention time column in
 #'     MGF
-#' @param col_sm [character] Character string name of SMILES column in MGF
-#' @param name_inchikey [character] Character string name of InChIKey column in
+#' @param col_sm [character] Name of SMILES column in MGF
+#' @param name_inchikey [character] Name of InChIKey column in
 #'     CSV
-#' @param name_name [character] Character string name of compound name column in
+#' @param name_name [character] Name of compound name column in
 #'     CSV
-#' @param name_rt [character] Character string name of retention time column in
+#' @param name_rt [character] Name of retention time column in
 #'     CSV
-#' @param name_smiles [character] Character string name of SMILES column in CSV
-#' @param unit_rt [character] Character string RT unit: "seconds" or "minutes"
+#' @param name_smiles [character] Name of SMILES column in CSV
+#' @param unit_rt [character] RT unit: "seconds" or "minutes"
 #'
 #' @return Character string path to the prepared retention time library
 #'
@@ -83,7 +83,6 @@ prepare_libraries_rt <- function(
   name_smiles = get_params(step = "prepare_libraries_rt")$names$smiles,
   unit_rt = get_params(step = "prepare_libraries_rt")$units$rt
 ) {
-  # Validate core arguments and normalize outputs ----
   # Validate RT unit
   if (!unit_rt %in% c("seconds", "minutes")) {
     cli::cli_abort(
@@ -130,7 +129,6 @@ prepare_libraries_rt <- function(
   # RTINSECONDS is in seconds by definition, whatever `unit_rt` says
   unit_rt_mgf <- if (identical(col_rt, "RTINSECONDS")) "seconds" else unit_rt
 
-  # Normalize input vectors ----
   .normalize_input_vec <- function(x) {
     # Accept NULL or character vectors, return NULL if empty/NA/blank
     # Handle list() from YAML params (when fields are empty)
@@ -155,7 +153,6 @@ prepare_libraries_rt <- function(
   temp_exp <- .normalize_input_vec(temp_exp)
   temp_is <- .normalize_input_vec(temp_is)
 
-  # Readers ----
   rts_from_mgf <- function(mgf) {
     # Metadata only: RT records need no peaks nor precursor, and importing
     # them as spectra would drop such entries
@@ -197,7 +194,6 @@ prepare_libraries_rt <- function(
       )
   }
 
-  # Polishing utilities ----
   polish_df <- function(df, type = "experimental", unit = unit_rt) {
     df_tmp <- tidytable::as_tidytable(df)
     if (!"inchikey" %in% colnames(df_tmp)) {
@@ -319,7 +315,6 @@ prepare_libraries_rt <- function(
     type = NA_character_
   )
 
-  # Build RT tables from sources ----
   # from mgf
   rts_exp_1 <- if (!is.null(mgf_exp)) {
     mgf_exp |>

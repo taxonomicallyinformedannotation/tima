@@ -34,19 +34,19 @@
 #' @include export_output.R
 #' @include prepare_annotations_sirius_utils.R
 #'
-#' @param input_directory [character] Character path to directory or zip file
+#' @param input_directory [character] Path to directory or zip file
 #'     containing
 #'     SIRIUS results.
-#' @param output_ann [character] Character path for prepared structure
+#' @param output_ann [character] Path for prepared structure
 #'     annotation output.
-#' @param output_can [character] Character path for prepared CANOPUS output.
-#' @param output_for [character] Character path for prepared formula output.
-#' @param sirius_version [character] Character SIRIUS version ("5" or "6").
-#' @param str_stereo [character] Character path to structure stereochemistry
+#' @param output_can [character] Path for prepared CANOPUS output.
+#' @param output_for [character] Path for prepared formula output.
+#' @param sirius_version [character] SIRIUS version ("5" or "6").
+#' @param str_stereo [character] Path to structure stereochemistry
 #'     file.
-#' @param str_met [character] Character path to structure metadata file.
-#' @param str_tax_cla [character] Character path to ClassyFire taxonomy file.
-#' @param str_tax_npc [character] Character path to NPClassifier taxonomy file.
+#' @param str_met [character] Path to structure metadata file.
+#' @param str_tax_cla [character] Path to ClassyFire taxonomy file.
+#' @param str_tax_npc [character] Path to NPClassifier taxonomy file.
 #' @param max_analog_abs_mz_error [numeric] Maximum allowed absolute m/z
 #'     deviation (Da) for keeping SIRIUS spectral analog hits.
 #'
@@ -98,7 +98,6 @@ prepare_annotations_sirius <-
   ) {
     ctx <- log_operation("prepare_annotations_sirius", version = sirius_version)
 
-    # Validation ----
     sirius_version <- as.character(sirius_version)
     validate_sirius_inputs(
       sirius_version = sirius_version,
@@ -113,7 +112,6 @@ prepare_annotations_sirius <-
     )
 
     log_debug("SIRIUS version: %s", sirius_version)
-    # Handle missing input ----
     input_directory <- .normalize_sirius_input_directory(input_directory)
     log_debug("SIRIUS directory: %s", input_directory)
     if (!file.exists(input_directory)) {
@@ -132,7 +130,6 @@ prepare_annotations_sirius <-
         str_tax_npc = str_tax_npc
       )
     }
-    # Split and export ----
     log_debug(
       "Splitting results into CANOPUS, formula, and structure tables"
     )

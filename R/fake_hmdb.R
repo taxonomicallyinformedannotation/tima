@@ -35,7 +35,6 @@
 #' fake_hmdb(export = "data/source/hmdb.sdf.zip")
 #' }
 fake_hmdb <- function(export) {
-  # Validate input
   if (missing(export) || !is.character(export) || length(export) != 1L) {
     cli::cli_abort(
       "export path must be a single character string",
@@ -81,7 +80,6 @@ fake_hmdb <- function(export) {
   # Write SDF to temporary file
   writeLines(fake_sdf, fake_export)
 
-  # Create zip archive
   zip_result <- .fake_hmdb_zip_cmd(export = export, fake_export = fake_export)
 
   if (zip_result != 0) {

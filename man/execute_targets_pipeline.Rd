@@ -7,7 +7,7 @@
 execute_targets_pipeline(target_pattern = "^(ann_wei|exp_mzt)$")
 }
 \arguments{
-\item{target_pattern}{\link{character} Character regex pattern to match target
+\item{target_pattern}{\link{character} Regex pattern to match target
 names}
 }
 \value{

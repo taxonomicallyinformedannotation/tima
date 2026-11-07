@@ -32,11 +32,11 @@
 #' @include validations_utils.R
 #' @include assert_utils.R
 #'
-#' @param csi_score [numeric] Numeric SIRIUS CSI score (expected mostly <= 0;
+#' @param csi_score [numeric] SIRIUS CSI score (expected mostly <= 0;
 #'     can be negative, NA, NULL, or absent)
-#' @param K [numeric] Numeric shift parameter to adjust the sigmoid center
+#' @param K [numeric] Shift parameter to adjust the sigmoid center
 #'     (default: 100, midpoint at score = -100)
-#' @param scale [numeric] Numeric scale parameter controlling sigmoid steepness
+#' @param scale [numeric] Scale parameter controlling sigmoid steepness
 #'     (default: 20)
 #'
 #' @return Numeric transformed score in the range (0, 1), or NA if input is
@@ -62,7 +62,6 @@
 #' transform_score_sirius_csi()
 #' }
 transform_score_sirius_csi <- function(csi_score = NULL, K = 100, scale = 20) {
-  # Handle NULL input
   if (is.null(csi_score)) {
     return(NA_real_)
   }

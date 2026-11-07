@@ -93,7 +93,6 @@ select_annotations_columns <- function(
 
   log_debug("Input: %d rows, %d columns", nrow(df), ncol(df))
 
-  # Get column model
   model <- columns_model()
 
   projection_columns <- .annotation_projection_columns(model)
@@ -134,7 +133,6 @@ select_annotations_columns <- function(
     )
   }
 
-  # Recompute all structure properties from SMILES ----
   if (isTRUE(recompute_smiles)) {
     # When a SMILES is available from annotation sources, use process_smiles()
     # to recompute ALL derived fields (canonical SMILES, SMILES no stereo,

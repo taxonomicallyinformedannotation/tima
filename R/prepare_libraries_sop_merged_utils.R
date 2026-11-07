@@ -16,7 +16,6 @@ validate_sop_merged_inputs <- function(
   output_str_tax_cla,
   output_str_tax_npc
 ) {
-  # Validate files parameter
   if (
     !is.character(files) ||
       length(files) < 1L ||
@@ -29,7 +28,6 @@ validate_sop_merged_inputs <- function(
     )
   }
 
-  # Validate filter parameter
   if (!is.logical(filter) || length(filter) != 1L) {
     cli::cli_abort(
       "filter must be a single logical value (TRUE/FALSE)",
@@ -38,7 +36,6 @@ validate_sop_merged_inputs <- function(
     )
   }
 
-  # Validate output paths
   output_paths <- list(
     output_key = output_key,
     output_org_tax_ott = output_org_tax_ott,
@@ -49,10 +46,8 @@ validate_sop_merged_inputs <- function(
     output_str_tax_npc = output_str_tax_npc
   )
 
-  # Validate all output paths are single character strings
   validate_all_single_strings(output_paths, "Output parameter(s)")
 
-  # Validate taxonomic filter parameters if filtering
   if (isTRUE(filter)) {
     valid_levels <- c(
       "domain",
@@ -810,7 +805,6 @@ enrich_taxonomy_from_cache <- function(
     return(taxonomy_table)
   }
 
-  # Apply column mapping if provided
   raw_cache_names <- names(cache_data)
   if (!is.null(col_mapping)) {
     cache_data <- .apply_col_mapping(cache_data, col_mapping)
@@ -858,10 +852,8 @@ enrich_taxonomy_from_cache <- function(
     had_chemontid_norm = had_chemontid_norm
   )
 
-  # Get existing keys
   existing_keys <- .get_existing_keys(taxonomy_table, key_col)
 
-  # Prepare cache supplement
   cache_supplement <- .prepare_cache_supplement(
     cache_data,
     key_col,

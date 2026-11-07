@@ -13,16 +13,16 @@
 #' @include export_output.R
 #' @include validations_params.R
 #'
-#' @param input [character] Character string or vector of paths to mzmine
+#' @param input [character] String or vector of paths to mzmine
 #'     annotation files
-#' @param output [character] Character string path for prepared mzmine
+#' @param output [character] Path for prepared mzmine
 #'     annotations output
-#' @param str_stereo [character] Character string path to structures
+#' @param str_stereo [character] Path to structures
 #'     stereochemistry file
-#' @param str_met [character] Character string path to structures metadata file
-#' @param str_tax_cla [character] Character string path to ClassyFire taxonomy
+#' @param str_met [character] Path to structures metadata file
+#' @param str_tax_cla [character] Path to ClassyFire taxonomy
 #'     file
-#' @param str_tax_npc [character] Character string path to NPClassifier taxonomy
+#' @param str_tax_npc [character] Path to NPClassifier taxonomy
 #'     file
 #'
 #' @return Character string path to prepared mzmine annotations
@@ -58,7 +58,6 @@ prepare_annotations_mzmine <- function(
     step = "prepare_annotations_mzmine"
   )$files$libraries$sop$merged$structures$taxonomies$npc
 ) {
-  # Validate output path
   if (!is.character(output) || length(output) != 1L) {
     cli::cli_abort(
       "output must be a single character string",
@@ -67,7 +66,6 @@ prepare_annotations_mzmine <- function(
     )
   }
 
-  # Validate all structure file paths
   validate_file_existence(
     file_list = list(
       str_stereo = str_stereo,

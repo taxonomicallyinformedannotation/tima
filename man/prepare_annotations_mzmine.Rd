@@ -20,21 +20,21 @@ prepare_annotations_mzmine(
 )
 }
 \arguments{
-\item{input}{\link{character} Character string or vector of paths to mzmine
+\item{input}{\link{character} String or vector of paths to mzmine
 annotation files}
 
-\item{output}{\link{character} Character string path for prepared mzmine
+\item{output}{\link{character} Path for prepared mzmine
 annotations output}
 
-\item{str_stereo}{\link{character} Character string path to structures
+\item{str_stereo}{\link{character} Path to structures
 stereochemistry file}
 
-\item{str_met}{\link{character} Character string path to structures metadata file}
+\item{str_met}{\link{character} Path to structures metadata file}
 
-\item{str_tax_cla}{\link{character} Character string path to ClassyFire taxonomy
+\item{str_tax_cla}{\link{character} Path to ClassyFire taxonomy
 file}
 
-\item{str_tax_npc}{\link{character} Character string path to NPClassifier taxonomy
+\item{str_tax_npc}{\link{character} Path to NPClassifier taxonomy
 file}
 }
 \value{

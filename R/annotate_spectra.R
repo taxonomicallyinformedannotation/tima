@@ -352,7 +352,6 @@ annotate_spectra <- function(
       update_ms1_zero_tracker(ms1_zero_tracker, spectral_library)
     }
 
-    # Compute similarities for this library
     # (calculate_entropy_and_similarity handles pre-computation outside hot loop)
     sim_chunk <- compute_similarity_safe(
       lib_sp = spectral_library,
@@ -373,7 +372,6 @@ annotate_spectra <- function(
       }
       lib_adducts_all <- attr(sim_chunk, "lib_adducts_raw")
 
-      # Get all unique target IDs from this library's results
       all_target_ids <- unique(sim_chunk$target_id)
       meta <- build_library_metadata(
         spectral_library,

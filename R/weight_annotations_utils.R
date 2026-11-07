@@ -191,9 +191,9 @@ validate_weight_annotations_inputs <- function(
 #' retain only MS1-based annotations (those without MS2 similarity or SIRIUS CSI
 #'     scores).
 #'
-#' @param annotations [character] Character vector of file paths to annotation
+#' @param annotations [character] Vector of file paths to annotation
 #'     files.
-#' @param ms1_only [logical] Logical; if TRUE, keep only annotations where both
+#' @param ms1_only [logical] If TRUE, keep only annotations where both
 #'     `candidate_score_similarity` and `candidate_score_sirius_csi` are NA.
 #'
 #' @return Data frame with combined (and optionally filtered) annotations.
@@ -289,10 +289,10 @@ load_annotation_tables <- function(annotations, ms1_only) {
 #'     taxonomy).
 #'     Returns a combined data frame suitable for biological scoring.
 #'
-#' @param library [character] Character, path to main library file (required).
-#' @param str_stereo [character] Character, path to stereo structures file
+#' @param library [character] Path to main library file (required).
+#' @param str_stereo [character] Path to stereo structures file
 #'     (optional; NULL allowed).
-#' @param org_tax_ott [character] Character, path to organism taxonomy file
+#' @param org_tax_ott [character] Path to organism taxonomy file
 #'     (optional; NULL allowed).
 #' @param needed_structures [character] Optional character vector of candidate
 #'     structure connectivity layers (`structure_inchikey_connectivity_layer`)
@@ -440,8 +440,8 @@ load_structure_organism_pairs <- function(
 #'     neighbors (by similarity score) for each feature. This reduces complexity
 #'     for downstream annotation propagation and scoring.
 #'
-#' @param edges [character] Character, path to edges file.
-#' @param candidates_neighbors [integer] Integer, number of top neighbors to
+#' @param edges [character] Path to edges file.
+#' @param candidates_neighbors [integer] Number of top neighbors to
 #'     keep per feature.
 #'
 #' @return Data frame with filtered edges (top `candidates_neighbors` per
@@ -1172,8 +1172,8 @@ rearrange_annotations <- function(
 #' @description Internal helper to export all result tiers and parameters.
 #'
 #' @param results_list [list] List with full, filtered, mini data frames
-#' @param output [character] Character, base output filename
-#' @param pattern [character] Character, pattern for directory naming
+#' @param output [character] Base output filename
+#' @param pattern [character] Pattern for directory naming
 #'
 #' @return Named character vector with output file paths
 #' @keywords internal

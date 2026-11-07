@@ -20,12 +20,12 @@
 #' @include process_smiles.R
 #' @include export_output.R
 #'
-#' @param bigg_doi [character] Character string DOI for BiGG database reference
+#' @param bigg_doi [character] DOI for BiGG database reference
 #' @param bigg_models [list] Named list of BiGG models with organism names as
 #'     keys
 #'     and named character vectors containing "model_id" and "doi" as values
-#' @param bigg_url [character] Character string base URL for BiGG models API
-#' @param output [character] Character string path for prepared BiGG library
+#' @param bigg_url [character] Base URL for BiGG models API
+#' @param output [character] Path for prepared BiGG library
 #'     output
 #'
 #' @return Character string path to prepared BiGG structure-organism pairs
@@ -311,7 +311,6 @@ prepare_libraries_sop_bigg <- function(
             structure_taxonomy_classyfire_04directparent = NA_character_
           )
 
-        # Process metabolites for each organism
         metabolites_by_organism <- lapply(
           organism_tables,
           function(org_table) {

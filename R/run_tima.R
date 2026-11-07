@@ -2,7 +2,7 @@
 #'
 #' @description Internal helper to archive log files with timestamps.
 #'
-#' @param log_file [character] Character path to log file
+#' @param log_file [character] Path to log file
 #' @param timestamp [POSIXct] POSIXct timestamp for filename
 #'
 #' @return Logical TRUE if successful, FALSE otherwise
@@ -13,7 +13,6 @@ archive_log_file <- function(log_file, timestamp) {
     return(FALSE)
   }
 
-  # Create output directory if needed
   output_dir <- "data/processed"
   if (!dir.exists(output_dir)) {
     dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
@@ -52,7 +51,7 @@ archive_log_file <- function(log_file, timestamp) {
 #'
 #' @description Internal helper to run the targets workflow with error handling.
 #'
-#' @param target_pattern [character] Character regex pattern to match target
+#' @param target_pattern [character] Regex pattern to match target
 #'     names
 #'
 #' @return Invisible NULL
@@ -273,7 +272,6 @@ run_tima <- function(
   )
   log_threshold <- parsed_log_level$threshold
 
-  # Initialize ----
   start_time <- Sys.time()
 
   # Start operation logging
@@ -300,12 +298,10 @@ run_tima <- function(
   log_info("Contributors: Pierre-Marie Allard (PMA)")
   log_info("=" |> rep(60) |> paste(collapse = ""))
 
-  # Pre-flight Data Validation (Optional but Recommended) ----
   # Note: Individual functions also validate their inputs
   # This is just for early detection of major issues
   log_debug("Pre-flight checks should be run with: validate_inputs()")
 
-  # Setup Environment ----
   tryCatch(
     {
       go_to_cache()
@@ -322,17 +318,14 @@ run_tima <- function(
     }
   )
 
-  # Execute Workflow ----
   execute_targets_pipeline(target_pattern = target_pattern)
 
-  # Finalize ----
   log_complete(ctx)
 
   log_info("=" |> rep(60) |> paste(collapse = ""))
   log_success("Complete TIMA workflow finished successfully")
   log_info("=" |> rep(60) |> paste(collapse = ""))
 
-  # Archive Logs ----
   archive_log_file(log_file = log_file, timestamp = Sys.time())
 
   invisible(NULL)

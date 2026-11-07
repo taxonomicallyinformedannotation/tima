@@ -17,22 +17,22 @@ validate_sirius_inputs(
 )
 }
 \arguments{
-\item{sirius_version}{\link{character} Character SIRIUS version ("5", "6", or
+\item{sirius_version}{\link{character} SIRIUS version ("5", "6", or
 coercible to those).}
 
-\item{output_ann}{\link{character} Character output path for annotations.}
+\item{output_ann}{\link{character} Output path for annotations.}
 
-\item{output_can}{\link{character} Character output path for CANOPUS.}
+\item{output_can}{\link{character} Output path for CANOPUS.}
 
-\item{output_for}{\link{character} Character output path for formulas.}
+\item{output_for}{\link{character} Output path for formulas.}
 
-\item{str_stereo}{\link{character} Character path to stereo file.}
+\item{str_stereo}{\link{character} Path to stereo file.}
 
-\item{str_met}{\link{character} Character path to metadata file.}
+\item{str_met}{\link{character} Path to metadata file.}
 
-\item{str_tax_cla}{\link{character} Character path to ClassyFire taxonomy.}
+\item{str_tax_cla}{\link{character} Path to ClassyFire taxonomy.}
 
-\item{str_tax_npc}{\link{character} Character path to NPClassifier taxonomy.}
+\item{str_tax_npc}{\link{character} Path to NPClassifier taxonomy.}
 
 \item{max_analog_abs_mz_error}{\link{numeric} Maximum allowed absolute m/z
 deviation (Da) for keeping SIRIUS spectral analog hits.}

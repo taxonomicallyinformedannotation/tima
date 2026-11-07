@@ -35,7 +35,6 @@ export_spectra_rds <- function(file, spectra) {
     )
   }
 
-  # Filter to spectra with valid compound IDs
   valid_spectra <- spectra[!is.na(spectra$compound_id)]
 
   # Still write the (empty) object: callers such as `format = "file"` targets
@@ -46,7 +45,6 @@ export_spectra_rds <- function(file, spectra) {
 
   log_debug("Exporting %d spectra to: %s", length(valid_spectra), file)
 
-  # Create output directory if needed
   create_dir(export = file)
 
   # Save spectra as RDS

@@ -377,7 +377,6 @@ weight_annotations <- function(
     n_candidates_final = candidates_final
   )
 
-  # Load Input Data ----
   log_debug("Loading input data tables")
 
   components_table <- safe_fread(
@@ -420,7 +419,6 @@ weight_annotations <- function(
   }
   log_debug("Extracted %d unique features", nrow(features_table))
 
-  # Rearrange and Merge Annotations ----
   log_debug(
     "Merging annotation sources (spectra, SIRIUS, CANOPUS, formula)"
   )
@@ -440,7 +438,6 @@ weight_annotations <- function(
   # Clean up intermediate objects
   rm(formula_table, canopus_table)
 
-  # Add Biological Metadata and Perform Scoring ----
   log_debug("Adding taxonomic metadata and computing biological scores")
 
   taxa_table <- safe_fread(
@@ -513,7 +510,6 @@ weight_annotations <- function(
     nrow(structure_organism_pairs_table)
   )
 
-  # Perform taxonomically informed scoring
   annot_table_wei_bio <- weight_bio(
     annotation_table_taxed = annotation_table_taxed,
     structure_organism_pairs_table = structure_organism_pairs_table,
@@ -740,7 +736,6 @@ weight_annotations <- function(
 
   log_complete(ctx, n_annotations = nrow(results_list$taxa))
 
-  # Export Results ----
   log_debug("Exporting results to disk")
 
   output_paths <- export_results(results_list, output, pattern)

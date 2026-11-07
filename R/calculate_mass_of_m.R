@@ -123,7 +123,6 @@ calculate_mass_of_m <- function(
       return(0)
     }
 
-    # Compute neutral mass inline
     isotope_shift <- n_iso * ISOTOPE_MASS_SHIFT_DALTONS
     z_signed <- n_charges * charge_sign
     neutral_mass <- (n_charges *

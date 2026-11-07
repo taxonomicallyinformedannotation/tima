@@ -6,17 +6,17 @@
 #' @include logs_utils.R
 #' @include errors_utils.R
 #' @include sanitize_data_utils.R
-#' @param features_file [character] Character path to features CSV/TSV
+#' @param features_file [character] Path to features CSV/TSV
 #'     (optional)
-#' @param mgf_file [character] Character path to MGF file (optional)
-#' @param metadata_file [character] Character path to metadata file (optional)
-#' @param sirius_dir [character] Character path to SIRIUS output directory or
+#' @param mgf_file [character] Path to MGF file (optional)
+#' @param metadata_file [character] Path to metadata file (optional)
+#' @param sirius_dir [character] Path to SIRIUS output directory or
 #'     ZIP (optional)
-#' @param filename_col [character] Character name of filename column (default:
+#' @param filename_col [character] Name of filename column (default:
 #'     "filename")
-#' @param organism_col [character] Character name of organism column (default:
+#' @param organism_col [character] Name of organism column (default:
 #'     "organism")
-#' @param feature_col [character] Character name of feature ID column (default:
+#' @param feature_col [character] Name of feature ID column (default:
 #'     "feature_id")
 #'
 #' @return Invisible TRUE if all validations pass, stops with error otherwise

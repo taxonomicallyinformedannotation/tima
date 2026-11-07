@@ -9,7 +9,7 @@ validate_all_single_strings(x_list, error_prefix = "Parameter(s)")
 \arguments{
 \item{x_list}{\link{list} Named list of values to validate}
 
-\item{error_prefix}{\link{character} Character string to prefix error message}
+\item{error_prefix}{\link{character} String to prefix error message}
 }
 \value{
 NULL (invisible) if validation passes, stops with error otherwise

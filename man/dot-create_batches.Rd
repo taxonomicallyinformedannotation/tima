@@ -7,9 +7,9 @@
 .create_batches(items, batch_size)
 }
 \arguments{
-\item{items}{\link{character} Character vector to batch}
+\item{items}{\link{character} Vector to batch}
 
-\item{batch_size}{\link{integer} Integer size of each batch}
+\item{batch_size}{\link{integer} Size of each batch}
 }
 \value{
 List of character vectors (batches)

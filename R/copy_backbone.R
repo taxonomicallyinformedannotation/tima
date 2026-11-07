@@ -77,7 +77,6 @@ copy_backbone <- function(
     )
   }
 
-  # Get package installation path
   pkg_path <- system.file(package = package)
 
   if (nchar(pkg_path) == 0L) {
@@ -93,7 +92,6 @@ copy_backbone <- function(
 
   log_info("Setting up TIMA cache directory at: %s", cache_dir)
 
-  # Create cache directory
   tryCatch(
     {
       .copy_backbone_dir_create(path = cache_dir)

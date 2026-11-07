@@ -10,7 +10,6 @@ Averick
 BMDB
 Backoff
 Barret
-Behaviour
 Benchmarking
 Bengtsson
 Benjamini
@@ -24,7 +23,6 @@ CFM
 CLI
 CMD
 CODATA
-CPM
 CRC
 CSF
 CSI
@@ -91,7 +89,6 @@ Louvain
 MCC
 MCDB
 MGF
-MGFs
 MSI
 MSP
 MSnLib
@@ -213,13 +210,13 @@ cumsum
 dalton
 daltons
 de
+deduplicating
 deduplication
 denovo
 deprotonated
 deprotonation
 deprotonations
 dest
-deterministically
 df
 dimerize
 dimerizes
@@ -231,8 +228,6 @@ dp
 dr
 elute
 eluting
-equi
-errored
 et
 etabolite
 exposomics
@@ -242,7 +237,6 @@ fastverse
 fbmn
 filesystem
 filesystems
-fluorinated
 fn
 fread
 fs
@@ -253,10 +247,10 @@ gsub
 gui
 gz
 gzip
+hardcoded
 https
 httr
 igraph
-igraph's
 inbo
 inborutils
 inchikey
@@ -284,7 +278,6 @@ memoization
 mer
 metabo
 metabolomics
-metaregistry
 mf
 mgf
 modelled
@@ -311,7 +304,6 @@ nnotation
 oligomer
 onwards
 opti
-optimises
 ott
 overexpansion
 parallelization
@@ -325,7 +317,6 @@ pbmclapply
 pkgload
 pos
 pre
-preallocates
 prefilter
 progenesis
 protonate
@@ -333,13 +324,11 @@ protonated
 rds
 renv
 reranked
-reranking
 reticulate
 rmarkdown
 rmzTabM
 rotl
 sanitization
-scalability
 scalable
 scriptable
 shinyhelper
@@ -367,12 +356,10 @@ th
 tibble
 tidyselect
 tidytable
-tidytable's
 tidyverse
 tl
 trinomial
 tsv
-unanchored
 unmanaged
 unmapped
 unparseable

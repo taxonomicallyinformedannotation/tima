@@ -10,8 +10,8 @@
 #' @include select_sop_columns.R
 #' @include prepare_libraries_sop_hmdb_like.R
 #'
-#' @param input [character] Character string path to HMDB SDF zip file
-#' @param output [character] Character string path for prepared HMDB library
+#' @param input [character] Path to HMDB SDF zip file
+#' @param output [character] Path for prepared HMDB library
 #'     output
 #'
 #' @return Character string path to prepared HMDB structure-organism pairs

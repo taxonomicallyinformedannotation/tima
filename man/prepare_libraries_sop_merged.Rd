@@ -32,21 +32,21 @@ prepare_libraries_sop_merged(
 )
 }
 \arguments{
-\item{files}{\link{character} Character vector or list of paths to prepared
+\item{files}{\link{character} Vector or list of paths to prepared
 library files}
 
-\item{filter}{\link{logical} Logical whether to filter the merged library by
+\item{filter}{\link{logical} Whether to filter the merged library by
 taxonomy}
 
-\item{level}{\link{character} Character string taxonomic rank for filtering
+\item{level}{\link{character} Taxonomic rank for filtering
 (kingdom, phylum,
 family, genus, etc.)}
 
-\item{value}{\link{character} Character string taxon name(s) to keep (can use |
+\item{value}{\link{character} Taxon name(s) to keep (can use |
 for multiple,
 e.g., 'Gentianaceae|Apocynaceae')}
 
-\item{cache}{\link{character} Character string path to cache directory for
+\item{cache}{\link{character} Path to cache directory for
 processed SMILES}
 
 \item{npc_cache}{\link{character} Optional path to an additional NPClassifier
@@ -66,24 +66,24 @@ columns: \code{structure_inchikey}, \code{structure_tax_cla_chemontid},
 names (e.g., \code{inchikey}, \code{chemontid}, \code{kingdom}, \code{superclass}, \code{class},
 \code{directparent}) are also supported.}
 
-\item{output_key}{\link{character} Character string path for output keys file}
+\item{output_key}{\link{character} Path for output keys file}
 
-\item{output_org_tax_ott}{\link{character} Character string path for organisms
+\item{output_org_tax_ott}{\link{character} Path for organisms
 taxonomy (OTT) file}
 
-\item{output_str_can}{\link{character} Character string path for structures
+\item{output_str_can}{\link{character} Path for structures
 canonical SMILES file}
 
-\item{output_str_stereo}{\link{character} Character string path for structures
+\item{output_str_stereo}{\link{character} Path for structures
 stereochemistry file}
 
-\item{output_str_met}{\link{character} Character string path for structures
+\item{output_str_met}{\link{character} Path for structures
 metadata file}
 
-\item{output_str_tax_cla}{\link{character} Character string path for ClassyFire
+\item{output_str_tax_cla}{\link{character} Path for ClassyFire
 taxonomy file}
 
-\item{output_str_tax_npc}{\link{character} Character string path for NPClassifier
+\item{output_str_tax_npc}{\link{character} Path for NPClassifier
 taxonomy file}
 }
 \value{

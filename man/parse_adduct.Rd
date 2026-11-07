@@ -7,11 +7,11 @@
 parse_adduct(adduct_string, regex = ADDUCT_REGEX_PATTERN)
 }
 \arguments{
-\item{adduct_string}{\link{character} Character string representing the adduct in
+\item{adduct_string}{\link{character} The adduct in
 standard
 notation (e.g., "[M+H]+", "[2M+Na]+", "[M-H2O+H]+")}
 
-\item{regex}{\link{character} Character string regular expression pattern for
+\item{regex}{\link{character} Regular expression pattern for
 parsing
 (default: uses ADDUCT_REGEX_PATTERN from constants)}
 }

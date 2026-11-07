@@ -12,8 +12,8 @@
 #' @include logs_utils.R
 #' @include export_output.R
 #'
-#' @param input [character] Character string path to the raw LOTUS data file
-#' @param output [character] Character string path for the prepared output file
+#' @param input [character] Path to the raw LOTUS data file
+#' @param output [character] Path for the prepared output file
 #'
 #' @return Character string path to the prepared structure-organism pairs
 #'     library file
@@ -39,7 +39,6 @@ prepare_libraries_sop_lotus <- function(
 ) {
   ctx <- log_operation("prepare_libraries_sop_lotus", input = input)
 
-  # Process LOTUS data if available
   if (file.exists(input)) {
     file_size <- file.info(input)$size
     log_debug(
