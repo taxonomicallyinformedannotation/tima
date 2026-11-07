@@ -266,6 +266,9 @@ clean_chemo <- function(
     df_filtered = df_filtered,
     annotation_notes_lookup = annotation_notes_lookup
   )
+  if (enforce_cluster_consensus) {
+    df_filtered <- drop_cross_rt_duplicate_final_candidates(df_filtered)
+  }
 
   if (!is.null(xrefs_table) && nrow(xrefs_table) > 0L) {
     df_filtered <- .add_xrefs_to_df(df_filtered, xrefs_table)

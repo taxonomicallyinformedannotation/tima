@@ -480,24 +480,45 @@ sample_candidates_per_group <- function(
   } else {
     rep.int(NA_character_, n_uk)
   }
+  merge_existing_note <- function(idx_vec, new_notes) {
+    if (!"annotation_note" %in% names(df) || length(idx_vec) == 0L) {
+      return(new_notes)
+    }
+    prev <- as.character(df$annotation_note[idx_vec])
+    has_prev <- !is.na(prev) & nzchar(trimws(prev))
+    if (any(has_prev)) {
+      new_notes[has_prev] <- paste(
+        prev[has_prev],
+        new_notes[has_prev],
+        sep = " | "
+      )
+    }
+    new_notes
+  }
   notes_ak <- if (n_ak > 0L) {
-    rep.int(
-      paste0(
-        "Kept candidate matching best-supported InChIKey from sibling ",
-        "feature with same neutral mass (different adduct)"
-      ),
-      n_ak
+    merge_existing_note(
+      idx_anchor_kept,
+      rep.int(
+        paste0(
+          "Kept candidate matching best-supported InChIKey from sibling ",
+          "feature with same neutral mass (different adduct)"
+        ),
+        n_ak
+      )
     )
   } else {
     character(0L)
   }
   notes_sm <- if (n_sm > 0L) {
-    paste0(
-      "Sampled ",
-      max_per_score,
-      " of ",
-      n_per_score[idx_sampled],
-      " tied candidates"
+    merge_existing_note(
+      idx_sampled,
+      paste0(
+        "Sampled ",
+        max_per_score,
+        " of ",
+        n_per_score[idx_sampled],
+        " tied candidates"
+      )
     )
   } else {
     character(0L)
@@ -816,6 +837,10 @@ prepare_ranked_candidates <- function(
       components_table
     )
     log_debug("Applied cluster-level entity consensus filtering")
+  }
+
+  if (enforce_cluster_consensus) {
+    df_ranked <- resolve_cross_rt_duplicate_candidates(df_ranked)
   }
 
   # Cross-feature M-anchor collapsing can work independently of cluster consensus.
@@ -1507,7 +1532,39 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
   c_id <- fastmatch::fmatch(row_comp, u_comp)
   m_id <- fastmatch::fmatch(cand_m_key, u_mkey)
   n_m <- length(u_mkey)
-  cm_key <- (c_id - 1L) * n_m + m_id
+  base_cm_key <- (c_id - 1L) * n_m + m_id
+
+  row_rt <- if ("rt" %in% names(df_out)) {
+    suppressWarnings(.as_numeric_dedup(df_out$rt))
+  } else if ("feature_rt" %in% names(df_out)) {
+    suppressWarnings(.as_numeric_dedup(df_out$feature_rt))
+  } else {
+    rep.int(NA_real_, n)
+  }
+  rt_sub_id <- integer(n)
+  fin_rt_idx <- which(!is.na(base_cm_key) & is.finite(row_rt))
+  if (length(fin_rt_idx) > 0L) {
+    ord_rt <- fin_rt_idx[order(
+      base_cm_key[fin_rt_idx],
+      row_rt[fin_rt_idx],
+      method = "radix"
+    )]
+    bcm_s <- base_cm_key[ord_rt]
+    rt_s <- row_rt[ord_rt]
+    n_s <- length(ord_rt)
+    new_rt_sub <- if (n_s > 1L) {
+      c(
+        TRUE,
+        bcm_s[-1L] != bcm_s[-n_s] |
+          (rt_s[-1L] - rt_s[-n_s]) > DEFAULT_HE_MAX_RT_ERROR_MIN
+      )
+    } else {
+      TRUE
+    }
+    rt_sub_id[ord_rt] <- cumsum(new_rt_sub)
+  }
+  n_rt_sub <- max(1L, max(rt_sub_id, na.rm = TRUE) + 1L)
+  cm_key <- as.double(base_cm_key - 1L) * n_rt_sub + (rt_sub_id + 1L)
 
   cm_r1 <- cm_key[ord_r1]
   anchor_rows <- ord_r1[!duplicated(cm_r1)]
@@ -1672,4 +1729,921 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
   } else {
     df_out
   }
+}
+
+#' Compute single-linkage RT cluster IDs per feature
+#' @keywords internal
+.compute_feature_rt_clusters <- function(
+  fids,
+  row_rt,
+  rt_tolerance = DEFAULT_HE_MAX_RT_ERROR_MIN
+) {
+  n <- length(fids)
+  if (n == 0L || !any(is.finite(row_rt))) {
+    return(rep.int(NA_integer_, n))
+  }
+  fin <- which(!is.na(fids) & is.finite(row_rt))
+  if (length(fin) == 0L) {
+    return(rep.int(NA_integer_, n))
+  }
+  first_f <- fin[!duplicated(fids[fin])]
+  if (length(first_f) < 2L) {
+    return(rep.int(NA_integer_, n))
+  }
+  u_fids <- fids[first_f]
+  u_rt <- row_rt[first_f]
+  ord <- order(u_rt, u_fids, method = "radix")
+  u_fids_s <- u_fids[ord]
+  u_rt_s <- u_rt[ord]
+  n_u <- length(u_rt_s)
+  new_c <- c(TRUE, (u_rt_s[-1L] - u_rt_s[-n_u]) > rt_tolerance)
+  u_cid <- cumsum(new_c)
+  if (u_cid[[n_u]] < 2L) {
+    return(rep.int(NA_integer_, n))
+  }
+  u_cid[fastmatch::fmatch(fids, u_fids_s)]
+}
+
+#' Compute per-row evidence priority and weight vectors for cross-RT disambiguation
+#' @keywords internal
+.cross_rt_row_priority_and_weights <- function(df) {
+  n <- nrow(df)
+  sim <- if ("candidate_score_similarity" %in% names(df)) {
+    suppressWarnings(.as_numeric_dedup(df$candidate_score_similarity))
+  } else {
+    rep.int(NA_real_, n)
+  }
+  sim_w <- sim
+  sim_w[!is.finite(sim_w) | sim_w < 0] <- 0
+
+  has_ms2 <- !is.na(sim) & sim > 0
+  if ("candidate_score_sirius_csi" %in% names(df)) {
+    has_ms2 <- has_ms2 | !is.na(df$candidate_score_sirius_csi)
+  }
+  if ("candidate_score_sirius_confidence" %in% names(df)) {
+    conf <- suppressWarnings(
+      .as_numeric_dedup(df$candidate_score_sirius_confidence)
+    )
+    has_ms2 <- has_ms2 | (!is.na(conf) & conf > 0)
+  }
+  swc <- if ("score_weighted_chemo" %in% names(df)) {
+    suppressWarnings(.as_numeric_dedup(df$score_weighted_chemo))
+  } else {
+    rep.int(0, n)
+  }
+  swc_sort <- swc
+  swc_sort[!is.finite(swc_sort)] <- -Inf
+  swc_w <- swc
+  swc_w[!is.finite(swc_w)] <- 0
+
+  spi <- if ("candidate_score_pseudo_initial" %in% names(df)) {
+    suppressWarnings(.as_numeric_dedup(df$candidate_score_pseudo_initial))
+  } else {
+    rep.int(0, n)
+  }
+  spi_sort <- spi
+  spi_sort[!is.finite(spi_sort)] <- -Inf
+  spi_w <- spi
+  spi_w[!is.finite(spi_w)] <- 0
+
+  err_rt <- if ("candidate_structure_error_rt" %in% names(df)) {
+    abs(suppressWarnings(.as_numeric_dedup(df$candidate_structure_error_rt)))
+  } else {
+    rep.int(Inf, n)
+  }
+  err_rt[!is.finite(err_rt)] <- Inf
+  q_rt <- ifelse(is.finite(err_rt), 1 / (1 + err_rt), 0)
+
+  err_mz <- if ("candidate_structure_error_mz" %in% names(df)) {
+    abs(suppressWarnings(.as_numeric_dedup(df$candidate_structure_error_mz)))
+  } else {
+    rep.int(Inf, n)
+  }
+  err_mz[!is.finite(err_mz)] <- Inf
+  q_mz <- ifelse(is.finite(err_mz), 1 / (1 + err_mz), 0)
+
+  fids <- as.character(df$feature_id)
+  iks <- if ("candidate_structure_inchikey_connectivity_layer" %in% names(df)) {
+    as.character(df$candidate_structure_inchikey_connectivity_layer)
+  } else {
+    rep.int("", n)
+  }
+  adds <- if ("candidate_adduct" %in% names(df)) {
+    as.character(df$candidate_adduct)
+  } else {
+    rep.int("", n)
+  }
+
+  ord <- order(
+    -as.integer(has_ms2),
+    -swc_sort,
+    -sim_w,
+    -spi_sort,
+    err_rt,
+    err_mz,
+    fids,
+    iks,
+    adds,
+    na.last = TRUE,
+    method = "radix"
+  )
+  prio_rank <- integer(n)
+  prio_rank[ord] <- seq_len(n)
+
+  # Pure, order-independent hierarchical composite weight:
+  # 1. Assigned candidate cardinality (100)
+  # 2. MS2-supported assignments (10)
+  # 3. Sum of score_weighted_chemo (1.0), similarity (1e-2), pseudo_initial (1e-4)
+  # 4. RT and m/z accuracy coupled supermodularly with (1 + s_eff) so that when
+  #    two features share isomer candidates with s_A > s_B, the feature with
+  #    smaller |error_rt| or |error_mz| strictly wins the higher-scoring isomer,
+  #    while truly identical evidence produces an exact tie (zero row-order bias).
+  s_eff <- swc_w + 1e-2 * sim_w + 1e-4 * spi_w
+  weights <- 100 +
+    10 * as.double(has_ms2) +
+    s_eff +
+    (1 + s_eff) * (1e-5 * q_rt + 1e-6 * q_mz)
+
+  list(prio_rank = prio_rank, weights = weights)
+}
+
+#' Solve exact maximum-weight bipartite assignment via Hungarian shortest augmenting paths
+#'
+#' @param weight_mat Numeric matrix (`K x M`) with `-Inf` for absent edges and
+#'   positive weights for valid `(RT_cluster, InChIKey)` edges.
+#' @return Integer vector of length `K` with matched column index in `1..M`, or
+#'   `NA_integer_` when a row is best left unmatched.
+#' @keywords internal
+.solve_bipartite_max_weight <- function(weight_mat) {
+  k <- nrow(weight_mat)
+  m <- ncol(weight_mat)
+  if (k == 0L || m == 0L) {
+    return(rep.int(NA_integer_, k))
+  }
+  n_cols <- m + k
+  big_cost <- 1e15
+  cost <- matrix(big_cost, nrow = k, ncol = n_cols)
+  fin <- is.finite(weight_mat)
+  cost[, seq_len(m)][fin] <- -weight_mat[fin]
+  for (i in seq_len(k)) {
+    cost[i, m + i] <- 0
+  }
+
+  u <- numeric(k + 1L)
+  v <- numeric(n_cols + 1L)
+  p <- integer(n_cols + 1L)
+  way <- integer(n_cols + 1L)
+
+  for (i in seq_len(k)) {
+    p[1L] <- i
+    j0 <- 1L
+    minv <- rep.int(Inf, n_cols + 1L)
+    used <- logical(n_cols + 1L)
+    repeat {
+      used[j0] <- TRUE
+      i0 <- p[j0]
+      delta <- Inf
+      j1 <- 1L
+      for (j in 2L:(n_cols + 1L)) {
+        if (!used[j]) {
+          cur <- cost[i0, j - 1L] - u[i0 + 1L] - v[j]
+          if (cur < minv[j]) {
+            minv[j] <- cur
+            way[j] <- j0
+          }
+          if (minv[j] < delta) {
+            delta <- minv[j]
+            j1 <- j
+          }
+        }
+      }
+      for (j in seq_len(n_cols + 1L)) {
+        if (used[j]) {
+          u[p[j] + 1L] <- u[p[j] + 1L] + delta
+          v[j] <- v[j] - delta
+        } else {
+          minv[j] <- minv[j] - delta
+        }
+      }
+      j0 <- j1
+      if (p[j0] == 0L) {
+        break
+      }
+    }
+    repeat {
+      j1 <- way[j0]
+      p[j0] <- p[j1]
+      j0 <- j1
+      if (j0 == 1L) {
+        break
+      }
+    }
+  }
+
+  match_col <- rep.int(NA_integer_, k)
+  for (j in 2L:(m + 1L)) {
+    r_idx <- p[j]
+    if (r_idx > 0L && is.finite(weight_mat[r_idx, j - 1L])) {
+      match_col[r_idx] <- j - 1L
+    }
+  }
+  match_col
+}
+
+#' Compute total weight of a bipartite matching vector
+#' @keywords internal
+.bipartite_matching_weight <- function(w_mat, match_vec) {
+  total <- 0
+  for (ii in seq_along(match_vec)) {
+    mj <- match_vec[[ii]]
+    if (!is.na(mj)) {
+      total <- total + w_mat[ii, mj]
+    }
+  }
+  total
+}
+
+#' Compute globally optimal RT-cluster to InChIKey assignment for conflicting clusters
+#' @keywords internal
+.solve_optimal_rt_cluster_assignment <- function(
+  fids,
+  rt_cid,
+  iks,
+  valid_ik,
+  col_rk,
+  row_prio_rank,
+  row_weights
+) {
+  r1_rows <- which(col_rk == 1L & valid_ik & !is.na(rt_cid))
+  if (length(r1_rows) < 2L) {
+    return(NULL)
+  }
+  r1_iks <- iks[r1_rows]
+  if (anyDuplicated(r1_iks) == 0L) {
+    return(NULL)
+  }
+
+  # Identify InChIKeys that appear at rank 1 in >= 2 distinct RT clusters
+  dup_iks_cand <- sort(unique(r1_iks[duplicated(r1_iks)]))
+  conflict_iks <- character(0L)
+  for (ik in dup_iks_cand) {
+    cids_ik <- unique(rt_cid[r1_rows[r1_iks == ik]])
+    if (length(cids_ik) >= 2L) {
+      conflict_iks <- c(conflict_iks, ik)
+    }
+  }
+  if (length(conflict_iks) == 0L) {
+    return(NULL)
+  }
+
+  # Expand conflict closure so promoting an alternative candidate that is rank 1
+  # in another RT cluster jointly optimizes all coupled RT clusters together.
+  active_cids <- sort(unique(rt_cid[r1_rows[r1_iks %in% conflict_iks]]))
+  valid_rows <- which(valid_ik & !is.na(rt_cid))
+  repeat {
+    in_act <- valid_rows[rt_cid[valid_rows] %in% active_cids]
+    pool_iks <- unique(iks[in_act])
+    new_cids <- unique(rt_cid[r1_rows[r1_iks %in% pool_iks]])
+    merged_cids <- sort(unique(c(active_cids, new_cids)))
+    if (length(merged_cids) == length(active_cids)) {
+      break
+    }
+    active_cids <- merged_cids
+  }
+
+  act_rows <- valid_rows[rt_cid[valid_rows] %in% active_cids]
+  act_iks <- sort(unique(iks[act_rows]))
+  k_all <- length(active_cids)
+  m_all <- length(act_iks)
+
+  cid_pos <- fastmatch::fmatch(rt_cid[act_rows], active_cids)
+  ik_pos <- fastmatch::fmatch(iks[act_rows], act_iks)
+
+  weight_mat <- matrix(-Inf, nrow = k_all, ncol = m_all)
+  best_row_mat <- matrix(NA_integer_, nrow = k_all, ncol = m_all)
+  for (idx in seq_along(act_rows)) {
+    r <- act_rows[[idx]]
+    ci <- cid_pos[[idx]]
+    ij <- ik_pos[[idx]]
+    w <- row_weights[[r]]
+    prev_r <- best_row_mat[ci, ij]
+    if (
+      w > weight_mat[ci, ij] ||
+        (w == weight_mat[ci, ij] &&
+          !is.na(prev_r) &&
+          row_prio_rank[[r]] < row_prio_rank[[prev_r]])
+    ) {
+      weight_mat[ci, ij] <- w
+      best_row_mat[ci, ij] <- r
+    }
+  }
+
+  # Solve connected components of the bipartite conflict graph independently
+  comp_of_cid <- integer(k_all)
+  comp_id <- 0L
+  for (start_ci in seq_len(k_all)) {
+    if (comp_of_cid[[start_ci]] != 0L) {
+      next
+    }
+    comp_id <- comp_id + 1L
+    queue <- start_ci
+    comp_of_cid[[start_ci]] <- comp_id
+    head_idx <- 1L
+    while (head_idx <= length(queue)) {
+      cur_ci <- queue[[head_idx]]
+      head_idx <- head_idx + 1L
+      js <- which(is.finite(weight_mat[cur_ci, ]))
+      if (length(js) > 0L) {
+        nbr_cis <- which(
+          rowSums(is.finite(weight_mat[, js, drop = FALSE])) > 0L
+        )
+        new_nbrs <- nbr_cis[comp_of_cid[nbr_cis] == 0L]
+        if (length(new_nbrs) > 0L) {
+          comp_of_cid[new_nbrs] <- comp_id
+          queue <- c(queue, new_nbrs)
+        }
+      }
+    }
+  }
+
+  target_iks_by_cid <- stats::setNames(
+    vector("list", k_all),
+    as.character(active_cids)
+  )
+  optimal_cids_by_ik <- stats::setNames(vector("list", m_all), act_iks)
+  holder_fids_by_ik <- stats::setNames(vector("list", m_all), act_iks)
+
+  for (cc in seq_len(comp_id)) {
+    sub_cis <- which(comp_of_cid == cc)
+    sub_js <- which(
+      colSums(is.finite(weight_mat[sub_cis, , drop = FALSE])) > 0L
+    )
+    k_sub <- length(sub_cis)
+    m_sub <- length(sub_js)
+    if (k_sub == 0L || m_sub == 0L) {
+      next
+    }
+    sub_w <- weight_mat[sub_cis, sub_js, drop = FALSE]
+    sub_match <- .solve_bipartite_max_weight(sub_w)
+    w_star <- .bipartite_matching_weight(sub_w, sub_match)
+    tol <- 1e-13 * max(1, abs(w_star))
+
+    opt_edge <- matrix(FALSE, nrow = k_sub, ncol = m_sub)
+    for (ii in seq_len(k_sub)) {
+      mj <- sub_match[[ii]]
+      if (!is.na(mj)) {
+        opt_edge[ii, mj] <- TRUE
+      }
+    }
+    for (ii in seq_len(k_sub)) {
+      for (jj in seq_len(m_sub)) {
+        if (!opt_edge[ii, jj] && is.finite(sub_w[ii, jj])) {
+          w_rem <- if (k_sub == 1L || m_sub == 1L) {
+            0
+          } else {
+            sub_w_rem <- sub_w[-ii, -jj, drop = FALSE]
+            rem_match <- .solve_bipartite_max_weight(sub_w_rem)
+            .bipartite_matching_weight(sub_w_rem, rem_match)
+          }
+          if ((w_star - (sub_w[ii, jj] + w_rem)) <= tol) {
+            opt_edge[ii, jj] <- TRUE
+          }
+        }
+      }
+    }
+
+    for (ii in seq_len(k_sub)) {
+      ci <- sub_cis[[ii]]
+      cid_chr <- as.character(active_cids[[ci]])
+      opt_jj <- which(opt_edge[ii, ])
+      target_iks_by_cid[[cid_chr]] <- act_iks[sub_js[opt_jj]]
+    }
+    for (jj in seq_len(m_sub)) {
+      ij <- sub_js[[jj]]
+      ik_val <- act_iks[[ij]]
+      opt_ii <- which(opt_edge[, jj])
+      if (length(opt_ii) > 0L) {
+        cids_opt <- active_cids[sub_cis[opt_ii]]
+        optimal_cids_by_ik[[ik_val]] <- cids_opt
+        holders <- vapply(
+          opt_ii,
+          function(ii_idx) {
+            ci <- sub_cis[[ii_idx]]
+            fids[[best_row_mat[ci, ij]]]
+          },
+          character(1L)
+        )
+        names(holders) <- as.character(cids_opt)
+        holder_fids_by_ik[[ik_val]] <- holders
+      } else {
+        optimal_cids_by_ik[[ik_val]] <- integer(0L)
+        holder_fids_by_ik[[ik_val]] <- character(0L)
+      }
+    }
+  }
+
+  list(
+    active_cids = active_cids,
+    target_iks_by_cid = target_iks_by_cid,
+    optimal_cids_by_ik = optimal_cids_by_ik,
+    holder_fids_by_ik = holder_fids_by_ik
+  )
+}
+
+#' Resolve duplicate rank-1 InChIKeys across distinct retention-time clusters
+#'
+#' @description Disambiguates cross-RT duplicate final candidates using globally
+#'   optimal maximum-weight bipartite matching (Hungarian / Kuhn-Munkres
+#'   algorithm) between retention-time clusters and candidate structures
+#'   (`candidate_structure_inchikey_connectivity_layer`), with exact-tie
+#'   preservation so no arbitrary or random choices are ever made.
+#'
+#'   Features eluting within `rt_tolerance` (default `0.05` min) belong to the
+#'   same chromatographic peak (e.g. co-eluting `[M+H]+`, `[M+Na]+`, or in-source
+#'   fragments) and may legitimately share the same final candidate. Features in
+#'   different RT clusters cannot represent the same compound; when they share a
+#'   rank-1 `InChIKey`, the bipartite solver computes the exact set of edges
+#'   participating in any globally optimal assignment that maximizes:
+#'   1. Total number of RT clusters assigned a distinct candidate,
+#'   2. Number of RT clusters assigned an MS2-supported candidate,
+#'   3. Total `score_weighted_chemo`, spectral similarity, and
+#'      `candidate_score_pseudo_initial`,
+#'   4. Supermodularly coupled RT and $m/z$ accuracy (so higher-scoring isomers
+#'      are strictly assigned to the feature with smaller $|\Delta\text{RT}|$ or
+#'      $|\Delta m/z|$).
+#'
+#'   Exact ties are preserved without randomness or row-order dependence:
+#'   - If a feature's rank-1 candidate is assigned to a stronger RT cluster and
+#'     multiple alternative candidates on the losing feature are tied, **all**
+#'     tied top alternatives are promoted together to `rank_final = 1`.
+#'   - If two RT clusters have 100% identical evidence across all scores and
+#'     errors, all candidates participating in any tied global optimum are placed
+#'     at `rank_final = 1` rather than picking one arbitrarily.
+#'
+#'   Whenever a feature promotes an alternative candidate to rank 1, its
+#'   `annotation_note` (and `note` in `mini`) records:
+#'   `"Promoted to rank 1: cross-RT duplicate InChIKey <IK> assigned to feature <id>"`
+#'   (or `"tied with feature <id>"` on an exact cross-RT tie).
+#'
+#' @param df_ranked Ranked candidate table.
+#' @param rt_tolerance Maximum RT difference (minutes) for co-eluting features.
+#' @return Updated `df_ranked` with cross-RT rank-1 duplicates disambiguated.
+#' @keywords internal
+#'
+#' @examples
+#' \dontrun{
+#' # Example 1: Asymmetric isomer scores across two retention times
+#' # Feature 1 (RT = 2.0 min) has IK_A (0.90) and IK_B (0.89).
+#' # Feature 2 (RT = 8.0 min) has IK_A (0.88) and IK_B (0.20).
+#' # Greedy selection would give IK_A to Feature 1 and force Feature 2 onto IK_B
+#' # (total score = 1.10). Optimal bipartite matching assigns IK_B (0.89) to
+#' # Feature 1 and IK_A (0.88) to Feature 2 (total score = 1.77), and records a
+#' # promotion note on Feature 1.
+#' df <- tidytable::tidytable(
+#'   feature_id = c("1", "1", "2", "2"),
+#'   rt = c(2.0, 2.0, 8.0, 8.0),
+#'   rank_final = c(1L, 2L, 1L, 2L),
+#'   candidate_structure_inchikey_connectivity_layer = c(
+#'     "IK_A", "IK_B", "IK_A", "IK_B"
+#'   ),
+#'   score_weighted_chemo = c(0.90, 0.89, 0.88, 0.20)
+#' )
+#' resolve_cross_rt_duplicate_candidates(df)
+#' }
+resolve_cross_rt_duplicate_candidates <- function(
+  df_ranked,
+  rt_tolerance = DEFAULT_HE_MAX_RT_ERROR_MIN
+) {
+  n <- nrow(df_ranked)
+  if (n == 0L) {
+    return(df_ranked)
+  }
+  req_cols <- c(
+    "feature_id",
+    "rank_final",
+    "candidate_structure_inchikey_connectivity_layer"
+  )
+  if (!all(req_cols %in% names(df_ranked))) {
+    return(df_ranked)
+  }
+  row_rt <- if ("rt" %in% names(df_ranked)) {
+    suppressWarnings(.as_numeric_dedup(df_ranked$rt))
+  } else if ("feature_rt" %in% names(df_ranked)) {
+    suppressWarnings(.as_numeric_dedup(df_ranked$feature_rt))
+  } else {
+    return(df_ranked)
+  }
+
+  fids <- as.character(df_ranked$feature_id)
+  rt_cid <- .compute_feature_rt_clusters(
+    fids = fids,
+    row_rt = row_rt,
+    rt_tolerance = rt_tolerance
+  )
+  if (all(is.na(rt_cid))) {
+    return(df_ranked)
+  }
+
+  iks <- as.character(
+    df_ranked$candidate_structure_inchikey_connectivity_layer
+  )
+  valid_ik <- !is.na(iks) & nzchar(iks)
+  col_rk <- as.integer(df_ranked$rank_final)
+
+  r1_check <- which(col_rk == 1L & valid_ik & !is.na(rt_cid))
+  if (length(r1_check) < 2L || anyDuplicated(iks[r1_check]) == 0L) {
+    return(df_ranked)
+  }
+
+  pw <- .cross_rt_row_priority_and_weights(df_ranked)
+  row_prio_rank <- pw$prio_rank
+  row_weights <- pw$weights
+
+  opt <- .solve_optimal_rt_cluster_assignment(
+    fids = fids,
+    rt_cid = rt_cid,
+    iks = iks,
+    valid_ik = valid_ik,
+    col_rk = col_rk,
+    row_prio_rank = row_prio_rank,
+    row_weights = row_weights
+  )
+  if (is.null(opt)) {
+    return(df_ranked)
+  }
+
+  df_out <- tidytable::as_tidytable(as.list(df_ranked))
+  if (!"cluster_consensus_promoted_from_anchor" %in% names(df_out)) {
+    data.table::set(
+      df_out,
+      j = "cluster_consensus_promoted_from_anchor",
+      value = rep.int(FALSE, n)
+    )
+  }
+  if (!"annotation_note" %in% names(df_out)) {
+    data.table::set(
+      df_out,
+      j = "annotation_note",
+      value = rep.int(NA_character_, n)
+    )
+  }
+
+  col_prom <- as.logical(df_out$cluster_consensus_promoted_from_anchor)
+  col_prom[is.na(col_prom)] <- FALSE
+  col_note <- as.character(df_out$annotation_note)
+
+  rows_by_fid <- split(seq_len(n), fids)
+  reordered_fids <- character(0L)
+
+  target_iks_by_cid <- opt$target_iks_by_cid
+  optimal_cids_by_ik <- opt$optimal_cids_by_ik
+  holder_fids_by_ik <- opt$holder_fids_by_ik
+
+  act_fids <- unique(fids[!is.na(rt_cid) & rt_cid %in% opt$active_cids])
+  for (lfid in act_fids) {
+    f_rows <- rows_by_fid[[lfid]]
+    cid <- rt_cid[f_rows[[1L]]]
+    cid_chr <- as.character(cid)
+    target_iks <- target_iks_by_cid[[cid_chr]]
+
+    r1_f <- f_rows[col_rk[f_rows] == 1L & valid_ik[f_rows]]
+    if (length(r1_f) == 0L) {
+      next
+    }
+    r1_f_ord <- r1_f[order(row_prio_rank[r1_f])]
+    orig_iks <- unique(iks[r1_f_ord])
+
+    # Determine which candidates on this feature belong exclusively to other RT clusters
+    f_iks <- iks[f_rows]
+    taken_by_other <- vapply(
+      seq_along(f_rows),
+      function(idx) {
+        if (!valid_ik[f_rows[[idx]]]) {
+          return(FALSE)
+        }
+        cids_opt <- optimal_cids_by_ik[[f_iks[[idx]]]]
+        length(cids_opt) > 0L && !(cid %in% cids_opt)
+      },
+      logical(1L)
+    )
+
+    is_target_row <- valid_ik[f_rows] &
+      (f_iks %in% target_iks) &
+      !taken_by_other
+    if (!any(is_target_row) && any(valid_ik[f_rows] & !taken_by_other)) {
+      avail_mask <- valid_ik[f_rows] & !taken_by_other
+      min_avail_rk <- min(col_rk[f_rows[avail_mask]], na.rm = TRUE)
+      is_target_row <- avail_mask & (col_rk[f_rows] == min_avail_rk)
+    }
+
+    if (!any(is_target_row)) {
+      next
+    }
+
+    f_target_iks <- unique(f_iks[is_target_row])
+    if (
+      length(orig_iks) == length(f_target_iks) &&
+        all(orig_iks %in% f_target_iks) &&
+        !any(taken_by_other)
+    ) {
+      next
+    }
+
+    tier <- ifelse(is_target_row, 0L, ifelse(taken_by_other, 2L, 1L))
+    ord_f <- order(
+      tier,
+      col_rk[f_rows],
+      row_prio_rank[f_rows],
+      method = "radix"
+    )
+    f_rows_s <- f_rows[ord_f]
+    tier_s <- tier[ord_f]
+    rk_key_part <- ifelse(tier_s == 0L, 1L, col_rk[f_rows_s])
+    old_key <- paste(tier_s, rk_key_part, sep = ":")
+    new_rk_f <- match(old_key, unique(old_key))
+    col_rk[f_rows_s] <- new_rk_f
+
+    r1_new <- f_rows_s[new_rk_f == 1L]
+    new_top_iks <- unique(iks[r1_new])
+    if (
+      length(orig_iks) == length(new_top_iks) &&
+        all(orig_iks %in% new_top_iks)
+    ) {
+      next
+    }
+
+    displaced_iks <- orig_iks[!(orig_iks %in% new_top_iks)]
+    if (length(displaced_iks) > 0L) {
+      displaced_ik <- displaced_iks[[1L]]
+      holders <- holder_fids_by_ik[[displaced_ik]]
+      other_holders <- holders[names(holders) != cid_chr]
+      holder_fid <- if (length(other_holders) > 0L) {
+        unname(other_holders[[1L]])
+      } else if (length(holders) > 0L) {
+        unname(holders[[1L]])
+      } else {
+        lfid
+      }
+      col_prom[f_rows] <- FALSE
+      col_prom[r1_new] <- TRUE
+      col_note[r1_new] <- paste0(
+        "Promoted to rank 1: cross-RT duplicate InChIKey ",
+        displaced_ik,
+        " assigned to feature ",
+        holder_fid
+      )
+      reordered_fids <- c(reordered_fids, lfid)
+    } else {
+      tied_ik <- orig_iks[[1L]]
+      holders <- holder_fids_by_ik[[tied_ik]]
+      other_holders <- holders[names(holders) != cid_chr]
+      tied_fid <- if (length(other_holders) > 0L) {
+        unname(other_holders[[1L]])
+      } else {
+        lfid
+      }
+      r1_promoted <- r1_new[!(iks[r1_new] %in% orig_iks)]
+      if (length(r1_promoted) > 0L) {
+        col_prom[f_rows] <- FALSE
+        col_prom[r1_promoted] <- TRUE
+        col_note[r1_promoted] <- paste0(
+          "Promoted to rank 1: cross-RT duplicate InChIKey ",
+          tied_ik,
+          " tied with feature ",
+          tied_fid
+        )
+        reordered_fids <- c(reordered_fids, lfid)
+      }
+    }
+  }
+
+  if (length(reordered_fids) == 0L) {
+    return(df_ranked)
+  }
+
+  u_fids <- unique(fids)
+  fid_id <- fastmatch::fmatch(fids, u_fids)
+  final_ord <- order(fid_id, col_rk, row_prio_rank, method = "radix")
+
+  data.table::set(df_out, j = "rank_final", value = col_rk)
+  data.table::set(
+    df_out,
+    j = "cluster_consensus_promoted_from_anchor",
+    value = col_prom
+  )
+  data.table::set(df_out, j = "annotation_note", value = col_note)
+
+  log_info(
+    "Disambiguated cross-RT duplicate rank-1 candidates across %d feature(s)",
+    length(unique(reordered_fids))
+  )
+
+  if (is.unsorted(final_ord)) {
+    tidytable::as_tidytable(lapply(as.list(df_out), `[`, final_ord))
+  } else {
+    df_out
+  }
+}
+
+#' Drop cross-RT duplicate rank-1 candidates from filtered-tier results
+#'
+#' @description Applies globally optimal RT-cluster assignment on `df_filtered`
+#'   so that when a losing feature at a different retention time had no
+#'   alternative candidate in `resolve_cross_rt_duplicate_candidates` (or when
+#'   `filter_high_evidence_only` removed its promoted alternative), any
+#'   candidate assigned exclusively to another RT cluster is removed from the
+#'   losing RT cluster in `df_filtered`. Exact ties are preserved without
+#'   randomness. If a remaining candidate in `df_filtered` is promoted to rank 1
+#'   as a result, its promotion comment is recorded on `annotation_note`.
+#'
+#' @param df_filtered Filtered-tier candidate table.
+#' @param rt_tolerance Maximum RT difference (minutes) for co-eluting features.
+#' @return `df_filtered` with cross-RT duplicate rank-1 candidates removed and
+#'   any resulting rank-1 promotions annotated in `annotation_note`.
+#' @keywords internal
+drop_cross_rt_duplicate_final_candidates <- function(
+  df_filtered,
+  rt_tolerance = DEFAULT_HE_MAX_RT_ERROR_MIN
+) {
+  n <- nrow(df_filtered)
+  if (n < 2L) {
+    return(df_filtered)
+  }
+  req_cols <- c(
+    "feature_id",
+    "rank_final",
+    "candidate_structure_inchikey_connectivity_layer"
+  )
+  if (!all(req_cols %in% names(df_filtered))) {
+    return(df_filtered)
+  }
+  row_rt <- if ("rt" %in% names(df_filtered)) {
+    suppressWarnings(.as_numeric_dedup(df_filtered$rt))
+  } else if ("feature_rt" %in% names(df_filtered)) {
+    suppressWarnings(.as_numeric_dedup(df_filtered$feature_rt))
+  } else {
+    return(df_filtered)
+  }
+
+  fids <- as.character(df_filtered$feature_id)
+  rt_cid <- .compute_feature_rt_clusters(
+    fids = fids,
+    row_rt = row_rt,
+    rt_tolerance = rt_tolerance
+  )
+  if (all(is.na(rt_cid))) {
+    return(df_filtered)
+  }
+
+  iks <- as.character(
+    df_filtered$candidate_structure_inchikey_connectivity_layer
+  )
+  valid_ik <- !is.na(iks) & nzchar(iks)
+  col_rk <- as.integer(df_filtered$rank_final)
+
+  pw <- .cross_rt_row_priority_and_weights(df_filtered)
+  row_prio_rank <- pw$prio_rank
+  row_weights <- pw$weights
+
+  opt <- .solve_optimal_rt_cluster_assignment(
+    fids = fids,
+    rt_cid = rt_cid,
+    iks = iks,
+    valid_ik = valid_ik,
+    col_rk = col_rk,
+    row_prio_rank = row_prio_rank,
+    row_weights = row_weights
+  )
+  if (is.null(opt)) {
+    return(df_filtered)
+  }
+
+  target_iks_by_cid <- opt$target_iks_by_cid
+  optimal_cids_by_ik <- opt$optimal_cids_by_ik
+  holder_fids_by_ik <- opt$holder_fids_by_ik
+
+  col_note <- if ("annotation_note" %in% names(df_filtered)) {
+    as.character(df_filtered$annotation_note)
+  } else {
+    rep.int(NA_character_, n)
+  }
+  added_note <- FALSE
+
+  keep_row <- !vapply(
+    seq_len(n),
+    function(r) {
+      if (!valid_ik[[r]] || is.na(rt_cid[[r]])) {
+        return(FALSE)
+      }
+      cids_opt <- optimal_cids_by_ik[[iks[[r]]]]
+      length(cids_opt) > 0L && !(rt_cid[[r]] %in% cids_opt)
+    },
+    logical(1L)
+  )
+
+  act_fids <- unique(fids[!is.na(rt_cid) & rt_cid %in% opt$active_cids])
+  for (lfid in act_fids) {
+    f_all <- which(fids == lfid)
+    r1_orig <- f_all[col_rk[f_all] == 1L & valid_ik[f_all]]
+    orig_iks <- unique(iks[r1_orig])
+    rem_f <- which(keep_row & fids == lfid)
+    if (length(rem_f) == 0L) {
+      next
+    }
+    cid_chr <- as.character(rt_cid[rem_f[[1L]]])
+    target_iks <- target_iks_by_cid[[cid_chr]]
+    is_target_rem <- valid_ik[rem_f] & (iks[rem_f] %in% target_iks)
+    if (!any(is_target_rem) && any(valid_ik[rem_f])) {
+      min_rem_rk <- min(col_rk[rem_f[valid_ik[rem_f]]], na.rm = TRUE)
+      is_target_rem <- valid_ik[rem_f] & (col_rk[rem_f] == min_rem_rk)
+    }
+    tier <- ifelse(is_target_rem, 0L, 1L)
+    ord_idx <- order(
+      tier,
+      col_rk[rem_f],
+      row_prio_rank[rem_f],
+      method = "radix"
+    )
+    ord_rem <- rem_f[ord_idx]
+    tier_s <- tier[ord_idx]
+    rk_key_part <- ifelse(tier_s == 0L, 1L, col_rk[ord_rem])
+    old_key <- paste(tier_s, rk_key_part, sep = ":")
+    new_rk <- match(old_key, unique(old_key))
+    col_rk[ord_rem] <- new_rk
+
+    r1_new <- ord_rem[new_rk == 1L]
+    new_top_iks <- unique(iks[r1_new])
+    if (
+      length(orig_iks) > 0L &&
+        !(length(orig_iks) == length(new_top_iks) &&
+          all(orig_iks %in% new_top_iks))
+    ) {
+      displaced_iks <- orig_iks[!(orig_iks %in% new_top_iks)]
+      if (length(displaced_iks) > 0L) {
+        displaced_ik <- displaced_iks[[1L]]
+        holders <- holder_fids_by_ik[[displaced_ik]]
+        other_holders <- holders[names(holders) != cid_chr]
+        holder_fid <- if (length(other_holders) > 0L) {
+          unname(other_holders[[1L]])
+        } else {
+          NA_character_
+        }
+        if (!is.na(holder_fid) && nzchar(holder_fid)) {
+          note_str <- paste0(
+            "Promoted to rank 1: cross-RT duplicate InChIKey ",
+            displaced_ik,
+            " assigned to feature ",
+            holder_fid
+          )
+          na_note <- is.na(col_note[r1_new]) | !nzchar(trimws(col_note[r1_new]))
+          if (any(na_note)) {
+            col_note[r1_new[na_note]] <- note_str
+            added_note <- TRUE
+          }
+        }
+      } else {
+        tied_ik <- orig_iks[[1L]]
+        holders <- holder_fids_by_ik[[tied_ik]]
+        other_holders <- holders[names(holders) != cid_chr]
+        tied_fid <- if (length(other_holders) > 0L) {
+          unname(other_holders[[1L]])
+        } else {
+          NA_character_
+        }
+        r1_promoted <- r1_new[!(iks[r1_new] %in% orig_iks)]
+        if (length(r1_promoted) > 0L && !is.na(tied_fid) && nzchar(tied_fid)) {
+          note_str <- paste0(
+            "Promoted to rank 1: cross-RT duplicate InChIKey ",
+            tied_ik,
+            " tied with feature ",
+            tied_fid
+          )
+          na_note <- is.na(col_note[r1_promoted]) |
+            !nzchar(trimws(col_note[r1_promoted]))
+          if (any(na_note)) {
+            col_note[r1_promoted[na_note]] <- note_str
+            added_note <- TRUE
+          }
+        }
+      }
+    }
+  }
+
+  if (all(keep_row) && !added_note) {
+    return(df_filtered)
+  }
+
+  keep_idx <- which(keep_row)
+  out <- tidytable::as_tidytable(lapply(as.list(df_filtered), `[`, keep_idx))
+  data.table::set(out, j = "rank_final", value = col_rk[keep_idx])
+  if (added_note || "annotation_note" %in% names(out)) {
+    data.table::set(out, j = "annotation_note", value = col_note[keep_idx])
+  }
+  if (!all(keep_row)) {
+    log_info(
+      "Filtered-tier cross-RT duplicate gate removed %d duplicate rank-1 row(s)",
+      n - length(keep_idx)
+    )
+  }
+  out
 }

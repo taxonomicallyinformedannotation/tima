@@ -116,6 +116,31 @@ Main output fields to inspect:
 - `candidate_annotation_level` (`primary`, `secondary`)
 - `candidate_evidence_tier` (`supported_strong`, `supported_weak`, `baseline`)
 
+#### Canonical adduct harmonization and loss vs. cluster disambiguation
+
+To prevent duplicate or algebraically equivalent ion notations from fragmenting
+the MS^1^ adduct network, `harmonize_adducts()` canonicalizes every adduct
+expression before hypothesis generation and library matching:
+
+- **Algebraic carrier folding:** Neutral ammonia clusters combined with a proton
+  (`[M+NH3+H]+`, `[M+H3N+H]+`, `[nM+H3N+H]+`) are folded into the single
+  canonical ammonium carrier `[M+H4N]+` (or `[nM+H4N]+`). Similarly,
+  multi-proton and multi-carrier expressions are normalized to Hill-ordered
+  formulas (`[M+2H]2+` $\to$ `[M+H2]2+`) and aligned with the user's configured
+  adduct table via `align_carrier_multiplicity_adducts()`.
+- **Directed loss vs. cluster attribution:** Within each retention-time window,
+  pairwise mass differences $\Delta m/z$ are oriented from the higher-$m/z$
+  precursor (`feature_source`) to the lower-$m/z$ product (`feature_target`). An
+  in-source neutral loss (`[M-H2O+H]+`, `[M-H3N+H]+`) is only attributed to the
+  lower-$m/z$ feature when a supported parent ion (`[M+H]+`, `[M+Na]+`,
+  `[M+H4N]+`, etc.) is present at the higher $m/z$, whereas solvent clusters
+  (`[M+H2O+H]+`, `[M+CH4O+H]+`) require explicit cluster-table configuration.
+- **Exact formula containment for neutral losses:** Any candidate structure
+  matched via a neutral-loss adduct (`[M-loss+carrier]`) must contain at least
+  the element counts of `loss` in its molecular formula
+  (`candidate_structure_molecular_formula`); for example, `[M-H3N+H]+` is
+  automatically rejected on nitrogen-free structures.
+
 ### Spectral
 
 ```{r}

@@ -293,10 +293,10 @@ subtract_atomic_formula <- function(formula, sub_formula = "H3N") {
   rebuild_hill_formula(unlist(formula_atoms))
 }
 
-#' Reduce (+H4N, -loss-containing-H3N) pairs to proton-plus-residual-loss form
+#' Reduce (+H3N, +H) -> +H4N and (+H4N, -loss-containing-H3N) pairs
 #' @keywords internal
 reduce_ammonium_loss_pairs <- function(net) {
-  if (!any(net$formula == "H4N" & net$signed_n > 0L)) {
+  if (nrow(net) == 0L) {
     return(net)
   }
 
@@ -315,6 +315,26 @@ reduce_ammonium_loss_pairs <- function(net) {
       df$signed_n[[idx]] <- as.integer(df$signed_n[[idx]] + delta)
     }
     df
+  }
+
+  # Collapse (+H3N, +H) -> +H4N so [M+H3N+H]+ and [M+NH3+H]+ unify with [M+H4N]+
+  h3n_idx <- match("H3N", net$formula)
+  h_idx <- match("H", net$formula)
+  if (
+    !is.na(h3n_idx) &&
+      !is.na(h_idx) &&
+      net$signed_n[[h3n_idx]] > 0L &&
+      net$signed_n[[h_idx]] > 0L
+  ) {
+    k <- min(net$signed_n[[h3n_idx]], net$signed_n[[h_idx]])
+    net$signed_n[[h3n_idx]] <- as.integer(net$signed_n[[h3n_idx]] - k)
+    net$signed_n[[h_idx]] <- as.integer(net$signed_n[[h_idx]] - k)
+    net <- add_or_increment(net, "H4N", k)
+    net <- net[net$signed_n != 0L, , drop = FALSE]
+  }
+
+  if (!any(net$formula == "H4N" & net$signed_n > 0L)) {
+    return(net)
   }
 
   ammonium_idx <- match("H4N", net$formula)
@@ -453,6 +473,26 @@ canonicalize_adduct_notation <- local({
       signed_n = net_n[keep_nz],
       stringsAsFactors = FALSE
     )
+    h_mask <- net$formula %in% c("H", "H2", "H3")
+    if (
+      any(h_mask) &&
+        any(net$signed_n[h_mask] > 0L) &&
+        any(net$signed_n[h_mask] < 0L)
+    ) {
+      h_mult <- c(H = 1L, H2 = 2L, H3 = 3L)[net$formula[h_mask]]
+      total_h <- sum(net$signed_n[h_mask] * h_mult)
+      net <- net[!h_mask, , drop = FALSE]
+      if (total_h != 0L) {
+        net <- rbind(
+          net,
+          data.frame(
+            formula = "H",
+            signed_n = as.integer(total_h),
+            stringsAsFactors = FALSE
+          )
+        )
+      }
+    }
     net <- reduce_ammonium_loss_pairs(net)
 
     rebuild_terms <- character(0L)

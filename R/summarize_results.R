@@ -301,10 +301,7 @@ summarize_results <- function(
       notes_key_df <- as.data.frame(
         as.list(annotation_notes_lookup)[note_join_cols]
       )
-      if (
-        length(note_add_cols) > 0L &&
-          anyDuplicated(notes_key_df) == 0L
-      ) {
+      if (anyDuplicated(notes_key_df) == 0L) {
         m_note <- .fast_match_rows(
           df_joined,
           annotation_notes_lookup,
@@ -317,12 +314,50 @@ summarize_results <- function(
             value = annotation_notes_lookup[[col]][m_note]
           )
         }
+        if (
+          "annotation_note" %in%
+            names(df_joined) &&
+            "annotation_note" %in% names(annotation_notes_lookup) &&
+            !"annotation_note" %in% note_add_cols
+        ) {
+          cur_note <- as.character(df_joined$annotation_note)
+          lkp_note <- as.character(annotation_notes_lookup$annotation_note[
+            m_note
+          ])
+          fill_na <- (is.na(cur_note) | !nzchar(trimws(cur_note))) &
+            !is.na(lkp_note)
+          if (any(fill_na)) {
+            cur_note[fill_na] <- lkp_note[fill_na]
+            data.table::set(df_joined, j = "annotation_note", value = cur_note)
+          }
+        }
       } else {
-        df_joined <- df_joined |>
-          tidytable::left_join(
-            y = annotation_notes_lookup,
-            by = note_join_cols
+        lkp_ren <- annotation_notes_lookup
+        if (
+          "annotation_note" %in%
+            names(df_joined) &&
+            "annotation_note" %in% names(lkp_ren)
+        ) {
+          lkp_ren <- tidytable::rename(
+            lkp_ren,
+            .annotation_note_lkp = annotation_note
           )
+          df_joined <- df_joined |>
+            tidytable::left_join(y = lkp_ren, by = note_join_cols) |>
+            tidytable::mutate(
+              annotation_note = tidytable::coalesce(
+                annotation_note,
+                .annotation_note_lkp
+              )
+            ) |>
+            tidytable::select(-tidyselect::any_of(".annotation_note_lkp"))
+        } else {
+          df_joined <- df_joined |>
+            tidytable::left_join(
+              y = annotation_notes_lookup,
+              by = note_join_cols
+            )
+        }
       }
     }
   }

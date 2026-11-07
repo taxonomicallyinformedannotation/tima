@@ -2162,3 +2162,247 @@ test_that("coerce_score_columns and remove_compound_names preserve tidytable sem
     c("F_POS_LOW_BIO", "F_NA_HIGH_BIO")
   )
 })
+
+test_that("clean_chemo disambiguates cross-RT duplicate final candidates while preserving co-eluting adducts", {
+  annot <- tidytable::tidytable(
+    feature_id = c("F_RT2", "F_RT2_COEL", "F_RT8", "F_RT8", "F_RT12"),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "IK_SHARED",
+      "IK_SHARED",
+      "IK_SHARED",
+      "IK_ALT",
+      "IK_SHARED"
+    ),
+    candidate_structure_name = c(
+      "Shared",
+      "Shared",
+      "Shared",
+      "Alt",
+      "Shared"
+    ),
+    candidate_structure_smiles_no_stereo = c("C1", "C1", "C1", "C2", "C1"),
+    candidate_library = rep("SOP", 5L),
+    score_weighted_chemo = c(0.95, 0.90, 0.85, 0.80, 0.70),
+    score_biological = rep(0.8, 5L),
+    score_chemical = rep(0.8, 5L),
+    candidate_adduct = c("[M+H]+", "[M+Na]+", "[M+H]+", "[M+H]+", "[M+H]+"),
+    candidate_score_pseudo_initial = c(0.95, 0.90, 0.85, 0.80, 0.70),
+    candidate_structure_organism_occurrence_closest = rep("Taxon", 5L),
+    candidate_score_similarity = c(0.92, 0.88, 0.75, 0.72, 0.65),
+    candidate_count_similarity_peaks_matched = c(8L, 7L, 6L, 6L, 5L),
+    candidate_structure_error_mz = rep(0.0005, 5L),
+    candidate_structure_error_rt = rep(0.01, 5L),
+    candidate_score_sirius_csi = rep(NA_real_, 5L),
+    candidate_structure_tax_cla_04dirpar = rep("Par", 5L),
+    candidate_structure_tax_cla_03cla = rep("Cla", 5L),
+    candidate_structure_tax_cla_02sup = rep("Sup", 5L),
+    candidate_structure_tax_cla_01kin = rep("Kin", 5L),
+    candidate_structure_tax_npc_03cla = rep("NCla", 5L),
+    candidate_structure_tax_npc_02sup = rep("NSup", 5L),
+    candidate_structure_tax_npc_01pat = rep("NPat", 5L)
+  )
+  features <- tidytable::tidytable(
+    feature_id = c("F_RT2", "F_RT2_COEL", "F_RT8", "F_RT12"),
+    rt = c(2.00, 2.02, 8.00, 12.00),
+    mz = c(301.1, 323.1, 301.1, 301.1)
+  )
+  components <- tidytable::tidytable(
+    feature_id = c("F_RT2", "F_RT2_COEL", "F_RT8", "F_RT12"),
+    component_id = c(1L, 1L, 1L, 2L)
+  )
+  sop <- tidytable::tidytable(
+    structure_inchikey_connectivity_layer = c("IK_SHARED", "IK_ALT"),
+    reference_doi = c("10.1/a", "10.1/b"),
+    organism_name = c("OrgA", "OrgB"),
+    organism_taxonomy_ottid = c(1L, 2L),
+    organism_taxonomy_01domain = c("Eukaryota", "Eukaryota"),
+    organism_taxonomy_02kingdom = c("Plantae", "Plantae"),
+    organism_taxonomy_03phylum = c("P", "P"),
+    organism_taxonomy_04class = c("C", "C"),
+    organism_taxonomy_05order = c("O", "O"),
+    organism_taxonomy_06family = c("F", "F"),
+    organism_taxonomy_07tribe = c("T", "T"),
+    organism_taxonomy_08genus = c("G", "G"),
+    organism_taxonomy_09species = c("S", "S"),
+    organism_taxonomy_10varietas = c("V", "V")
+  )
+
+  res <- clean_chemo(
+    annot_table_wei_chemo = annot,
+    components_table = components,
+    features_table = features,
+    structure_organism_pairs_table = sop,
+    candidates_final = 1L,
+    best_percentile = 0.8,
+    minimal_ms1_bio = 0.5,
+    minimal_ms1_chemo = 0.5,
+    minimal_ms1_condition = "OR",
+    compounds_names = TRUE,
+    high_evidence = FALSE,
+    remove_ties = TRUE,
+    summarize = FALSE
+  )
+
+  mini <- res$mini
+  expect_identical(
+    mini$inchikey_connectivity_layer[mini$feature_id == "F_RT2"],
+    "IK_SHARED"
+  )
+  # Co-eluting feature within RT tolerance keeps IK_SHARED
+  expect_identical(
+    mini$inchikey_connectivity_layer[mini$feature_id == "F_RT2_COEL"],
+    "IK_SHARED"
+  )
+  # Feature at RT = 8.0 min promotes its runner-up IK_ALT instead of duplicating IK_SHARED
+  expect_identical(
+    mini$inchikey_connectivity_layer[mini$feature_id == "F_RT8"],
+    "IK_ALT"
+  )
+  expect_match(
+    mini$note[mini$feature_id == "F_RT8"],
+    "^Promoted to rank 1: cross-RT duplicate InChIKey IK_SHARED assigned to feature F_RT2"
+  )
+  expect_match(
+    res$filtered$annotation_note[res$filtered$feature_id == "F_RT8"],
+    "^Promoted to rank 1: cross-RT duplicate InChIKey IK_SHARED assigned to feature F_RT2"
+  )
+  # Feature at RT = 12.0 min with only IK_SHARED does not duplicate IK_SHARED in mini/filtered
+  expect_true(is.na(mini$inchikey_connectivity_layer[
+    mini$feature_id == "F_RT12"
+  ]))
+})
+
+test_that("resolve_cross_rt_duplicate_candidates finds globally optimal bipartite combination", {
+  # F1 (RT = 2.0) has IK_A (0.90) and IK_B (0.89)
+  # F2 (RT = 8.0) has IK_A (0.88) and IK_B (0.20)
+  # Greedy would assign F1 -> IK_A (0.90) and F2 -> IK_B (0.20), total = 1.10.
+  # Globally optimal bipartite assignment picks F1 -> IK_B (0.89) and F2 -> IK_A (0.88), total = 1.77.
+  df <- tidytable::tidytable(
+    feature_id = c("F1", "F1", "F2", "F2"),
+    rt = c(2.00, 2.00, 8.00, 8.00),
+    rank_final = c(1L, 2L, 1L, 2L),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "IK_A",
+      "IK_B",
+      "IK_A",
+      "IK_B"
+    ),
+    score_weighted_chemo = c(0.90, 0.89, 0.88, 0.20),
+    candidate_score_similarity = c(0.85, 0.84, 0.83, 0.15)
+  )
+  out <- resolve_cross_rt_duplicate_candidates(df, rt_tolerance = 0.05)
+  r1_f1 <- out[out$feature_id == "F1" & out$rank_final == 1L, ]
+  r1_f2 <- out[out$feature_id == "F2" & out$rank_final == 1L, ]
+
+  expect_identical(
+    r1_f1$candidate_structure_inchikey_connectivity_layer,
+    "IK_B"
+  )
+  expect_identical(
+    r1_f2$candidate_structure_inchikey_connectivity_layer,
+    "IK_A"
+  )
+  expect_true(r1_f1$cluster_consensus_promoted_from_anchor)
+  expect_identical(
+    r1_f1$annotation_note,
+    "Promoted to rank 1: cross-RT duplicate InChIKey IK_A assigned to feature F2"
+  )
+})
+
+test_that("resolve_cross_rt_duplicate_candidates handles exact ties without randomness or row-order bias", {
+  # 1. Within-feature exact tie among promoted alternatives:
+  # F1 wins IK_SAME (0.95). F2 has IK_SAME (0.80, rank 1) and two tied
+  # rank-2 alternatives IK_ALT_1 (0.70) and IK_ALT_2 (0.70).
+  # Both IK_ALT_1 and IK_ALT_2 must be promoted together to rank_final == 1.
+  df_within_tie <- tidytable::tidytable(
+    feature_id = c("F1", "F2", "F2", "F2"),
+    rt = c(2.00, 8.50, 8.50, 8.50),
+    rank_final = c(1L, 1L, 2L, 2L),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "IK_SAME",
+      "IK_SAME",
+      "IK_ALT_2",
+      "IK_ALT_1"
+    ),
+    score_weighted_chemo = c(0.95, 0.80, 0.70, 0.70)
+  )
+  out_wt <- resolve_cross_rt_duplicate_candidates(df_within_tie, 0.05)
+  f2_r1 <- out_wt[out_wt$feature_id == "F2" & out_wt$rank_final == 1L, ]
+  expect_identical(
+    f2_r1$candidate_structure_inchikey_connectivity_layer,
+    c("IK_ALT_1", "IK_ALT_2")
+  )
+  expect_true(all(f2_r1$cluster_consensus_promoted_from_anchor))
+  expect_true(all(
+    f2_r1$annotation_note ==
+      "Promoted to rank 1: cross-RT duplicate InChIKey IK_SAME assigned to feature F1"
+  ))
+
+  # 2. Supermodular quality coupling on 2x2 isomer conflict:
+  # F1 (|error_mz| = 0.2 ppm) and F2 (|error_mz| = 4.5 ppm) share the exact same
+  # candidate scores IK_A (0.85, rank 1) and IK_B (0.75, rank 2).
+  # F1 (smaller mass error) must strictly win IK_A (0.85) and F2 gets IK_B (0.75),
+  # regardless of input row permutation.
+  df_qual <- tidytable::tidytable(
+    feature_id = c("F2", "F2", "F1", "F1"),
+    rt = c(8.50, 8.50, 2.00, 2.00),
+    rank_final = c(2L, 1L, 2L, 1L),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "IK_B",
+      "IK_A",
+      "IK_B",
+      "IK_A"
+    ),
+    score_weighted_chemo = c(0.75, 0.85, 0.75, 0.85),
+    candidate_structure_error_mz = c(4.5, 4.5, 0.2, 0.2)
+  )
+  out_q <- resolve_cross_rt_duplicate_candidates(df_qual, 0.05)
+  expect_identical(
+    out_q$candidate_structure_inchikey_connectivity_layer[
+      out_q$feature_id == "F1" & out_q$rank_final == 1L
+    ],
+    "IK_A"
+  )
+  expect_identical(
+    out_q$candidate_structure_inchikey_connectivity_layer[
+      out_q$feature_id == "F2" & out_q$rank_final == 1L
+    ],
+    "IK_B"
+  )
+
+  # 3. True 100% exact cross-RT tie (all scores and errors identical):
+  # Neither feature is arbitrarily chosen as sole winner; on both features,
+  # IK_B is promoted to tie at rank 1 alongside IK_A.
+  df_sym <- tidytable::tidytable(
+    feature_id = c("F1", "F1", "F2", "F2"),
+    rt = c(2.00, 2.00, 8.50, 8.50),
+    rank_final = c(1L, 2L, 1L, 2L),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "IK_A",
+      "IK_B",
+      "IK_A",
+      "IK_B"
+    ),
+    score_weighted_chemo = c(0.85, 0.75, 0.85, 0.75)
+  )
+  out_sym <- resolve_cross_rt_duplicate_candidates(df_sym, 0.05)
+  expect_identical(
+    out_sym$candidate_structure_inchikey_connectivity_layer[
+      out_sym$feature_id == "F1" & out_sym$rank_final == 1L
+    ],
+    c("IK_A", "IK_B")
+  )
+  expect_identical(
+    out_sym$candidate_structure_inchikey_connectivity_layer[
+      out_sym$feature_id == "F2" & out_sym$rank_final == 1L
+    ],
+    c("IK_A", "IK_B")
+  )
+  expect_identical(
+    out_sym$annotation_note[
+      out_sym$feature_id == "F1" &
+        out_sym$candidate_structure_inchikey_connectivity_layer == "IK_B"
+    ],
+    "Promoted to rank 1: cross-RT duplicate InChIKey IK_A tied with feature F2"
+  )
+})

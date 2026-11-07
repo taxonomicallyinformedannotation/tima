@@ -256,6 +256,12 @@ annotate_masses <- function(
   clusters <- ion_tables$clusters
   multi_adducts <- ion_tables$multi_adducts
   baseline_adducts <- ion_tables$baseline_adducts
+  if (nrow(already_assigned) > 0L && "adduct" %in% colnames(already_assigned)) {
+    already_assigned$adduct <- align_carrier_multiplicity_adducts(
+      already_assigned$adduct,
+      c(adducts, baseline_adducts)
+    )
+  }
   log_debug(
     paste0(
       "Adduct delta tables ready: %d adduct deltas, %d modifier deltas, ",
@@ -1480,25 +1486,28 @@ build_annotate_masses_ion_tables <- function(
     out_col = "loss",
     strip_label = TRUE
   )
-  baseline_adducts <- switch(
-    ms_mode,
-    "pos" = c(
-      "[M+H2]2+",
-      "[M+H]+",
-      "[M+H4N]+",
-      "[M+Na]+",
-      "[M+K]+",
-      "[2M+H]+"
+  baseline_adducts <- align_carrier_multiplicity_adducts(
+    switch(
+      ms_mode,
+      "pos" = c(
+        "[M+H2]2+",
+        "[M+H]+",
+        "[M+H4N]+",
+        "[M+Na]+",
+        "[M+K]+",
+        "[2M+H]+"
+      ),
+      "neg" = c(
+        "[M-H2]2-",
+        "[M-H]-",
+        "[M-H+CH2O2]-",
+        "[M-H+CH5NO2]-",
+        "[M-H+CHNaO2]-",
+        "[M-H+CHKO2]-",
+        "[2M-H]-"
+      )
     ),
-    "neg" = c(
-      "[M-H2]2-",
-      "[M-H]-",
-      "[M-H+CH2O2]-",
-      "[M-H+CH5NO2]-",
-      "[M-H+CHNaO2]-",
-      "[M-H+CHKO2]-",
-      "[2M-H]-"
-    )
+    adducts
   )
 
   list(
@@ -1830,6 +1839,124 @@ adduct_has_explicit_loss <- function(adduct, loss_formula) {
     },
     FUN.VALUE = logical(1L)
   ))
+}
+
+#' Return TRUE when an adduct string explicitly carries a given cluster term
+#' @keywords internal
+adduct_has_explicit_cluster <- function(adduct, cluster_formula) {
+  adduct <- as.character(adduct)
+  cluster_formula <- trimws(sub(" .*", "", as.character(cluster_formula)))
+  if (
+    is.na(adduct) ||
+      !nzchar(adduct) ||
+      is.na(cluster_formula) ||
+      !nzchar(cluster_formula)
+  ) {
+    return(FALSE)
+  }
+  inner <- sub("^\\[(.*)\\][0-9]*[+-]+$", "\\1", adduct, perl = TRUE)
+  if (!nzchar(inner) || identical(inner, adduct)) {
+    return(FALSE)
+  }
+  mods <- sub("^[0-9]*M[0-9]*", "", inner, perl = TRUE)
+  if (!nzchar(mods)) {
+    return(FALSE)
+  }
+  tokens <- regmatches(mods, gregexpr("[+-][^+-]+", mods, perl = TRUE))[[1L]]
+  if (length(tokens) == 0L) {
+    return(FALSE)
+  }
+  clu_norm <- normalize_modifier_formula_term(cluster_formula)
+  clu_parsed <- tryCatch(
+    parse_atomic_formula(clu_norm),
+    error = function(.err) {
+      invisible(.err)
+      NULL
+    }
+  )
+  any(vapply(
+    X = tokens,
+    FUN = function(tok) {
+      if (!startsWith(tok, "+")) {
+        return(FALSE)
+      }
+      body <- substr(tok, 2L, nchar(tok))
+      formula <- sub("^[0-9]+", "", body, perl = TRUE)
+      formula_norm <- normalize_modifier_formula_term(formula)
+      if (identical(formula_norm, clu_norm)) {
+        return(TRUE)
+      }
+      token_parsed <- tryCatch(
+        parse_atomic_formula(formula_norm),
+        error = function(.err) {
+          invisible(.err)
+          NULL
+        }
+      )
+      if (
+        is.null(clu_parsed) ||
+          length(clu_parsed) == 0L ||
+          is.null(token_parsed) ||
+          length(token_parsed) == 0L
+      ) {
+        return(FALSE)
+      }
+      all_names <- sort(unique(c(names(clu_parsed), names(token_parsed))))
+      clu_full <- stats::setNames(numeric(length(all_names)), all_names)
+      token_full <- stats::setNames(numeric(length(all_names)), all_names)
+      clu_full[names(clu_parsed)] <- as.numeric(clu_parsed)
+      token_full[names(token_parsed)] <- as.numeric(token_parsed)
+      if (
+        any(clu_full <= 0) ||
+          any(token_full < 0) ||
+          any(token_full == 0 & clu_full > 0)
+      ) {
+        return(FALSE)
+      }
+      ratios <- token_full[clu_full > 0] / clu_full[clu_full > 0]
+      length(ratios) > 0L &&
+        all(is.finite(ratios)) &&
+        all(abs(ratios - round(ratios)) < 1e-8) &&
+        length(unique(round(ratios))) == 1L &&
+        unique(round(ratios)) >= 1L
+    },
+    FUN.VALUE = logical(1L)
+  ))
+}
+
+#' Align equivalent multicharged carrier notations (e.g. `[M+2H]2+` vs `[M+H2]2+`)
+#' to whichever convention is present in `reference_adducts`.
+#' @keywords internal
+align_carrier_multiplicity_adducts <- function(adducts, reference_adducts) {
+  if (length(adducts) == 0L) {
+    return(adducts)
+  }
+  pairs <- list(
+    c("[M+2H]2+", "[M+H2]2+"),
+    c("[M+3H]3+", "[M+H3]3+"),
+    c("[M-2H]2-", "[M-H2]2-"),
+    c("[M-3H]3-", "[M-H3]3-"),
+    c("[M+2Na]2+", "[M+Na2]2+"),
+    c("[M+3Na]3+", "[M+Na3]3+"),
+    c("[M+2K]2+", "[M+K2]2+"),
+    c("[M+3K]3+", "[M+K3]3+"),
+    c("[M+2Cu]2+", "[M+Cu2]2+"),
+    c("[M+2H4N]2+", "[M+H8N2]2+")
+  )
+  ref_set <- unique(as.character(reference_adducts))
+  out <- as.character(adducts)
+  for (p in pairs) {
+    p_pref <- p[[1L]]
+    p_sub <- p[[2L]]
+    has_pref <- p_pref %in% ref_set
+    has_sub <- p_sub %in% ref_set
+    if (has_pref && !has_sub) {
+      out[!is.na(out) & out == p_sub] <- p_pref
+    } else {
+      out[!is.na(out) & out == p_pref] <- p_sub
+    }
+  }
+  out
 }
 
 #' Discover all edge classes used by annotate_masses

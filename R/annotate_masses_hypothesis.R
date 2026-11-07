@@ -772,12 +772,12 @@ collect_node_adduct_hypotheses <- function(
     support_base <- base_hyps |>
       tidytable::filter(candidate_adduct_origin == "supported")
     tidytable::bind_rows(
-      expand_with_modifier(
+      propagate_modifier_dest_to_src(
         base_hyps = support_base,
         edges = cluster_edges,
-        edge_feature_col = "feature_id_dest",
         mod_col = "cluster",
-        mod_sign = "+"
+        mod_sign = "-",
+        source_label = "cluster"
       ),
       propagate_modifier_src_to_dest(
         base_hyps = support_base,
@@ -951,9 +951,32 @@ collect_node_adduct_hypotheses <- function(
       }
 
       has_pos_h4n <- any(grepl("^\\+[0-9]*H4N$", tokens, perl = TRUE))
+      has_pos_h <- any(grepl("^\\+[0-9]*H$", tokens, perl = TRUE))
+
+      gcd2 <- function(a, b) {
+        while (b != 0L) {
+          t <- b
+          b <- a %% b
+          a <- t
+        }
+        abs(a)
+      }
+      gcd_vec <- function(x) {
+        if (length(x) == 0L) {
+          return(1L)
+        }
+        g <- as.integer(abs(x[[1L]]))
+        if (length(x) > 1L) {
+          for (k in 2:length(x)) {
+            g <- gcd2(g, as.integer(abs(x[[k]])))
+          }
+        }
+        if (g == 0L) 1L else g
+      }
 
       carrier_net <- list()
-      modifier_atomic_net <- list()
+      mod_emp_net <- list()
+      mod_emp_atoms <- list()
 
       for (tok in tokens) {
         tg <- regmatches(tok, regexec(tok_re, tok, perl = TRUE))[[1L]]
@@ -961,9 +984,13 @@ collect_node_adduct_hypotheses <- function(
         mult <- if (nzchar(tg[[3L]])) as.integer(tg[[3L]]) else 1L
         formula <- tg[[4L]]
 
-        # Keep NH3 explicit in presence of NH4 so harmonize_adducts can reduce
-        # (-H3N,+H4N) pairs to +H instead of hiding NH3 in atomic collapse.
-        if (formula %in% carriers || (has_pos_h4n && formula == "H3N")) {
+        # Keep NH3 explicit in presence of NH4 or +H so harmonize_adducts can
+        # reduce (-H3N,+H4N) -> +H and (+H3N,+H) -> +H4N.
+        if (
+          formula %in%
+            carriers ||
+            ((has_pos_h4n || has_pos_h) && formula == "H3N")
+        ) {
           prev <- carrier_net[[formula]] %||% 0L
           carrier_net[[formula]] <- prev + sign * mult
         } else {
@@ -971,10 +998,47 @@ collect_node_adduct_hypotheses <- function(
           if (is.null(atoms) || length(atoms) == 0L) {
             return(adduct)
           }
-          for (el in names(atoms)) {
-            prev <- modifier_atomic_net[[el]] %||% 0L
-            modifier_atomic_net[[el]] <- prev +
-              sign * mult * as.integer(atoms[[el]])
+          g <- gcd_vec(atoms)
+          emp_atoms <- lapply(atoms, function(v) as.integer(v) %/% g)
+          emp_f <- hill_formula(emp_atoms)
+          mod_emp_atoms[[emp_f]] <- emp_atoms
+          prev_m <- mod_emp_net[[emp_f]] %||% 0L
+          mod_emp_net[[emp_f]] <- prev_m + sign * mult * g
+        }
+      }
+
+      h_keys <- intersect(names(carrier_net), c("H", "H2", "H3"))
+      if (length(h_keys) > 0L) {
+        h_vals <- unlist(carrier_net[h_keys], use.names = FALSE)
+        if (any(h_vals > 0L) && any(h_vals < 0L)) {
+          h_mults <- c(H = 1L, H2 = 2L, H3 = 3L)[h_keys]
+          total_h <- sum(as.integer(h_vals) * as.integer(h_mults))
+          for (hk in h_keys) {
+            carrier_net[[hk]] <- NULL
+          }
+          if (total_h != 0L) {
+            carrier_net[["H"]] <- total_h
+          }
+        }
+      }
+
+      neg_modifier_atomic_net <- list()
+      pos_modifier_atomic_net <- list()
+      for (emp_f in names(mod_emp_net)) {
+        net_m <- mod_emp_net[[emp_f]]
+        if (net_m < 0L) {
+          ea <- mod_emp_atoms[[emp_f]]
+          for (el in names(ea)) {
+            prev <- neg_modifier_atomic_net[[el]] %||% 0L
+            neg_modifier_atomic_net[[el]] <- prev +
+              abs(net_m) * as.integer(ea[[el]])
+          }
+        } else if (net_m > 0L) {
+          ea <- mod_emp_atoms[[emp_f]]
+          for (el in names(ea)) {
+            prev <- pos_modifier_atomic_net[[el]] %||% 0L
+            pos_modifier_atomic_net[[el]] <- prev +
+              net_m * as.integer(ea[[el]])
           }
         }
       }
@@ -982,9 +1046,9 @@ collect_node_adduct_hypotheses <- function(
       new_mods <- character()
 
       # Negative atomic term (loss)
-      neg_atoms <- Filter(function(x) x < 0L, modifier_atomic_net)
+      neg_atoms <- Filter(function(x) x > 0L, neg_modifier_atomic_net)
       if (length(neg_atoms) > 0L) {
-        f <- hill_formula(lapply(neg_atoms, abs))
+        f <- hill_formula(neg_atoms)
         if (nzchar(f)) new_mods <- c(new_mods, paste0("-", f))
       }
 
@@ -996,7 +1060,7 @@ collect_node_adduct_hypotheses <- function(
       }
 
       # Positive atomic term (addition)
-      pos_atoms <- Filter(function(x) x > 0L, modifier_atomic_net)
+      pos_atoms <- Filter(function(x) x > 0L, pos_modifier_atomic_net)
       if (length(pos_atoms) > 0L) {
         f <- hill_formula(pos_atoms)
         if (nzchar(f)) new_mods <- c(new_mods, paste0("+", f))
@@ -1097,8 +1161,29 @@ propagate_modifier_src_to_dest <- function(
   }
 
   # Join on the SOURCE feature, then rename feature_id_dest → feature_id
-  out <- base_hyps |>
-    tidytable::inner_join(src_dest, by = "feature_id") |>
+  joined <- base_hyps |>
+    tidytable::inner_join(src_dest, by = "feature_id")
+
+  # Recovering a precursor from a product over a loss edge (+loss) is only
+  # valid when the source (product) adduct explicitly carries that loss.
+  if (
+    nrow(joined) > 0L &&
+      identical(mod_col, "loss") &&
+      identical(mod_sign, "+")
+  ) {
+    keep_loss <- mapply(
+      adduct_has_explicit_loss,
+      joined$adduct,
+      joined[[mod_col]],
+      USE.NAMES = FALSE
+    )
+    joined <- joined[which(keep_loss), , drop = FALSE]
+  }
+  if (nrow(joined) == 0L) {
+    return(base_hyps[0L, ])
+  }
+
+  out <- joined |>
     tidytable::mutate(
       feature_id = feature_id_dest,
       adduct = .apply_modifier_column_fast(
@@ -1161,8 +1246,30 @@ propagate_modifier_dest_to_src <- function(
       )
   }
 
-  out <- base_hyps |>
-    tidytable::inner_join(dest_src, by = "feature_id") |>
+  joined <- base_hyps |>
+    tidytable::inner_join(dest_src, by = "feature_id")
+
+  # Recovering a lower-mz feature from a cluster-bearing destination over a
+  # cluster edge (-cluster) is only valid when the destination adduct explicitly
+  # carries that cluster.
+  if (
+    nrow(joined) > 0L &&
+      identical(mod_col, "cluster") &&
+      identical(mod_sign, "-")
+  ) {
+    keep_clu <- mapply(
+      adduct_has_explicit_cluster,
+      joined$adduct,
+      joined[[mod_col]],
+      USE.NAMES = FALSE
+    )
+    joined <- joined[which(keep_clu), , drop = FALSE]
+  }
+  if (nrow(joined) == 0L) {
+    return(base_hyps[0L, ])
+  }
+
+  out <- joined |>
     tidytable::mutate(
       feature_id = feature_id_src,
       adduct = .apply_modifier_column_fast(

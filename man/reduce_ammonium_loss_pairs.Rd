@@ -2,11 +2,11 @@
 % Please edit documentation in R/harmonize_adducts.R
 \name{reduce_ammonium_loss_pairs}
 \alias{reduce_ammonium_loss_pairs}
-\title{Reduce (+H4N, -loss-containing-H3N) pairs to proton-plus-residual-loss form}
+\title{Reduce (+H3N, +H) -> +H4N and (+H4N, -loss-containing-H3N) pairs}
 \usage{
 reduce_ammonium_loss_pairs(net)
 }
 \description{
-Reduce (+H4N, -loss-containing-H3N) pairs to proton-plus-residual-loss form
+Reduce (+H3N, +H) -> +H4N and (+H4N, -loss-containing-H3N) pairs
 }
 \keyword{internal}

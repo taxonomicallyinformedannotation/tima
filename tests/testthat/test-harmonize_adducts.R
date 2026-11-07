@@ -470,3 +470,30 @@ test_that("harmonize_adducts semantically reduces ammonium-plus-loss combination
   expect_equal(result$adduct[[1L]], "[M-H2O+H]+")
   expect_equal(result$adduct[[2L]], "[M+H]+")
 })
+
+test_that("harmonize_adducts unifies (+H3N,+H) to +H4N and collapses opposite-sign H carriers", {
+  df <- data.frame(
+    adduct = c(
+      "[M+H3N+H]+",
+      "[M+NH3+H]+",
+      "[M+H+NH3]+",
+      "[2M+H3N+H]+",
+      "[M-H2+H]+",
+      "[M+H2-H]+"
+    )
+  )
+
+  result <- harmonize_adducts(df, adducts_translations = adducts_translations)
+
+  expect_equal(
+    result$adduct,
+    c(
+      "[M+H4N]+",
+      "[M+H4N]+",
+      "[M+H4N]+",
+      "[2M+H4N]+",
+      "[M-H]+",
+      "[M+H]+"
+    )
+  )
+})

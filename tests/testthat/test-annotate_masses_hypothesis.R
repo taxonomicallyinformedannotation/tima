@@ -499,3 +499,68 @@ test_that("append_component_weak_hypotheses expands weak hypotheses only for unr
   f2_rows <- out[out$feature_id == "F2", ]
   expect_true(nrow(f2_rows) >= 1L)
 })
+
+test_that(".simplify_adduct_after_modifier does not cross-subtract unrelated negative losses from positive clusters", {
+  inp <- c(
+    "[M-H2O+H2O+H]+",
+    "[M-H4O2+H2O+H]+",
+    "[M-H2O+C2H6O+H4N]+",
+    "[M-C2H2O+CH2O+H]+",
+    "[M-H2O+CHNaO2+H]+",
+    "[M-H2+H]+"
+  )
+  out <- .simplify_adduct_after_modifier(inp)
+  expect_identical(
+    out,
+    c(
+      "[M+H]+",
+      "[M-H2O+H]+",
+      "[M-H2O+C2H6O+H4N]+",
+      "[M-C2H2O+CH2O+H]+",
+      "[M-H2O+CHNaO2+H]+",
+      "[M-H]+"
+    )
+  )
+})
+
+test_that("propagate_modifier_src_to_dest only adds +loss when source adduct carries that loss", {
+  base_hyps <- tidytable::tidytable(
+    feature_id = c("PROD_LOSS", "PROD_BASE"),
+    adduct = c("[M-H2O+H]+", "[M+H]+"),
+    source = c("pair", "pair"),
+    is_preassigned = c(FALSE, FALSE),
+    candidate_adduct_origin = c("supported", "supported")
+  )
+  loss_edges <- tidytable::tidytable(
+    feature_id = c("PROD_LOSS", "PROD_BASE"),
+    feature_id_dest = c("PREC_OK", "PREC_FAKE"),
+    loss = c("H2O", "O")
+  )
+  out <- propagate_modifier_src_to_dest(
+    base_hyps = base_hyps,
+    edges = loss_edges,
+    mod_col = "loss",
+    mod_sign = "+",
+    strip_label = TRUE,
+    source_label = "loss"
+  )
+  expect_identical(out$feature_id, "PREC_OK")
+  expect_identical(out$adduct, "[M+H]+")
+})
+
+test_that("align_carrier_multiplicity_adducts unifies [M+2H]2+ and [M+H2]2+ conventions", {
+  expect_identical(
+    align_carrier_multiplicity_adducts(
+      c("[M+2H]2+", "[M+H2]2+", "[M+3H]3+", "[M-2H]2-"),
+      c("[M+H]+", "[M+H2]2+", "[M+H3]3+", "[M-H2]2-")
+    ),
+    c("[M+H2]2+", "[M+H2]2+", "[M+H3]3+", "[M-H2]2-")
+  )
+  expect_identical(
+    align_carrier_multiplicity_adducts(
+      c("[M+2H]2+", "[M+H2]2+"),
+      c("[M+H]+", "[M+2H]2+")
+    ),
+    c("[M+2H]2+", "[M+2H]2+")
+  )
+})
