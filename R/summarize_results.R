@@ -185,12 +185,8 @@ summarize_results <- function(
   # Start from annotation rows and add compact per-feature metadata.
   src_cols <- unname(select_cols)
   tgt_cols <- names(select_cols)
-  if (is.null(tgt_cols)) {
-    tgt_cols <- src_cols
-  } else {
-    empty_tgt <- is.na(tgt_cols) | !nzchar(tgt_cols)
-    tgt_cols[empty_tgt] <- src_cols[empty_tgt]
-  }
+  empty_tgt <- is.na(tgt_cols) | !nzchar(tgt_cols)
+  tgt_cols[empty_tgt] <- src_cols[empty_tgt]
   keep_sel <- src_cols %in% names(df)
   src_present <- src_cols[keep_sel]
   tgt_present <- tgt_cols[keep_sel]
@@ -202,80 +198,65 @@ summarize_results <- function(
   df_joined <- tidytable::as_tidytable(df_list)
   rm(df_list)
 
-  if (nrow(df_joined) > 0L) {
-    fids_j <- df_joined$feature_id
+  fids_j <- df_joined$feature_id
 
-    feat_add_cols <- setdiff(names(features_min), names(df_joined))
-    if (length(feat_add_cols) > 0L && nrow(features_min) > 0L) {
-      f_min_ids <- features_min$feature_id
-      m_f <- if (anyNA(f_min_ids) || anyNA(fids_j)) {
-        match(fids_j, f_min_ids)
-      } else {
-        fastmatch::fmatch(fids_j, f_min_ids)
-      }
-      for (col in feat_add_cols) {
-        data.table::set(df_joined, j = col, value = features_min[[col]][m_f])
-      }
+  feat_add_cols <- setdiff(names(features_min), names(df_joined))
+  if (length(feat_add_cols) > 0L && nrow(features_min) > 0L) {
+    m_f <- match(fids_j, features_min$feature_id)
+    for (col in feat_add_cols) {
+      data.table::set(df_joined, j = col, value = features_min[[col]][m_f])
     }
+  }
 
-    comp_add_cols <- setdiff(names(components_min), names(df_joined))
-    if (length(comp_add_cols) > 0L && nrow(components_min) > 0L) {
-      c_min_ids <- components_min$feature_id
-      m_c <- if (anyNA(c_min_ids) || anyNA(fids_j)) {
-        match(fids_j, c_min_ids)
-      } else {
-        fastmatch::fmatch(fids_j, c_min_ids)
-      }
-      for (col in comp_add_cols) {
-        data.table::set(df_joined, j = col, value = components_min[[col]][m_c])
-      }
+  comp_add_cols <- setdiff(names(components_min), names(df_joined))
+  if (length(comp_add_cols) > 0L && nrow(components_min) > 0L) {
+    m_c <- match(fids_j, components_min$feature_id)
+    for (col in comp_add_cols) {
+      data.table::set(df_joined, j = col, value = components_min[[col]][m_c])
     }
+  }
 
-    org_join_by <- c(
-      "feature_id",
-      "candidate_structure_inchikey_connectivity_layer",
-      "candidate_structure_organism_occurrence_closest"
-    )
-    org_add_cols <- setdiff(names(organism_lookup), names(df_joined))
-    if (
-      length(org_add_cols) > 0L &&
-        all(org_join_by %in% names(df_joined)) &&
-        all(org_join_by %in% names(organism_lookup))
-    ) {
-      if (nrow(organism_lookup) == 0L) {
-        for (col in org_add_cols) {
-          data.table::set(
-            df_joined,
-            j = col,
-            value = rep.int(
-              organism_lookup[[col]][NA_integer_],
-              nrow(df_joined)
-            )
+  org_join_by <- c(
+    "feature_id",
+    "candidate_structure_inchikey_connectivity_layer",
+    "candidate_structure_organism_occurrence_closest"
+  )
+  org_add_cols <- setdiff(names(organism_lookup), names(df_joined))
+  if (
+    length(org_add_cols) > 0L &&
+      all(org_join_by %in% names(df_joined)) &&
+      all(org_join_by %in% names(organism_lookup))
+  ) {
+    if (nrow(organism_lookup) == 0L) {
+      for (col in org_add_cols) {
+        data.table::set(
+          df_joined,
+          j = col,
+          value = rep.int(
+            organism_lookup[[col]][NA_integer_],
+            nrow(df_joined)
           )
-        }
-      } else {
-        m_org <- .fast_match_rows(df_joined, organism_lookup, by = org_join_by)
-        for (col in org_add_cols) {
-          data.table::set(
-            df_joined,
-            j = col,
-            value = organism_lookup[[col]][m_org]
-          )
-        }
+        )
+      }
+    } else {
+      m_org <- .fast_match_rows(df_joined, organism_lookup, by = org_join_by)
+      for (col in org_add_cols) {
+        data.table::set(
+          df_joined,
+          j = col,
+          value = organism_lookup[[col]][m_org]
+        )
       }
     }
+  }
 
-    keep_j_cols <- intersect(final_select_cols, names(df_joined))
-    drop_j_cols <- setdiff(names(df_joined), keep_j_cols)
-    if (length(drop_j_cols) > 0L) {
-      data.table::set(df_joined, j = drop_j_cols, value = NULL)
-    }
-    if (!identical(names(df_joined), keep_j_cols) && length(keep_j_cols) > 0L) {
-      data.table::setcolorder(df_joined, keep_j_cols)
-    }
-  } else {
-    df_joined <- df_joined |>
-      tidytable::select(tidyselect::any_of(x = final_select_cols))
+  keep_j_cols <- intersect(final_select_cols, names(df_joined))
+  drop_j_cols <- setdiff(names(df_joined), keep_j_cols)
+  if (length(drop_j_cols) > 0L) {
+    data.table::set(df_joined, j = drop_j_cols, value = NULL)
+  }
+  if (!identical(names(df_joined), keep_j_cols) && length(keep_j_cols) > 0L) {
+    data.table::setcolorder(df_joined, keep_j_cols)
   }
 
   rm(features_min, components_min)
@@ -361,95 +342,64 @@ summarize_results <- function(
 
   if (remove_ties) {
     log_info("Removing ties")
-    if (
-      nrow(df_joined) > 1L &&
-        all(c("feature_id", "rank_final") %in% names(df_joined))
-    ) {
+    if (nrow(df_joined) > 1L) {
       f_rt <- df_joined$feature_id
       r_rt <- df_joined$rank_final
       u_f_rt <- unique(f_rt)
       u_r_rt <- unique(r_rt)
-      f_id_rt <- if (anyNA(u_f_rt)) {
-        match(f_rt, u_f_rt)
-      } else {
-        fastmatch::fmatch(f_rt, u_f_rt)
-      }
-      r_id_rt <- if (anyNA(u_r_rt)) {
-        match(r_rt, u_r_rt)
-      } else {
-        fastmatch::fmatch(r_rt, u_r_rt)
-      }
+      f_id_rt <- match(f_rt, u_f_rt)
+      r_id_rt <- match(r_rt, u_r_rt)
       nr_rt <- max(1L, length(u_r_rt))
-      key_rt <- if (as.double(length(u_f_rt)) * nr_rt < .Machine$integer.max) {
-        (f_id_rt - 1L) * nr_rt + r_id_rt
-      } else {
-        as.double(f_id_rt - 1L) * nr_rt + r_id_rt
-      }
+      key_rt <- as.double(f_id_rt - 1L) * nr_rt + r_id_rt
       dup_rt <- duplicated(key_rt)
       if (any(dup_rt)) {
         df_joined <- df_joined[!dup_rt, , drop = FALSE]
       }
-    } else {
-      df_joined <- df_joined |>
-        tidytable::distinct(feature_id, rank_final, .keep_all = TRUE)
     }
   }
 
   # Summarize if requested
   if (summarize) {
-    if (nrow(df_joined) == 0L) {
-      df_final <- df_joined
+    rank_num <- suppressWarnings(as.integer(df_joined$rank_final))
+
+    score_final_num <- if ("score_weighted_chemo" %in% names(df_joined)) {
+      -.as_numeric_dedup(df_joined$score_weighted_chemo)
     } else {
-      rank_num <- suppressWarnings(as.integer(df_joined$rank_final))
-
-      score_final_num <- if ("score_final" %in% names(df_joined)) {
-        -.as_numeric_dedup(df_joined$score_final)
-      } else if ("score_weighted_chemo" %in% names(df_joined)) {
-        -.as_numeric_dedup(df_joined$score_weighted_chemo)
-      } else {
-        rep_len(0, nrow(df_joined))
-      }
-
-      initial_num <- if ("score_initial" %in% names(df_joined)) {
-        -.as_numeric_dedup(df_joined$score_initial)
-      } else if ("candidate_score_pseudo_initial" %in% names(df_joined)) {
-        -.as_numeric_dedup(df_joined$candidate_score_pseudo_initial)
-      } else {
-        rep_len(0, nrow(df_joined))
-      }
-
-      fids_sum <- df_joined$feature_id
-      u_fids_sum <- sort(unique(fids_sum), na.last = TRUE)
-      fid_id_sum <- if (anyNA(u_fids_sum)) {
-        match(fids_sum, u_fids_sum)
-      } else {
-        fastmatch::fmatch(fids_sum, u_fids_sum)
-      }
-
-      ord <- order(
-        fid_id_sum,
-        rank_num,
-        score_final_num,
-        initial_num,
-        na.last = TRUE,
-        method = "radix"
-      )
-      keep <- !duplicated(fid_id_sum[ord])
-      df_final <- df_joined[ord[keep], , drop = FALSE]
-
-      rm(
-        ord,
-        keep,
-        rank_num,
-        score_final_num,
-        initial_num,
-        fids_sum,
-        u_fids_sum,
-        fid_id_sum
-      )
+      rep_len(0, nrow(df_joined))
     }
 
-    rm(df_joined)
+    initial_num <- if ("score_initial" %in% names(df_joined)) {
+      -.as_numeric_dedup(df_joined$score_initial)
+    } else {
+      rep_len(0, nrow(df_joined))
+    }
+
+    fids_sum <- df_joined$feature_id
+    u_fids_sum <- sort(unique(fids_sum), na.last = TRUE)
+    fid_id_sum <- match(fids_sum, u_fids_sum)
+
+    ord <- order(
+      fid_id_sum,
+      rank_num,
+      score_final_num,
+      initial_num,
+      na.last = TRUE,
+      method = "radix"
+    )
+    keep <- !duplicated(fid_id_sum[ord])
+    df_final <- df_joined[ord[keep], , drop = FALSE]
+
+    rm(
+      ord,
+      keep,
+      rank_num,
+      score_final_num,
+      initial_num,
+      fids_sum,
+      u_fids_sum,
+      fid_id_sum,
+      df_joined
+    )
   } else {
     df_final <- df_joined
     rm(df_joined)
@@ -643,14 +593,9 @@ summarize_results <- function(
       annotated_ids <- results[[feature_id_col]][has_ann]
       if (length(annotated_ids) > 0L) {
         annotated_ids <- unique(as.character(annotated_ids))
-        if (length(total_feature_ids) > 0L) {
-          annotated_features <- sum(
-            fastmatch::fmatch(total_feature_ids, annotated_ids, nomatch = 0L) >
-              0L
-          )
-        } else {
-          annotated_features <- length(annotated_ids)
-        }
+        annotated_features <- sum(
+          fastmatch::fmatch(total_feature_ids, annotated_ids, nomatch = 0L) > 0L
+        )
       }
     }
   }
@@ -673,18 +618,25 @@ summarize_results <- function(
     names(df)
 
   empty_lookup <- function() {
-    structure_organism_pairs_table[0L, ] |>
-      tidytable::select(
-        candidate_structure_inchikey_connectivity_layer = structure_inchikey_connectivity_layer,
-        reference_doi,
-        tidyselect::contains(match = "organism_taxonomy_"),
-        -tidyselect::any_of("organism_taxonomy_ottid")
-      ) |>
-      tidytable::mutate(
-        feature_id = character(),
-        candidate_structure_organism_occurrence_closest = character(),
-        candidate_structure_organism_occurrence_reference = character()
-      )
+    tax_cols <- setdiff(
+      grep(
+        "^organism_taxonomy_",
+        names(structure_organism_pairs_table),
+        value = TRUE
+      ),
+      "organism_taxonomy_ottid"
+    )
+    out <- tidytable::tidytable(
+      candidate_structure_inchikey_connectivity_layer = character(),
+      reference_doi = character()
+    )
+    for (tc in tax_cols) {
+      out[[tc]] <- character()
+    }
+    out$feature_id <- character()
+    out$candidate_structure_organism_occurrence_closest <- character()
+    out$candidate_structure_organism_occurrence_reference <- character()
+    out
   }
 
   if (!has_organism_col) {
@@ -790,18 +742,8 @@ summarize_results <- function(
   u_dois <- unique(all_dois)
   doi_id <- fastmatch::fmatch(all_dois, u_dois)
   n_u_dois <- max(1L, length(u_dois))
-  use_int_pd <- as.double(length(u_matched_pids)) * n_u_dois <
-    .Machine$integer.max
-  pd_code <- if (use_int_pd) {
-    (pid_grp - 1L) * n_u_dois + doi_id
-  } else {
-    (as.numeric(pid_grp - 1L) * n_u_dois) + doi_id
-  }
-  first_pd <- if (use_int_pd) {
-    !duplicated(pd_code)
-  } else {
-    fastmatch::fmatch(pd_code, pd_code) == seq_along(pd_code)
-  }
+  pd_code <- as.double(pid_grp - 1L) * n_u_dois + doi_id
+  first_pd <- !duplicated(pd_code)
 
   pid_grp_u <- pid_grp[first_pd]
   dois_u <- all_dois[first_pd]
@@ -843,26 +785,14 @@ summarize_results <- function(
   # Match distinct (feature_id, inchikey, occurrence) triples to u_matched_pids
   in_matched <- fastmatch::fmatch(pair_id_df, u_matched_pids)
   has_m <- which(!is.na(in_matched))
-  if (length(has_m) == 0L) {
-    return(empty_lookup())
-  }
 
   f_m <- fid_sub[has_m]
   g_m <- in_matched[has_m]
   u_fids <- unique(f_m)
   f_id <- fastmatch::fmatch(f_m, u_fids)
   n_g <- max(1L, length(u_matched_pids))
-  use_int_fg <- as.double(length(u_fids)) * n_g < .Machine$integer.max
-  fg_code <- if (use_int_fg) {
-    (f_id - 1L) * n_g + g_m
-  } else {
-    (as.numeric(f_id - 1L) * n_g) + g_m
-  }
-  first_fg <- if (use_int_fg) {
-    !duplicated(fg_code)
-  } else {
-    fastmatch::fmatch(fg_code, fg_code) == seq_along(fg_code)
-  }
+  fg_code <- as.double(f_id - 1L) * n_g + g_m
+  first_fg <- !duplicated(fg_code)
   keep_fg <- has_m[first_fg]
   g_final <- in_matched[keep_fg]
 
@@ -931,11 +861,7 @@ summarize_results <- function(
 
   fids <- annot_table_wei_chemo$feature_id
   u_fids <- sort(unique(fids), na.last = TRUE)
-  fid_id <- if (anyNA(u_fids)) {
-    match(fids, u_fids)
-  } else {
-    fastmatch::fmatch(fids, u_fids)
-  }
+  fid_id <- match(fids, u_fids)
 
   ord_keys <- list(fid_id)
   if (any(note_present)) {

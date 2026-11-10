@@ -19,7 +19,14 @@ weight_bio(
   score_biological_genus,
   score_biological_species,
   score_biological_variety,
-  score_biological_biota
+  score_biological_biota,
+  score_biological_infraorder = NULL,
+  score_biological_subfamily = NULL,
+  score_biological_subtribe = NULL,
+  score_biological_subgenus = NULL,
+  score_biological_subspecies = NULL,
+  spectral_fusion = c("mean", "corroborated", "noisy_or"),
+  use_zodiac = FALSE
 )
 }
 \arguments{
@@ -59,6 +66,28 @@ highest)}
 
 \item{score_biological_biota}{\link{numeric} Score for Biota-level match (0-1,
 special)}
+
+\item{score_biological_infraorder}{\link{numeric} Optional score for
+infraorder-level match (0-1)}
+
+\item{score_biological_subfamily}{\link{numeric} Optional score for
+subfamily-level match (0-1)}
+
+\item{score_biological_subtribe}{\link{numeric} Optional score for
+subtribe-level match (0-1)}
+
+\item{score_biological_subgenus}{\link{numeric} Optional score for
+subgenus-level match (0-1)}
+
+\item{score_biological_subspecies}{\link{numeric} Optional score for
+subspecies-level match (0-1)}
+
+\item{spectral_fusion}{\link{character} Method to combine library MS2 similarity
+and SIRIUS scores when both are present: \code{"mean"} (default),
+\code{"corroborated"} (synergistic monotone fusion), or \code{"noisy_or"}.}
+
+\item{use_zodiac}{\link{logical} If \code{TRUE} and \code{candidate_score_sirius_zodiac}
+is present, modulates transformed SIRIUS CSI scores by Zodiac confidence.}
 }
 \value{
 Data frame with biologically weighted annotations including

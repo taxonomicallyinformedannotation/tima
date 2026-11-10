@@ -466,26 +466,10 @@ compute_classyfire_taxonomy <- function(df_pred_tax, weights) {
   }
 
   # Normalize weight inputs: ensure numeric scalar defaults to 0 when NULL or non-numeric
-  w_cla_kin <- if (!is.null(weights$w_cla_kin)) {
-    as.numeric(weights$w_cla_kin)
-  } else {
-    0
-  }
-  w_cla_sup <- if (!is.null(weights$w_cla_sup)) {
-    as.numeric(weights$w_cla_sup)
-  } else {
-    0
-  }
-  w_cla_cla <- if (!is.null(weights$w_cla_cla)) {
-    as.numeric(weights$w_cla_cla)
-  } else {
-    0
-  }
-  w_cla_par <- if (!is.null(weights$w_cla_par)) {
-    as.numeric(weights$w_cla_par)
-  } else {
-    0
-  }
+  w_cla_kin <- as.numeric(weights$w_cla_kin %||% 0)
+  w_cla_sup <- as.numeric(weights$w_cla_sup %||% 0)
+  w_cla_cla <- as.numeric(weights$w_cla_cla %||% 0)
+  w_cla_par <- as.numeric(weights$w_cla_par %||% 0)
 
   v_kin <- df_pred_tax$feature_pred_tax_cla_01kin_val
   v_sup <- df_pred_tax$feature_pred_tax_cla_02sup_val
@@ -557,21 +541,9 @@ compute_npclassifier_taxonomy <- function(df_pred_tax, weights) {
   }
 
   # Normalize weight inputs: ensure numeric scalar defaults to 0 when NULL or non-numeric
-  w_npc_pat <- if (!is.null(weights$w_npc_pat)) {
-    as.numeric(weights$w_npc_pat)
-  } else {
-    0
-  }
-  w_npc_sup <- if (!is.null(weights$w_npc_sup)) {
-    as.numeric(weights$w_npc_sup)
-  } else {
-    0
-  }
-  w_npc_cla <- if (!is.null(weights$w_npc_cla)) {
-    as.numeric(weights$w_npc_cla)
-  } else {
-    0
-  }
+  w_npc_pat <- as.numeric(weights$w_npc_pat %||% 0)
+  w_npc_sup <- as.numeric(weights$w_npc_sup %||% 0)
+  w_npc_cla <- as.numeric(weights$w_npc_cla %||% 0)
 
   v_pat <- df_pred_tax$feature_pred_tax_npc_01pat_val
   v_sup <- df_pred_tax$feature_pred_tax_npc_02sup_val
@@ -658,21 +630,12 @@ compute_candidate_M <- function(mz, adduct_string) {
   u_z_elec <- rep(NA_real_, n_u)
 
   for (ui in seq_len(n_u)) {
-    parsed <- tryCatch(
-      suppressWarnings(parse_adduct(u_add[[ui]])),
-      error = function(.err) {
-        invisible(.err)
-        NULL
-      }
-    )
+    parsed <- suppressWarnings(parse_adduct(u_add[[ui]]))
     if (is.null(parsed) || all(parsed == 0)) {
       next
     }
     n_charges <- parsed[["n_charges"]]
     n_mer <- parsed[["n_mer"]]
-    if (n_mer == 0L || n_charges == 0L) {
-      next
-    }
     u_n_charges[[ui]] <- n_charges
     u_n_mer[[ui]] <- n_mer
     u_iso_shift[[ui]] <- parsed[["n_iso"]] * ISOTOPE_MASS_SHIFT_DALTONS
@@ -689,7 +652,8 @@ compute_candidate_M <- function(mz, adduct_string) {
   v_idx <- usable_idx[valid_add]
   v_aid <- add_id[valid_add]
   m_vec <- (u_n_charges[v_aid] *
-    (mz_num[v_idx] - u_iso_shift[v_aid]) -
+    mz_num[v_idx] -
+    u_iso_shift[v_aid] -
     u_mass_mods[v_aid] +
     u_z_elec[v_aid]) /
     u_n_mer[v_aid]

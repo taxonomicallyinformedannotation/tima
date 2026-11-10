@@ -956,4 +956,97 @@ test_that("validate_filter_annotations_inputs, filter_ms1_redundancy, apply_rt_f
     res_zero_merge$candidate_count_similarity_peaks_matched,
     c("0", NA_character_)
   )
+
+  # 6. Additional edge cases: zero-transfer when ms1_tbl lacks column, apply_rt_filter with no matches,
+  # enforce_ms1_adduct_semantics without error_mz / without candidate_library / empty chosen_strong_idx,
+  # and filter_annotations with duplicate feature_id, rt column in rts, duplicate RT standards, and unannotated features
+  res_zero_newcol <- filter_ms1_redundancy(list(
+    ms1 = tidytable::tidytable(
+      feature_id = "F1",
+      candidate_structure_inchikey_no_stereo = "IK_Z",
+      candidate_structure_inchikey_connectivity_layer = "IK_Z"
+    ),
+    spectral = tidytable::tidytable(
+      feature_id = "F1",
+      candidate_structure_inchikey_no_stereo = "IK_Z",
+      candidate_structure_inchikey_connectivity_layer = "IK_Z",
+      candidate_score_similarity = "0",
+      candidate_count_similarity_peaks_matched = "0",
+      candidate_spectrum_id = "SP1"
+    )
+  ))
+  expect_identical(res_zero_newcol$candidate_spectrum_id, "SP1")
+
+  res_no_rt_match <- apply_rt_filter(
+    f_ann_type,
+    tidytable::tidytable(
+      candidate_structure_inchikey_connectivity_layer = "UNMATCHED_IK",
+      rt_target = "4.5"
+    ),
+    tolerance_rt = 0.5
+  )
+  expect_true(all(is.na(res_no_rt_match$candidate_structure_error_rt)))
+
+  res_no_errmz_nolib <- enforce_ms1_adduct_semantics(
+    tidytable::tidytable(
+      feature_id = c("F1", "F1", "F1"),
+      mz = c(101.0073, 101.0073, 101.0073),
+      candidate_adduct = c("[M+H]+", "[M+Na]+", "[M+H]+"),
+      candidate_annotation_level = c("primary", "primary", NA),
+      candidate_evidence_tier = c(
+        "supported_strong",
+        "supported_strong",
+        NA
+      ),
+      candidate_score_similarity = c(NA_real_, NA_real_, 0.9)
+    )
+  )
+  expect_identical(nrow(res_no_errmz_nolib), 3L)
+
+  # filter_annotations end-to-end with duplicate feature_id in features, 'rt' col in rts, and unannotated feature
+  td <- withr::local_tempdir()
+  f_path <- file.path(td, "feat.tsv")
+  a_path <- file.path(td, "ann.tsv")
+  r_path <- file.path(td, "rt.tsv")
+  o_path <- file.path(td, "out.tsv")
+  tidytable::fwrite(
+    tidytable::tidytable(
+      feature_id = c("F1", "F1", "F2"),
+      rt = c("5.0", "5.0", "6.0"),
+      mz = c("101.0073", "101.0073", "200.0")
+    ),
+    f_path,
+    sep = "\t"
+  )
+  tidytable::fwrite(
+    tidytable::tidytable(
+      feature_id = c("F1", "F1"),
+      candidate_structure_inchikey_connectivity_layer = c("IK1", "IK1"),
+      candidate_adduct = c("[M+H]+", "[M+H]+"),
+      candidate_library = c("ms1", "ms1")
+    ),
+    a_path,
+    sep = "\t"
+  )
+  tidytable::fwrite(
+    tidytable::tidytable(
+      candidate_structure_inchikey_connectivity_layer = c("IK1", "IK1"),
+      rt = c("5.0", "5.1")
+    ),
+    r_path,
+    sep = "\t"
+  )
+  local_mocked_bindings(
+    get_params = function(step) list(step = step),
+    export_params = function(...) invisible(NULL),
+    .package = "tima"
+  )
+  out_f <- filter_annotations(
+    annotations = a_path,
+    features = f_path,
+    rts = r_path,
+    output = o_path,
+    tolerance_rt = 0.5
+  )
+  expect_true(file.exists(out_f))
 })

@@ -91,21 +91,7 @@ adduct_to_string <- function(
       clusters
     }
     inside_losses <- if (isTRUE(loss_inside_multimer)) losses else integer()
-    outside_losses <- if (isTRUE(loss_inside_multimer)) losses else integer()
-    # Default routing: when only one flag is TRUE, the other component stays
-    # outside. When both flags are TRUE, both go inside.
-    if (isTRUE(loss_inside_multimer) && !isTRUE(cluster_inside_multimer)) {
-      inside_losses <- losses
-      outside_losses <- integer()
-      inside_clusters <- integer()
-      outside_clusters <- clusters
-    }
-    if (!isTRUE(loss_inside_multimer) && isTRUE(cluster_inside_multimer)) {
-      inside_losses <- integer()
-      outside_losses <- losses
-      inside_clusters <- clusters
-      outside_clusters <- integer()
-    }
+    outside_losses <- if (isTRUE(loss_inside_multimer)) integer() else losses
     # Canonical body inside parentheses: losses first, then clusters
     inside_body <- paste0(
       "M",
@@ -362,12 +348,13 @@ generate_adduct_hypotheses <- function(
       if (z_abs < 1L || z_abs > 6L) {
         next
       }
-      comp <- .compositions(z_abs, n_carriers)
+      comp <- tidytable::bind_rows(lapply(
+        seq_len(z_abs),
+        .compositions,
+        k = n_carriers
+      ))
       for (ri in seq_len(nrow(comp))) {
         counts <- comp[ri, ]
-        if (sum(counts) != z_abs) {
-          next
-        }
         z_net <- as.integer(sum(counts * carrier_zcontrib))
         if (z_net != z_val) {
           next
@@ -407,19 +394,6 @@ generate_adduct_hypotheses <- function(
     }
   }
 
-  rm(
-    carrier_idx,
-    m_val,
-    z_val,
-    z_abs,
-    comp,
-    ri,
-    counts,
-    z_net,
-    carrier_state,
-    rows_out,
-    row
-  )
   rows
 }
 

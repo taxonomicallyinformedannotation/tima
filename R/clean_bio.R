@@ -127,11 +127,7 @@ clean_bio <- function(
     )[keep_no_pred, ]
   } else {
     df1 <- NULL
-    df2 <- if (length(pred_tax_cols) > 0L) {
-      tidytable::as_tidytable(as.list(annotations_distinct)[non_pred_cols])
-    } else {
-      tidytable::as_tidytable(as.list(annotations_distinct))
-    }
+    df2 <- tidytable::as_tidytable(as.list(annotations_distinct)[non_pred_cols])
   }
   rm(annotations_distinct)
 
@@ -344,11 +340,7 @@ clean_bio <- function(
     fid <- if (anyNA(uf)) match(f, uf) else fastmatch::fmatch(f, uf)
     kid <- if (anyNA(uk)) match(k, uk) else fastmatch::fmatch(k, uk)
     nk <- max(1L, length(uk))
-    pk <- if (as.double(length(uf)) * nk < .Machine$integer.max) {
-      (fid - 1L) * nk + kid
-    } else {
-      as.double(fid - 1L) * nk + kid
-    }
+    pk <- as.double(fid - 1L) * nk + kid
     if (anyDuplicated(pk) == 0L) {
       attr(annot_table, ".unique_feature_ik") <- TRUE
       return(annot_table)
@@ -420,15 +412,41 @@ clean_bio <- function(
     keep <- not_self & ent_ok
   }
 
+  has_sim_col <- "candidate_score_similarity" %in% colnames(edges_table)
+
   if (!any(keep)) {
-    return(tidytable::tidytable(
-      feature_source = src[0L],
-      feature_target = tgt[0L]
+    return(tidytable::select(
+      edges_table[0L, ],
+      tidyselect::any_of(c(
+        "feature_source",
+        "feature_target",
+        "candidate_score_similarity"
+      ))
     ))
   }
 
   src_k <- src[keep]
   tgt_k <- tgt[keep]
+  sim_k <- if (has_sim_col) {
+    s_num <- suppressWarnings(as.double(
+      edges_table$candidate_score_similarity[keep]
+    ))
+    bad_s <- is.na(s_num) | !is.finite(s_num) | s_num <= 0
+    if (any(bad_s)) {
+      s_num[bad_s] <- 1
+    }
+    s_num
+  } else {
+    NULL
+  }
+
+  if (has_sim_col && length(sim_k) > 1L && any(sim_k != sim_k[1L])) {
+    ord_sim <- order(-sim_k, method = "radix")
+    src_k <- src_k[ord_sim]
+    tgt_k <- tgt_k[ord_sim]
+    sim_k <- sim_k[ord_sim]
+  }
+
   u_nodes <- unique(c(unique(src_k), unique(tgt_k)))
   n_nodes <- length(u_nodes)
   s_id <- fastmatch::fmatch(src_k, u_nodes)
@@ -442,6 +460,13 @@ clean_bio <- function(
   keep_deg <- counts[s_dedup] >= min_neighbors
 
   idx_final <- which(not_dup)[keep_deg]
+  if (has_sim_col) {
+    return(tidytable::tidytable(
+      feature_source = src_k[idx_final],
+      feature_target = tgt_k[idx_final],
+      candidate_score_similarity = sim_k[idx_final]
+    ))
+  }
   tidytable::tidytable(
     feature_source = src_k[idx_final],
     feature_target = tgt_k[idx_final]
@@ -534,14 +559,44 @@ clean_bio <- function(
   edge_src_ann <- edge_src[keep_edge]
   edge_tgt_ann <- edge_tgt[keep_edge]
 
+  has_sim_w <- "candidate_score_similarity" %in%
+    colnames(edges_filtered) &&
+    length(edge_src_ann) > 0L
+  edge_w_ann <- if (has_sim_w) {
+    w_num <- suppressWarnings(as.double(
+      edges_filtered$candidate_score_similarity[keep_edge]
+    ))
+    bad_w <- is.na(w_num) | !is.finite(w_num) | w_num <= 0
+    if (any(bad_w)) {
+      w_num[bad_w] <- 1
+    }
+    if (all(w_num == w_num[1L])) {
+      has_sim_w <- FALSE
+      NULL
+    } else {
+      w_num
+    }
+  } else {
+    NULL
+  }
+
   # Since edges_filtered has distinct (feature_source, feature_target) pairs,
-  # n_targets per source is simply tabulate(edge_src_ann)
-  n_targets_by_fid <- tabulate(edge_src_ann, nbins = n_fids)
+  # n_targets per source is tabulate(edge_src_ann) (or weighted sum when
+  # varying candidate_score_similarity weights are present)
+  n_targets_by_fid <- if (has_sim_w) {
+    w_sum <- numeric(n_fids)
+    rs <- rowsum(edge_w_ann, edge_src_ann, reorder = FALSE)
+    w_sum[as.integer(rownames(rs))] <- as.double(rs[, 1L])
+    w_sum
+  } else {
+    tabulate(edge_src_ann, nbins = n_fids)
+  }
 
   if (length(edge_src_ann) > 0L) {
     ord_e <- order(edge_tgt_ann, edge_src_ann, method = "radix")
     e_tgt_s <- edge_tgt_ann[ord_e]
     e_src_s <- edge_src_ann[ord_e]
+    e_w_s <- if (has_sim_w) edge_w_ann[ord_e] else NULL
     tgt_deg <- tabulate(e_tgt_s, nbins = n_fids)
     tgt_ends <- cumsum(tgt_deg)
     tgt_starts <- tgt_ends - tgt_deg + 1L
@@ -581,17 +636,8 @@ clean_bio <- function(
     n_tax <- length(u_tax)
     tax_v <- fastmatch::fmatch(vals_v, u_tax)
 
-    use_int_pair <- as.double(n_fids) * n_tax < .Machine$integer.max
-    pair_key <- if (use_int_pair) {
-      (fid_v - 1L) * n_tax + tax_v
-    } else {
-      (as.numeric(fid_v) - 1) * n_tax + tax_v
-    }
-    first_pair <- if (use_int_pair) {
-      !duplicated(pair_key)
-    } else {
-      fastmatch::fmatch(pair_key, pair_key) == seq_along(pair_key)
-    }
+    pair_key <- (fid_v - 1L) * n_tax + tax_v
+    first_pair <- !duplicated(pair_key)
 
     u_fid_pair <- fid_v[first_pair]
     u_tax_pair <- tax_v[first_pair]
@@ -611,27 +657,22 @@ clean_bio <- function(
     starts_k <- tgt_starts[u_fid_pair[has_e]]
     tax_k <- u_tax_pair[has_e]
 
-    j_src <- e_src_s[sequence(deg_k, from = starts_k)]
+    seq_idx <- sequence(deg_k, from = starts_k)
+    j_src <- e_src_s[seq_idx]
     j_tax <- rep.int(tax_k, deg_k)
+    j_w <- if (has_sim_w) e_w_s[seq_idx] else NULL
 
-    if (use_int_pair) {
-      j_key <- (j_src - 1L) * n_tax + j_tax
-      u_j_key <- sort(unique(j_key), method = "radix")
-      j_id <- fastmatch::fmatch(j_key, u_j_key)
-      c_cnt <- tabulate(j_id, nbins = length(u_j_key))
-      c_src <- (u_j_key - 1L) %/% n_tax + 1L
-      c_tax <- (u_j_key - 1L) %% n_tax + 1L
-      c_pair_key <- u_j_key
+    j_key <- (j_src - 1L) * n_tax + j_tax
+    u_j_key <- sort(unique(j_key), method = "radix")
+    j_id <- fastmatch::fmatch(j_key, u_j_key)
+    c_cnt <- if (has_sim_w) {
+      as.double(rowsum(j_w, j_id, reorder = TRUE)[, 1L])
     } else {
-      count_dt <- data.table::data.table(src_id = j_src, tax_id = j_tax)[,
-        list(count = .N),
-        keyby = c("src_id", "tax_id")
-      ]
-      c_src <- count_dt$src_id
-      c_tax <- count_dt$tax_id
-      c_cnt <- count_dt$count
-      c_pair_key <- (as.numeric(c_src) - 1) * n_tax + c_tax
+      tabulate(j_id, nbins = length(u_j_key))
     }
+    c_src <- (u_j_key - 1L) %/% n_tax + 1L
+    c_tax <- (u_j_key - 1L) %% n_tax + 1L
+    c_pair_key <- u_j_key
 
     cons_vec <- c_cnt / n_targets_by_fid[c_src]
     src_sc <- u_sc_pair[fastmatch::fmatch(c_pair_key, u_pair_keys)]

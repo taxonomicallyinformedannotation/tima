@@ -207,17 +207,6 @@ annotate_spectra <- function(
     )
   }
 
-  missing_in <- input_vec[!file.exists(input_vec)]
-  if (length(missing_in)) {
-    cli::cli_abort(
-      c(
-        "input file(s) not found",
-        "x" = paste(missing_in, collapse = ", ")
-      ),
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
-  }
   missing_lib <- libs_vec[!file.exists(libs_vec)]
   if (length(missing_lib)) {
     cli::cli_abort(
@@ -367,9 +356,6 @@ annotate_spectra <- function(
 
     if (nrow(sim_chunk) > 0L) {
       lib_precursors_all <- attr(sim_chunk, "lib_precursors_raw")
-      if (is.null(lib_precursors_all)) {
-        lib_precursors_all <- get_precursors(spectral_library)
-      }
       lib_adducts_all <- attr(sim_chunk, "lib_adducts_raw")
 
       all_target_ids <- unique(sim_chunk$target_id)
@@ -377,11 +363,7 @@ annotate_spectra <- function(
         spectral_library,
         lib_precursors_all,
         target_ids = all_target_ids,
-        target_adduct_raw = if (!is.null(lib_adducts_all)) {
-          lib_adducts_all[all_target_ids]
-        } else {
-          NULL
-        }
+        target_adduct_raw = lib_adducts_all[all_target_ids]
       )
 
       # Finalize this library's results
@@ -758,9 +740,6 @@ extract_vector <- function(obj, field, len, fill = NA, subset_idx = NULL) {
   }
 
   v <- spectra_data[[idx]]
-  if (is.null(v)) {
-    return(rep.int(fill, out_len))
-  }
   if (length(v) == len) {
     return(if (is.null(subset_idx)) v else v[subset_idx])
   }
@@ -1218,9 +1197,6 @@ update_ms1_zero_tracker <- function(tracker, lib_sp) {
   pair_sm_unm <- tracker$pair_sm_id[unm_idx]
   first_pos <- fastmatch::fmatch(pair_sm_unm, lib_sm_sub)
   has_cand <- !is.na(first_pos)
-  if (!any(has_cand)) {
-    return(invisible(NULL))
-  }
 
   cand_unm <- unm_idx[has_cand]
   fp <- first_pos[has_cand]
@@ -1427,15 +1403,13 @@ convert_precursor_for_matching <- function(precursors, adducts) {
     }
 
     idx <- idx_groups[[add]]
-    if (!length(idx)) {
-      next
-    }
     mz_vec <- precursors_num[idx]
     iso_shift <- n_iso * ISOTOPE_MASS_SHIFT_DALTONS
     # Same formula as calculate_mass_of_m(), including the electron term
     z_signed <- n_charges * charge_sign
     m_vec <- (n_charges *
-      (mz_vec - iso_shift) -
+      mz_vec -
+      iso_shift -
       mass_mods +
       z_signed * ELECTRON_MASS_DALTONS) /
       n_mer
@@ -1538,16 +1512,12 @@ reduce_library_by_precursor <- function(
 
   rem_idx <- which(!keep_raw)
   # Extract adducts only for remaining unmatched library spectra
-  if (inherits(lib_sp, "Spectra")) {
-    lib_adducts_rem <- extract_vector(
-      lib_sp,
-      c("adduct", "precursor_type"),
-      length(lib_sp),
-      NA_character_
-    )[rem_idx]
-  } else {
-    lib_adducts_rem <- rep(NA_character_, length(rem_idx))
-  }
+  lib_adducts_rem <- extract_vector(
+    lib_sp,
+    c("adduct", "precursor_type"),
+    length(lib_sp),
+    NA_character_
+  )[rem_idx]
   lib_adducts_rem <- harmonize_adduct_vector(
     lib_adducts_rem,
     colname = "target_adduct"
@@ -1598,7 +1568,9 @@ compute_similarity_safe <- function(
     query_ids,
     query_precursors,
     query_spectra,
-    space_label
+    space_label,
+    query_window_masses = NULL,
+    lib_window_masses = NULL
   ) {
     out <- calculate_entropy_and_similarity(
       lib_ids = lib_ids,
@@ -1611,12 +1583,11 @@ compute_similarity_safe <- function(
       dalton = dalton,
       ppm = ppm,
       threshold = eff_threshold,
-      approx = approx
+      approx = approx,
+      query_window_masses = query_window_masses,
+      lib_window_masses = lib_window_masses
     )
-    if (nrow(out) == 0L) {
-      return(tidytable::tidytable())
-    }
-    if ("candidate_score_similarity" %in% names(out)) {
+    if ("candidate_score_similarity" %in% names(out) && nrow(out) > 0L) {
       keep_pos <- !is.na(out$candidate_score_similarity) &
         as.numeric(out$candidate_score_similarity) > 0
       if ("candidate_count_similarity_peaks_matched" %in% names(out)) {
@@ -1626,10 +1597,10 @@ compute_similarity_safe <- function(
       }
       if (!all(keep_pos)) {
         out <- out[which(keep_pos), , drop = FALSE]
-        if (nrow(out) == 0L) {
-          return(tidytable::tidytable())
-        }
       }
+    }
+    if (nrow(out) == 0L) {
+      return(tidytable::tidytable())
     }
     out <- tidytable::as_tidytable(out)
     data.table::set(out, j = ".similarity_space", value = space_label)
@@ -1703,12 +1674,14 @@ compute_similarity_safe <- function(
           ) {
             neutral_out <- run_similarity(
               lib_ids = neutral_lib_indices,
-              lib_precursors = lib_neutral[neutral_lib_indices],
+              lib_precursors = lib_prec_match[neutral_lib_indices],
               lib_spectra = lib_sp@backend@peaksData[neutral_lib_indices],
               query_ids = query_ids[neutral_query_indices],
-              query_precursors = query_neutral[neutral_query_indices],
+              query_precursors = query_prec_match[neutral_query_indices],
               query_spectra = query_sp@backend@peaksData[neutral_query_indices],
-              space_label = "neutral_M"
+              space_label = "neutral_M",
+              query_window_masses = query_neutral[neutral_query_indices],
+              lib_window_masses = lib_neutral[neutral_lib_indices]
             )
           }
         }
@@ -1862,33 +1835,12 @@ finalize_results <- function(
   n_qadd <- max(1L, length(u_qadd))
   n_libs <- max(1L, length(u_libs))
   n_sm <- max(1L, length(u_sm))
-  prod_key <- as.double(length(u_fids)) *
-    as.double(n_qadd) *
-    as.double(n_libs) *
-    as.double(n_sm)
-  if (prod_key < .Machine$integer.max) {
-    grp_key <- (((fid_id[ord] - 1L) * n_qadd + (qadd_id[ord] - 1L)) *
-      n_libs +
-      (lib_id[ord] - 1L)) *
-      n_sm +
-      sm_id[ord]
-    keep_ord <- ord[!duplicated(grp_key)]
-  } else if (prod_key < 4.5e15) {
-    grp_key <- (((as.double(fid_id[ord] - 1L) * n_qadd + (qadd_id[ord] - 1L)) *
-      n_libs +
-      (lib_id[ord] - 1L)) *
-      n_sm) +
-      sm_id[ord]
-    keep_ord <- ord[fastmatch::fmatch(grp_key, grp_key) == seq_along(grp_key)]
-  } else {
-    grp_df <- data.frame(
-      f = fid_id[ord],
-      a = qadd_id[ord],
-      l = lib_id[ord],
-      s = sm_id[ord]
-    )
-    keep_ord <- ord[!duplicated(grp_df)]
-  }
+  grp_key <- (((as.double(fid_id[ord] - 1L) * n_qadd + (qadd_id[ord] - 1L)) *
+    n_libs +
+    (lib_id[ord] - 1L)) *
+    n_sm) +
+    sm_id[ord]
+  keep_ord <- ord[!duplicated(grp_key)]
 
   idx_m_keep <- idx_meta[keep_ord]
   q_add_keep <- query_adduct[keep_ord]
@@ -2009,11 +1961,7 @@ log_library_stats <- function(lib_sp) {
       u_s <- unique(s_sub)
       n_s <- length(u_s)
       s_id <- fastmatch::fmatch(s_sub, u_s)
-      pair_key <- if (as.double(n_lib) * n_s < .Machine$integer.max) {
-        (l_sub - 1L) * n_s + s_id
-      } else {
-        as.double(l_sub - 1L) * n_s + s_id
-      }
+      pair_key <- as.double(l_sub - 1L) * n_s + s_id
       unique_struct_cnt <- tabulate(l_sub[!duplicated(pair_key)], nbins = n_lib)
     }
   }

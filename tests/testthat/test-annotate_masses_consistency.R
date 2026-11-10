@@ -545,11 +545,22 @@ test_that("annotate_masses_consistency helpers cover empty, NA, fallback adduct 
   )
 
   # Multi-node ambiguous component where state flips on iter 1 and re-evaluates on iter 2
+  # N1 has [M+H]+ connected to two incompatible states on N2 ([M+K]+ and [M+NH4]+),
+  # giving initial prior 2+2=4, while N1:[M+Na]+ connects to N3:[M+H]+ (which also connects
+  # to N4:[M+Na]+, giving edge score 3). On iter 1 only one N2 state is active so N1 flips
+  # to [M+Na]+, while N5 (connected only to N4) has nb_changed == FALSE on iter 2.
   eg_multi <- enforce_graph_adduct_consistency(tidytable::tidytable(
-    feature_id = c("N1", "N1", "N2", "N2", "N2"),
-    adduct = c("raw_long_state", "[M+H]+", "[M+H]+", "[M+Na]+", "[M+Na]+"),
-    feature_id_dest = c("N2", "N2", "N3", "N4", "N5"),
-    adduct_dest = c("[M+H]+", "[M+Na]+", "[M+K]+", "[M+K]+", "[M+NH4]+")
+    feature_id = c("N1", "N1", "N1", "N3", "N4", "N4"),
+    adduct = c("[M+H]+", "[M+H]+", "[M+Na]+", "[M+H]+", "[M+Na]+", "[M+Na]+"),
+    feature_id_dest = c("N2", "N2", "N3", "N4", "N5", "N5"),
+    adduct_dest = c(
+      "[M+K]+",
+      "[M+NH4]+",
+      "[M+H]+",
+      "[M+Na]+",
+      "[M+K]+",
+      "[M+NH4]+"
+    )
   ))
   expect_true(nrow(eg_multi) >= 2L)
 })

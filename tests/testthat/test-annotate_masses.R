@@ -1962,10 +1962,1141 @@ test_that("filter_modifier_edges_by_assigned_adducts keeps edges when endpoint a
 
 test_that(".log_top_pair_deltas handles empty, single-value, and standard delta pairs", {
   expect_null(.log_top_pair_deltas(data.table::data.table(delta = numeric(0))))
+  expect_null(.log_top_pair_deltas(data.table::data.table(delta = NA_real_)))
+  expect_null(.log_top_pair_deltas(data.table::data.table(delta = 0)))
   expect_null(.log_top_pair_deltas(data.table::data.table(
     delta = rep(18.0106, 5L)
   )))
   expect_null(.log_top_pair_deltas(data.table::data.table(
-    delta = c(14.0156, 18.0106, 18.0106, 27.9949, 44.0262)
+    delta = seq(1, 25, by = 1)
   )))
+})
+
+test_that("annotate_masses_hypothesis helpers cover edge cases, covariance components, and propagation", {
+  # 2. solve_consistent_adduct_assignments edge cases:
+  # - edges with features missing from features_table -> nrow(edges) == 0
+  res_no_f <- solve_consistent_adduct_assignments(
+    adduct_edges = tidytable::tidytable(
+      feature_id = "F_MISS1",
+      adduct = "[M+H]+",
+      feature_id_dest = "F_MISS2",
+      adduct_dest = "[M+Na]+"
+    ),
+    features_table = tidytable::tidytable(feature_id = "F1", mz = 100.0),
+    tolerance_ppm = 5,
+    tolerance_dalton = 0.0025
+  )
+  expect_identical(nrow(res_no_f$consistent_edges), 0L)
+
+  # - edges with invalid neutral mass (mz too small for [M+Na]+) and inconsistent edges
+  res_incons <- solve_consistent_adduct_assignments(
+    adduct_edges = tidytable::tidytable(
+      feature_id = c("F_TINY", "F1"),
+      adduct = c("[M+Na]+", "[M+H]+"),
+      feature_id_dest = c("F1", "F2"),
+      adduct_dest = c("[M+Na]+", "[M+Na]+")
+    ),
+    features_table = tidytable::tidytable(
+      feature_id = c("F_TINY", "F1", "F2"),
+      mz = c(5.0, 101.0073, 250.0)
+    ),
+    tolerance_ppm = 5,
+    tolerance_dalton = NULL
+  )
+  expect_identical(nrow(res_incons$consistent_edges), 0L)
+
+  # - component where a feature has multiple candidate M values (one consistent, one outlier)
+  M_true <- 200.0
+  mz_h <- as.numeric(calculate_mz_from_mass(M_true, "[M+H]+"))
+  mz_na <- as.numeric(calculate_mz_from_mass(M_true, "[M+Na]+"))
+  mz_k <- as.numeric(calculate_mz_from_mass(M_true, "[M+K]+"))
+  res_cov <- solve_consistent_adduct_assignments(
+    adduct_edges = tidytable::tidytable(
+      feature_id = c("F1", "F1", "F1"),
+      adduct = c("[M+H]+", "[M+H]+", "[M+K]+"),
+      feature_id_dest = c("F2", "F3", "F3"),
+      adduct_dest = c("[M+Na]+", "[M+K]+", "[M+Na]+")
+    ),
+    features_table = tidytable::tidytable(
+      feature_id = c("F1", "F2", "F3", "F4", "F5"),
+      mz = c(mz_h, mz_na, mz_k, 301.0, 323.0)
+    ),
+    tolerance_ppm = 10,
+    tolerance_dalton = 0.01
+  )
+  expect_true(nrow(res_cov$consistent_edges) >= 2L)
+
+  # 3. collect_node_adduct_hypotheses with preassigned, evidence_hypotheses = NULL,
+  # covariance_edges, and both labeled (with adduct/adduct_dest) and unlabeled cluster/loss edges
+  ft_3 <- tidytable::tidytable(
+    feature_id = c("F1", "F2", "F3", "F4", "F5"),
+    mz = c(mz_h, mz_na, mz_h + 18.01056, 301.0, 323.0),
+    rt = c(1.0, 1.0, 1.0, 1.0, 1.0)
+  )
+  hyps_labeled <- collect_node_adduct_hypotheses(
+    adduct_edges = tidytable::tidytable(
+      feature_id = "F1",
+      adduct = "[M+H]+",
+      feature_id_dest = "F2",
+      adduct_dest = "[M+Na]+"
+    ),
+    cluster_edges = tidytable::tidytable(
+      feature_id = "F1",
+      adduct = "[M+H]+",
+      cluster = "H2O",
+      feature_id_dest = "F3",
+      adduct_dest = "[M+H2O+H]+"
+    ),
+    loss_edges = tidytable::tidytable(
+      feature_id = "F1",
+      adduct = "[M-H2O+H]+",
+      loss = "H2O",
+      feature_id_dest = "F3",
+      adduct_dest = "[M+H]+"
+    ),
+    evidence_hypotheses = NULL,
+    preassigned = tidytable::tidytable(
+      feature_id = "F1",
+      adduct = "[M+H]+"
+    ),
+    baseline_adducts = character(0),
+    features_table = ft_3,
+    covariance_edges = tidytable::tidytable(
+      feature_id = c("F1", "F4"),
+      feature_id_dest = c("F4", "F5")
+    )
+  )
+  expect_true(nrow(hyps_labeled) >= 3L)
+
+  # Unlabeled cluster_edges and loss_edges + evidence_hypotheses missing optional columns
+  hyps_unlabeled <- collect_node_adduct_hypotheses(
+    adduct_edges = tidytable::tidytable(
+      feature_id = "F1",
+      adduct = "[M+H]+",
+      feature_id_dest = "F2",
+      adduct_dest = "[M+Na]+"
+    ),
+    cluster_edges = tidytable::tidytable(
+      feature_id = "F1",
+      cluster = "H2O",
+      feature_id_dest = "F3"
+    ),
+    loss_edges = tidytable::tidytable(
+      feature_id = "F1",
+      loss = "H2O (water)",
+      feature_id_dest = "F3"
+    ),
+    evidence_hypotheses = tidytable::tidytable(
+      feature_id = "F1",
+      adduct = "[M+H]+"
+    ),
+    preassigned = tidytable::tidytable(
+      feature_id = "F1",
+      adduct = "[M+H]+"
+    ),
+    baseline_adducts = "[M+H]+",
+    features_table = ft_3
+  )
+  expect_true(nrow(hyps_unlabeled) >= 3L)
+
+  # 4. .simplify_adduct_after_modifier, .apply_modifier_column_fast, propagate_modifier_*, expand_with_modifier
+  expect_identical(.simplify_adduct_after_modifier(character(0)), character(0))
+  expect_identical(
+    .simplify_adduct_after_modifier(NA_character_),
+    NA_character_
+  )
+  expect_identical(
+    .simplify_adduct_after_modifier(c(
+      "NOT_BRACKET",
+      "[M]+",
+      "[M+H?]+",
+      "[M+Zz99+H]+",
+      "[M+C2H4O2-C2H4O2+H]+",
+      "[M+2C2H4O2+H]+"
+    )),
+    c(
+      "NOT_BRACKET",
+      "[M]+",
+      "[M+H?]+",
+      "[M+Zz99+H]+",
+      "[M+H]+",
+      "[M+C4H8O4+H]+"
+    )
+  )
+  expect_identical(
+    .apply_modifier_column_fast(character(0), character(0), "+"),
+    character(0)
+  )
+
+  base_h <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    adduct = c("[M-H2O+H]+", "[M+H2O+H]+"),
+    source = c("pair", "pair"),
+    is_preassigned = c(FALSE, FALSE),
+    adduct_support = c(1L, 1L)
+  )
+  expect_true(
+    nrow(propagate_modifier_src_to_dest(
+      base_hyps = base_h,
+      edges = tidytable::tidytable(
+        feature_id = "F1",
+        feature_id_dest = "F2",
+        loss = "H2O (water)"
+      ),
+      mod_col = "loss",
+      mod_sign = "+",
+      strip_label = TRUE,
+      source_label = NULL
+    )) >=
+      1L
+  )
+  expect_true(
+    nrow(propagate_modifier_dest_to_src(
+      base_hyps = base_h,
+      edges = tidytable::tidytable(
+        feature_id = "F1",
+        feature_id_dest = "F2",
+        cluster = "H2O"
+      ),
+      mod_col = "cluster",
+      mod_sign = "-",
+      strip_label = TRUE,
+      source_label = NULL
+    )) >=
+      1L
+  )
+  expect_identical(
+    nrow(expand_with_modifier(
+      base_hyps = base_h[0L, ],
+      edges = tidytable::tidytable(feature_id = "F1", loss = "H2O"),
+      edge_feature_col = "feature_id",
+      mod_col = "loss",
+      mod_sign = "-"
+    )),
+    0L
+  )
+  expect_true(
+    nrow(expand_with_modifier(
+      base_hyps = base_h,
+      edges = tidytable::tidytable(feature_id = "F1", loss = "H2O (water)"),
+      edge_feature_col = "feature_id",
+      mod_col = "loss",
+      mod_sign = "-",
+      strip_label = TRUE
+    )) >=
+      1L
+  )
+
+  # 5. dedupe_node_hypotheses with missing is_preassigned and supported_weak duplicates
+  ded_out <- dedupe_node_hypotheses(tidytable::tidytable(
+    feature_id = c("F1", "F1"),
+    adduct = c("[M+H]+", "[M+H]+"),
+    source = c("baseline", "weak_component"),
+    adduct_support = c(0L, 0L),
+    candidate_adduct_origin = c("baseline", "supported_weak")
+  ))
+  expect_identical(nrow(ded_out), 1L)
+  expect_identical(ded_out$candidate_adduct_origin, "supported_weak")
+
+  # 6. discover_evidence_adduct_signal, filter_modifier_evidence_by_pairwise_support, evidence_adduct_requires_pairwise_support
+  expect_identical(
+    nrow(
+      discover_evidence_adduct_signal(
+        features_table = ft_3[0L, ],
+        adducts = "[M+H]+",
+        clusters = character(),
+        neutral_losses = character(),
+        ms_mode = "pos",
+        tolerance_ppm = 10,
+        tolerance_rt = 0.05,
+        exact_masses = 200.0
+      )$hypotheses
+    ),
+    0L
+  )
+  expect_identical(
+    nrow(
+      discover_evidence_adduct_signal(
+        features_table = ft_3,
+        adducts = "[M+H]+",
+        candidate_adducts = "",
+        clusters = character(),
+        neutral_losses = character(),
+        ms_mode = "pos",
+        tolerance_ppm = 10,
+        tolerance_rt = 0.05,
+        exact_masses = 200.0
+      )$hypotheses
+    ),
+    0L
+  )
+  expect_identical(
+    nrow(
+      discover_evidence_adduct_signal(
+        features_table = ft_3,
+        universe = tidytable::tidytable(),
+        adducts = "[M+H]+",
+        clusters = character(),
+        neutral_losses = character(),
+        ms_mode = "pos",
+        tolerance_ppm = 10,
+        tolerance_rt = 0.05,
+        exact_masses = 200.0
+      )$hypotheses
+    ),
+    0L
+  )
+
+  # filter_modifier_evidence_by_pairwise_support with 0 evidence edges
+  f_pw <- filter_modifier_evidence_by_pairwise_support(
+    evidence_signal = list(
+      hypotheses = tidytable::tidytable(
+        feature_id = "F1",
+        adduct = "[M-H2O+H]+",
+        source = "evidence",
+        is_preassigned = FALSE,
+        adduct_support = 2L
+      ),
+      edges = tidytable::tidytable(
+        feature_id = character(),
+        adduct = character(),
+        feature_id_dest = character(),
+        adduct_dest = character()
+      )
+    ),
+    universe = tidytable::tidytable(),
+    adduct_edges = tidytable::tidytable(
+      feature_id = "F1",
+      adduct = "[M-H2O+H]+",
+      feature_id_dest = "F2",
+      adduct_dest = "[M+Na]+"
+    ),
+    cluster_edges = tidytable::tidytable(),
+    loss_edges = tidytable::tidytable(),
+    baseline_adduct = "[M+H]+",
+    features_table = tidytable::tidytable(
+      feature_id = c("F1", "F2"),
+      mz = c(mz_h - 18.01056, mz_na),
+      rt = c(1.0, 1.0)
+    )
+  )
+  expect_identical(nrow(f_pw$hypotheses), 1L)
+
+  expect_false(evidence_adduct_requires_pairwise_support(NA_character_))
+  expect_false(evidence_adduct_requires_pairwise_support("[M]+"))
+  testthat::with_mocked_bindings(
+    parse_modification_components = function(...) NULL,
+    expect_false(evidence_adduct_requires_pairwise_support("[M-H2O+H]+"))
+  )
+  testthat::with_mocked_bindings(
+    normalize_adduct_string = function(...) stop("err"),
+    expect_true(evidence_adduct_requires_pairwise_support("[M-H2O+H]+"))
+  )
+
+  # 7. generate_multi_hypotheses_from_node_masses, match_candidates_to_library,
+  # prune_candidates_by_network_consensus, and propagate_annotations_across_m_cliques
+  expect_identical(
+    nrow(generate_multi_hypotheses_from_node_masses(
+      node_hypotheses = tidytable::tidytable(
+        feature_id = "F1",
+        adduct = "[M+H]+",
+        source = "pair",
+        mz = mz_h,
+        rt = 1.0,
+        mass = M_true
+      ),
+      multi_adducts = tidytable::tidytable(adduct = "[2M+H]+"),
+      tolerance_ppm = 10,
+      tolerance_dalton = NULL
+    )),
+    0L
+  )
+
+  m_cand <- match_candidates_to_library(
+    candidates = tidytable::tidytable(
+      feature_id = "F1",
+      rt = 1.0,
+      mz = mz_h,
+      adduct = "[M+H]+",
+      mass = M_true,
+      source = "pair",
+      adduct_support = 1L
+    ),
+    library_em = tidytable::tidytable(
+      value_min = M_true - 0.01,
+      value_max = M_true + 0.01,
+      exact_mass = M_true
+    ),
+    tolerance_ppm = NULL,
+    tolerance_dalton = NULL
+  )
+  expect_identical(nrow(m_cand), 1L)
+
+  pruned_cand <- prune_candidates_by_network_consensus(
+    matched = tidytable::tidytable(
+      feature_id = c("F1", "F1"),
+      adduct = c("[M+H]+", "[M+K]+"),
+      source = c("pair", "multi"),
+      mass = c(M_true, M_true)
+    ),
+    adduct_edges = tidytable::tidytable(
+      feature_id = "F1",
+      adduct = "[M+H]+",
+      feature_id_dest = "F2",
+      adduct_dest = "[M+Na]+"
+    ),
+    baseline_adduct = NULL
+  )
+  expect_identical(nrow(pruned_cand), 1L)
+
+  # propagate_annotations_across_m_cliques edge cases
+  expect_identical(
+    nrow(propagate_annotations_across_m_cliques(
+      annotations = tidytable::tidytable(),
+      node_hypotheses = tidytable::tidytable()
+    )),
+    0L
+  )
+  nh_prop <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    mz = c(mz_h, mz_na),
+    rt = c(1.0, 1.0),
+    adduct = c("[M+H]+", "[M+Na]+"),
+    mass = c(M_true, M_true)
+  )
+  attr(nh_prop, "component_membership") <- tidytable::tidytable(
+    feature_id = "F1",
+    component_id = "C1"
+  )
+  attr(nh_prop, "feature_m_map") <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    component_id = c("C1", "C1"),
+    neutral_mass = c(M_true, M_true)
+  )
+  ann_prop <- tidytable::tidytable(
+    feature_id = "F1",
+    rt = 1.0,
+    mz = mz_h,
+    adduct = "[M+H]+",
+    mass = M_true,
+    structure_exact_mass = M_true,
+    error_mz = 0.0,
+    source = "propagated_clique_supported",
+    is_preassigned = FALSE,
+    candidate_adduct_origin = "supported",
+    adduct_support = 0L
+  )
+  # Single-feature component returns unchanged
+  expect_identical(
+    nrow(propagate_annotations_across_m_cliques(ann_prop, nh_prop)),
+    1L
+  )
+
+  # Multi-feature component with propagation + existing propagated_clique_supported + coverage_audit
+  attr(nh_prop, "component_membership") <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    component_id = c("C1", "C1")
+  )
+  nh_prop_both <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    mz = c(mz_h, mz_h),
+    rt = c(1.0, 1.0),
+    adduct = c("[M+H]+", "[M+H]+"),
+    mass = c(M_true, M_true)
+  )
+  attr(nh_prop_both, "component_membership") <- attr(
+    nh_prop,
+    "component_membership"
+  )
+  attr(nh_prop_both, "feature_m_map") <- attr(nh_prop, "feature_m_map")
+  attr(ann_prop, "coverage_audit") <- list(n_input = 1L)
+  prop_out <- propagate_annotations_across_m_cliques(
+    annotations = ann_prop,
+    node_hypotheses = nh_prop_both,
+    tolerance_ppm = 10,
+    tolerance_dalton = NULL
+  )
+  expect_identical(nrow(prop_out), 2L)
+  # Calling again when F2 already has propagated_clique_supported row returns unchanged
+  expect_identical(
+    nrow(propagate_annotations_across_m_cliques(prop_out, nh_prop_both)),
+    2L
+  )
+})
+
+test_that("annotate_masses internal helpers cover primary/secondary, weak hypotheses, modifiers, and conflict resolution", {
+  M_true <- 200.0
+  mz_h <- as.numeric(calculate_mz_from_mass(M_true, "[M+H]+"))
+  mz_na <- as.numeric(calculate_mz_from_mass(M_true, "[M+Na]+"))
+
+  # 1. derive_primary_secondary_annotations edge cases
+  expect_identical(
+    nrow(derive_primary_secondary_annotations(
+      tidytable::tidytable(),
+      "[M+H]+"
+    )),
+    0L
+  )
+  psa_1 <- derive_primary_secondary_annotations(
+    tidytable::tidytable(
+      feature_id = "F1",
+      adduct = "[M+H]+",
+      structure_exact_mass = M_true
+    ),
+    baseline_adducts = "[M+H]+"
+  )
+  expect_identical(psa_1$annotation_level, "primary")
+
+  # 2. append_component_weak_hypotheses edge cases
+  expect_identical(
+    nrow(append_component_weak_hypotheses(
+      tidytable::tidytable(),
+      tidytable::tidytable(),
+      character(),
+      character(),
+      "[M+H]+",
+      NULL,
+      10,
+      0.01
+    )),
+    0L
+  )
+  nh_w <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    adduct = c("[M+H]+", "[M+H]+"),
+    source = c("pair", "baseline"),
+    is_preassigned = c(FALSE, FALSE),
+    adduct_support = c(1L, 0L),
+    candidate_adduct_origin = c("supported", "baseline"),
+    mz = c(mz_h, mz_h - 18.01056),
+    rt = c(1.0, 1.0),
+    mass = c(M_true, M_true - 18.01056)
+  )
+  # Missing component_membership / feature_m_map / baseline_adducts / valid neutral_mass
+  expect_identical(
+    nrow(append_component_weak_hypotheses(
+      nh_w,
+      tidytable::tidytable(),
+      "H2O",
+      "H2O",
+      "[M+H]+",
+      NULL,
+      10,
+      0.01
+    )),
+    2L
+  )
+  attr(nh_w, "component_membership") <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    component_id = c("C1", "C1")
+  )
+  expect_identical(
+    nrow(append_component_weak_hypotheses(
+      nh_w,
+      tidytable::tidytable(),
+      "H2O",
+      "H2O",
+      "[M+H]+",
+      NULL,
+      10,
+      0.01
+    )),
+    2L
+  )
+  attr(nh_w, "feature_m_map") <- tidytable::tidytable(
+    feature_id = "F1",
+    component_id = "C1",
+    neutral_mass = NA_real_
+  )
+  expect_identical(
+    nrow(append_component_weak_hypotheses(
+      nh_w,
+      tidytable::tidytable(),
+      "H2O",
+      "H2O",
+      character(0),
+      NULL,
+      10,
+      0.01
+    )),
+    2L
+  )
+  expect_identical(
+    nrow(append_component_weak_hypotheses(
+      nh_w,
+      tidytable::tidytable(),
+      "H2O",
+      "H2O",
+      "[M+H]+",
+      NULL,
+      10,
+      0.01
+    )),
+    2L
+  )
+  # Valid feature_m_map -> recovers F2 as [M-H2O+H]+ weak_component_loss
+  attr(nh_w, "feature_m_map") <- tidytable::tidytable(
+    feature_id = "F1",
+    component_id = "C1",
+    neutral_mass = M_true
+  )
+  nh_w_out <- append_component_weak_hypotheses(
+    node_hypotheses = nh_w,
+    features_table = tidytable::tidytable(
+      feature_id = c("F1", "F2"),
+      mz = c(mz_h, mz_h - 18.01056),
+      rt = c(1.0, 1.0)
+    ),
+    neutral_losses_list = "H2O",
+    clusters = "H2O",
+    baseline_adducts = "[M+H]+",
+    adduct_lookup = NULL,
+    tolerance_ppm = 15,
+    tolerance_dalton = 0.01
+  )
+  expect_true(any(nh_w_out$candidate_adduct_origin == "supported_weak"))
+
+  # 3. filter_modifier_edges_by_assigned_adducts with state-labeled edges (unique and duplicate assigned features)
+  cl_lab <- tidytable::tidytable(
+    feature_id = "F1",
+    adduct = "[M+H]+",
+    cluster = "H2O",
+    feature_id_dest = "F2",
+    adduct_dest = "[M+H2O+H]+"
+  )
+  lo_lab <- tidytable::tidytable(
+    feature_id = "F1",
+    adduct = "[M-H2O+H]+",
+    loss = "H2O",
+    feature_id_dest = "F2",
+    adduct_dest = "[M+H]+"
+  )
+  fm_uniq <- filter_modifier_edges_by_assigned_adducts(
+    cluster_edges = cl_lab,
+    loss_edges = lo_lab,
+    assigned_nodes = tidytable::tidytable(
+      feature_id = c("F1", "F2"),
+      adduct = c("[M+H]+", "[M+H2O+H]+")
+    )
+  )
+  expect_identical(nrow(fm_uniq$cluster_edges), 1L)
+  expect_identical(nrow(fm_uniq$loss_edges), 0L)
+
+  fm_dup <- filter_modifier_edges_by_assigned_adducts(
+    cluster_edges = cl_lab,
+    loss_edges = lo_lab,
+    assigned_nodes = tidytable::tidytable(
+      feature_id = c("F1", "F1", "F2"),
+      adduct = c("[M+H]+", "[M+Na]+", "[M+H2O+H]+")
+    )
+  )
+  expect_identical(nrow(fm_dup$cluster_edges), 1L)
+
+  # 4. adduct_has_explicit_loss, adduct_has_explicit_cluster, align_carrier_multiplicity_adducts,
+  # normalize_modifier_formula_term, build_single_adduct_pairwise_deltas, build_modifier_mass_table
+  expect_false(adduct_has_explicit_loss(NA_character_, "H2O"))
+  expect_false(adduct_has_explicit_loss("NOT_BRACKET", "H2O"))
+  expect_false(adduct_has_explicit_loss("[M]+", "H2O"))
+  expect_false(adduct_has_explicit_loss("[MX]+", "H2O"))
+  expect_true(adduct_has_explicit_loss("[M-H4O2+H]+", "H2O"))
+  expect_false(adduct_has_explicit_loss("[M-CO2+H]+", "H2O"))
+
+  expect_false(adduct_has_explicit_cluster(NA_character_, "H2O"))
+  expect_false(adduct_has_explicit_cluster("NOT_BRACKET", "H2O"))
+  expect_false(adduct_has_explicit_cluster("[M]+", "H2O"))
+  expect_false(adduct_has_explicit_cluster("[MX]+", "H2O"))
+  expect_true(adduct_has_explicit_cluster("[M+H4O2+H]+", "H2O"))
+  expect_false(adduct_has_explicit_cluster("[M+CO2+H]+", "H2O"))
+
+  expect_identical(
+    align_carrier_multiplicity_adducts(character(0), character(0)),
+    character(0)
+  )
+  expect_identical(normalize_modifier_formula_term(""), NA_character_)
+  expect_identical(normalize_modifier_formula_term("   "), NA_character_)
+  expect_identical(normalize_modifier_formula_term("Zz99"), "Zz99")
+  expect_identical(normalize_modifier_terms(NULL), character(0))
+  expect_identical(
+    normalize_modifier_terms(list("H2O", c("CO2", "H2O"))),
+    c("H2O", "CO2")
+  )
+  expect_identical(
+    nrow(build_single_adduct_pairwise_deltas(tidytable::tidytable())),
+    0L
+  )
+  expect_identical(
+    nrow(build_modifier_mass_table(character(0), "loss")),
+    0L
+  )
+
+  # 5. resolve_competing_cluster_loss_edges_by_hypotheses:
+  # - fast path when cluster_edges and loss_edges have adduct/adduct_dest
+  res_comp_fast <- resolve_competing_cluster_loss_edges_by_hypotheses(
+    cluster_edges = cl_lab,
+    loss_edges = lo_lab,
+    node_hypotheses = tidytable::tidytable(
+      feature_id = c("F1", "F2"),
+      adduct = c("[M+H]+", "[M+H2O+H]+"),
+      source = c("pair", "pair"),
+      candidate_adduct_origin = c("supported", "supported"),
+      adduct_support = c(2L, 2L)
+    ),
+    ms_mode = "pos"
+  )
+  expect_identical(nrow(res_comp_fast$cluster_edges), 1L)
+  expect_identical(nrow(res_comp_fast$loss_edges), 0L)
+
+  # - neighbor tie-breaker when hypothesis scores are tied (both cluster > loss and loss > cluster)
+  res_comp_nb_c <- resolve_competing_cluster_loss_edges_by_hypotheses(
+    cluster_edges = tidytable::tidytable(
+      feature_id = c("F1", "F1"),
+      cluster = c("H2O", "H2O"),
+      feature_id_dest = c("F2", "F3")
+    ),
+    loss_edges = tidytable::tidytable(
+      feature_id = "F1",
+      loss = "H2O",
+      feature_id_dest = "F2"
+    ),
+    node_hypotheses = tidytable::tidytable(
+      feature_id = "F99",
+      adduct = "[M+H]+",
+      source = "baseline",
+      candidate_adduct_origin = "baseline",
+      adduct_support = 0L
+    ),
+    ms_mode = "pos"
+  )
+  expect_identical(res_comp_nb_c$n_loss_dropped, 1L)
+
+  res_comp_nb_l <- resolve_competing_cluster_loss_edges_by_hypotheses(
+    cluster_edges = tidytable::tidytable(
+      feature_id = "F1",
+      cluster = "H2O",
+      feature_id_dest = "F2"
+    ),
+    loss_edges = tidytable::tidytable(
+      feature_id = c("F1", "F1"),
+      loss = c("H2O", "H2O"),
+      feature_id_dest = c("F2", "F3")
+    ),
+    node_hypotheses = tidytable::tidytable(
+      feature_id = "F99",
+      adduct = "[M+H]+",
+      source = "baseline",
+      candidate_adduct_origin = "baseline",
+      adduct_support = 0L
+    ),
+    ms_mode = "pos"
+  )
+  expect_identical(res_comp_nb_l$n_cluster_dropped, 1L)
+
+  # - non-labeled edges where cluster_score > loss_score and loss_score > cluster_score
+  res_comp_c_win <- resolve_competing_cluster_loss_edges_by_hypotheses(
+    cluster_edges = tidytable::tidytable(
+      feature_id = "F1",
+      cluster = "H2O",
+      feature_id_dest = "F2"
+    ),
+    loss_edges = tidytable::tidytable(
+      feature_id = "F1",
+      loss = "H2O",
+      feature_id_dest = "F2"
+    ),
+    node_hypotheses = tidytable::tidytable(
+      feature_id = c("F1", "F2"),
+      adduct = c("[M+H]+", "[M+H2O+H]+"),
+      source = c("pair", "pair"),
+      candidate_adduct_origin = c("supported", "supported"),
+      adduct_support = c(2L, 2L)
+    ),
+    ms_mode = "pos"
+  )
+  expect_identical(res_comp_c_win$n_loss_dropped, 1L)
+
+  res_comp_l_win <- resolve_competing_cluster_loss_edges_by_hypotheses(
+    cluster_edges = tidytable::tidytable(
+      feature_id = "F1",
+      cluster = "H2O",
+      feature_id_dest = "F2"
+    ),
+    loss_edges = tidytable::tidytable(
+      feature_id = "F1",
+      loss = "H2O",
+      feature_id_dest = "F2"
+    ),
+    node_hypotheses = tidytable::tidytable(
+      feature_id = c("F1", "F2"),
+      adduct = c("[M-H2O+H]+", "[M+H]+"),
+      source = c("pair", "pair"),
+      candidate_adduct_origin = c("supported", "supported"),
+      adduct_support = c(2L, 2L)
+    ),
+    ms_mode = "pos"
+  )
+  expect_identical(res_comp_l_win$n_cluster_dropped, 1L)
+
+  # 6. enforce_non_conflicting_annotation_states edge cases:
+  expect_identical(
+    nrow(enforce_non_conflicting_annotation_states(
+      annotations = tidytable::tidytable(feature_id = "F1"),
+      adduct_edges = tidytable::tidytable(
+        feature_id = "F1",
+        adduct = "[M+H]+",
+        feature_id_dest = "F2",
+        adduct_dest = "[M+Na]+"
+      )
+    )),
+    1L
+  )
+  ann_nc <- tidytable::tidytable(
+    feature_id = c("F1", "F1", "F_UNC"),
+    adduct = c("[M+H]+", "[M+K]+", "[M+H]+")
+  )
+  out_nc <- enforce_non_conflicting_annotation_states(
+    annotations = ann_nc,
+    adduct_edges = tidytable::tidytable(
+      feature_id = "F1",
+      adduct = "[M+H]+",
+      feature_id_dest = "F2",
+      adduct_dest = "[M+Na]+"
+    ),
+    baseline_adduct = "[M+H]+",
+    coverage_mode = "best_supported_conflict_free"
+  )
+  expect_identical(nrow(out_nc), 2L)
+
+  # 7. Remaining helper edge cases across R/annotate_masses_hypothesis.R & R/annotate_masses.R:
+  mz_k <- as.numeric(calculate_mz_from_mass(M_true, "[M+K]+"))
+  M_alt <- as.numeric(calculate_mass_of_m(mz_h, "[M+Na]+"))
+  mz_f4 <- as.numeric(calculate_mz_from_mass(M_alt, "[M+H]+"))
+  eg_res <- enforce_global_m_consistency(
+    consistent_edges = tidytable::tidytable(
+      feature_id = c("F1", "F1", "F1"),
+      adduct = c("[M+H]+", "[M+H]+", "[M+Na]+"),
+      feature_id_dest = c("F2", "F3", "F4"),
+      adduct_dest = c("[M+Na]+", "[M+K]+", "[M+H]+")
+    ),
+    features_table = tidytable::tidytable(
+      feature_id = c("F1", "F2", "F3", "F4"),
+      mz = c(mz_h, mz_na, mz_k, mz_f4)
+    ),
+    tolerance_ppm = 0,
+    tolerance_dalton = 0.005
+  )
+  expect_identical(nrow(eg_res), 2L)
+
+  expect_identical(nrow(dedupe_node_hypotheses(tidytable::tidytable())), 0L)
+  expect_identical(
+    nrow(generate_multi_hypotheses_from_node_masses(
+      node_hypotheses = tidytable::tidytable(
+        feature_id = "F1",
+        adduct = "[2M+H]+",
+        source = "multi",
+        mz = mz_h,
+        rt = 1.0,
+        mass = M_true
+      ),
+      multi_adducts = tidytable::tidytable(adduct = "[2M+H]+"),
+      tolerance_ppm = 10,
+      tolerance_dalton = 0.01
+    )),
+    0L
+  )
+  expect_identical(
+    nrow(match_candidates_to_library(
+      tidytable::tidytable(),
+      tidytable::tidytable(),
+      10,
+      0.01
+    )),
+    0L
+  )
+
+  # propagate_annotations_across_m_cliques when structure_exact_mass is NA or target_mass incompatible
+  nh_incompat <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    mz = c(mz_h, 500.0),
+    rt = c(1.0, 1.0),
+    adduct = c("[M+H]+", "[M+H]+"),
+    mass = c(M_true, 500.0)
+  )
+  attr(nh_incompat, "component_membership") <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    component_id = c("C1", "C1")
+  )
+  attr(nh_incompat, "feature_m_map") <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    component_id = c("C1", "C1"),
+    neutral_mass = c(M_true, M_true)
+  )
+  ann_na_sem <- tidytable::tidytable(
+    feature_id = "F1",
+    rt = 1.0,
+    mz = mz_h,
+    adduct = "[M+H]+",
+    mass = M_true,
+    structure_exact_mass = NA_real_
+  )
+  expect_identical(
+    nrow(propagate_annotations_across_m_cliques(ann_na_sem, nh_incompat)),
+    1L
+  )
+  ann_valid_sem <- ann_na_sem
+  ann_valid_sem$structure_exact_mass <- M_true
+  expect_identical(
+    nrow(propagate_annotations_across_m_cliques(
+      ann_valid_sem,
+      nh_incompat,
+      tolerance_ppm = 5,
+      tolerance_dalton = NULL
+    )),
+    1L
+  )
+
+  # append_component_weak_hypotheses when u_mz is NA or no template hits
+  expect_identical(
+    nrow(append_component_weak_hypotheses(
+      node_hypotheses = nh_w,
+      features_table = tidytable::tidytable(
+        feature_id = c("F1", "F2"),
+        mz = c(mz_h, NA_real_),
+        rt = c(1.0, 1.0)
+      ),
+      neutral_losses_list = "H2O",
+      clusters = "H2O",
+      baseline_adducts = "[M+H]+",
+      adduct_lookup = NULL,
+      tolerance_ppm = 10,
+      tolerance_dalton = 0.01
+    )),
+    2L
+  )
+  expect_identical(
+    nrow(append_component_weak_hypotheses(
+      node_hypotheses = nh_w,
+      features_table = tidytable::tidytable(
+        feature_id = c("F1", "F2"),
+        mz = c(mz_h, 999.0),
+        rt = c(1.0, 1.0)
+      ),
+      neutral_losses_list = "H2O",
+      clusters = "H2O",
+      baseline_adducts = "[M+H]+",
+      adduct_lookup = NULL,
+      tolerance_ppm = 10,
+      tolerance_dalton = 0.01
+    )),
+    2L
+  )
+
+  expect_identical(harmonize_adduct_vector(character(0)), character(0))
+  expect_identical(nrow(build_adduct_lookup_from_strings(character(0))), 0L)
+  expect_identical(nrow(build_adduct_lookup_from_strings("NOT_AN_ADDUCT")), 0L)
+  expect_identical(
+    select_single_charge_monomer_adducts(character(0), "pos"),
+    character(0)
+  )
+  expect_identical(
+    nrow(build_single_legacy_adduct_mass_table(character(0))),
+    0L
+  )
+  expect_identical(
+    nrow(build_single_legacy_adduct_mass_table("NOT_AN_ADDUCT")),
+    0L
+  )
+  expect_identical(nrow(build_modifier_mass_table("INVALID_$$$", "loss")), 0L)
+  testthat::with_mocked_bindings(
+    calculate_formula_mass = function(...) stop("err"),
+    expect_identical(nrow(build_modifier_mass_table("H2O", "loss")), 0L)
+  )
+  expect_identical(
+    score_modifier_relation_from_hypotheses(
+      src_hypotheses = tidytable::tidytable(
+        adduct = "[M+Na]+",
+        .row_weight = 10L
+      ),
+      dest_hypotheses = tidytable::tidytable(
+        adduct = "[M+H2O+H]+",
+        .row_weight = 10L
+      ),
+      modifier = "H2O",
+      relation = "cluster"
+    ),
+    0L
+  )
+  expect_false(adduct_has_explicit_cluster("[M-H2O+H]+", "H2O"))
+  expect_identical(normalize_modifier_formula_terms(character(0)), character(0))
+  expect_identical(
+    apply_modifier_to_adducts(character(0), "H2O", "+"),
+    character(0)
+  )
+  testthat::with_mocked_bindings(
+    parse_atomic_formula = function(...) stop("err"),
+    expect_identical(normalize_modifier_formula_term("H2O"), "H2O")
+  )
+
+  # build_annotate_masses_candidate_hypotheses with bad_mass and non-finite tolerance_ppm
+  adduct_lkp_min <- build_adduct_lookup_from_strings(c("[M+H]+", "[M+Na]+"))
+  cand_bad <- suppressWarnings(build_annotate_masses_candidate_hypotheses(
+    adduct_edges = tidytable::tidytable(
+      feature_id = "F1",
+      adduct = "[M+H]+",
+      feature_id_dest = "F2",
+      adduct_dest = "[M+Na]+"
+    ),
+    cluster_edges = tidytable::tidytable(),
+    loss_edges = tidytable::tidytable(),
+    evidence_hypotheses = tidytable::tidytable(
+      feature_id = "F1",
+      adduct = "[0M+H]+",
+      source = "evidence",
+      is_preassigned = FALSE,
+      adduct_support = 1L,
+      candidate_adduct_origin = "supported"
+    ),
+    preassigned = tidytable::tidytable(
+      feature_id = character(),
+      adduct = character()
+    ),
+    baseline_adducts = "[M+H]+",
+    features_table = tidytable::tidytable(
+      feature_id = c("F1", "F2"),
+      mz = c(mz_h, mz_na),
+      rt = c(1.0, 1.0)
+    ),
+    multi_adducts = tidytable::tidytable(adduct = character()),
+    adduct_lookup = adduct_lkp_min,
+    tolerance_ppm = NA_real_,
+    tolerance_dalton = 0.01
+  ))
+  expect_true(nrow(cand_bad) >= 2L)
+
+  # discover_annotate_masses_edge_sets with intensity_all column + end-to-end annotate_masses with empty features, str_nam, already_assigned, and competing cluster/loss refinement
+  td <- withr::local_tempdir()
+  f_empty <- file.path(td, "f_empty.tsv")
+  f_comp <- file.path(td, "f_comp.tsv")
+  lib_smi <- file.path(td, "lib.smi")
+  str_ste <- file.path(td, "str_ste.tsv")
+  str_met <- file.path(td, "str_met.tsv")
+  str_nam <- file.path(td, "str_nam.tsv")
+  str_cla <- file.path(td, "str_cla.tsv")
+  str_npc <- file.path(td, "str_npc.tsv")
+  out_ann_e <- file.path(td, "out_ann_e.tsv")
+  out_edg_e <- file.path(td, "out_edg_e.tsv")
+  out_ann_c <- file.path(td, "out_ann_c.tsv")
+  out_edg_c <- file.path(td, "out_edg_c.tsv")
+
+  writeLines("feature_id\trt\tmz\tsample", f_empty)
+  writeLines("CCO\tETHANOL", lib_smi)
+  M_eth <- 46.04186
+  mz_eth_h <- as.numeric(calculate_mz_from_mass(M_eth, "[M+H]+"))
+  mz_eth_h2o <- as.numeric(calculate_mz_from_mass(M_eth, "[M+H2O+H]+"))
+  mz_eth_na <- as.numeric(calculate_mz_from_mass(M_eth, "[M+Na]+"))
+
+  tidytable::fwrite(
+    tidytable::tidytable(
+      feature_id = c("F1", "F2", "F3"),
+      rt = c(1.0, 1.0, 1.0),
+      mz = c(mz_eth_h, mz_eth_h2o, mz_eth_na),
+      sample = c("S1", "S1", "S1"),
+      adduct = c("[M+H]+", NA_character_, NA_character_),
+      intensity_all = c("100|200|300", "200|400|600", "150|300|450")
+    ),
+    f_comp,
+    sep = "\t"
+  )
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_smiles = "CCO",
+      structure_inchikey = "LFQSCWFLJHTTHZ-UHFFFAOYSA-N",
+      structure_smiles_no_stereo = "CCO",
+      structure_inchikey_connectivity_layer = "LFQSCWFLJHTTHZ"
+    ),
+    str_ste,
+    sep = "\t"
+  )
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_smiles_no_stereo = "CCO",
+      structure_exact_mass = M_eth,
+      structure_molecular_formula = "C2H6O",
+      structure_xlogp = -0.3
+    ),
+    str_met,
+    sep = "\t"
+  )
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_smiles_no_stereo = "CCO",
+      structure_name = "Ethanol"
+    ),
+    str_nam,
+    sep = "\t"
+  )
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_inchikey_connectivity_layer = "LFQSCWFLJHTTHZ",
+      structure_tax_cla_chemontid = "0000001",
+      structure_tax_cla_01kin = "Organic compounds",
+      structure_tax_cla_02sup = "Organic oxygen compounds",
+      structure_tax_cla_03cla = "Organooxygen compounds",
+      structure_tax_cla_04dirpar = "Alcohols and polyols"
+    ),
+    str_cla,
+    sep = "\t"
+  )
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_smiles_no_stereo = "CCO",
+      structure_tax_npc_01pat = "Fatty acids",
+      structure_tax_npc_02sup = "Small alcohols",
+      structure_tax_npc_03cla = "Primary alcohols"
+    ),
+    str_npc,
+    sep = "\t"
+  )
+
+  # Empty features file -> write_empty_annotate_masses_outputs
+  testthat::with_mocked_bindings(
+    sanitize_all_inputs = function(...) invisible(NULL),
+    annotate_masses(
+      features = f_empty,
+      library = lib_smi,
+      str_stereo = str_ste,
+      str_met = str_met,
+      str_nam = str_nam,
+      str_tax_cla = str_cla,
+      str_tax_npc = str_npc,
+      adducts_list = list(pos = c("H1", "Na1"), neg = "H1"),
+      clusters_list = list(pos = "H2O", neg = "H2O"),
+      neutral_losses_list = "H2O",
+      ms_mode = "pos",
+      tolerance_ppm = 10,
+      tolerance_rt = 0.05,
+      output_annotations = out_ann_e,
+      output_edges = out_edg_e
+    )
+  )
+  expect_true(file.exists(out_ann_e))
+
+  # Competing cluster/loss ("H2O" in both clusters_list and neutral_losses_list) + str_nam + preassigned adduct
+  annotate_masses(
+    features = f_comp,
+    library = lib_smi,
+    str_stereo = str_ste,
+    str_met = str_met,
+    str_nam = str_nam,
+    str_tax_cla = str_cla,
+    str_tax_npc = str_npc,
+    adducts_list = list(pos = c("H1", "Na1"), neg = "H1"),
+    clusters_list = list(pos = "H2O", neg = "H2O"),
+    neutral_losses_list = "H2O",
+    ms_mode = "pos",
+    tolerance_ppm = 10,
+    tolerance_rt = 0.05,
+    output_annotations = out_ann_c,
+    output_edges = out_edg_c
+  )
+  expect_true(file.exists(out_ann_c))
 })

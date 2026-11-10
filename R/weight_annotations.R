@@ -409,14 +409,10 @@ weight_annotations <- function(
   log_annotation_stats(annotation_table)
 
   feat_cols <- intersect(c("feature_id", "rt", "mz"), names(annotation_table))
-  features_table <- if (length(feat_cols) == 0L) {
-    tidytable::tidytable()
-  } else {
-    .fast_distinct_with_key_guard(
-      tidytable::as_tidytable(as.list(annotation_table)[feat_cols]),
-      "feature_id"
-    )
-  }
+  features_table <- .fast_distinct_with_key_guard(
+    tidytable::as_tidytable(as.list(annotation_table)[feat_cols]),
+    "feature_id"
+  )
   log_debug("Extracted %d unique features", nrow(features_table))
 
   log_debug(
@@ -488,16 +484,9 @@ weight_annotations <- function(
 
   rm(annotation_table)
 
-  needed_structures <- if (
-    "candidate_structure_inchikey_connectivity_layer" %in%
-      names(annotation_table_taxed)
-  ) {
-    unique(
-      annotation_table_taxed$candidate_structure_inchikey_connectivity_layer
-    )
-  } else {
-    NULL
-  }
+  needed_structures <- unique(
+    annotation_table_taxed$candidate_structure_inchikey_connectivity_layer
+  )
   structure_organism_pairs_table <- load_structure_organism_pairs(
     library,
     str_stereo,
@@ -525,7 +514,12 @@ weight_annotations <- function(
     score_biological_genus = score_biological_genus,
     score_biological_species = score_biological_species,
     score_biological_variety = score_biological_variety,
-    score_biological_biota = score_biological_biota
+    score_biological_biota = score_biological_biota,
+    score_biological_infraorder = score_biological_infraorder,
+    score_biological_subfamily = score_biological_subfamily,
+    score_biological_subtribe = score_biological_subtribe,
+    score_biological_subgenus = score_biological_subgenus,
+    score_biological_subspecies = score_biological_subspecies
   )
   rm(annotation_table_taxed)
   log_debug(

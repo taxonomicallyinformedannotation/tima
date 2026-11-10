@@ -220,7 +220,8 @@ annotate_masses <- function(
   pairs <- build_feature_pairs_within_rt(
     df_rt_tol = features_table,
     df_fea_min = features_table,
-    tolerance_ppm = tolerance_ppm
+    tolerance_ppm = tolerance_ppm,
+    tolerance_dalton = tolerance_dalton
   )
   log_info("Built %d RT-window pair(s)", nrow(pairs))
   .log_top_pair_deltas(pairs)
@@ -565,83 +566,78 @@ annotate_masses <- function(
     return(invisible(NULL))
   }
   x <- pairs$delta
-  nb <- 100000L
-  rx <- range(x, na.rm = TRUE)
-  if (!all(is.finite(rx))) {
-    bins <- pairs[, .N, by = .(bin = cut(delta, breaks = nb))] |>
-      tidytable::arrange(tidytable::desc(N)) |>
-      tidytable::slice_head(n = 16L)
-  } else {
-    dx <- rx[2L] - rx[1L]
-    if (dx == 0) {
-      dx <- abs(rx[1L])
-      breaks <- seq.int(
-        rx[1L] - if (dx == 0) 0.001 else dx / 1000,
-        rx[2L] + if (dx == 0) 0.001 else dx / 1000,
-        length.out = nb + 1L
-      )
-    } else {
-      breaks <- seq.int(rx[1L], rx[2L], length.out = nb + 1L)
-      breaks[c(1L, nb + 1L)] <- c(rx[1L] - dx * 0.001, rx[2L] + dx * 0.001)
-    }
-    codes <- .bincode(x, breaks = breaks, right = TRUE, include.lowest = FALSE)
-    counts <- tabulate(codes, nbins = nb)
-    nz <- which(counts > 0L)
-    if (length(nz) == 0L) {
-      return(invisible(NULL))
-    }
-    cand <- if (length(nz) > 16L) {
-      thresh <- sort(counts[nz], partial = length(nz) - 15L)[length(nz) - 15L]
-      which(counts >= thresh)
-    } else {
-      nz
-    }
-    first_pos <- match(cand, codes)
-    ord <- cand[order(-counts[cand], first_pos)]
-    top_idx <- ord[seq_len(min(16L, length(ord)))]
-
-    step <- (breaks[nb] - breaks[2L]) / (nb - 2L)
-    p10 <- 10^(floor(log10(max(step, abs(rx[1L])))):ceiling(log10(max(
-      step,
-      abs(rx[2L])
-    ))))
-    idx_lo <- as.integer(ceiling((p10 - rx[1L]) / step)) + 1L
-    idx_hi <- as.integer(floor((p10 - rx[1L]) / step))
-    probe_lo <- unique(c(
-      1L,
-      2L,
-      nb - 1L,
-      nb,
-      as.integer(seq.int(1L, nb, length.out = 64L)),
-      idx_lo[idx_lo >= 1L & idx_lo <= nb],
-      idx_hi[idx_hi >= 1L & idx_hi <= nb],
-      top_idx
-    ))
-    for (dig in 3L:12L) {
-      ch_lo_p <- formatC(0 + breaks[probe_lo], digits = dig, width = 1L)
-      ch_hi_p <- formatC(0 + breaks[probe_lo + 1L], digits = dig, width = 1L)
-      if (all(ch_lo_p != ch_hi_p)) {
-        break
-      }
-    }
-    nt <- length(top_idx)
-    ch_top <- formatC(
-      0 + breaks[c(top_idx, top_idx + 1L)],
-      digits = dig,
-      width = 1L
-    )
-    top_labels <- paste0(
-      "(",
-      ch_top[seq_len(nt)],
-      ",",
-      ch_top[nt + seq_len(nt)],
-      "]"
-    )
-    bins <- tidytable::tidytable(
-      bin = top_labels,
-      N = counts[top_idx]
-    )
+  x <- x[is.finite(x)]
+  if (length(x) == 0L) {
+    return(invisible(NULL))
   }
+  nb <- 100000L
+  rx <- range(x)
+  dx <- rx[2L] - rx[1L]
+  if (dx == 0) {
+    dx <- abs(rx[1L])
+    breaks <- seq.int(
+      rx[1L] - if (dx == 0) 0.001 else dx / 1000,
+      rx[2L] + if (dx == 0) 0.001 else dx / 1000,
+      length.out = nb + 1L
+    )
+  } else {
+    breaks <- seq.int(rx[1L], rx[2L], length.out = nb + 1L)
+    breaks[c(1L, nb + 1L)] <- c(rx[1L] - dx * 0.001, rx[2L] + dx * 0.001)
+  }
+  codes <- .bincode(x, breaks = breaks, right = TRUE, include.lowest = FALSE)
+  counts <- tabulate(codes, nbins = nb)
+  nz <- which(counts > 0L)
+  cand <- if (length(nz) > 16L) {
+    thresh <- sort(counts[nz], partial = length(nz) - 15L)[length(nz) - 15L]
+    which(counts >= thresh)
+  } else {
+    nz
+  }
+  first_pos <- match(cand, codes)
+  ord <- cand[order(-counts[cand], first_pos)]
+  top_idx <- ord[seq_len(min(16L, length(ord)))]
+
+  step <- (breaks[nb] - breaks[2L]) / (nb - 2L)
+  p10 <- 10^(floor(log10(max(step, abs(rx[1L])))):ceiling(log10(max(
+    step,
+    abs(rx[2L])
+  ))))
+  idx_lo <- as.integer(ceiling((p10 - rx[1L]) / step)) + 1L
+  idx_hi <- as.integer(floor((p10 - rx[1L]) / step))
+  probe_lo <- unique(c(
+    1L,
+    2L,
+    nb - 1L,
+    nb,
+    as.integer(seq.int(1L, nb, length.out = 64L)),
+    idx_lo[idx_lo >= 1L & idx_lo <= nb],
+    idx_hi[idx_hi >= 1L & idx_hi <= nb],
+    top_idx
+  ))
+  for (dig in 3L:12L) {
+    ch_lo_p <- formatC(0 + breaks[probe_lo], digits = dig, width = 1L)
+    ch_hi_p <- formatC(0 + breaks[probe_lo + 1L], digits = dig, width = 1L)
+    if (all(ch_lo_p != ch_hi_p)) {
+      break
+    }
+  }
+  nt <- length(top_idx)
+  ch_top <- formatC(
+    0 + breaks[c(top_idx, top_idx + 1L)],
+    digits = dig,
+    width = 1L
+  )
+  top_labels <- paste0(
+    "(",
+    ch_top[seq_len(nt)],
+    ",",
+    ch_top[nt + seq_len(nt)],
+    "]"
+  )
+  bins <- tidytable::tidytable(
+    bin = top_labels,
+    N = counts[top_idx]
+  )
   bins <- add_percentage_column(bins, count_col = "N", out_col = "Pct")
   log_info(
     "Here are the top 16 observed m/z differences inside the RT windows:"
@@ -722,16 +718,8 @@ derive_primary_secondary_annotations <- function(
 
   u_f <- unique(out$feature_id)
   u_a <- sort(unique(out$adduct), na.last = TRUE)
-  f_id <- if (anyNA(u_f)) {
-    match(out$feature_id, u_f)
-  } else {
-    fastmatch::fmatch(out$feature_id, u_f)
-  }
-  a_id <- if (anyNA(u_a)) {
-    match(out$adduct, u_a)
-  } else {
-    fastmatch::fmatch(out$adduct, u_a)
-  }
+  f_id <- match(out$feature_id, u_f)
+  a_id <- match(out$adduct, u_a)
 
   same_prev <- if (n > 1L) {
     c(
@@ -759,11 +747,7 @@ derive_primary_secondary_annotations <- function(
   err_s <- abs_err_inf[keep_sub]
 
   n_a <- length(u_a)
-  fa_key <- if (as.double(length(u_f)) * n_a < .Machine$integer.max) {
-    (f_s - 1L) * n_a + a_s
-  } else {
-    as.double(f_s - 1L) * n_a + a_s
-  }
+  fa_key <- as.double(f_s - 1L) * n_a + a_s
 
   if (anyDuplicated(fa_key) > 0L) {
     u_fa <- unique(fa_key)
@@ -877,9 +861,6 @@ append_component_weak_hypotheses <- function(
     fm_nm[valid_fm],
     feature_m_map$component_id[valid_fm]
   )
-  if (length(med_c$groups) == 0L) {
-    return(node_hypotheses)
-  }
 
   nh_orig <- tidytable::coalesce(
     node_hypotheses$candidate_adduct_origin,
@@ -897,34 +878,13 @@ append_component_weak_hypotheses <- function(
   u_cids <- component_membership$component_id[idx_unres]
   u_cmass <- med_c$medians[fastmatch::fmatch(u_cids, med_c$groups)]
 
-  ft_fids <- features_table$feature_id
-  ft_mz <- features_table$mz
-  ft_rt <- features_table$rt
-  if (anyDuplicated(ft_fids) > 0L) {
-    keep_ft <- !duplicated(paste(ft_fids, ft_mz, ft_rt, sep = "\r"))
-    ft_fids <- ft_fids[keep_ft]
-    ft_mz <- ft_mz[keep_ft]
-    ft_rt <- ft_rt[keep_ft]
-  }
-  if (anyDuplicated(ft_fids) == 0L) {
-    m_ft <- fastmatch::fmatch(u_fids, ft_fids)
-    u_mz <- as.numeric(ft_mz[m_ft])
-    u_rt <- as.numeric(ft_rt[m_ft])
-  } else {
-    unresolved_df <- tidytable::tidytable(
-      feature_id = u_fids,
-      component_id = u_cids,
-      component_mass = u_cmass
-    ) |>
-      tidytable::left_join(
-        tidytable::tidytable(feature_id = ft_fids, mz = ft_mz, rt = ft_rt),
-        by = "feature_id"
-      )
-    u_fids <- unresolved_df$feature_id
-    u_cmass <- unresolved_df$component_mass
-    u_mz <- as.numeric(unresolved_df$mz)
-    u_rt <- as.numeric(unresolved_df$rt)
-  }
+  keep_ft <- !duplicated(features_table$feature_id)
+  ft_fids <- features_table$feature_id[keep_ft]
+  ft_mz <- features_table$mz[keep_ft]
+  ft_rt <- features_table$rt[keep_ft]
+  m_ft <- fastmatch::fmatch(u_fids, ft_fids)
+  u_mz <- as.numeric(ft_mz[m_ft])
+  u_rt <- as.numeric(ft_rt[m_ft])
 
   valid_u <- which(!is.na(u_cmass) & !is.na(u_mz) & is.finite(u_mz))
   if (length(valid_u) == 0L) {
@@ -1030,10 +990,6 @@ append_component_weak_hypotheses <- function(
   ) |>
     tidytable::distinct()
 
-  if (nrow(weak_all) == 0L) {
-    return(node_hypotheses)
-  }
-
   out <- tidytable::bind_rows(node_hypotheses, weak_all) |>
     dedupe_node_hypotheses()
   attr(out, "component_membership") <- component_membership
@@ -1098,29 +1054,21 @@ retain_supported_single_m_edges <- function(
     tidytable::distinct()
 
   # Use igraph to compute connected components (faster and vectorized)
-  if (nrow(undirected) == 0L) {
-    comp_members <- tidytable::tidytable(
-      feature_id = character(0),
-      component_id = character(0)
-    )
-  } else {
-    graph_df <- data.frame(
-      from = undirected$src,
-      to = undirected$dest,
-      stringsAsFactors = FALSE
-    )
-    g <- igraph::graph_from_data_frame(graph_df, directed = FALSE)
-    comps <- igraph::components(g, mode = "weak")
-    membership <- comps$membership
-    names(membership) <- igraph::V(g)$name
-    comp_ids <- paste0("M_", as.integer(membership))
-    comp_members <- data.frame(
-      feature_id = names(membership),
-      component_id = comp_ids,
-      stringsAsFactors = FALSE
-    )
-    comp_members <- tidytable::as_tidytable(comp_members)
-  }
+  graph_df <- data.frame(
+    from = undirected$src,
+    to = undirected$dest,
+    stringsAsFactors = FALSE
+  )
+  g <- igraph::graph_from_data_frame(graph_df, directed = FALSE)
+  comps <- igraph::components(g, mode = "weak")
+  membership <- comps$membership
+  names(membership) <- igraph::V(g)$name
+  comp_ids <- paste0("M_", as.integer(membership))
+  comp_members <- tidytable::as_tidytable(data.frame(
+    feature_id = names(membership),
+    component_id = comp_ids,
+    stringsAsFactors = FALSE
+  ))
 
   # Keep directly matched modifier edges; avoid over-pruning by adduct-component
   # membership and enforce coherence with assigned adduct states below.
@@ -1150,11 +1098,7 @@ retain_supported_single_m_edges <- function(
     if (any(na_comp)) {
       u_comp_id[na_comp] <- paste0("M_singleton_", u_f[na_comp])
     }
-    f_idx <- if (anyNA(u_f)) {
-      match(annotations$feature_id, u_f)
-    } else {
-      fastmatch::fmatch(annotations$feature_id, u_f)
-    }
+    f_idx <- match(annotations$feature_id, u_f)
     data.table::set(
       annotations,
       j = "component_id",
@@ -1214,9 +1158,6 @@ filter_modifier_edges_by_assigned_adducts <- function(
 
     an_keys <- map_keys[fastmatch::fmatch(assigned_nodes$adduct, map_adducts)]
     valid_an <- which(!is.na(an_keys))
-    if (length(valid_an) == 0L) {
-      return(edges)
-    }
     an_fids <- assigned_nodes$feature_id[valid_an]
     an_keys <- an_keys[valid_an]
     keep_ak <- !duplicated(paste(an_fids, an_keys, sep = "\r"))
@@ -1292,13 +1233,7 @@ filter_modifier_edges_by_assigned_adducts <- function(
   ) {
     src_adducts <- unique(stats::na.omit(as.character(src_adducts)))
     dest_adducts <- unique(stats::na.omit(as.character(dest_adducts)))
-    if (length(src_adducts) == 0L || length(dest_adducts) == 0L) {
-      return(TRUE)
-    }
     modifier <- normalize_modifier_formula_term(modifier)
-    if (is.na(modifier) || !nzchar(modifier)) {
-      return(TRUE)
-    }
 
     if (identical(relation, "cluster")) {
       expected_dest <- unique(apply_modifier_to_adducts(
@@ -1316,24 +1251,20 @@ filter_modifier_edges_by_assigned_adducts <- function(
       ))
     }
 
-    if (identical(relation, "loss")) {
-      expected_product <- unique(apply_modifier_to_adducts(
-        dest_adducts,
-        modifier,
-        "-"
-      ))
-      state_map <- build_adduct_state_key_map(unique(c(
-        expected_product,
-        src_adducts
-      )))
-      key_lookup <- stats::setNames(state_map$state_key, state_map$adduct)
-      return(any(
-        unname(key_lookup[expected_product]) %in%
-          unname(key_lookup[src_adducts])
-      ))
-    }
-
-    TRUE
+    expected_product <- unique(apply_modifier_to_adducts(
+      dest_adducts,
+      modifier,
+      "-"
+    ))
+    state_map <- build_adduct_state_key_map(unique(c(
+      expected_product,
+      src_adducts
+    )))
+    key_lookup <- stats::setNames(state_map$state_key, state_map$adduct)
+    any(
+      unname(key_lookup[expected_product]) %in%
+        unname(key_lookup[src_adducts])
+    )
   }
 
   assigned_by_fid <- if (nrow(assigned_nodes) > 0L) {
@@ -1600,7 +1531,7 @@ build_adduct_lookup_from_strings <- function(adducts) {
     tidytable::mutate(
       adduct_mass_per_monomer = 0,
       mz_slope = n_mer / abs(z),
-      mz_offset = adduct_mass / abs(z) + n_iso * isotope_shift,
+      mz_offset = (adduct_mass + n_iso * isotope_shift) / abs(z),
       carrier_key = "",
       cluster_key = "",
       loss_key = ""
@@ -1764,13 +1695,7 @@ adduct_has_explicit_loss <- function(adduct, loss_formula) {
     return(FALSE)
   }
   loss_norm <- normalize_modifier_formula_term(loss_formula)
-  loss_parsed <- tryCatch(
-    parse_atomic_formula(loss_norm),
-    error = function(.err) {
-      invisible(.err)
-      NULL
-    }
-  )
+  loss_parsed <- parse_atomic_formula(loss_norm)
   any(vapply(
     X = tokens,
     FUN = function(tok) {
@@ -1783,37 +1708,18 @@ adduct_has_explicit_loss <- function(adduct, loss_formula) {
       if (identical(formula_norm, loss_norm)) {
         return(TRUE)
       }
-      token_parsed <- tryCatch(
-        parse_atomic_formula(formula_norm),
-        error = function(.err) {
-          invisible(.err)
-          NULL
-        }
-      )
+      token_parsed <- parse_atomic_formula(formula_norm)
       if (
         is.null(loss_parsed) ||
           length(loss_parsed) == 0L ||
           is.null(token_parsed) ||
-          length(token_parsed) == 0L
+          !setequal(names(loss_parsed), names(token_parsed))
       ) {
         return(FALSE)
       }
-      all_names <- sort(unique(c(names(loss_parsed), names(token_parsed))))
-      loss_full <- stats::setNames(numeric(length(all_names)), all_names)
-      token_full <- stats::setNames(numeric(length(all_names)), all_names)
-      loss_full[names(loss_parsed)] <- as.numeric(loss_parsed)
-      token_full[names(token_parsed)] <- as.numeric(token_parsed)
-      if (
-        any(loss_full <= 0) ||
-          any(token_full < 0) ||
-          any(token_full == 0 & loss_full > 0)
-      ) {
-        return(FALSE)
-      }
-      ratios <- token_full[loss_full > 0] / loss_full[loss_full > 0]
-      length(ratios) > 0L &&
-        all(is.finite(ratios)) &&
-        all(abs(ratios - round(ratios)) < 1e-8) &&
+      ratios <- as.numeric(token_parsed[names(loss_parsed)]) /
+        as.numeric(loss_parsed)
+      all(abs(ratios - round(ratios)) < 1e-8) &&
         length(unique(round(ratios))) == 1L &&
         unique(round(ratios)) >= 1L
     },
@@ -1847,13 +1753,7 @@ adduct_has_explicit_cluster <- function(adduct, cluster_formula) {
     return(FALSE)
   }
   clu_norm <- normalize_modifier_formula_term(cluster_formula)
-  clu_parsed <- tryCatch(
-    parse_atomic_formula(clu_norm),
-    error = function(.err) {
-      invisible(.err)
-      NULL
-    }
-  )
+  clu_parsed <- parse_atomic_formula(clu_norm)
   any(vapply(
     X = tokens,
     FUN = function(tok) {
@@ -1866,37 +1766,18 @@ adduct_has_explicit_cluster <- function(adduct, cluster_formula) {
       if (identical(formula_norm, clu_norm)) {
         return(TRUE)
       }
-      token_parsed <- tryCatch(
-        parse_atomic_formula(formula_norm),
-        error = function(.err) {
-          invisible(.err)
-          NULL
-        }
-      )
+      token_parsed <- parse_atomic_formula(formula_norm)
       if (
         is.null(clu_parsed) ||
           length(clu_parsed) == 0L ||
           is.null(token_parsed) ||
-          length(token_parsed) == 0L
+          !setequal(names(clu_parsed), names(token_parsed))
       ) {
         return(FALSE)
       }
-      all_names <- sort(unique(c(names(clu_parsed), names(token_parsed))))
-      clu_full <- stats::setNames(numeric(length(all_names)), all_names)
-      token_full <- stats::setNames(numeric(length(all_names)), all_names)
-      clu_full[names(clu_parsed)] <- as.numeric(clu_parsed)
-      token_full[names(token_parsed)] <- as.numeric(token_parsed)
-      if (
-        any(clu_full <= 0) ||
-          any(token_full < 0) ||
-          any(token_full == 0 & clu_full > 0)
-      ) {
-        return(FALSE)
-      }
-      ratios <- token_full[clu_full > 0] / clu_full[clu_full > 0]
-      length(ratios) > 0L &&
-        all(is.finite(ratios)) &&
-        all(abs(ratios - round(ratios)) < 1e-8) &&
+      ratios <- as.numeric(token_parsed[names(clu_parsed)]) /
+        as.numeric(clu_parsed)
+      all(abs(ratios - round(ratios)) < 1e-8) &&
         length(unique(round(ratios))) == 1L &&
         unique(round(ratios)) >= 1L
     },
@@ -2187,32 +2068,19 @@ score_modifier_relation_from_hypotheses <- function(
     return(0L)
   }
   modifier <- normalize_modifier_formula_term(modifier)
-  if (is.na(modifier) || !nzchar(modifier)) {
-    return(0L)
-  }
-
-  if (!".row_weight" %in% names(src_hypotheses)) {
-    src_hypotheses <- src_hypotheses |>
-      tidytable::mutate(
-        .row_weight = score_modifier_hypothesis_row(
-          source = source,
-          candidate_adduct_origin = candidate_adduct_origin,
-          adduct_support = adduct_support
-        )
-      )
-  }
-  if (!".row_weight" %in% names(dest_hypotheses)) {
-    dest_hypotheses <- dest_hypotheses |>
-      tidytable::mutate(
-        .row_weight = score_modifier_hypothesis_row(
-          source = source,
-          candidate_adduct_origin = candidate_adduct_origin,
-          adduct_support = adduct_support
-        )
-      )
-  }
 
   if (identical(relation, "cluster")) {
+    keep_dest <- vapply(
+      dest_hypotheses$adduct,
+      adduct_has_explicit_cluster,
+      logical(1L),
+      cluster_formula = modifier,
+      USE.NAMES = FALSE
+    )
+    dest_hypotheses <- dest_hypotheses[which(keep_dest), , drop = FALSE]
+    if (nrow(dest_hypotheses) == 0L) {
+      return(0L)
+    }
     expected <- apply_modifier_to_adducts(src_hypotheses$adduct, modifier, "+")
     state_map <- build_adduct_state_key_map(unique(c(
       expected,
@@ -2222,7 +2090,18 @@ score_modifier_relation_from_hypotheses <- function(
 
     src_keys <- unname(key_lookup[expected])
     dest_keys <- unname(key_lookup[dest_hypotheses$adduct])
-  } else if (identical(relation, "loss")) {
+  } else {
+    keep_src <- vapply(
+      src_hypotheses$adduct,
+      adduct_has_explicit_loss,
+      logical(1L),
+      loss_formula = modifier,
+      USE.NAMES = FALSE
+    )
+    src_hypotheses <- src_hypotheses[which(keep_src), , drop = FALSE]
+    if (nrow(src_hypotheses) == 0L) {
+      return(0L)
+    }
     expected <- apply_modifier_to_adducts(dest_hypotheses$adduct, modifier, "-")
     state_map <- build_adduct_state_key_map(unique(c(
       expected,
@@ -2232,15 +2111,10 @@ score_modifier_relation_from_hypotheses <- function(
 
     src_keys <- unname(key_lookup[src_hypotheses$adduct])
     dest_keys <- unname(key_lookup[expected])
-  } else {
-    return(0L)
   }
 
   valid_s <- which(!is.na(src_keys))
   valid_d <- which(!is.na(dest_keys))
-  if (length(valid_s) == 0L || length(valid_d) == 0L) {
-    return(0L)
-  }
   sk_s <- src_keys[valid_s]
   sk_d <- dest_keys[valid_d]
   common_keys <- intersect(sk_s, sk_d)
@@ -2772,41 +2646,13 @@ build_annotate_masses_annotations <- function(
     u_f <- unique(c(node_hypotheses$feature_id, matched$feature_id))
     u_a <- unique(c(node_hypotheses$adduct, matched$adduct))
     n_a <- max(1L, length(u_a))
-    if (as.numeric(length(u_f)) * as.numeric(n_a) < 2e9) {
-      f_h <- if (anyNA(u_f)) {
-        match(node_hypotheses$feature_id, u_f)
-      } else {
-        fastmatch::fmatch(node_hypotheses$feature_id, u_f)
-      }
-      a_h <- if (anyNA(u_a)) {
-        match(node_hypotheses$adduct, u_a)
-      } else {
-        fastmatch::fmatch(node_hypotheses$adduct, u_a)
-      }
-      f_m <- if (anyNA(u_f)) {
-        match(matched$feature_id, u_f)
-      } else {
-        fastmatch::fmatch(matched$feature_id, u_f)
-      }
-      a_m <- if (anyNA(u_a)) {
-        match(matched$adduct, u_a)
-      } else {
-        fastmatch::fmatch(matched$adduct, u_a)
-      }
-      key_h <- (f_h - 1L) * n_a + a_h
-      key_m <- (f_m - 1L) * n_a + a_m
-      has_m <- logical(length(u_f) * n_a)
-      has_m[key_m] <- TRUE
-      unm_idx <- which(!has_m[key_h])
-    } else {
-      key_h <- paste(
-        node_hypotheses$feature_id,
-        node_hypotheses$adduct,
-        sep = "\r"
-      )
-      key_m <- unique(paste(matched$feature_id, matched$adduct, sep = "\r"))
-      unm_idx <- which(is.na(fastmatch::fmatch(key_h, key_m)))
-    }
+    f_h <- match(node_hypotheses$feature_id, u_f)
+    a_h <- match(node_hypotheses$adduct, u_a)
+    f_m <- match(matched$feature_id, u_f)
+    a_m <- match(matched$adduct, u_a)
+    key_h <- as.double(f_h - 1L) * n_a + a_h
+    key_m <- unique(as.double(f_m - 1L) * n_a + a_m)
+    unm_idx <- which(is.na(fastmatch::fmatch(key_h, key_m)))
     unm <- tidytable::as_tidytable(
       lapply(as.list(node_hypotheses), `[`, unm_idx)
     )
@@ -2864,9 +2710,6 @@ enforce_non_conflicting_annotation_states <- function(
   }
 
   consistent_edges <- enforce_graph_adduct_consistency(adduct_edges)
-  if (nrow(consistent_edges) == 0L) {
-    return(annotations)
-  }
 
   assigned_states <- tidytable::bind_rows(
     consistent_edges |>
@@ -2875,9 +2718,6 @@ enforce_non_conflicting_annotation_states <- function(
       tidytable::transmute(feature_id = feature_id_dest, adduct = adduct_dest)
   ) |>
     tidytable::distinct()
-  if (nrow(assigned_states) == 0L) {
-    return(annotations)
-  }
 
   u_add_all <- unique(c(annotations$adduct, assigned_states$adduct))
   state_map <- build_adduct_state_key_map(u_add_all)
@@ -2900,36 +2740,19 @@ enforce_non_conflicting_annotation_states <- function(
     sm_key[row_m_add]
   )
 
-  # Fast path when each constrained feature has a single assigned_state_key
-  if (anyDuplicated(assigned_states$feature_id) == 0L) {
-    m_feat <- fastmatch::fmatch(
-      annotations$feature_id,
-      assigned_states$feature_id
-    )
-    ass_row_key <- assigned_states$assigned_state_key[m_feat]
-    keep <- is.na(ass_row_key) |
-      (!is.na(row_state_key) & row_state_key == ass_row_key)
-    feat_is_unconstrained <- is.na(ass_row_key)
-  } else {
-    # Fallback if multiple assigned states exist for a feature
-    ass_pairs <- paste(
-      assigned_states$feature_id,
-      assigned_states$assigned_state_key,
-      sep = "\r"
-    )
-    row_pairs <- paste(annotations$feature_id, row_state_key, sep = "\r")
-    feat_is_unconstrained <- is.na(fastmatch::fmatch(
-      annotations$feature_id,
-      assigned_states$feature_id
-    ))
-    keep <- feat_is_unconstrained |
-      !is.na(fastmatch::fmatch(row_pairs, ass_pairs))
-  }
+  m_feat <- fastmatch::fmatch(
+    annotations$feature_id,
+    assigned_states$feature_id
+  )
+  ass_row_key <- assigned_states$assigned_state_key[m_feat]
+  keep <- is.na(ass_row_key) |
+    (!is.na(row_state_key) & row_state_key == ass_row_key)
+  feat_is_unconstrained <- is.na(ass_row_key)
 
   f_col <- annotations$feature_id
   u_f <- unique(f_col)
   n_u_f <- length(u_f)
-  f_id <- if (anyNA(u_f)) match(f_col, u_f) else fastmatch::fmatch(f_col, u_f)
+  f_id <- match(f_col, u_f)
 
   coverage_mode <- resolve_annotate_masses_coverage_mode(coverage_mode)
   if (coverage_mode == "best_supported_conflict_free") {
@@ -3013,11 +2836,7 @@ enforce_non_conflicting_annotation_states <- function(
     drop_idx <- which(!keep)
     add_drop <- annotations$adduct[drop_idx]
     u_add_drop <- unique(add_drop)
-    add_drop_id <- if (anyNA(u_add_drop)) {
-      match(add_drop, u_add_drop)
-    } else {
-      fastmatch::fmatch(add_drop, u_add_drop)
-    }
+    add_drop_id <- match(add_drop, u_add_drop)
     n_u_add_drop <- length(u_add_drop)
     pair_key <- as.double(f_id[drop_idx] - 1L) * n_u_add_drop + add_drop_id
     dropped_n <- length(unique(pair_key))

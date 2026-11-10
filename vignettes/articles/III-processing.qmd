@@ -61,12 +61,40 @@ this should be a piece of cake, you deserve it!
 tima::run_tima()
 ```
 
+## Scoring and network consistency
+
+During `weight_annotations()`, candidate structures are scored in three steps:
+
+1. **Initial spectral score (`weight_bio`):**
+   - SIRIUS CSI:FingerID log-scores (`<= 0`) are mapped to `(0, 1)` via a
+     logistic transform (`K = 100`, `scale = 20`) and optionally modulated by
+     SIRIUS Zodiac formula confidence.
+   - When both library MS^2^ similarity and SIRIUS scores are present, they are
+     combined via `spectral_fusion` (`"mean"`, `"corroborated"`, or
+     `"noisy_or"`).
+2. **Biological source weighting (`weight_bio` & `clean_bio`):**
+   - Taxonomic matches are scored across all 15 ranks from `domain` to `variety`
+     (including `infraorder`, `subfamily`, `subtribe`, `subgenus`, and
+     `subspecies`), with universal core metabolites (`domain == "Biota"`)
+     receiving the `biota` score.
+   - Network neighbor consistency (`clean_bio`) weights each neighbor's chemical
+     class vote by its edge similarity score rather than treating weak and
+     strong edges equally.
+3. **Chemical class weighting (`weight_chemo`):**
+   - ClassyFire and NPClassifier agreement with the component's consensus
+     chemical class is combined with the spectral and biological scores.
+   - Each weighted combination tracks per-row evidence `coverage` (fraction of
+     total weight backed by non-`NA` evidence in `[0, 1]`), supports optional
+     Empirical Bayes shrinkage (`na_prior = "mean"`), and can apply a smooth
+     Cauchy penalty for RT and `m/z` errors (`compute_rt_mz_penalty()`).
+
 ## Avoiding duplicate final candidates across retention times
 
 A single compound (2D `InChIKey`) cannot elute at two different retention times
 (`> 0.05` min apart) on the same chromatographic gradient. Co-eluting ions of
-the same peak (`[M+H]+`, `[M+Na]+`, or in-source fragments within `0.05` min)
-can share the same top candidate, but distinct chromatographic peaks cannot.
+the same peak (`[M+H]+`, `[M+Na]+`, or in-source fragments grouped by 1D
+complete-linkage RT clustering so every cluster has diameter `<= 0.05` min) can
+share the same top candidate, but distinct chromatographic peaks cannot.
 
 When two peaks at different retention times initially rank the same structure
 1st---typically isomers sharing an exact mass or a similar MS^2^ spectrum---TIMA

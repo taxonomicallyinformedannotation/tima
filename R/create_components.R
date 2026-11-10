@@ -55,7 +55,18 @@ EDGE_MATCHED_PEAKS_COLUMNS <- c(
     peak_col <- intersect(peak_columns, names(edges))
     denominator <- rep(6, nrow(edges))
 
-    if (length(peak_col) > 0L) {
+    if (
+      all(
+        c("source_feature_spectrum_peaks", "target_feature_spectrum_peaks") %in%
+          names(edges)
+      )
+    ) {
+      src_peaks <- .as_numeric_dedup(edges[["source_feature_spectrum_peaks"]])
+      tgt_peaks <- .as_numeric_dedup(edges[["target_feature_spectrum_peaks"]])
+      src_peaks[!is.finite(src_peaks) | src_peaks < 1] <- 6
+      tgt_peaks[!is.finite(tgt_peaks) | tgt_peaks < 1] <- 6
+      denominator <- pmin(src_peaks, tgt_peaks)
+    } else if (length(peak_col) > 0L) {
       peak_values <- .as_numeric_dedup(edges[[peak_col[[1L]]]])
       peak_values[!is.finite(peak_values)] <- 6
       peak_values[peak_values < 1] <- 6
@@ -114,16 +125,42 @@ EDGE_MATCHED_PEAKS_COLUMNS <- c(
     return(intra_edges[seq_len(min(2L, nrow(intra_edges))), , drop = FALSE])
   }
 
-  qs <- stats::quantile(
-    edge_weights,
-    probs = c(0.5, 0.75),
-    na.rm = TRUE,
-    names = FALSE
-  )
-  threshold <- max(0.05, qs[[1L]], qs[[2L]])
-  keep_edge <- edge_weights >= threshold
-  if (!any(keep_edge)) {
-    keep_edge[which.max(edge_weights)] <- TRUE
+  intra_comm <- s_comm[same_community]
+  u_intra_comm <- unique(intra_comm)
+  if (length(u_intra_comm) <= 1L) {
+    qs <- stats::quantile(
+      edge_weights,
+      probs = c(0.5, 0.75),
+      na.rm = TRUE,
+      names = FALSE
+    )
+    threshold <- max(0.05, qs[[1L]], qs[[2L]])
+    keep_edge <- edge_weights >= threshold
+    if (!any(keep_edge)) {
+      keep_edge[which.max(edge_weights)] <- TRUE
+    }
+  } else {
+    keep_edge <- logical(nrow(intra_edges))
+    comm_groups <- split(seq_along(intra_comm), intra_comm)
+    for (idx_c in comm_groups) {
+      w_c <- edge_weights[idx_c]
+      if (!any(is.finite(w_c)) || all(w_c <= 1e-6)) {
+        keep_edge[idx_c[seq_len(min(2L, length(idx_c)))]] <- TRUE
+      } else {
+        qs_c <- stats::quantile(
+          w_c,
+          probs = c(0.5, 0.75),
+          na.rm = TRUE,
+          names = FALSE
+        )
+        thresh_c <- max(0.05, qs_c[[1L]], qs_c[[2L]])
+        keep_c <- !is.na(w_c) & w_c >= thresh_c
+        if (!any(keep_c)) {
+          keep_c[which.max(w_c)] <- TRUE
+        }
+        keep_edge[idx_c[keep_c]] <- TRUE
+      }
+    }
   }
 
   intra_edges[keep_edge, , drop = FALSE]
@@ -138,7 +175,8 @@ EDGE_MATCHED_PEAKS_COLUMNS <- c(
   seed = NULL,
   label_column = "componentindex",
   cut_to_communities = FALSE,
-  populate_edges = TRUE
+  populate_edges = TRUE,
+  max_edges = 200000L
 ) {
   if (nrow(edges) == 0L) {
     return(list(
@@ -152,29 +190,14 @@ EDGE_MATCHED_PEAKS_COLUMNS <- c(
   }
 
   if (label_column %in% names(edges) && !all(is.na(edges[[label_column]]))) {
-    sf_col <- edges[[name_source]]
-    tf_col <- edges[[name_target]]
-    source_features <- if (is.character(sf_col)) {
-      sf_col
-    } else {
-      as.character(sf_col)
-    }
-    target_features <- if (is.character(tf_col)) {
-      tf_col
-    } else {
-      as.character(tf_col)
-    }
+    source_features <- as.character(edges[[name_source]])
+    target_features <- as.character(edges[[name_target]])
     all_features <- unique(c(unique(source_features), unique(target_features)))
     all_features <- all_features[
       !is.na(all_features) & nzchar(all_features, keepNA = FALSE)
     ]
 
-    el_col <- edges[[label_column]]
-    edge_label_values <- if (is.character(el_col)) {
-      el_col
-    } else {
-      as.character(el_col)
-    }
+    edge_label_values <- as.character(edges[[label_column]])
     valid_lbl <- which(
       !is.na(edge_label_values) & nzchar(edge_label_values, keepNA = FALSE)
     )
@@ -215,10 +238,10 @@ EDGE_MATCHED_PEAKS_COLUMNS <- c(
     edge_weights <- .resolve_edge_weights(edges)
     edge_weights <- pmax(edge_weights, 1e-6)
 
-    if (nrow(edges) > 200000L) {
+    if (nrow(edges) > max_edges) {
       q_cut <- stats::quantile(
         edge_weights,
-        probs = max(0, 1 - 200000 / nrow(edges)),
+        probs = max(0, 1 - max_edges / nrow(edges)),
         na.rm = TRUE,
         names = FALSE
       )
@@ -261,104 +284,96 @@ EDGE_MATCHED_PEAKS_COLUMNS <- c(
       igraph::E(network_graph)$weight <- edge_weights
     }
 
-    if (igraph::ecount(network_graph) > 0L) {
-      resolution_grid <- if (nrow(edges) > 200000L) {
-        unique(c(resolution, 1))
-      } else {
-        unique(c(
-          resolution,
-          resolution / 2,
-          resolution / 4,
-          resolution * 2,
-          resolution * 4,
-          0.025,
-          0.05,
-          0.1,
-          0.2,
-          0.5,
-          1
-        ))
+    resolution_grid <- if (nrow(edges) > max_edges) {
+      unique(c(resolution, 1))
+    } else {
+      unique(c(
+        resolution,
+        resolution / 2,
+        resolution / 4,
+        resolution * 2,
+        resolution * 4,
+        0.025,
+        0.05,
+        0.1,
+        0.2,
+        0.5,
+        1
+      ))
+    }
+    resolution_grid <- resolution_grid[
+      is.finite(resolution_grid) & resolution_grid > 0
+    ]
+    resolution_grid <- unique(round(resolution_grid, 6))
+    resolution_grid <- resolution_grid[order(
+      abs(resolution_grid - round(resolution, 6)),
+      resolution_grid
+    )]
+    eff_iterations <- if (nrow(edges) > max_edges) 1L else n_iterations
+
+    detect_communities <- function(resolution_value) {
+      # Re-seed per call so each resolution is reproducible on its own
+      if (!is.null(seed)) {
+        set.seed(seed)
       }
-      resolution_grid <- resolution_grid[
-        is.finite(resolution_grid) & resolution_grid > 0
-      ]
-      resolution_grid <- sort(unique(round(resolution_grid, 6)))
-      eff_iterations <- if (nrow(edges) > 200000L) 1L else n_iterations
-
-      detect_communities <- function(resolution_value) {
-        # Re-seed per call so each resolution is reproducible on its own
-        if (!is.null(seed)) {
-          set.seed(seed)
-        }
-        tryCatch(
-          {
-            if ("cluster_leiden" %in% getNamespaceExports("igraph")) {
-              # Optimise modularity, the same criterion used below to pick
-              # the resolution (igraph's default objective is CPM)
-              igraph::cluster_leiden(
-                network_graph,
-                objective_function = "modularity",
-                weights = igraph::E(network_graph)$weight,
-                resolution = resolution_value,
-                n_iterations = eff_iterations
-              )
-            } else {
-              igraph::cluster_louvain(
-                network_graph,
-                weights = igraph::E(network_graph)$weight,
-                resolution = resolution_value
-              )
-            }
-          },
-          error = function(e) {
-            log_warn(
-              "Weighted community detection failed at resolution %.3f (%s)",
-              resolution_value,
-              conditionMessage(e)
-            )
-            NULL
-          }
-        )
-      }
-
-      best_partition <- NULL
-      best_modularity <- -Inf
-      best_resolution <- resolution
-
-      for (resolution_value in resolution_grid) {
-        community_detection <- detect_communities(resolution_value)
-        if (is.null(community_detection)) {
-          next
-        }
-
-        membership <- igraph::membership(community_detection)
-        modularity_value <- igraph::modularity(
-          network_graph,
-          membership = membership,
-          weights = igraph::E(network_graph)$weight
-        )
-
-        if (
-          is.finite(modularity_value) &&
-            modularity_value > best_modularity + 1e-8
-        ) {
-          best_partition <- community_detection
-          best_modularity <- modularity_value
-          best_resolution <- resolution_value
-        }
-      }
-
-      if (!is.null(best_partition)) {
-        community_detection <- best_partition
-        if (best_resolution != resolution) {
-          log_info(
-            "Selected community partition at resolution %.3f (modularity %.3f)",
-            best_resolution,
-            best_modularity
+      tryCatch(
+        {
+          # Optimise modularity, the same criterion used below to pick
+          # the resolution (igraph's default objective is CPM)
+          igraph::cluster_leiden(
+            network_graph,
+            objective_function = "modularity",
+            weights = igraph::E(network_graph)$weight,
+            resolution = resolution_value,
+            n_iterations = eff_iterations
           )
+        },
+        error = function(e) {
+          log_warn(
+            "Weighted community detection failed at resolution %.3f (%s)",
+            resolution_value,
+            conditionMessage(e)
+          )
+          NULL
         }
-      } else {
-        community_detection <- NULL
+      )
+    }
+
+    best_partition <- NULL
+    best_modularity <- -Inf
+    best_resolution <- resolution
+
+    for (resolution_value in resolution_grid) {
+      community_detection <- detect_communities(resolution_value)
+      if (is.null(community_detection)) {
+        next
+      }
+
+      membership <- igraph::membership(community_detection)
+      modularity_value <- igraph::modularity(
+        network_graph,
+        membership = membership,
+        weights = igraph::E(network_graph)$weight
+      )
+
+      if (
+        is.finite(modularity_value) &&
+          modularity_value > best_modularity + 1e-8
+      ) {
+        best_partition <- community_detection
+        best_modularity <- modularity_value
+        best_resolution <- resolution_value
+      }
+    }
+
+    if (!is.null(best_partition)) {
+      community_detection <- best_partition
+      if (best_resolution != resolution) {
+        log_info(
+          "Selected community partition at resolution %.3f (modularity %.3f)",
+          best_resolution,
+          best_modularity
+        )
       }
     } else {
       community_detection <- NULL
@@ -375,10 +390,6 @@ EDGE_MATCHED_PEAKS_COLUMNS <- c(
       ))
       names(component_membership) <- igraph::V(network_graph)$name
       method_used <- "weighted Louvain/Leiden clustering"
-    }
-
-    if (is.null(names(component_membership))) {
-      names(component_membership) <- all_features
     }
 
     component_membership_vector <- as.integer(component_membership)
@@ -592,7 +603,15 @@ create_components <- function(
     "feature_target",
     "componentindex",
     utils::head(intersect(EDGE_WEIGHT_COLUMNS, names(edges)), 1L),
-    utils::head(intersect(EDGE_MATCHED_PEAKS_COLUMNS, names(edges)), 1L)
+    utils::head(intersect(EDGE_MATCHED_PEAKS_COLUMNS, names(edges)), 1L),
+    intersect(
+      c(
+        "feature_spectrum_peaks",
+        "source_feature_spectrum_peaks",
+        "target_feature_spectrum_peaks"
+      ),
+      names(edges)
+    )
   )
 
   edges <- edges |>

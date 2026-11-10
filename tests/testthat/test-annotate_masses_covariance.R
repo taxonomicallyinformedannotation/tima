@@ -170,7 +170,12 @@ test_that("compute_intensity_covariance_edges respects RT window", {
   )
 }
 
-.reference_covariance <- function(intensities, threshold) {
+.reference_covariance <- function(
+  intensities,
+  threshold,
+  log_transform = TRUE,
+  alternative = "greater"
+) {
   # Independent oracle: all pairs, pairwise-complete positive values, BH
   ids <- names(intensities)
   pairs <- utils::combn(ids, 2L, simplify = FALSE)
@@ -178,7 +183,9 @@ test_that("compute_intensity_covariance_edges respects RT window", {
     x <- intensities[[p[[1L]]]]
     y <- intensities[[p[[2L]]]]
     ok <- !is.na(x) & !is.na(y) & x > 0 & y > 0
-    ct <- stats::cor.test(x[ok], y[ok])
+    xv <- if (isTRUE(log_transform)) log10(x[ok]) else x[ok]
+    yv <- if (isTRUE(log_transform)) log10(y[ok]) else y[ok]
+    ct <- stats::cor.test(xv, yv, alternative = alternative)
     data.frame(
       key = paste(sort(p), collapse = "-"),
       r = unname(ct$estimate),
@@ -259,7 +266,7 @@ test_that("covariance keeps samples aligned when intensities are missing", {
   ok <- !is.na(x)
   expect_identical(nrow(result), 1L)
   expect_identical(result$n_samples, 5L)
-  expect_equal(result$correlation, stats::cor(x[ok], y[ok]))
+  expect_equal(result$correlation, stats::cor(log10(x[ok]), log10(y[ok])))
 
   # Pipe-separated strings (as read back from CSV) behave the same
   as_text <- .covariance_table(list(
@@ -311,4 +318,67 @@ test_that("covariance handles constant vectors, sparse samples, and RT boundarie
   expect_identical(nrow(result), 1L)
   expect_identical(result$feature_id, "f1")
   expect_identical(result$feature_id_dest, "f2")
+})
+
+test_that("compute_intensity_covariance_edges covers edge cases and alternative = two.sided", {
+  # 1. Fewer than 2 features with non-NA rt
+  ft_1 <- tidytable::tidytable(
+    feature_id = "f1",
+    rt = 1.0,
+    intensity_all = list(c(1, 2, 3))
+  )
+  expect_identical(
+    nrow(compute_intensity_covariance_edges(ft_1, tolerance_rt = 0.5)),
+    0L
+  )
+
+  # 2. Pair inside tolerance_rt + 1e-12 window but outside tolerance_rt (hits !all(keep_rt) and n_pairs_tested == 0)
+  ft_eps <- tidytable::tidytable(
+    feature_id = c("f1", "f2"),
+    rt = c(1.0, 1.0 + 0.5 + 0.5e-12),
+    intensity_all = list(c(1, 2, 3), c(1, 2, 3))
+  )
+  expect_identical(
+    nrow(compute_intensity_covariance_edges(ft_eps, tolerance_rt = 0.5)),
+    0L
+  )
+
+  # 3. No features with non-NA intensity_all
+  ft_na_int <- tidytable::tidytable(
+    feature_id = c("f1", "f2"),
+    rt = c(1.0, 1.1),
+    intensity_all = c(NA_character_, NA_character_)
+  )
+  expect_identical(
+    nrow(compute_intensity_covariance_edges(ft_na_int, tolerance_rt = 0.5)),
+    0L
+  )
+
+  # 4. Mixed-type list (character, nested list, integer, NULL) + multiple sample lengths + <3 shared samples + two.sided
+  ft_mixed <- tidytable::tidytable(
+    feature_id = c("f1", "f2", "f3", "f4", "f5", "f6"),
+    rt = c(1.0, 1.05, 1.1, 1.15, 1.2, 1.25),
+    intensity_all = list(
+      "10|20|30|40|50",
+      list(11, 21, 31, 41, 51),
+      c(10L, 20L, 30L, 0L, 0L),
+      c(0L, 0L, 10L, 20L, 30L), # >= 3 positive alone, but only 1 shared with f3
+      c(100, 200, 300, 400), # different length (4 vs 5) -> multiple cand_lens with f6
+      NULL
+    )
+  )
+  ft_mixed2 <- tidytable::bind_rows(
+    ft_mixed,
+    tidytable::tidytable(
+      feature_id = "f7",
+      rt = 1.22,
+      intensity_all = list(c(105, 205, 305, 405))
+    )
+  )
+  res_mixed <- compute_intensity_covariance_edges(
+    ft_mixed2,
+    tolerance_rt = 0.5,
+    alternative = "two.sided"
+  )
+  expect_gt(nrow(res_mixed), 0L)
 })

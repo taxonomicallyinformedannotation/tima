@@ -4,7 +4,12 @@
 \alias{compute_weighted_components}
 \title{Compute evidence-aware weighted sum (row-wise for data frames)}
 \usage{
-compute_weighted_components(..., weights, include_coverage = TRUE)
+compute_weighted_components(
+  ...,
+  weights,
+  include_coverage = TRUE,
+  na_prior = 0
+)
 }
 \arguments{
 \item{...}{\link{numeric} Columns/vectors of component values (passed as
@@ -12,10 +17,18 @@ separate arguments).}
 
 \item{weights}{\link{numeric} Vector of non-negative weights (one per
 component).}
+
+\item{include_coverage}{\link{logical} Whether to compute the per-row weight
+coverage fraction in \verb{[0, 1]}.}
+
+\item{na_prior}{\link{numeric} Prior value for missing (\code{NA})
+modalities: numeric scalar/vector in \verb{[0, 1]} (default \code{0}), or \code{"mean"}
+for Empirical Bayes shrinkage toward each component's observed mean.}
 }
 \value{
-List with \code{score} (weighted average over all components, treating
-missing values as 0) and \code{coverage} (unused; returned as \code{NA}).
+List with \code{score} (weighted average over all components) and
+\code{coverage} (fraction of total weight backed by non-NA evidence in
+\verb{[0, 1]}, or \code{NULL} when \code{include_coverage = FALSE}).
 Rows where all weights are zero return NA.
 }
 \description{

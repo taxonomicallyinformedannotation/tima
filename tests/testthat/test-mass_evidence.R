@@ -461,4 +461,109 @@ test_that("build_evidence_edges handles singleton clusters, same-feature duplica
   expect_identical(nrow(edges_no_m), 1L)
   expect_identical(edges_no_m$feature_id, "F1")
   expect_identical(edges_no_m$feature_id_dest, "F2")
+
+  # 5. Multiple duplicated clusters where each cluster has only 1 unique feature after dedup -> same_cl is empty
+  hyps_no_same_cl <- tidytable::tidytable(
+    feature_id = c("F1", "F1", "F2", "F2"),
+    mz = c(100.0, 100.0, 122.0, 122.0),
+    adduct = c("[M+H]+", "[M+Na]+", "[M+H]+", "[M+Na]+"),
+    evidence_cluster = c("CL1", "CL1", "CL2", "CL2"),
+    evidence_count = c(2L, 1L, 2L, 1L),
+    implied_M = c(99.0, 77.0, 121.0, 99.0)
+  )
+  expect_identical(nrow(build_evidence_edges(hyps_no_same_cl)), 0L)
+})
+
+test_that("build_evidence_supported_hypotheses covers edge cases and baseline fallback", {
+  u <- .mini_universe()
+  # 1. Empty features or empty universe returns empty_evidence_table()
+  expect_identical(
+    nrow(build_evidence_supported_hypotheses(
+      df_fea_min = tidytable::tidytable(
+        feature_id = character(),
+        rt = numeric(),
+        mz = numeric(),
+        sample = character()
+      ),
+      universe = u,
+      tolerance_ppm = 10,
+      tolerance_rt = 0.05,
+      ms_mode = "pos"
+    )),
+    0L
+  )
+
+  # 2. Invalid max_hypotheses_per_feature (< 1 or NA), out-of-range masses (ok_work all FALSE),
+  # missing baseline_adduct in universe, NA sample, and single kept hypothesis (n_h == 1L) with/without prefilter
+  u_no_base <- u[u$adduct != "[M+H]+", ]
+  feats_one <- tidytable::tidytable(
+    feature_id = "F1",
+    rt = 1.0,
+    mz = 203.0526,
+    sample = NA_character_
+  )
+  res_one_nopre <- build_evidence_supported_hypotheses(
+    df_fea_min = feats_one,
+    universe = u_no_base[u_no_base$adduct == "[M+Na]+", ],
+    tolerance_ppm = 10,
+    tolerance_rt = 0.05,
+    ms_mode = "pos",
+    max_hypotheses_per_feature = 0L,
+    min_neutral_mass = 170,
+    max_neutral_mass = 190
+  )
+  expect_identical(nrow(res_one_nopre), 0L)
+
+  res_one_pre <- build_evidence_supported_hypotheses(
+    df_fea_min = tidytable::tidytable(
+      feature_id = "F1",
+      rt = 1.0,
+      mz = 181.0707,
+      sample = NA_character_
+    ),
+    universe = u[u$adduct == "[M+H]+", ],
+    tolerance_ppm = 10,
+    tolerance_rt = 0.05,
+    ms_mode = "pos",
+    exact_masses = 180.0634,
+    max_hypotheses_per_feature = -1L
+  )
+  expect_identical(nrow(res_one_pre), 1L)
+
+  # 3. When no hypotheses survive mass range/prefilter -> .materialize_baseline_only()
+  feats_out <- tidytable::tidytable(
+    feature_id = "F_OUT",
+    rt = 1.0,
+    mz = 50.0,
+    sample = "S1"
+  )
+  # Baseline missing in universe -> empty_evidence_table()
+  expect_identical(
+    nrow(build_evidence_supported_hypotheses(
+      df_fea_min = feats_out,
+      universe = u_no_base,
+      tolerance_ppm = 10,
+      tolerance_rt = 0.05,
+      ms_mode = "pos",
+      min_neutral_mass = 500
+    )),
+    0L
+  )
+  # Baseline present in universe, but implied mass <= 0 -> empty_evidence_table()
+  expect_identical(
+    nrow(build_evidence_supported_hypotheses(
+      df_fea_min = tidytable::tidytable(
+        feature_id = "F_TINY",
+        rt = 1.0,
+        mz = 0.5,
+        sample = "S1"
+      ),
+      universe = u,
+      tolerance_ppm = 10,
+      tolerance_rt = 0.05,
+      ms_mode = "pos",
+      min_neutral_mass = 500
+    )),
+    0L
+  )
 })

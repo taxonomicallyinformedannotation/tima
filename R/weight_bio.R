@@ -1,3 +1,50 @@
+#' Combine spectral library similarity and SIRIUS scores
+#' @noRd
+corroborate_spectral_scores <- function(
+  s_sim,
+  s_sir,
+  method = c("mean", "corroborated", "noisy_or")
+) {
+  method <- match.arg(method)
+  n <- max(length(s_sim), length(s_sir))
+  if (n == 0L) {
+    return(numeric(0L))
+  }
+  s1 <- rep_len(as.double(s_sim), n)
+  s2 <- rep_len(as.double(s_sir), n)
+  has1 <- !is.na(s1)
+  has2 <- !is.na(s2)
+  out <- rep(NA_real_, n)
+  only1 <- which(has1 & !has2)
+  if (length(only1) > 0L) {
+    out[only1] <- s1[only1]
+  }
+  only2 <- which(!has1 & has2)
+  if (length(only2) > 0L) {
+    out[only2] <- s2[only2]
+  }
+  both <- which(has1 & has2)
+  if (length(both) > 0L) {
+    a <- s1[both]
+    b <- s2[both]
+    out[both] <- switch(
+      method,
+      mean = (a + b) / 2,
+      corroborated = {
+        hi <- pmax(a, b)
+        lo <- pmin(a, b)
+        hi + 0.5 * lo * pmax(0, 1 - hi)
+      },
+      noisy_or = {
+        a_c <- pmin(pmax(a, 0), 1)
+        b_c <- pmin(pmax(b, 0), 1)
+        1 - (1 - a_c) * (1 - b_c)
+      }
+    )
+  }
+  out
+}
+
 #' @title Weight annotations by biological source
 #'
 #' @description Weights MS annotations according to their biological source by
@@ -49,6 +96,21 @@
 #'     highest)
 #' @param score_biological_biota [numeric] Score for Biota-level match (0-1,
 #'     special)
+#' @param score_biological_infraorder [numeric] Optional score for
+#'     infraorder-level match (0-1)
+#' @param score_biological_subfamily [numeric] Optional score for
+#'     subfamily-level match (0-1)
+#' @param score_biological_subtribe [numeric] Optional score for
+#'     subtribe-level match (0-1)
+#' @param score_biological_subgenus [numeric] Optional score for
+#'     subgenus-level match (0-1)
+#' @param score_biological_subspecies [numeric] Optional score for
+#'     subspecies-level match (0-1)
+#' @param spectral_fusion [character] Method to combine library MS2 similarity
+#'     and SIRIUS scores when both are present: `"mean"` (default),
+#'     `"corroborated"` (synergistic monotone fusion), or `"noisy_or"`.
+#' @param use_zodiac [logical] If `TRUE` and `candidate_score_sirius_zodiac`
+#'     is present, modulates transformed SIRIUS CSI scores by Zodiac confidence.
 #'
 #' @return Data frame with biologically weighted annotations including
 #'     biological
@@ -92,8 +154,16 @@ weight_bio <- function(
   score_biological_genus,
   score_biological_species,
   score_biological_variety,
-  score_biological_biota
+  score_biological_biota,
+  score_biological_infraorder = NULL,
+  score_biological_subfamily = NULL,
+  score_biological_subtribe = NULL,
+  score_biological_subgenus = NULL,
+  score_biological_subspecies = NULL,
+  spectral_fusion = c("mean", "corroborated", "noisy_or"),
+  use_zodiac = FALSE
 ) {
+  spectral_fusion <- match.arg(spectral_fusion)
   ctx <- log_operation(
     "weight_bio",
     n_annotations = nrow(annotation_table_taxed),
@@ -183,14 +253,6 @@ weight_bio <- function(
     structure_organism_pairs_table
   )
 
-  if (!is.data.frame(structure_organism_pairs_table)) {
-    cli::cli_abort(
-      "structure_organism_pairs_table must be a data frame",
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
-  }
-
   # Early exit for empty input
   n_annotations <- nrow(annotation_table_taxed)
   if (n_annotations == 0L) {
@@ -200,61 +262,23 @@ weight_bio <- function(
     return(annotation_table_taxed)
   }
 
-  weights <- list(
-    spectral = weight_spectral,
-    biological = weight_biological
+  subrank_scores <- list(
+    infraorder = score_biological_infraorder,
+    subfamily = score_biological_subfamily,
+    subtribe = score_biological_subtribe,
+    subgenus = score_biological_subgenus,
+    subspecies = score_biological_subspecies
   )
-
-  is_valid_weight <- vapply(
-    X = weights,
-    FUN = function(w) is_numeric_in_range(w, 0, 1),
-    logical(1)
-  )
-
-  if (!all(is_valid_weight)) {
-    invalid_weights <- names(weights)[!is_valid_weight]
-    cli::cli_abort(
-      c(
-        "weight(s) must be between 0 and 1",
-        "x" = paste(invalid_weights, collapse = ", ")
-      ),
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
-  }
-
-  bio_scores <- list(
-    domain = score_biological_domain,
-    kingdom = score_biological_kingdom,
-    phylum = score_biological_phylum,
-    class = score_biological_class,
-    order = score_biological_order,
-    family = score_biological_family,
-    tribe = score_biological_tribe,
-    genus = score_biological_genus,
-    species = score_biological_species,
-    variety = score_biological_variety
-  )
-
-  is_valid_score <- vapply(
-    X = bio_scores,
-    FUN = function(s) is_numeric_in_range(s, 0, 1),
-    logical(1)
-  )
-
-  if (!all(is_valid_score)) {
-    invalid_scores <- names(bio_scores)[!is_valid_score]
-    cli::cli_abort(
-      c(
-        "biological score(s) must be between 0 and 1",
-        "x" = paste(
-          paste0("score_biological_", invalid_scores),
-          collapse = ", "
-        )
-      ),
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
+  for (sr_nm in names(subrank_scores)) {
+    sr_val <- subrank_scores[[sr_nm]]
+    if (!is.null(sr_val)) {
+      validate_numeric_range(
+        sr_val,
+        0,
+        1,
+        param_name = paste0("score_biological_", sr_nm)
+      )
+    }
   }
 
   log_info("Weighting %d annotations by biological source", n_annotations)
@@ -283,7 +307,7 @@ weight_bio <- function(
   rm(keep_sop, needed_structures)
 
   na_if_empty_chr <- function(x) {
-    x_chr <- if (is.character(x)) x else as.character(x)
+    x_chr <- as.character(x)
     if (length(x_chr) == 0L) {
       return(character(0L))
     }
@@ -291,7 +315,7 @@ weight_bio <- function(
     if (!any(u == "", na.rm = TRUE)) {
       return(x_chr)
     }
-    m <- if (anyNA(u)) match(x_chr, u) else fastmatch::fmatch(x_chr, u)
+    m <- match(x_chr, u)
     u[u == ""] <- NA_character_
     u[m]
   }
@@ -302,28 +326,11 @@ weight_bio <- function(
   )
   u_sop_ik <- unique(sop_ik_sub)
   u_sop_org <- unique(sop_org_sub)
-  ik_id_s <- if (anyNA(u_sop_ik)) {
-    match(sop_ik_sub, u_sop_ik)
-  } else {
-    fastmatch::fmatch(sop_ik_sub, u_sop_ik)
-  }
-  org_id_s <- if (anyNA(u_sop_org)) {
-    match(sop_org_sub, u_sop_org)
-  } else {
-    fastmatch::fmatch(sop_org_sub, u_sop_org)
-  }
+  ik_id_s <- match(sop_ik_sub, u_sop_ik)
+  org_id_s <- match(sop_org_sub, u_sop_org)
   n_u_org <- max(1L, length(u_sop_org))
-  use_int_io <- as.double(length(u_sop_ik)) * n_u_org < .Machine$integer.max
-  io_key <- if (use_int_io) {
-    (ik_id_s - 1L) * n_u_org + org_id_s
-  } else {
-    as.double(ik_id_s - 1L) * n_u_org + org_id_s
-  }
-  keep_io <- if (use_int_io) {
-    !duplicated(io_key)
-  } else {
-    fastmatch::fmatch(io_key, io_key) == seq_along(io_key)
-  }
+  io_key <- as.double(ik_id_s - 1L) * n_u_org + org_id_s
+  keep_io <- !duplicated(io_key)
 
   sop_ik_org <- tidytable::tidytable(
     candidate_structure_inchikey_connectivity_layer = sop_ik_sub[keep_io],
@@ -334,26 +341,54 @@ weight_bio <- function(
 
   sop_ott_sub <- sop_ott[keep_sop_idx]
   u_ott <- unique(sop_ott_sub)
-  ott_id_s <- if (anyNA(u_ott)) {
-    match(sop_ott_sub, u_ott)
-  } else {
-    fastmatch::fmatch(sop_ott_sub, u_ott)
-  }
+  ott_id_s <- match(sop_ott_sub, u_ott)
   n_u_ott <- max(1L, length(u_ott))
-  use_int_oo <- as.double(n_u_org) * n_u_ott < .Machine$integer.max
-  oo_key <- if (use_int_oo) {
-    (org_id_s - 1L) * n_u_ott + ott_id_s
-  } else {
-    as.double(org_id_s - 1L) * n_u_ott + ott_id_s
-  }
-  keep_oo <- if (use_int_oo) {
-    which(!duplicated(oo_key))
-  } else {
-    which(fastmatch::fmatch(oo_key, oo_key) == seq_along(oo_key))
-  }
+  oo_key <- as.double(org_id_s - 1L) * n_u_ott + ott_id_s
+  keep_oo <- which(!duplicated(oo_key))
   first_org_idx <- keep_sop_idx[keep_oo]
 
-  cand_tax_distinct <- tidytable::tidytable(
+  subrank_specs <- list(
+    list(
+      score = score_biological_infraorder,
+      sop_col = "organism_taxonomy_05_1infraorder",
+      cand_col = "candidate_organism_05_1_infraorder",
+      samp_col = "sample_organism_05_1_infraorder"
+    ),
+    list(
+      score = score_biological_subfamily,
+      sop_col = "organism_taxonomy_06_1subfamily",
+      cand_col = "candidate_organism_06_1_subfamily",
+      samp_col = "sample_organism_06_1_subfamily"
+    ),
+    list(
+      score = score_biological_subtribe,
+      sop_col = "organism_taxonomy_07_1subtribe",
+      cand_col = "candidate_organism_07_1_subtribe",
+      samp_col = "sample_organism_07_1_subtribe"
+    ),
+    list(
+      score = score_biological_subgenus,
+      sop_col = "organism_taxonomy_08_1subgenus",
+      cand_col = "candidate_organism_08_1_subgenus",
+      samp_col = "sample_organism_08_1_subgenus"
+    ),
+    list(
+      score = score_biological_subspecies,
+      sop_col = "organism_taxonomy_09_1subspecies",
+      cand_col = "candidate_organism_09_1_subspecies",
+      samp_col = "sample_organism_09_1_subspecies"
+    )
+  )
+  active_subranks <- Filter(
+    function(sp) {
+      !is.null(sp$score) &&
+        sp$sop_col %in% names(structure_organism_pairs_table) &&
+        sp$samp_col %in% names(annotation_table_taxed)
+    },
+    subrank_specs
+  )
+
+  cand_tax_raw <- tidytable::tidytable(
     candidate_organism_name = sop_org_sub[keep_oo],
     candidate_organism_01_domain = na_if_empty_chr(
       structure_organism_pairs_table$organism_taxonomy_01domain[first_org_idx]
@@ -385,9 +420,22 @@ weight_bio <- function(
     candidate_organism_10_varietas = na_if_empty_chr(
       structure_organism_pairs_table$organism_taxonomy_10varietas[first_org_idx]
     )
-  ) |>
-    .fast_distinct_with_key_guard("candidate_organism_name")
+  )
+  for (sp in active_subranks) {
+    data.table::set(
+      cand_tax_raw,
+      j = sp$cand_col,
+      value = na_if_empty_chr(
+        structure_organism_pairs_table[[sp$sop_col]][first_org_idx]
+      )
+    )
+  }
+  cand_tax_distinct <- .fast_distinct_with_key_guard(
+    cand_tax_raw,
+    "candidate_organism_name"
+  )
   rm(
+    cand_tax_raw,
     sop_org_sub,
     org_id_s,
     sop_ott_sub,
@@ -408,7 +456,8 @@ weight_bio <- function(
     "sample_organism_07_tribe",
     "sample_organism_08_genus",
     "sample_organism_09_species",
-    "sample_organism_10_varietas"
+    "sample_organism_10_varietas",
+    vapply(active_subranks, `[[`, character(1L), "samp_col")
   )
   sample_tax_distinct <- if ("feature_id" %in% names(annotation_table_taxed)) {
     f_col <- annotation_table_taxed$feature_id
@@ -441,7 +490,7 @@ weight_bio <- function(
     rm(sop_ik_org)
     valid_cand <- which(!is.na(cand_tax_distinct$candidate_organism_name))
     n_vc <- length(valid_cand)
-    df2_list <- vector("list", 22L)
+    df2_list <- vector("list", length(samp_cols) + length(cand_tax_distinct))
     names(df2_list) <- c(samp_cols, names(cand_tax_distinct))
     for (sc in samp_cols) {
       df2_list[[sc]] <- rep.int(sample_tax_distinct[[sc]][1L], n_vc)
@@ -453,28 +502,11 @@ weight_bio <- function(
     rm(sample_tax_distinct, cand_tax_distinct, df2_list)
   } else {
     u_ann_ik <- unique(ann_ik)
-    aik_id <- if (anyNA(u_ann_ik)) {
-      match(ann_ik, u_ann_ik)
-    } else {
-      fastmatch::fmatch(ann_ik, u_ann_ik)
-    }
-    aso_id <- if (anyNA(u_ann_so)) {
-      match(ann_so, u_ann_so)
-    } else {
-      fastmatch::fmatch(ann_so, u_ann_so)
-    }
+    aik_id <- match(ann_ik, u_ann_ik)
+    aso_id <- match(ann_so, u_ann_so)
     n_aso <- max(1L, length(u_ann_so))
-    use_int_as <- as.double(length(u_ann_ik)) * n_aso < .Machine$integer.max
-    as_key <- if (use_int_as) {
-      (aik_id - 1L) * n_aso + aso_id
-    } else {
-      as.double(aik_id - 1L) * n_aso + aso_id
-    }
-    keep_as <- if (use_int_as) {
-      !duplicated(as_key)
-    } else {
-      fastmatch::fmatch(as_key, as_key) == seq_along(as_key)
-    }
+    as_key <- as.double(aik_id - 1L) * n_aso + aso_id
+    keep_as <- !duplicated(as_key)
 
     df1 <- tidytable::tidytable(
       candidate_structure_inchikey_connectivity_layer = ann_ik[keep_as],
@@ -497,17 +529,8 @@ weight_bio <- function(
       so_id <- fastmatch::fmatch(so_v, u_so_v)
       co_id <- fastmatch::fmatch(co_v, u_co_v)
       n_co <- max(1L, length(u_co_v))
-      use_int_sc <- as.double(length(u_so_v)) * n_co < .Machine$integer.max
-      sc_key <- if (use_int_sc) {
-        (so_id - 1L) * n_co + co_id
-      } else {
-        as.double(so_id - 1L) * n_co + co_id
-      }
-      first_sc <- if (use_int_sc) {
-        !duplicated(sc_key)
-      } else {
-        fastmatch::fmatch(sc_key, sc_key) == seq_along(sc_key)
-      }
+      sc_key <- as.double(so_id - 1L) * n_co + co_id
+      first_sc <- !duplicated(sc_key)
       keep_sc <- valid_d1[first_sc]
       df2_keys <- tidytable::tidytable(
         sample_organism_name = df1$sample_organism_name[keep_sc],
@@ -520,37 +543,22 @@ weight_bio <- function(
       )
     }
 
-    if (
-      anyDuplicated(sample_tax_distinct$sample_organism_name) == 0L &&
-        anyDuplicated(cand_tax_distinct$candidate_organism_name) == 0L
-    ) {
-      m_s <- fastmatch::fmatch(
-        df2_keys$sample_organism_name,
-        sample_tax_distinct$sample_organism_name
-      )
-      m_c <- fastmatch::fmatch(
-        df2_keys$candidate_organism_name,
-        cand_tax_distinct$candidate_organism_name
-      )
-      keep_jc <- which(!is.na(m_s) & !is.na(m_c))
-      ms_k <- m_s[keep_jc]
-      mc_k <- m_c[keep_jc]
-      df2_list <- c(
-        lapply(as.list(sample_tax_distinct), `[`, ms_k),
-        lapply(as.list(cand_tax_distinct), `[`, mc_k)
-      )
-      df2 <- tidytable::as_tidytable(df2_list)
-    } else {
-      df2 <- df2_keys |>
-        tidytable::inner_join(
-          y = sample_tax_distinct,
-          by = "sample_organism_name"
-        ) |>
-        tidytable::inner_join(
-          y = cand_tax_distinct,
-          by = "candidate_organism_name"
-        )
-    }
+    m_s <- fastmatch::fmatch(
+      df2_keys$sample_organism_name,
+      sample_tax_distinct$sample_organism_name
+    )
+    m_c <- fastmatch::fmatch(
+      df2_keys$candidate_organism_name,
+      cand_tax_distinct$candidate_organism_name
+    )
+    keep_jc <- which(!is.na(m_s) & !is.na(m_c))
+    ms_k <- m_s[keep_jc]
+    mc_k <- m_c[keep_jc]
+    df2_list <- c(
+      lapply(as.list(sample_tax_distinct), `[`, ms_k),
+      lapply(as.list(cand_tax_distinct), `[`, mc_k)
+    )
+    df2 <- tidytable::as_tidytable(df2_list)
     rm(sample_tax_distinct, cand_tax_distinct, df2_keys)
   }
 
@@ -638,6 +646,17 @@ weight_bio <- function(
       pmax(s09, s10, na.rm = TRUE),
       na.rm = TRUE
     )
+    sr_scores_list <- vector("list", length(active_subranks))
+    for (sr_i in seq_along(active_subranks)) {
+      sp <- active_subranks[[sr_i]]
+      s_sr <- score_level(
+        df2[[sp$cand_col]],
+        df2[[sp$samp_col]],
+        sp$score
+      )
+      sr_scores_list[[sr_i]] <- s_sr
+      sc_bio <- pmax(sc_bio, s_sr, na.rm = TRUE)
+    }
     is_biota <- !is.na(df2$candidate_organism_01_domain) &
       df2$candidate_organism_01_domain == "Biota"
     sc_bio[is_biota] <- score_biological_biota
@@ -663,6 +682,15 @@ weight_bio <- function(
     occ[m02] <- as.character(df2$candidate_organism_02_kingdom[m02])
     m01 <- !is.na(sc_bio) & sc_bio == score_biological_domain
     occ[m01] <- as.character(df2$candidate_organism_01_domain[m01])
+    for (sr_i in seq_along(active_subranks)) {
+      sp <- active_subranks[[sr_i]]
+      s_sr <- sr_scores_list[[sr_i]]
+      m_sr <- !is.na(sc_bio) &
+        sc_bio == sp$score &
+        !is.na(s_sr) &
+        s_sr == sp$score
+      occ[m_sr] <- as.character(df2[[sp$cand_col]][m_sr])
+    }
     occ[is_biota] <- "Biota"
 
     keep_occ <- which(!is.na(occ))
@@ -712,27 +740,16 @@ weight_bio <- function(
       ord_d1 <- order(-d1_sc, na.last = TRUE, method = "radix")
       ik_d1_ord <- df1$candidate_structure_inchikey_connectivity_layer[ord_d1]
       u_ik_d1 <- unique(ik_d1_ord)
-      ik_d1_id <- if (anyNA(u_ik_d1)) {
-        match(ik_d1_ord, u_ik_d1)
-      } else {
-        fastmatch::fmatch(ik_d1_ord, u_ik_d1)
-      }
+      ik_d1_id <- match(ik_d1_ord, u_ik_d1)
       keep_ik <- !duplicated(ik_d1_id)
       win_d1 <- ord_d1[keep_ik]
       win_ik <- ik_d1_ord[keep_ik]
       win_sc <- d1_sc[win_d1]
       win_occ <- d1_occ[win_d1]
-      m_bio <- if (anyNA(win_ik)) {
-        match(
-          annot_table_wei_bio$candidate_structure_inchikey_connectivity_layer,
-          win_ik
-        )
-      } else {
-        fastmatch::fmatch(
-          annot_table_wei_bio$candidate_structure_inchikey_connectivity_layer,
-          win_ik
-        )
-      }
+      m_bio <- match(
+        annot_table_wei_bio$candidate_structure_inchikey_connectivity_layer,
+        win_ik
+      )
       score_bio_v <- win_sc[m_bio]
       occ_closest_v <- win_occ[m_bio]
     } else {
@@ -758,56 +775,20 @@ weight_bio <- function(
         df1$candidate_organism_name,
         annot_table_wei_bio_init$candidate_organism_name
       ))
-      so_i <- if (anyNA(u_so_all)) {
-        match(annot_table_wei_bio_init$sample_organism_name, u_so_all)
-      } else {
-        fastmatch::fmatch(
-          annot_table_wei_bio_init$sample_organism_name,
-          u_so_all
-        )
-      }
-      co_i <- if (anyNA(u_co_all)) {
-        match(annot_table_wei_bio_init$candidate_organism_name, u_co_all)
-      } else {
-        fastmatch::fmatch(
-          annot_table_wei_bio_init$candidate_organism_name,
-          u_co_all
-        )
-      }
+      so_i <- match(annot_table_wei_bio_init$sample_organism_name, u_so_all)
+      co_i <- match(annot_table_wei_bio_init$candidate_organism_name, u_co_all)
       n_co_all <- max(1L, length(u_co_all))
-      use_int_init <- as.double(length(u_so_all)) * n_co_all <
-        .Machine$integer.max
-      k_init <- if (use_int_init) {
-        (so_i - 1L) * n_co_all + co_i
-      } else {
-        as.double(so_i - 1L) * n_co_all + co_i
-      }
-      keep_u_init <- if (use_int_init) {
-        !duplicated(k_init)
-      } else {
-        fastmatch::fmatch(k_init, k_init) == seq_along(k_init)
-      }
+      k_init <- as.double(so_i - 1L) * n_co_all + co_i
+      keep_u_init <- !duplicated(k_init)
       k_init_u <- k_init[keep_u_init]
       sc_init_u <- annot_table_wei_bio_init$score_biological[keep_u_init]
       occ_init_u <- annot_table_wei_bio_init$candidate_structure_organism_occurrence_closest[
         keep_u_init
       ]
 
-      so_d1 <- if (anyNA(u_so_all)) {
-        match(df1$sample_organism_name, u_so_all)
-      } else {
-        fastmatch::fmatch(df1$sample_organism_name, u_so_all)
-      }
-      co_d1 <- if (anyNA(u_co_all)) {
-        match(df1$candidate_organism_name, u_co_all)
-      } else {
-        fastmatch::fmatch(df1$candidate_organism_name, u_co_all)
-      }
-      k_d1 <- if (use_int_init) {
-        (so_d1 - 1L) * n_co_all + co_d1
-      } else {
-        as.double(so_d1 - 1L) * n_co_all + co_d1
-      }
+      so_d1 <- match(df1$sample_organism_name, u_so_all)
+      co_d1 <- match(df1$candidate_organism_name, u_co_all)
+      k_d1 <- as.double(so_d1 - 1L) * n_co_all + co_d1
       m_d1 <- fastmatch::fmatch(k_d1, k_init_u)
       d1_sc <- sc_init_u[m_d1]
       d1_occ <- occ_init_u[m_d1]
@@ -816,24 +797,10 @@ weight_bio <- function(
       ik_d1_ord <- df1$candidate_structure_inchikey_connectivity_layer[ord_d1]
       so_d1_ord <- so_d1[ord_d1]
       u_ik_d1 <- unique(ik_d1_ord)
-      ik_d1_id <- if (anyNA(u_ik_d1)) {
-        match(ik_d1_ord, u_ik_d1)
-      } else {
-        fastmatch::fmatch(ik_d1_ord, u_ik_d1)
-      }
+      ik_d1_id <- match(ik_d1_ord, u_ik_d1)
       n_so_all <- max(1L, length(u_so_all))
-      use_int_ikso <- as.double(length(u_ik_d1)) * n_so_all <
-        .Machine$integer.max
-      k_ikso <- if (use_int_ikso) {
-        (ik_d1_id - 1L) * n_so_all + so_d1_ord
-      } else {
-        as.double(ik_d1_id - 1L) * n_so_all + so_d1_ord
-      }
-      keep_ikso <- if (use_int_ikso) {
-        !duplicated(k_ikso)
-      } else {
-        fastmatch::fmatch(k_ikso, k_ikso) == seq_along(k_ikso)
-      }
+      k_ikso <- as.double(ik_d1_id - 1L) * n_so_all + so_d1_ord
+      keep_ikso <- !duplicated(k_ikso)
       win_d1 <- ord_d1[keep_ikso]
       k_ikso_u <- k_ikso[keep_ikso]
       win_sc <- d1_sc[win_d1]
@@ -844,27 +811,12 @@ weight_bio <- function(
     rm(df1, annot_table_wei_bio_init)
 
     if (length(win_sc) > 0L && n_ann > 0L) {
-      m_ik_ann <- if (anyNA(u_ik_d1)) {
-        match(
-          annot_table_wei_bio$candidate_structure_inchikey_connectivity_layer,
-          u_ik_d1
-        )
-      } else {
-        fastmatch::fmatch(
-          annot_table_wei_bio$candidate_structure_inchikey_connectivity_layer,
-          u_ik_d1
-        )
-      }
-      m_so_ann <- if (anyNA(u_so_all)) {
-        match(annot_table_wei_bio$sample_organism_name, u_so_all)
-      } else {
-        fastmatch::fmatch(annot_table_wei_bio$sample_organism_name, u_so_all)
-      }
-      k_ann <- if (use_int_ikso) {
-        (m_ik_ann - 1L) * n_so_all + m_so_ann
-      } else {
-        as.double(m_ik_ann - 1L) * n_so_all + m_so_ann
-      }
+      m_ik_ann <- match(
+        annot_table_wei_bio$candidate_structure_inchikey_connectivity_layer,
+        u_ik_d1
+      )
+      m_so_ann <- match(annot_table_wei_bio$sample_organism_name, u_so_all)
+      k_ann <- as.double(m_ik_ann - 1L) * n_so_all + m_so_ann
       m_bio <- fastmatch::fmatch(k_ann, k_ikso_u)
       score_bio_v <- win_sc[m_bio]
       occ_closest_v <- win_occ[m_bio]
@@ -903,36 +855,44 @@ weight_bio <- function(
   }
 
   csi_num <- .as_numeric_dedup(annot_table_wei_bio$candidate_score_sirius_csi)
+  zodiac_num <- if (
+    isTRUE(use_zodiac) &&
+      "candidate_score_sirius_zodiac" %in% names(annot_table_wei_bio)
+  ) {
+    .as_numeric_dedup(annot_table_wei_bio$candidate_score_sirius_zodiac)
+  } else {
+    NULL
+  }
   conf_num <- .as_numeric_dedup(
     annot_table_wei_bio$candidate_score_sirius_confidence
   )
   has_conf <- !is.na(conf_num)
   sirius_tmp <- if (any(has_conf)) {
-    out_s <- transform_score_sirius_csi(csi_num)
+    out_s <- transform_score_sirius_csi(csi_num, zodiac_score = zodiac_num)
     conf_idx <- which(has_conf)
-    out_s[conf_idx] <- conf_num[conf_idx]
+    out_s[conf_idx] <- if (!is.null(zodiac_num)) {
+      z_c <- zodiac_num[conf_idx]
+      ok_zc <- !is.na(z_c) & is.finite(z_c)
+      res_c <- conf_num[conf_idx]
+      if (any(ok_zc)) {
+        res_c[ok_zc] <- res_c[ok_zc] * pmin(pmax(z_c[ok_zc], 0), 1)
+      }
+      res_c
+    } else {
+      conf_num[conf_idx]
+    }
     out_s
   } else {
-    transform_score_sirius_csi(csi_num)
+    transform_score_sirius_csi(csi_num, zodiac_score = zodiac_num)
   }
   sim_num <- .as_numeric_dedup(annot_table_wei_bio$candidate_score_similarity)
 
-  has_sim <- !is.na(sim_num)
-  has_sir <- !is.na(sirius_tmp)
-  pseudo_init <- rep(NA_real_, n_ann)
-  both_idx <- which(has_sim & has_sir)
-  if (length(both_idx) > 0L) {
-    pseudo_init[both_idx] <- (sim_num[both_idx] + sirius_tmp[both_idx]) / 2
-  }
-  sim_only <- which(has_sim & !has_sir)
-  if (length(sim_only) > 0L) {
-    pseudo_init[sim_only] <- sim_num[sim_only]
-  }
-  sir_only <- which(!has_sim & has_sir)
-  if (length(sir_only) > 0L) {
-    pseudo_init[sir_only] <- sirius_tmp[sir_only]
-  }
-  rm(csi_num, conf_num, has_conf, sirius_tmp, sim_num, has_sim, has_sir)
+  pseudo_init <- corroborate_spectral_scores(
+    s_sim = sim_num,
+    s_sir = sirius_tmp,
+    method = spectral_fusion
+  )
+  rm(csi_num, zodiac_num, conf_num, has_conf, sirius_tmp, sim_num)
 
   data.table::set(
     annot_table_wei_bio,

@@ -402,3 +402,223 @@ test_that(".build_feature_consensus_table handles all-NA scores and note tie-bre
   expect_equal(out_notes$component_id, c("C1_B", "C2_B"))
   expect_equal(out_notes$annotation_note, c("Consensus note", "   "))
 })
+
+test_that("summarize_results and helpers cover empty tables, notes lookup branches, factor trimming, and organism lookup edge cases", {
+  model <- columns_model()
+  features_table <- tidytable::tidytable(
+    feature_id = c("1", "2"),
+    rt = c(10.0, 20.0),
+    mz = c(100.0, 200.0)
+  )
+  components_table <- tidytable::tidytable(
+    feature_id = c("1", "2"),
+    component_id = c("C1", "C2")
+  )
+  empty_sop <- tidytable::tidytable(
+    structure_inchikey_connectivity_layer = character(),
+    reference_doi = character(),
+    organism_taxonomy_08species = character()
+  )
+
+  # 1. Empty df with summarize = TRUE and empty_sop
+  df_empty <- tidytable::tidytable(
+    feature_id = character(),
+    candidate_structure_inchikey_connectivity_layer = character(),
+    rank_final = integer()
+  )
+  res_empty <- suppressWarnings(summarize_results(
+    df = df_empty,
+    features_table = features_table[0L, ],
+    components_table = components_table[0L, ],
+    structure_organism_pairs_table = empty_sop,
+    remove_ties = FALSE,
+    summarize = TRUE
+  ))
+  expect_equal(nrow(res_empty), 0L)
+
+  # 2. Notes lookup: unique keys with existing annotation_note coalesce, and duplicate keys (with and without existing annotation_note)
+  df_with_note <- tidytable::tidytable(
+    feature_id = c("1", "2"),
+    candidate_adduct = factor(c(" [M+H]+ ", "[M+Na]+")),
+    candidate_structure_inchikey_connectivity_layer = c("IK1", "IK2"),
+    rank_final = c(1L, 1L),
+    score_final = c(0.9, 0.8),
+    annotation_note = c(NA_character_, "existing")
+  )
+  notes_u <- tidytable::tidytable(
+    feature_id = c("1", "2"),
+    rank_final = c(1L, 1L),
+    annotation_note = c("filled_note", "ignored_note"),
+    extra_lookup_col = c("X", "Y")
+  )
+  res_nu <- summarize_results(
+    df = df_with_note,
+    features_table = features_table,
+    components_table = components_table,
+    structure_organism_pairs_table = empty_sop,
+    annotation_notes_lookup = notes_u,
+    remove_ties = FALSE,
+    summarize = TRUE
+  )
+  expect_equal(res_nu$annotation_note, c("filled_note", "existing"))
+
+  notes_dup <- tidytable::tidytable(
+    feature_id = c("1", "1"),
+    rank_final = c(1L, 1L),
+    annotation_note = c("dup_note_1", "dup_note_2")
+  )
+  res_nd1 <- summarize_results(
+    df = df_with_note,
+    features_table = features_table,
+    components_table = components_table,
+    structure_organism_pairs_table = empty_sop,
+    annotation_notes_lookup = notes_dup,
+    remove_ties = FALSE,
+    summarize = TRUE
+  )
+  expect_equal(nrow(res_nd1), 2L)
+
+  df_no_note <- tidytable::tidytable(
+    feature_id = c("1", "2"),
+    candidate_structure_inchikey_connectivity_layer = c("IK1", "IK2"),
+    rank_final = c(1L, 1L)
+  )
+  res_nd2 <- summarize_results(
+    df = df_no_note,
+    features_table = features_table,
+    components_table = components_table,
+    structure_organism_pairs_table = empty_sop,
+    annotation_notes_lookup = notes_dup,
+    remove_ties = FALSE,
+    summarize = TRUE
+  )
+  expect_equal(nrow(res_nd2), 2L)
+
+  # 3. .count_annotated_features edge cases
+  cnt_empty <- .count_annotated_features(
+    results = tidytable::tidytable(),
+    features_table = NULL
+  )
+  expect_equal(cnt_empty$total_features, 0L)
+  expect_equal(cnt_empty$pct_annotated, 0)
+
+  cnt_no_ft <- .count_annotated_features(
+    results = tidytable::tidytable(
+      feature_id = c("1", "2"),
+      candidate_structure_inchikey_connectivity_layer = c(
+        NA_character_,
+        NA_character_
+      )
+    ),
+    features_table = NULL
+  )
+  expect_equal(cnt_no_ft$total_features, 2L)
+  expect_equal(cnt_no_ft$annotated_features, 0L)
+
+  # 4. .build_organism_lookup guard branches
+  expect_equal(
+    nrow(.build_organism_lookup(
+      empty_sop,
+      tidytable::tidytable(feature_id = "1")
+    )),
+    0L
+  )
+  expect_equal(
+    nrow(.build_organism_lookup(
+      tidytable::tidytable(other_col = "x"),
+      tidytable::tidytable(
+        feature_id = "1",
+        candidate_structure_inchikey_connectivity_layer = "IK1",
+        candidate_structure_organism_occurrence_closest = "Sp1"
+      )
+    )),
+    0L
+  )
+  expect_equal(
+    nrow(.build_organism_lookup(
+      tidytable::tidytable(structure_inchikey_connectivity_layer = "IK1"),
+      tidytable::tidytable(
+        feature_id = "1",
+        candidate_structure_inchikey_connectivity_layer = "IK1",
+        candidate_structure_organism_occurrence_closest = "Sp1"
+      )
+    )),
+    0L
+  )
+  expect_equal(
+    nrow(.build_organism_lookup(
+      tidytable::tidytable(
+        structure_inchikey_connectivity_layer = "IK_OTHER",
+        organism_taxonomy_08species = "Sp1"
+      ),
+      tidytable::tidytable(
+        feature_id = "1",
+        candidate_structure_inchikey_connectivity_layer = NA_character_,
+        candidate_structure_organism_occurrence_closest = NA_character_
+      )
+    )),
+    0L
+  )
+  expect_equal(
+    nrow(.build_organism_lookup(
+      tidytable::tidytable(
+        structure_inchikey_connectivity_layer = "IK_OTHER",
+        organism_taxonomy_08species = "Sp1"
+      ),
+      tidytable::tidytable(
+        feature_id = "1",
+        candidate_structure_inchikey_connectivity_layer = "IK1",
+        candidate_structure_organism_occurrence_closest = "Sp1"
+      )
+    )),
+    0L
+  )
+  lkp_no_doi <- .build_organism_lookup(
+    tidytable::tidytable(
+      structure_inchikey_connectivity_layer = "IK1",
+      organism_taxonomy_08species = "Sp1"
+    ),
+    tidytable::tidytable(
+      feature_id = "1",
+      candidate_structure_inchikey_connectivity_layer = "IK1",
+      candidate_structure_organism_occurrence_closest = "Sp1"
+    )
+  )
+  expect_equal(nrow(lkp_no_doi), 1L)
+  expect_identical(
+    lkp_no_doi$candidate_structure_organism_occurrence_reference,
+    ""
+  )
+
+  # .build_organism_lookup where IK1 and Sp2 exist in df separately (not as a pair)
+  expect_equal(
+    nrow(.build_organism_lookup(
+      tidytable::tidytable(
+        structure_inchikey_connectivity_layer = "IK1",
+        organism_taxonomy_08species = "Sp2",
+        reference_doi = "10.1000/cross"
+      ),
+      tidytable::tidytable(
+        feature_id = c("1", "2"),
+        candidate_structure_inchikey_connectivity_layer = c("IK1", "IK2"),
+        candidate_structure_organism_occurrence_closest = c("Sp1", "Sp2")
+      )
+    )),
+    0L
+  )
+
+  # 5. .build_feature_consensus_table with 0-row input and character score/rank
+  cons_0 <- .build_feature_consensus_table(df_empty, model)
+  expect_equal(nrow(cons_0), 0L)
+  expect_true("annotation_note" %in% names(cons_0))
+
+  cons_chr <- .build_feature_consensus_table(
+    tidytable::tidytable(
+      feature_id = c("1", "1"),
+      score_weighted_chemo = c("0.5", "0.9"),
+      rank_final = c("2", "1")
+    ),
+    model
+  )
+  expect_equal(nrow(cons_chr), 1L)
+})

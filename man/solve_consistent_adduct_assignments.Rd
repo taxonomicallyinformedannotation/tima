@@ -9,7 +9,8 @@ solve_consistent_adduct_assignments(
   features_table,
   tolerance_ppm,
   tolerance_dalton,
-  adduct_lookup = NULL
+  adduct_lookup = NULL,
+  baseline_adduct = NULL
 )
 }
 \description{

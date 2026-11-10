@@ -47,6 +47,16 @@
   - `build_universe_transition_tables()` always orients pairs from lighter to
     heavier adduct and supports single-adduct universes
   - `adduct_support` no longer counts a feature as its own neighbor
+  - Applied exact `1 / |z|` isotope shift (`n_iso * 1.003355 / |z|`) in
+    `calculate_mass_of_m()` and `calculate_mz_from_mass()`, enumerated mixed
+    multivalent charge carriers (`+2`, `+3`) via integer charge balance, used
+    tolerance-bounded consensus mode for component neutral mass `M`, replaced
+    grid-quantized mass/RT bins in `mass_evidence` with bounded-diameter 1D
+    clustering, and evaluated co-variance edges with one-sided Pearson
+    correlation on `log1p(intensity)`
+  - Required explicit modifier presence in
+    `score_modifier_relation_from_hypotheses()` so cluster and neutral-loss
+    interpretations are not scored identically after algebraic cancellation
 - **Ranking and filtering**:
   - The filtered tier keeps the `candidates_final` best-ranked candidates
   - Ranks are computed after deduplicating structures
@@ -60,10 +70,24 @@
     requires sufficient score coverage; `high_evidence` only toggles the `full`
     table (`filtered` and `mini` always filter to high evidence)
   - Default Biota biological score is capped at `1.0` (was `1.007276`)
+  - Computed real per-row evidence `coverage` (`present_weight / weight_sum`) in
+    `compute_weighted_components()`, added optional `na_prior` shrinkage and
+    Cauchy RT/`m/z` error decay (`compute_rt_mz_penalty()`), supported
+    `"corroborated"` and `"noisy_or"` spectral score fusion plus SIRIUS Zodiac
+    modulation, scored all 15 taxonomic ranks (including `infraorder`,
+    `subfamily`, `subtribe`, `subgenus`, `subspecies`), weighted neighbor
+    consistency in `clean_bio()` by edge similarity, used complete-linkage 1D RT
+    clustering in `resolve_cross_rt_duplicate_candidates()`, and filtered trace
+    sample attributions in `prepare_taxa()` via `min_rel_intensity`
 - **Masses and spectra**:
   - Applied signed electron-mass correction (`z * m_e`, CODATA 2018
     `ELECTRON_MASS_DALTONS`) consistently across `calculate_mass_of_m()`,
     `calculate_mz_from_mass()`, and spectral neutral-mass calculations
+  - Separated `"cosine"` (unshifted direct cosine) from `"gnps"`
+    (precursor-shifted modified cosine), passed actual precursor `m/z` for the
+    GNPS neutral-loss shift during neutral-mass window matching in
+    `annotate_spectra()`, and used adaptive per-community edge pruning and
+    symmetric `min(N_source, N_target)` peak scaling in `create_components()`
   - `annotate_spectra()` and `create_edges_spectra()` warn once and return valid
     empty outputs instead of aborting when an MGF has no MS2 spectra; hardened
     `get_spectra_ids()` on 0-row `Spectra`

@@ -4,7 +4,12 @@
 \alias{build_feature_pairs_within_rt}
 \title{Build feature pairs inside RT windows using sweep-line algorithm.}
 \usage{
-build_feature_pairs_within_rt(df_rt_tol, df_fea_min, tolerance_ppm)
+build_feature_pairs_within_rt(
+  df_rt_tol,
+  df_fea_min,
+  tolerance_ppm,
+  tolerance_dalton = NULL
+)
 }
 \description{
 For every pair \verb{(src, dest)} of features in the same RT tolerance window

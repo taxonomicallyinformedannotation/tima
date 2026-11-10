@@ -192,11 +192,7 @@ clean_chemo <- function(
     length(.missing_from_ft) > 0L && "feature_id" %in% names(features_table)
   ) {
     .ft_fids <- features_table$feature_id
-    .m_ft <- if (anyNA(.ft_fids)) {
-      match(annot_table_wei_chemo$feature_id, .ft_fids)
-    } else {
-      fastmatch::fmatch(annot_table_wei_chemo$feature_id, .ft_fids)
-    }
+    .m_ft <- fastmatch::fmatch(annot_table_wei_chemo$feature_id, .ft_fids)
     for (.col in .missing_from_ft) {
       data.table::set(
         annot_table_wei_chemo,
@@ -363,11 +359,7 @@ clean_chemo <- function(
   ord1 <- order(df$rank_final, na.last = TRUE, method = "radix")
   fids_ord1 <- df$feature_id[ord1]
   u_fids <- unique(fids_ord1)
-  fid_id <- if (anyNA(u_fids)) {
-    match(fids_ord1, u_fids)
-  } else {
-    fastmatch::fmatch(fids_ord1, u_fids)
-  }
+  fid_id <- fastmatch::fmatch(fids_ord1, u_fids)
   ord2 <- order(fid_id, method = "radix")
   g_sorted <- fid_id[ord2]
   new_g <- if (n > 1L) c(TRUE, g_sorted[-1L] != g_sorted[-n]) else TRUE
@@ -384,11 +376,7 @@ clean_chemo <- function(
     return(tidytable::as_tidytable(res_list))
   }
   rc_fids <- results_candidates$feature_id
-  idx <- if (anyNA(rc_fids)) {
-    match(results$feature_id, rc_fids)
-  } else {
-    fastmatch::fmatch(results$feature_id, rc_fids)
-  }
+  idx <- fastmatch::fmatch(results$feature_id, rc_fids)
   c_eval <- results_candidates$candidates_evaluated[idx]
   c_best <- results_candidates$candidates_best[idx]
   if ("candidate_structure_inchikey_connectivity_layer" %in% names(results)) {
@@ -433,11 +421,7 @@ clean_chemo <- function(
     n_res <- nrow(results)
     cand_idx <- if ("feature_id" %in% note_join_cols) {
       u_nf <- unique(annotation_notes_lookup$feature_id)
-      m_nf <- if (anyNA(u_nf)) {
-        match(results$feature_id, u_nf)
-      } else {
-        fastmatch::fmatch(results$feature_id, u_nf)
-      }
+      m_nf <- fastmatch::fmatch(results$feature_id, u_nf)
       which(!is.na(m_nf))
     } else {
       seq_len(n_res)
@@ -450,20 +434,14 @@ clean_chemo <- function(
     }
 
     if (length(cand_idx) > 0L) {
-      if (length(note_join_cols) == 1L) {
-        c1 <- note_join_cols[[1L]]
-        r_k <- results[[c1]][cand_idx]
-        n_k <- annotation_notes_lookup[[c1]]
-      } else {
-        r_cols <- lapply(note_join_cols, function(col) results[[col]][cand_idx])
-        n_cols <- lapply(
-          note_join_cols,
-          function(col) annotation_notes_lookup[[col]]
-        )
-        r_k <- do.call(paste, c(r_cols, list(sep = "\r")))
-        n_k <- do.call(paste, c(n_cols, list(sep = "\r")))
-      }
-      m_idx <- if (anyNA(n_k)) match(r_k, n_k) else fastmatch::fmatch(r_k, n_k)
+      r_cols <- lapply(note_join_cols, function(col) results[[col]][cand_idx])
+      n_cols <- lapply(
+        note_join_cols,
+        function(col) annotation_notes_lookup[[col]]
+      )
+      r_k <- do.call(paste, c(r_cols, list(sep = "\r")))
+      n_k <- do.call(paste, c(n_cols, list(sep = "\r")))
+      m_idx <- fastmatch::fmatch(r_k, n_k)
       matched_notes <- annotation_notes_lookup$annotation_note[m_idx]
       cur_sub <- note_col[cand_idx]
       fill_mask <- is.na(cur_sub) & !is.na(matched_notes)

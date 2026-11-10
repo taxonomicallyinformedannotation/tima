@@ -605,4 +605,87 @@ test_that("build_mini_taxonomy_table prefers structure label on score equality a
   # F1: npc structure score (0.80) < pred score (0.85) -> prediction wins
   expect_identical(out$label_npclassifier, c("PredNpc1", "PredNpc2"))
   expect_equal(out$score_npclassifier, c(0.85, 0.60))
+
+  # Edge cases: validate_clean_chemo_inputs minimal_ms1_bio/chemo, 0-row filter_ms1_annotations,
+  # missing similarity col, and 1-row rank_and_deduplicate
+  df_dummy <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_structure_inchikey_connectivity_layer = "IK1",
+    score_biological = 0.5,
+    score_chemical = 0.5,
+    score_weighted_chemo = 0.5,
+    candidate_score_pseudo_initial = 0.5
+  )
+  expect_error(
+    validate_clean_chemo_inputs(
+      annot_table_wei_chemo = df_dummy,
+      candidates_final = 1L,
+      best_percentile = 0.5,
+      minimal_ms1_bio = -0.1,
+      minimal_ms1_chemo = 0.5,
+      minimal_ms1_condition = "OR",
+      compounds_names = TRUE,
+      high_evidence = FALSE,
+      remove_ties = FALSE,
+      summarize = FALSE,
+      max_per_score = 1L,
+      score_chemical_cla_kingdom = 0.5,
+      score_chemical_cla_superclass = 0.5,
+      score_chemical_cla_class = 0.5,
+      score_chemical_cla_parent = 0.5,
+      score_chemical_npc_pathway = 0.5,
+      score_chemical_npc_superclass = 0.5,
+      score_chemical_npc_class = 0.5
+    ),
+    "minimal_ms1_bio",
+    class = "tima_validation_error"
+  )
+  expect_error(
+    validate_clean_chemo_inputs(
+      annot_table_wei_chemo = df_dummy,
+      candidates_final = 1L,
+      best_percentile = 0.5,
+      minimal_ms1_bio = 0.5,
+      minimal_ms1_chemo = 1.5,
+      minimal_ms1_condition = "OR",
+      compounds_names = TRUE,
+      high_evidence = FALSE,
+      remove_ties = FALSE,
+      summarize = FALSE,
+      max_per_score = 1L,
+      score_chemical_cla_kingdom = 0.5,
+      score_chemical_cla_superclass = 0.5,
+      score_chemical_cla_class = 0.5,
+      score_chemical_cla_parent = 0.5,
+      score_chemical_npc_pathway = 0.5,
+      score_chemical_npc_superclass = 0.5,
+      score_chemical_npc_class = 0.5
+    ),
+    "minimal_ms1_chemo",
+    class = "tima_validation_error"
+  )
+  expect_identical(
+    nrow(filter_ms1_annotations(tidytable::tidytable(), 0.5, 0.5, "OR")),
+    0L
+  )
+  expect_identical(
+    nrow(filter_ms1_annotations(
+      tidytable::tidytable(
+        feature_id = "F1",
+        score_biological = 0.8,
+        score_chemical = 0.8
+      ),
+      0.5,
+      0.5,
+      "OR"
+    )),
+    1L
+  )
+  rk1 <- rank_and_deduplicate(tidytable::tidytable(
+    feature_id = "F1",
+    candidate_structure_inchikey_connectivity_layer = "IK1",
+    score_final = 0.9,
+    candidate_score_pseudo_initial = 0.8
+  ))
+  expect_identical(rk1$rank_initial, 1L)
 })

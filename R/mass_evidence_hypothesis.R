@@ -56,9 +56,6 @@ build_evidence_supported_hypotheses <- function(
   feature_samples <- as.character(feats_dt$sample)
 
   uni_dt <- annotate_adduct_universe_metadata(universe, polarity = ms_mode)
-  if (!"adduct_mass_per_monomer" %in% colnames(uni_dt)) {
-    uni_dt <- uni_dt |> tidytable::mutate(adduct_mass_per_monomer = 0)
-  }
   uni_dt <- uni_dt[,
     .(
       adduct,
@@ -159,7 +156,7 @@ build_evidence_supported_hypotheses <- function(
     am_pm_u <- am_pm_v[ui]
 
     # Vectorized implied mass computation
-    implied_work <- (z_abs * (feature_mzs - iso_shift) - am_u) /
+    implied_work <- (z_abs * feature_mzs - iso_shift - am_u) /
       n_mer_u -
       am_pm_u
 
@@ -273,7 +270,8 @@ build_evidence_supported_hypotheses <- function(
     if (length(missing_feats) > 0L) {
       iso_shift_b <- niso_v[b] * EVIDENCE_ISOTOPE_SHIFT_DA
       implied_b <- (abs(z_v[b]) *
-        (feature_mzs[missing_feats] - iso_shift_b) -
+        feature_mzs[missing_feats] -
+        iso_shift_b -
         am_v[b]) /
         n_mer_v[b]
       ok_b <- is.finite(implied_b) & implied_b > 0
@@ -285,16 +283,8 @@ build_evidence_supported_hypotheses <- function(
     }
   }
 
-  if (length(f_idx_vec) == 0L) {
-    return(empty_evidence_table())
-  }
-
   u_samples <- sort(unique(feature_samples), method = "radix")
-  feat_sample_id <- if (anyNA(u_samples)) {
-    match(feature_samples, u_samples)
-  } else {
-    fastmatch::fmatch(feature_samples, u_samples)
-  }
+  feat_sample_id <- fastmatch::fmatch(feature_samples, u_samples)
   s_id_vec <- feat_sample_id[f_idx_vec]
   rt_vec <- feature_rts[f_idx_vec]
 
@@ -313,9 +303,18 @@ build_evidence_supported_hypotheses <- function(
     ref_em <- hi_em
     ref_em[use_lo] <- lo_em[use_lo]
     ppm_err <- d_min / pmax.int(ref_em, 1e-9) * 1e6
+    da_ok <- !is.null(tolerance_dalton) &&
+      is.finite(tolerance_dalton) &
+      (d_min <= tolerance_dalton)
     m_idx <- hi_idx
     m_idx[use_lo] <- lo_idx[use_lo]
-    m_idx[ppm_err > tol_ppm_num] <- NA_integer_
+    m_idx[ppm_err > tol_ppm_num & !da_ok] <- NA_integer_
+    em_cl_lut <- .ppm_cluster_sorted(
+      exact_masses_sorted,
+      tol_ppm_num,
+      tolerance_dalton = tolerance_dalton
+    )
+    m_cl <- ifelse(is.na(m_idx), NA_integer_, em_cl_lut[m_idx])
     rm(
       idx_em,
       lo_idx,
@@ -326,7 +325,9 @@ build_evidence_supported_hypotheses <- function(
       d_hi,
       use_lo,
       d_min,
-      ref_em
+      ref_em,
+      da_ok,
+      em_cl_lut
     )
     log_debug(
       "Exact-mass anchoring: %d matched targets in %.2fs",
@@ -335,37 +336,49 @@ build_evidence_supported_hypotheses <- function(
     )
 
     t_rt <- Sys.time()
-    ord_rt <- order(s_id_vec, m_idx, rt_vec, method = "radix")
+    ord_rt <- order(s_id_vec, m_cl, rt_vec, method = "radix")
     f_idx_vec <- f_idx_vec[ord_rt]
     a_idx_vec <- a_idx_vec[ord_rt]
     m_vec <- m_vec[ord_rt]
     ppm_err <- ppm_err[ord_rt]
     s_id_vec <- s_id_vec[ord_rt]
     m_v <- m_idx[ord_rt]
+    m_cl_v <- m_cl[ord_rt]
     rt_vec <- rt_vec[ord_rt]
-    rm(m_idx, ord_rt)
+    rm(m_idx, m_cl, ord_rt)
 
     n_h <- length(f_idx_vec)
     same_sm <- if (n_h > 1L) {
       c(
         FALSE,
         s_id_vec[-1L] == s_id_vec[-n_h] &
-          ((is.na(m_v[-1L]) & is.na(m_v[-n_h])) |
-            (!is.na(m_v[-1L]) & !is.na(m_v[-n_h]) & m_v[-1L] == m_v[-n_h]))
+          ((is.na(m_cl_v[-1L]) & is.na(m_cl_v[-n_h])) |
+            (!is.na(m_cl_v[-1L]) &
+              !is.na(m_cl_v[-n_h]) &
+              m_cl_v[-1L] == m_cl_v[-n_h]))
       )
     } else {
       FALSE
     }
     prev_rt <- if (n_h > 1L) c(NA_real_, rt_vec[-n_h]) else NA_real_
     step_rt <- !same_sm |
-      is.na(m_v) |
+      is.na(m_cl_v) |
       is.na(prev_rt) |
       is.na(rt_vec) |
       (rt_vec - prev_rt) > tolerance_rt
+    if (n_h > 2L && any(!step_rt[-1L] & !step_rt[-n_h])) {
+      anchor_rt <- rt_vec[1L]
+      for (i in 2L:n_h) {
+        if (step_rt[i] || (rt_vec[i] - anchor_rt) > tolerance_rt) {
+          step_rt[i] <- TRUE
+          anchor_rt <- rt_vec[i]
+        }
+      }
+    }
     cs_step <- cumsum(step_rt)
     grp_base <- cummax(ifelse(!same_sm, cs_step, 0L))
     rt_cl <- cs_step - grp_base + 1L
-    valid_cl <- !is.na(m_v)
+    valid_cl <- !is.na(m_cl_v)
     n_clusters <- sum(step_rt & valid_cl)
     cid <- ifelse(valid_cl, cumsum(step_rt & valid_cl), NA_integer_)
     rm(
@@ -394,7 +407,11 @@ build_evidence_supported_hypotheses <- function(
     rt_vec <- rt_vec[ord_m]
     rm(ord_m)
 
-    mc_v <- .ppm_cluster_sorted(m_vec, tolerance_ppm)
+    mc_v <- .ppm_cluster_sorted(
+      m_vec,
+      tolerance_ppm,
+      tolerance_dalton = tolerance_dalton
+    )
     log_debug(
       "Mass clustering: %d clusters in %.2fs",
       if (length(mc_v) > 0L) mc_v[length(mc_v)] else 0L,
@@ -409,6 +426,7 @@ build_evidence_supported_hypotheses <- function(
     ppm_err <- ppm_err[ord_rt]
     s_id_vec <- s_id_vec[ord_rt]
     m_v <- mc_v[ord_rt]
+    m_cl_v <- m_v
     rt_vec <- rt_vec[ord_rt]
     rm(mc_v, ord_rt)
 
@@ -423,6 +441,15 @@ build_evidence_supported_hypotheses <- function(
       is.na(prev_rt) |
       is.na(rt_vec) |
       (rt_vec - prev_rt) > tolerance_rt
+    if (n_h > 2L && any(!step_rt[-1L] & !step_rt[-n_h])) {
+      anchor_rt <- rt_vec[1L]
+      for (i in 2L:n_h) {
+        if (step_rt[i] || (rt_vec[i] - anchor_rt) > tolerance_rt) {
+          step_rt[i] <- TRUE
+          anchor_rt <- rt_vec[i]
+        }
+      }
+    }
     cs_step <- cumsum(step_rt)
     grp_base <- cummax(ifelse(!same_sm, cs_step, 0L))
     rt_cl <- cs_step - grp_base + 1L
@@ -445,32 +472,26 @@ build_evidence_supported_hypotheses <- function(
   t_score <- Sys.time()
   n_h <- length(f_idx_vec)
   valid_idx <- which(!is.na(cid))
-  if (length(valid_idx) > 0L && n_clusters > 0L) {
-    c_v <- cid[valid_idx]
-    f_v <- f_idx_vec[valid_idx]
-    a_v <- a_idx_vec[valid_idx]
+  c_v <- cid[valid_idx]
+  f_v <- f_idx_vec[valid_idx]
+  a_v <- a_idx_vec[valid_idx]
 
-    cf_key <- as.double(c_v - 1L) * (n_feat + 1) + f_v
-    n_feat_lut <- tabulate(c_v[!duplicated(cf_key)], nbins = n_clusters)
+  cf_key <- as.double(c_v - 1L) * (n_feat + 1) + f_v
+  n_feat_lut <- tabulate(c_v[!duplicated(cf_key)], nbins = n_clusters)
 
-    has_core_lut <- logical(n_clusters)
-    has_core_lut[c_v[core_v[a_v]]] <- TRUE
+  has_core_lut <- logical(n_clusters)
+  has_core_lut[c_v[core_v[a_v]]] <- TRUE
 
-    ca_key <- as.double(c_v - 1L) * (K + 1L) + a_v
-    n_add_lut <- tabulate(c_v[!duplicated(ca_key)], nbins = n_clusters)
+  ca_key <- as.double(c_v - 1L) * (K + 1L) + a_v
+  n_add_lut <- tabulate(c_v[!duplicated(ca_key)], nbins = n_clusters)
 
-    n_ev_feat <- rep(1L, n_h)
-    n_ev_feat[valid_idx] <- n_feat_lut[c_v]
-    cl_has_core <- logical(n_h)
-    cl_has_core[valid_idx] <- has_core_lut[c_v]
-    cl_n_add <- rep(1L, n_h)
-    cl_n_add[valid_idx] <- n_add_lut[c_v]
-    rm(c_v, f_v, a_v, cf_key, n_feat_lut, has_core_lut, ca_key, n_add_lut)
-  } else {
-    n_ev_feat <- rep(1L, n_h)
-    cl_has_core <- logical(n_h)
-    cl_n_add <- rep(1L, n_h)
-  }
+  n_ev_feat <- rep(1L, n_h)
+  n_ev_feat[valid_idx] <- n_feat_lut[c_v]
+  cl_has_core <- logical(n_h)
+  cl_has_core[valid_idx] <- has_core_lut[c_v]
+  cl_n_add <- rep(1L, n_h)
+  cl_n_add[valid_idx] <- n_add_lut[c_v]
+  rm(c_v, f_v, a_v, cf_key, n_feat_lut, has_core_lut, ca_key, n_add_lut)
   rm(cid, valid_idx, s_id_vec)
 
   ev_count <- as.integer(pmax.int(0L, n_ev_feat - 1L))
@@ -489,6 +510,7 @@ build_evidence_supported_hypotheses <- function(
   ppm_k <- ppm_err[keep_mask]
   rt_k <- rt_vec[keep_mask]
   mv_k <- m_v[keep_mask]
+  mcl_k <- m_cl_v[keep_mask]
   rtcl_k <- rt_cl[keep_mask]
   nev_k <- as.integer(n_ev_feat[keep_mask])
   evc_k <- ev_count[keep_mask]
@@ -499,6 +521,7 @@ build_evidence_supported_hypotheses <- function(
     ppm_err,
     rt_vec,
     m_v,
+    m_cl_v,
     rt_cl,
     n_ev_feat,
     cl_has_core,
@@ -513,11 +536,11 @@ build_evidence_supported_hypotheses <- function(
 
   if (use_library_prefilter) {
     ev_cl <- rep(NA_character_, length(f_k))
-    ok_mv <- !is.na(mv_k)
+    ok_mv <- !is.na(mcl_k)
     if (any(ok_mv)) {
       ev_cl[ok_mv] <- paste(
         samp_k[ok_mv],
-        mv_k[ok_mv],
+        mcl_k[ok_mv],
         rtcl_k[ok_mv],
         sep = "|"
       )
@@ -603,13 +626,15 @@ build_evidence_supported_hypotheses <- function(
   universe,
   baseline_adduct
 ) {
-  base_row <- universe[adduct == baseline_adduct][1L]
+  base_row <- universe[adduct == baseline_adduct]
   if (nrow(base_row) == 0L) {
     return(empty_evidence_table())
   }
+  base_row <- base_row[1L]
   iso_shift <- base_row$n_iso * EVIDENCE_ISOTOPE_SHIFT_DA
   implied <- (abs(base_row$z) *
-    (feature_mzs - iso_shift) -
+    feature_mzs -
+    iso_shift -
     base_row$adduct_mass) /
     base_row$n_mer
   ok <- is.finite(implied) & implied > 0

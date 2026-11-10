@@ -256,20 +256,8 @@ rebuild_hill_formula <- function(atom_counts) {
 #' Subtract one formula from another, returning the residual formula string
 #' @keywords internal
 subtract_atomic_formula <- function(formula, sub_formula = "H3N") {
-  formula_atoms <- tryCatch(
-    parse_atomic_formula(formula),
-    error = function(.err) {
-      invisible(.err)
-      NULL
-    }
-  )
-  sub_atoms <- tryCatch(
-    parse_atomic_formula(sub_formula),
-    error = function(.err) {
-      invisible(.err)
-      NULL
-    }
-  )
+  formula_atoms <- parse_atomic_formula(formula)
+  sub_atoms <- parse_atomic_formula(sub_formula)
   if (is.null(formula_atoms) || is.null(sub_atoms)) {
     return(NULL)
   }
@@ -293,9 +281,6 @@ reduce_ammonium_loss_pairs <- function(net) {
   }
 
   add_or_increment <- function(df, formula, delta) {
-    if (!nzchar(formula) || delta == 0L) {
-      return(df)
-    }
     idx <- match(formula, df$formula)
     if (is.na(idx)) {
       df <- data.frame(
@@ -429,10 +414,6 @@ canonicalize_adduct_notation <- local({
     tok_re <- "([+-])(\\d*)([A-Za-z][A-Za-z0-9]*)"
     tok_matches <- gregexpr(tok_re, mods, perl = TRUE)
     tokens <- regmatches(mods, tok_matches)[[1L]]
-    if (length(tokens) == 0L) {
-      .canon_cache[[adduct_input]] <- adduct
-      return(adduct)
-    }
 
     remainder <- gsub(tok_re, "", mods, perl = TRUE)
     if (!identical(remainder, "")) {

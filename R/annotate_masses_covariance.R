@@ -28,8 +28,11 @@
 compute_intensity_covariance_edges <- function(
   features_table,
   tolerance_rt,
-  correlation_p_threshold = 0.05
+  correlation_p_threshold = 0.05,
+  log_transform = TRUE,
+  alternative = c("greater", "two.sided")
 ) {
+  alternative <- match.arg(alternative)
   if (nrow(features_table) == 0L) {
     return(.empty_covariance_edges())
   }
@@ -155,11 +158,6 @@ compute_intensity_covariance_edges <- function(
   feat_ids_int <- intensity_by_feature$feature_id
   idx_i <- fastmatch::fmatch(pair_feat_i, feat_ids_int)
   idx_j <- fastmatch::fmatch(pair_feat_j, feat_ids_int)
-  is_null_vec <- vapply(intensity_vectors, is.null, logical(1L))
-  if (any(is_null_vec)) {
-    idx_i[!is.na(idx_i) & is_null_vec[idx_i]] <- NA_integer_
-    idx_j[!is.na(idx_j) & is_null_vec[idx_j]] <- NA_integer_
-  }
 
   in_mat <- !is.na(idx_i) & !is.na(idx_j)
   n_not_in_matrix <- sum(!in_mat)
@@ -202,6 +200,9 @@ compute_intensity_covariance_edges <- function(
         byrow = TRUE
       )
       mask <- !is.na(mat) & mat > 0
+      if (isTRUE(log_transform)) {
+        mat[mask] <- log10(mat[mask])
+      }
       mat[!mask] <- 0
 
       local_i <- fastmatch::fmatch(idx_i[pair_sub], u_feats)
@@ -265,7 +266,11 @@ compute_intensity_covariance_edges <- function(
     n_kept <- n_samp_all[keep]
     df <- n_kept - 2L
     t_stat <- sqrt(df) * r_kept / sqrt(pmax(0, 1 - r_kept * r_kept))
-    p_raw_kept <- 2 * stats::pt(-abs(t_stat), df = df)
+    p_raw_kept <- if (identical(alternative, "greater")) {
+      stats::pt(-t_stat, df = df)
+    } else {
+      2 * stats::pt(-abs(t_stat), df = df)
+    }
     tidytable::tidytable(
       feature_id = pair_feat_i[keep],
       feature_id_dest = pair_feat_j[keep],

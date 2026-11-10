@@ -747,3 +747,103 @@ test_that("clean_bio handles unique vs duplicate feature-inchikey pairs and does
   expect_identical(names(annotations_unique), orig_cols)
   expect_true("consistency_structure_npc_pat" %in% names(res))
 })
+
+test_that("clean_bio internal helpers cover merge, taxonomy extraction, and similarity-weighted edge cases", {
+  # 1. .merge_consistency_tables: empty list, copy_input = TRUE, feature_id not first col
+  base_df <- tidytable::tidytable(other = 1L, feature_id = "F1")
+  expect_identical(.merge_consistency_tables(base_df, list()), base_df)
+  merged <- .merge_consistency_tables(
+    base_df,
+    list(tidytable::tidytable(feature_source = "F1", col_a = 0.9)),
+    copy_input = TRUE
+  )
+  expect_identical(names(merged)[[1L]], "feature_id")
+  expect_equal(merged$col_a, 0.9)
+
+  # 2. .extract_distinct_taxonomy_pairs: duplicate (feature_id, ik) with distinct taxonomy,
+  # and table without inchikey column
+  ann_diff_tax <- tidytable::tidytable(
+    feature_id = c("F1", "F1"),
+    candidate_structure_inchikey_connectivity_layer = c("IK1", "IK1"),
+    candidate_structure_tax_cla_01kin = c("Organic", "Inorganic"),
+    score_weighted_bio = c(0.8, 0.7)
+  )
+  expect_equal(nrow(.extract_distinct_taxonomy_pairs(ann_diff_tax)), 2L)
+
+  ann_no_ik <- tidytable::tidytable(
+    feature_id = c("F1", "F1"),
+    candidate_structure_tax_cla_01kin = c("Organic", "Organic"),
+    score_weighted_bio = c(0.8, 0.8)
+  )
+  expect_equal(nrow(.extract_distinct_taxonomy_pairs(ann_no_ik)), 1L)
+
+  # 3. .filter_edges_for_consistency: no valid edges with candidate_score_similarity,
+  # and varying/invalid candidate_score_similarity
+  edges_none <- tidytable::tidytable(
+    feature_source = "F1",
+    feature_target = "F1",
+    feature_spectrum_entropy = 0.5,
+    candidate_score_similarity = 0.8
+  )
+  ef_none <- .filter_edges_for_consistency(edges_none)
+  expect_equal(nrow(ef_none), 0L)
+  expect_true("candidate_score_similarity" %in% names(ef_none))
+
+  edges_sim <- tidytable::tidytable(
+    feature_source = c("F1", "F1", "F1"),
+    feature_target = c("F2", "F2", "F3"),
+    feature_spectrum_entropy = c(0.5, 0.6, 0.7),
+    candidate_score_similarity = c(NA_real_, 0.9, 0.4)
+  )
+  ef_sim <- .filter_edges_for_consistency(edges_sim)
+  expect_equal(nrow(ef_sim), 2L)
+
+  # 4. .calculate_consistency_all_levels: weighted edges, all-NA level, NA scores, and no target hits
+  ann_levels <- tidytable::tidytable(
+    feature_id = c("F1", "F2", "F3"),
+    candidate_structure_tax_cla_01kin = c(
+      NA_character_,
+      NA_character_,
+      NA_character_
+    ),
+    candidate_structure_tax_npc_01pat = c(
+      "Alkaloids",
+      "Alkaloids",
+      "Terpenoids"
+    ),
+    candidate_structure_tax_cla_02sup = c("SupA", NA_character_, NA_character_),
+    candidate_structure_tax_npc_02sup = c(
+      "Alkaloids",
+      "Alkaloids",
+      "Alkaloids"
+    ),
+    candidate_structure_tax_cla_03cla = c("ClaA", "ClaA", "ClaA"),
+    candidate_structure_tax_npc_03cla = c("NpcA", "NpcA", "NpcA"),
+    candidate_structure_tax_cla_04dirpar = c("ParA", "ParA", "ParA"),
+    score_weighted_bio = c(NA_real_, 0.8, 0.7)
+  )
+  ef_weighted <- tidytable::tidytable(
+    feature_source = c("F1", "F1"),
+    feature_target = c("F2", "F3"),
+    candidate_score_similarity = c(NA_real_, 0.5)
+  )
+  cons_w <- .calculate_consistency_all_levels(
+    edges_filtered = ef_weighted,
+    annotations_for_join = ann_levels,
+    minimal_consistency = 0.1
+  )
+  expect_equal(nrow(cons_w[[1L]]), 0L) # all-NA cla_01kin
+  expect_equal(nrow(cons_w[[3L]]), 0L) # SupA only on F1 (not a target), so !any(has_e)
+
+  ef_const_w <- tidytable::tidytable(
+    feature_source = c("F1", "F1"),
+    feature_target = c("F2", "F3"),
+    candidate_score_similarity = c(0.5, 0.5)
+  )
+  cons_cw <- .calculate_consistency_all_levels(
+    edges_filtered = ef_const_w,
+    annotations_for_join = ann_levels,
+    minimal_consistency = 0.1
+  )
+  expect_equal(length(cons_cw), 7L)
+})

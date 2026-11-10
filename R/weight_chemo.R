@@ -1,10 +1,3 @@
-#' Validate that a score is between 0 and 1
-#' @keywords internal
-#' @noRd
-.is_valid_score <- function(score) {
-  is.numeric(score) && score >= 0 && score <= 1
-}
-
 #' @title Weight annotations by chemical consistency
 #'
 #' @description Weights biologically weighted annotations according to their
@@ -40,6 +33,8 @@
 #'     (0-1)
 #' @param score_chemical_npc_class [numeric] Score for NPC class match (0-1,
 #'     highest)
+#' @param weight_by_pred_score [logical] If `TRUE`, weights predicted chemical
+#'     class frequencies by their CANOPUS/CSI prediction probabilities.
 #'
 #' @return Data frame with chemically weighted annotations including chemical
 #'     consistency scores and final weighted scores
@@ -74,7 +69,8 @@ weight_chemo <- function(
   score_chemical_cla_parent,
   score_chemical_npc_pathway,
   score_chemical_npc_superclass,
-  score_chemical_npc_class
+  score_chemical_npc_class,
+  weight_by_pred_score = FALSE
 ) {
   ctx <- log_operation(
     "weight_chemo",
@@ -156,41 +152,6 @@ weight_chemo <- function(
     )
   }
 
-  if (weight_spectral < 0 || weight_biological < 0 || weight_chemical < 0) {
-    cli::cli_abort(
-      "all weights must be non-negative",
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
-  }
-
-  chem_scores <- list(
-    cla_kingdom = score_chemical_cla_kingdom,
-    cla_superclass = score_chemical_cla_superclass,
-    cla_class = score_chemical_cla_class,
-    cla_parent = score_chemical_cla_parent,
-    npc_pathway = score_chemical_npc_pathway,
-    npc_superclass = score_chemical_npc_superclass,
-    npc_class = score_chemical_npc_class
-  )
-
-  invalid_scores <- !vapply(
-    X = chem_scores,
-    FUN = .is_valid_score,
-    logical(1L)
-  )
-  if (any(invalid_scores)) {
-    invalid_names <- names(chem_scores)[invalid_scores]
-    cli::cli_abort(
-      c(
-        "the following scores must be between 0 and 1",
-        "x" = paste0("score_chemical_", invalid_names, collapse = ", ")
-      ),
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
-  }
-
   log_info(
     "Weighting %d annotations by chemical consistency",
     n_annotations
@@ -206,42 +167,49 @@ weight_chemo <- function(
     list(
       cand = "candidate_structure_tax_cla_01kin",
       fval = "feature_pred_tax_cla_01kin_val",
+      fscore = "feature_pred_tax_cla_01kin_score",
       weight = score_chemical_cla_kingdom,
       out = "score_chemical_1"
     ),
     list(
       cand = "candidate_structure_tax_npc_01pat",
       fval = "feature_pred_tax_npc_01pat_val",
+      fscore = "feature_pred_tax_npc_01pat_score",
       weight = score_chemical_npc_pathway,
       out = "score_chemical_2"
     ),
     list(
       cand = "candidate_structure_tax_cla_02sup",
       fval = "feature_pred_tax_cla_02sup_val",
+      fscore = "feature_pred_tax_cla_02sup_score",
       weight = score_chemical_cla_superclass,
       out = "score_chemical_3"
     ),
     list(
       cand = "candidate_structure_tax_npc_02sup",
       fval = "feature_pred_tax_npc_02sup_val",
+      fscore = "feature_pred_tax_npc_02sup_score",
       weight = score_chemical_npc_superclass,
       out = "score_chemical_4"
     ),
     list(
       cand = "candidate_structure_tax_cla_03cla",
       fval = "feature_pred_tax_cla_03cla_val",
+      fscore = "feature_pred_tax_cla_03cla_score",
       weight = score_chemical_cla_class,
       out = "score_chemical_5"
     ),
     list(
       cand = "candidate_structure_tax_npc_03cla",
       fval = "feature_pred_tax_npc_03cla_val",
+      fscore = "feature_pred_tax_npc_03cla_score",
       weight = score_chemical_npc_class,
       out = "score_chemical_6"
     ),
     list(
       cand = "candidate_structure_tax_cla_04dirpar",
       fval = "feature_pred_tax_cla_04dirpar_val",
+      fscore = "feature_pred_tax_cla_04dirpar_score",
       weight = score_chemical_cla_parent,
       out = "score_chemical_7"
     )
@@ -280,24 +248,38 @@ weight_chemo <- function(
           if (length(valid_idx) > 0L) {
             c_sub_id <- c_id[valid_idx]
             f_sub_id <- f_id[valid_idx]
-            if (as.double(n_uc) * n_uf <= 5e7) {
-              match_lut <- logical(n_uc * n_uf)
-              match_lut[(tok_c_id - 1L) * n_uf + tok_f_id] <- TRUE
-              hit <- match_lut[(c_sub_id - 1L) * n_uf + f_sub_id]
-            } else {
-              hit_keys <- unique(as.double(tok_c_id - 1L) * n_uf + tok_f_id)
-              pair_k <- as.double(c_sub_id - 1L) * n_uf + f_sub_id
-              hit <- !is.na(fastmatch::fmatch(pair_k, hit_keys))
-            }
+            match_lut <- logical(n_uc * n_uf)
+            match_lut[(tok_c_id - 1L) * n_uf + tok_f_id] <- TRUE
+            hit <- match_lut[(c_sub_id - 1L) * n_uf + f_sub_id]
             if (any(hit)) {
               w_val <- as.numeric(lvl$weight)
               hit_idx <- valid_idx[hit]
-              col_out[hit_idx] <- w_val
-              if (w_val > 0) {
-                score_chem_max[hit_idx] <- pmax.int(
-                  score_chem_max[hit_idx],
-                  w_val
-                )
+              if (
+                isTRUE(weight_by_pred_score) &&
+                  lvl$fscore %in% names(annot_table_wei_chemo)
+              ) {
+                sc_raw <- annot_table_wei_chemo[[lvl$fscore]][hit_idx]
+                sc_num <- suppressWarnings(as.double(sc_raw))
+                ok_sc <- !is.na(sc_num) & is.finite(sc_num)
+                w_vec <- rep.int(w_val, length(hit_idx))
+                if (any(ok_sc)) {
+                  w_vec[ok_sc] <- w_val * pmin(pmax(sc_num[ok_sc], 0), 1)
+                }
+                col_out[hit_idx] <- w_vec
+                if (w_val > 0) {
+                  score_chem_max[hit_idx] <- pmax.int(
+                    score_chem_max[hit_idx],
+                    w_vec
+                  )
+                }
+              } else {
+                col_out[hit_idx] <- w_val
+                if (w_val > 0) {
+                  score_chem_max[hit_idx] <- pmax.int(
+                    score_chem_max[hit_idx],
+                    w_val
+                  )
+                }
               }
             }
           }

@@ -517,3 +517,88 @@ test_that("create_components writes the same partition on repeated runs", {
     tidytable::fread(out2, colClasses = "character")
   )
 })
+
+test_that("create_components helpers cover large character dedup, dual peak cols, multi-community pruning, and max_edges", {
+  # 1. .as_numeric_dedup with > 1000 character elements
+  big_chr <- rep(c("0.25", "0.75"), 600L)
+  expect_equal(
+    .as_numeric_dedup(big_chr),
+    rep(c(0.25, 0.75), 600L)
+  )
+
+  # 2. .resolve_edge_weights with source_feature_spectrum_peaks and target_feature_spectrum_peaks
+  edges_pk <- tidytable::tidytable(
+    feature_source = c("A", "B"),
+    feature_target = c("B", "C"),
+    similarity = c(0.8, 0.9),
+    matched_peaks = c(4, 5),
+    source_feature_spectrum_peaks = c(8, 0),
+    target_feature_spectrum_peaks = c(10, 5)
+  )
+  w_pk <- .resolve_edge_weights(edges_pk)
+  expect_equal(length(w_pk), 2L)
+  expect_true(all(w_pk > 0 & w_pk <= 1))
+
+  # 3. .prune_intra_community_edges: single community with all weights < 0.05
+  edges_low <- tidytable::tidytable(
+    feature_source = c("A", "B", "A"),
+    feature_target = c("B", "C", "C"),
+    similarity = c(0.1, 0.15, 0.2)
+  )
+  pruned_low <- .prune_intra_community_edges(
+    edges = edges_low,
+    component_membership = c(A = "1", B = "1", C = "1"),
+    name_source = "feature_source",
+    name_target = "feature_target"
+  )
+  expect_equal(nrow(pruned_low), 1L)
+
+  # 4. .prune_intra_community_edges: multiple communities (normal, all-zero, and all < 0.05)
+  edges_multi <- tidytable::tidytable(
+    feature_source = c("A", "B", "A", "D", "E", "D", "G", "H", "G"),
+    feature_target = c("B", "C", "C", "E", "F", "F", "H", "I", "I"),
+    similarity = c(0.9, 0.8, 0.3, 0, 0, 0, 0.1, 0.15, 0.2)
+  )
+  comm_multi <- c(
+    A = "1",
+    B = "1",
+    C = "1",
+    D = "2",
+    E = "2",
+    F = "2",
+    G = "3",
+    H = "3",
+    I = "3"
+  )
+  pruned_multi <- .prune_intra_community_edges(
+    edges = edges_multi,
+    component_membership = comm_multi,
+    name_source = "feature_source",
+    name_target = "feature_target"
+  )
+  expect_true(nrow(pruned_multi) >= 3L)
+
+  # 5. .build_components_from_edges with 0-row edges and max_edges cap
+  empty_res <- .build_components_from_edges(edges_low[0L, ])
+  expect_identical(empty_res$method_used, "no edges")
+  expect_equal(nrow(empty_res$components_table), 0L)
+
+  capped_res <- .build_components_from_edges(
+    edges = edges_low,
+    max_edges = 1L,
+    seed = 1L
+  )
+  expect_true(nrow(capped_res$components_table) > 0L)
+
+  self_edges <- tidytable::tidytable(
+    feature_source = c("A", "B"),
+    feature_target = c("A", "B"),
+    similarity = c(0.5, 0.5)
+  )
+  self_res <- .build_components_from_edges(
+    edges = self_edges,
+    max_edges = 1L,
+    seed = 1L
+  )
+  expect_equal(nrow(self_res$components_table), 2L)
+})

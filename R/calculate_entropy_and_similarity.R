@@ -85,7 +85,9 @@ calculate_entropy_and_similarity <- function(
   query_adducts = NULL,
   lib_adducts = NULL,
   compute_forward_reverse = TRUE,
-  compute_entropy = TRUE
+  compute_entropy = TRUE,
+  query_window_masses = NULL,
+  lib_window_masses = NULL
 ) {
   ctx <- log_operation(
     "calculate_entropy_similarity",
@@ -139,7 +141,11 @@ calculate_entropy_and_similarity <- function(
   space_label <- "precursor_mz"
   query_precursors_used <- query_precursors
   lib_precursors_used <- lib_precursors
-  if (!is.null(query_adducts) && !is.null(lib_adducts)) {
+  if (!is.null(query_window_masses) && !is.null(lib_window_masses)) {
+    space_label <- "neutral_M"
+    query_precursors_used <- as.numeric(query_window_masses)
+    lib_precursors_used <- as.numeric(lib_window_masses)
+  } else if (!is.null(query_adducts) && !is.null(lib_adducts)) {
     space_label <- "neutral_M"
     query_precursors_used <- convert_precursor_to_neutral_if_possible(
       precursors = query_precursors,
@@ -228,21 +234,19 @@ calculate_entropy_and_similarity <- function(
         lib_indices_sub <- lib_precursors_sorted_idx[low_idx:high_idx]
       } else {
         lib_indices_sub <- all_lib_indices
-        if (length(lib_indices_sub) == 0L) {
-          return(NULL)
-        }
       }
 
       current_spectrum <- query_spectra[[spectrum_idx]]
       current_precursor <- query_precursors_used[spectrum_idx]
+      current_ion_precursor <- query_precursors[spectrum_idx]
       current_id <- query_ids[spectrum_idx]
       n_candidates <- length(lib_indices_sub)
 
       # Process library batch using vectorized C call when possible
       # (reduces per-pair R↔C overhead vs. individual wrapper calls)
       if (use_gnps_batch) {
-        # For GNPS: use batch call if available, falls back to individual calls
-        lib_batch_precursors <- lib_precursors_used[lib_indices_sub]
+        # For GNPS: use actual ion precursor m/z so adduct mass shifts are captured
+        lib_batch_precursors <- lib_precursors[lib_indices_sub]
         lib_batch_spectra <- lib_spectra[lib_indices_sub]
 
         # Try fused batch call; falls back to per-pair if it fails
@@ -250,7 +254,7 @@ calculate_entropy_and_similarity <- function(
           {
             gnps_chain_dp_batch_wrapper(
               x = current_spectrum,
-              xPrecursorMz = current_precursor,
+              xPrecursorMz = current_ion_precursor,
               y_list = lib_batch_spectra,
               yPrecursorMz = lib_batch_precursors,
               tolerance = dalton,
@@ -306,12 +310,12 @@ calculate_entropy_and_similarity <- function(
             next
           }
 
-          target_precursor <- lib_precursors_used[[lib_idx]]
+          target_ion_precursor <- lib_precursors[[lib_idx]]
           res <- gnps_chain_dp_wrapper(
             current_spectrum,
             lib_spectrum,
-            current_precursor,
-            target_precursor,
+            current_ion_precursor,
+            target_ion_precursor,
             dalton,
             ppm,
             matchedPeaksCount = TRUE
@@ -340,21 +344,17 @@ calculate_entropy_and_similarity <- function(
             next
           }
 
-          target_precursor <- lib_precursors_used[[lib_idx]]
+          target_ion_precursor <- lib_precursors[[lib_idx]]
           scores[[pos_idx]] <- as.numeric(calculate_similarity(
             method = method,
             query_spectrum = current_spectrum,
             target_spectrum = lib_spectrum,
-            query_precursor = current_precursor,
-            target_precursor = target_precursor,
+            query_precursor = current_ion_precursor,
+            target_precursor = target_ion_precursor,
             dalton = dalton,
             ppm = ppm
           ))
-          lib_mz_sorted <- if (!is.null(lib_mz_sorted_list)) {
-            lib_mz_sorted_list[[lib_idx]]
-          } else {
-            NULL
-          }
+          lib_mz_sorted <- lib_mz_sorted_list[[lib_idx]]
           if (is.null(lib_mz_sorted)) {
             mz_col <- lib_spectrum[, 1L]
             lib_mz_sorted <- if (is.unsorted(mz_col)) sort(mz_col) else mz_col
@@ -372,11 +372,21 @@ calculate_entropy_and_similarity <- function(
               scores[[pos_idx]] >= threshold &&
               compute_forward_reverse
           ) {
+            fwd_rev_q_prec <- if (method == "cosine") {
+              NA_real_
+            } else {
+              current_ion_precursor
+            }
+            fwd_rev_t_prec <- if (method == "cosine") {
+              NA_real_
+            } else {
+              target_ion_precursor
+            }
             fwd_rev <- gnps_chain_dp_wrapper(
               current_spectrum,
               lib_spectrum,
-              current_precursor,
-              target_precursor,
+              fwd_rev_q_prec,
+              fwd_rev_t_prec,
               dalton,
               ppm,
               matchedPeaksCount = TRUE

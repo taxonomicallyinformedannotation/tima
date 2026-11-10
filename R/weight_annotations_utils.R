@@ -570,17 +570,10 @@ log_annotation_stats <- function(annotation_table) {
 
     n_libs <- max(1L, length(u_libs))
     n_iks <- max(1L, length(u_iks))
-    max_combos <- as.double(length(u_fids)) * n_libs * n_iks
-    if (max_combos < .Machine$integer.max) {
-      combo_key <- ((fid_id - 1L) * n_libs + (lib_id - 1L)) * n_iks + ik_id
-      first_occ <- !duplicated(combo_key)
-    } else {
-      combo_key <- ((as.numeric(fid_id - 1L) * n_libs + (lib_id - 1L)) *
-        n_iks) +
-        ik_id
-      first_occ <- fastmatch::fmatch(combo_key, combo_key) ==
-        seq_along(combo_key)
-    }
+    combo_key <- ((as.numeric(fid_id - 1L) * n_libs + (lib_id - 1L)) *
+      n_iks) +
+      ik_id
+    first_occ <- !duplicated(combo_key)
     lib_counts <- tabulate(lib_id[first_occ], nbins = length(u_libs))
     ord_l <- order(lib_counts, decreasing = TRUE)
     annotation_stats <- tidytable::tidytable(
@@ -832,19 +825,15 @@ rearrange_annotations <- function(
         k1 <- annotation_table[[c1]][k_idx_na]
         k2 <- annotation_table[[c2]][k_idx_na]
         u_f <- unique(z1)
-        m_f <- if (anyNA(u_f)) match(k1, u_f) else fastmatch::fmatch(k1, u_f)
+        m_f <- fastmatch::fmatch(k1, u_f)
         cand_rel <- which(!is.na(m_f))
         if (length(cand_rel) > 0L) {
           u_i <- unique(z2)
-          m_i <- if (anyNA(u_i)) {
-            match(k2[cand_rel], u_i)
-          } else {
-            fastmatch::fmatch(k2[cand_rel], u_i)
-          }
+          m_i <- fastmatch::fmatch(k2[cand_rel], u_i)
           both_rel <- cand_rel[!is.na(m_i)]
           if (length(both_rel) > 0L) {
-            zf <- if (anyNA(u_f)) match(z1, u_f) else fastmatch::fmatch(z1, u_f)
-            zi <- if (anyNA(u_i)) match(z2, u_i) else fastmatch::fmatch(z2, u_i)
+            zf <- fastmatch::fmatch(z1, u_f)
+            zi <- fastmatch::fmatch(z2, u_i)
             n_ui <- length(u_i)
             zk <- as.double(zf - 1L) * n_ui + zi
             kk <- as.double(m_f[both_rel] - 1L) *
@@ -917,13 +906,7 @@ rearrange_annotations <- function(
         zv <- annotation_table_merged[[z_col]]
         na_z <- zero_transfer_rows[is.na(zv[zero_transfer_rows])]
         if (length(na_z) > 0L) {
-          zv[na_z] <- if (is.character(zv)) {
-            "0"
-          } else if (is.integer(zv)) {
-            0L
-          } else {
-            0
-          }
+          zv[na_z] <- as.vector(0, mode = typeof(zv))
           data.table::set(annotation_table_merged, j = z_col, value = zv)
         }
       }
@@ -965,44 +948,20 @@ rearrange_annotations <- function(
       fastmatch::fmatch(ik2, u_ik2)
     }
     n_ik2 <- max(1L, length(u_ik2))
-    use_int2 <- as.double(length(u_f2)) * n_ik2 < .Machine$integer.max
-    k2 <- if (use_int2) {
-      (f2_id - 1L) * n_ik2 + ik2_id
-    } else {
-      as.double(f2_id - 1L) * n_ik2 + ik2_id
-    }
-    keep2_mask <- if (use_int2) {
-      !duplicated(k2)
-    } else {
-      fastmatch::fmatch(k2, k2) == seq_along(k2)
-    }
+    k2 <- as.double(f2_id - 1L) * n_ik2 + ik2_id
+    keep2_mask <- !duplicated(k2)
     keep2_rel <- rel_ord2[keep2_mask]
     k2_u <- k2[keep2_mask]
 
-    m_f <- if (anyNA(u_f2)) {
-      match(annotation_table_merged$feature_id, u_f2)
-    } else {
-      fastmatch::fmatch(annotation_table_merged$feature_id, u_f2)
-    }
-    m_ik <- if (anyNA(u_ik2)) {
-      match(
-        annotation_table_merged$candidate_structure_inchikey_connectivity_layer,
-        u_ik2
-      )
-    } else {
-      fastmatch::fmatch(
-        annotation_table_merged$candidate_structure_inchikey_connectivity_layer,
-        u_ik2
-      )
-    }
+    m_f <- fastmatch::fmatch(annotation_table_merged$feature_id, u_f2)
+    m_ik <- fastmatch::fmatch(
+      annotation_table_merged$candidate_structure_inchikey_connectivity_layer,
+      u_ik2
+    )
     both_ok <- !is.na(m_f) & !is.na(m_ik)
     m_pos <- rep.int(NA_integer_, nrow(annotation_table_merged))
     if (any(both_ok)) {
-      k_m <- if (use_int2) {
-        (m_f[both_ok] - 1L) * n_ik2 + m_ik[both_ok]
-      } else {
-        as.double(m_f[both_ok] - 1L) * n_ik2 + m_ik[both_ok]
-      }
+      k_m <- as.double(m_f[both_ok] - 1L) * n_ik2 + m_ik[both_ok]
       m_pos[both_ok] <- fastmatch::fmatch(k_m, k2_u)
     }
     csi_u <- csi_num[keep2_rel]
@@ -1038,11 +997,7 @@ rearrange_annotations <- function(
       k_col <- formula_join_by[[1L]]
       fk <- formula_table[[k_col]]
       if (anyDuplicated(fk) == 0L) {
-        m_for <- if (anyNA(fk)) {
-          match(annotation_table_merged[[k_col]], fk)
-        } else {
-          fastmatch::fmatch(annotation_table_merged[[k_col]], fk)
-        }
+        m_for <- fastmatch::fmatch(annotation_table_merged[[k_col]], fk)
         for (col in formula_new_cols) {
           data.table::set(
             annotation_table_merged,
@@ -1059,34 +1014,17 @@ rearrange_annotations <- function(
       f_c2 <- formula_table[[c2]]
       u1 <- unique(f_c1)
       u2 <- unique(f_c2)
-      id1 <- if (anyNA(u1)) match(f_c1, u1) else fastmatch::fmatch(f_c1, u1)
-      id2 <- if (anyNA(u2)) match(f_c2, u2) else fastmatch::fmatch(f_c2, u2)
+      id1 <- fastmatch::fmatch(f_c1, u1)
+      id2 <- fastmatch::fmatch(f_c2, u2)
       n2 <- max(1L, length(u2))
-      use_int_f <- as.double(length(u1)) * n2 < .Machine$integer.max
-      kf <- if (use_int_f) {
-        (id1 - 1L) * n2 + id2
-      } else {
-        as.double(id1 - 1L) * n2 + id2
-      }
+      kf <- as.double(id1 - 1L) * n2 + id2
       if (anyDuplicated(kf) == 0L) {
-        m1 <- if (anyNA(u1)) {
-          match(annotation_table_merged[[c1]], u1)
-        } else {
-          fastmatch::fmatch(annotation_table_merged[[c1]], u1)
-        }
-        m2 <- if (anyNA(u2)) {
-          match(annotation_table_merged[[c2]], u2)
-        } else {
-          fastmatch::fmatch(annotation_table_merged[[c2]], u2)
-        }
+        m1 <- fastmatch::fmatch(annotation_table_merged[[c1]], u1)
+        m2 <- fastmatch::fmatch(annotation_table_merged[[c2]], u2)
         both_f <- !is.na(m1) & !is.na(m2)
         m_for <- rep.int(NA_integer_, nrow(annotation_table_merged))
         if (any(both_f)) {
-          km <- if (use_int_f) {
-            (m1[both_f] - 1L) * n2 + m2[both_f]
-          } else {
-            as.double(m1[both_f] - 1L) * n2 + m2[both_f]
-          }
+          km <- as.double(m1[both_f] - 1L) * n2 + m2[both_f]
           m_for[both_f] <- fastmatch::fmatch(km, kf)
         }
         for (col in formula_new_cols) {

@@ -333,3 +333,83 @@ test_that("weight_bio single_so_fast picks highest score when organism name has 
     "Gentiana lutea"
   )
 })
+
+test_that("corroborate_spectral_scores and weight_bio cover subranks, zodiac modulation, and empty organism matches", {
+  # 1. corroborate_spectral_scores methods and edge cases
+  expect_identical(
+    corroborate_spectral_scores(numeric(0), numeric(0)),
+    numeric(0)
+  )
+  expect_equal(
+    corroborate_spectral_scores(
+      c(NA_real_, 0.8),
+      c(0.6, 0.4),
+      method = "corroborated"
+    ),
+    c(0.6, 0.8 + 0.5 * 0.4 * 0.2)
+  )
+  expect_equal(
+    corroborate_spectral_scores(
+      c(0.5, NA_real_),
+      c(0.5, 0.7),
+      method = "noisy_or"
+    ),
+    c(0.75, 0.7)
+  )
+
+  # 2. Subranks, empty strings in SOP, missing feature_id, and Zodiac modulation of confidence & CSI
+  ann_sub <- create_test_annotation(
+    "F1",
+    "IK_SUB",
+    sample_organism = "Gentiana lutea",
+    family = "Gentianaceae",
+    genus = "Swertia",
+    species = "Swertia perennis",
+    score_similarity = 0.8,
+    score_sirius = -50
+  ) |>
+    tidytable::mutate(
+      sample_organism_05_1_infraorder = "Gentianineae",
+      candidate_score_sirius_zodiac = 0.9,
+      candidate_score_sirius_confidence = 0.8,
+      feature_id = NULL
+    )
+  sop_sub <- sop_for(
+    "IK_SUB",
+    organism = "Gentiana lutea",
+    family = "Gentianaceae",
+    genus = "",
+    species = ""
+  ) |>
+    tidytable::mutate(organism_taxonomy_05_1infraorder = "Gentianineae")
+
+  out_sub <- call_wb(
+    ann_sub,
+    sop_sub,
+    score_biological_infraorder = 0.65,
+    spectral_fusion = "corroborated",
+    use_zodiac = TRUE
+  )
+  expect_equal(out_sub$score_biological, 0.65)
+  expect_equal(
+    out_sub$candidate_structure_organism_occurrence_closest,
+    "Gentianineae"
+  )
+
+  # 3. Single-organism and multi-organism paths with no matching SOP rows
+  sop_empty <- sop_for("IK_OTHER")[0L, ]
+  out_single_empty <- call_wb(
+    create_test_annotation("F1", "IK_A", sample_organism = "OrgA"),
+    sop_empty
+  )
+  expect_true(is.na(out_single_empty$score_biological))
+
+  out_multi_empty <- call_wb(
+    tidytable::bind_rows(
+      create_test_annotation("F1", "IK_A", sample_organism = "OrgA"),
+      create_test_annotation("F2", "IK_B", sample_organism = "OrgB")
+    ),
+    sop_empty
+  )
+  expect_true(all(is.na(out_multi_empty$score_biological)))
+})

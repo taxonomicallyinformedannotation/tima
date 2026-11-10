@@ -13,7 +13,8 @@ prepare_taxa(
   org_tax_ott = get_params(step =
     "prepare_taxa")$files$libraries$sop$merged$organisms$taxonomies$ott,
   output = get_params(step = "prepare_taxa")$files$metadata$prepared,
-  taxon = get_params(step = "prepare_taxa")$organisms$taxon
+  taxon = get_params(step = "prepare_taxa")$organisms$taxon,
+  min_rel_intensity = 0.01
 )
 }
 \arguments{
@@ -40,6 +41,9 @@ taxonomy file}
 \item{taxon}{\link{character} Organism name to enforce for all
 features
 (e.g., "Homo sapiens"). If provided, overrides metadata-based assignment.}
+
+\item{min_rel_intensity}{\link{numeric} Minimum relative intensity fraction
+(default 0.01) to retain an organism attribution in aligned samples.}
 }
 \value{
 Character string path to the prepared taxa file

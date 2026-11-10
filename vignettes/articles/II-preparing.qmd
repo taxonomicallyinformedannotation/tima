@@ -101,9 +101,16 @@ tima::annotate_masses()
 
 - **Primary (strict graph):** each `feature_id` gets one primary ion species.
   Edges are kept only when both nodes are strongly supported, and consistent
-  with the same neutral mass `M`.
+  with the same neutral mass `M` (estimated via tolerance-bounded consensus mode
+  rather than a raw median, avoiding breakdown on 2-feature components).
 - **Secondary (coverage):** additional non-conflicting ion-species hypotheses
   are kept as secondary.
+- **Physical charge and isotope modeling:** multicharged isotopologues use exact
+  `1.003355 / |z|` `m/z` shifts, and mixed multivalent carriers (`+2`, `+3`) are
+  enumerated by exact integer charge-balance (`sum(c_i * q_i) = z`).
+- **Co-variance support:** when sample intensities are available, feature pairs
+  within the RT window are tested with one-sided Pearson correlation on
+  `log1p(intensity)` and Benjamini-Hochberg FDR control.
 
 For unresolved nodes in a supported component, TIMA also tests direct forms from
 the component mass `M` (for example `[M +/- loss + carrier]`) and keeps valid
@@ -145,8 +152,14 @@ tima::annotate_spectra()
 tima::prepare_annotations_spectra()
 ```
 
-There are multiple similarities available, including `spectral entropy` from
-<https://doi.org/10.1038/s41592-021-01331-z> for matching.
+There are multiple similarities available:
+
+- `entropy`: spectral entropy similarity
+  (<https://doi.org/10.1038/s41592-021-01331-z>)
+- `cosine`: unshifted direct fragment cosine similarity
+- `gnps`: precursor-shifted modified cosine similarity, solved via exact
+  connected-component bipartite matching on the direct + precursor-shifted peak
+  graph (preventing greedy chain-stealing when peaks compete within tolerance)
 
 #### GNPS
 
@@ -314,7 +327,9 @@ Prepare the edges:
 tima::prepare_features_edges()
 ```
 
-Create and prepare the components:
+Create and prepare the components (partitioned with Leiden modularity
+optimization, per-community adaptive edge pruning, and symmetric
+`min(N_source, N_target)` matched-peak scaling):
 
 ```{r}
 #| label: create-components
@@ -338,8 +353,9 @@ This step allows you to attribute biological source information to your
 features. If all your features come from a single extract, it will attribute the
 biological source of your extract to all your features. If you have multiple
 extracts aligned, it will take the *n* highest intensities of your aligned
-feature table and attribute the biological source of corresponding extracts
-(according to your parameters).
+feature table (retaining attributions above the relative intensity threshold
+`min_rel_intensity = 0.01` to ignore trace carry-over) and attribute the
+biological source of corresponding extracts (according to your parameters).
 <!-- It can take both manual inputs or GNPS metadata directly from your GNPS job ID. -->
 
 ```{r}

@@ -126,7 +126,8 @@ calculate_mass_of_m <- function(
     isotope_shift <- n_iso * ISOTOPE_MASS_SHIFT_DALTONS
     z_signed <- n_charges * charge_sign
     neutral_mass <- (n_charges *
-      (mz - isotope_shift) -
+      mz -
+      isotope_shift -
       mass_modifications +
       z_signed * electron_mass) /
       n_mer
@@ -263,14 +264,12 @@ calculate_mass_of_m_batch <- function(
       }
 
       idx <- idx_groups[[i]]
-      if (length(idx) == 0L) {
-        next
-      }
       mz_sub <- mzs[idx]
       iso_shift <- n_iso * ISOTOPE_MASS_SHIFT_DALTONS
       z_signed <- n_charges * charge_sign
       masses <- (n_charges *
-        (mz_sub - iso_shift) -
+        mz_sub -
+        iso_shift -
         mass_mods +
         z_signed * electron_mass) /
         n_mer
@@ -339,15 +338,12 @@ calculate_mz_from_mass_batch <- function(
       }
 
       idx <- idx_groups[[i]]
-      if (length(idx) == 0L) {
-        next
-      }
       mz_sub <- (neutral_vals[idx] *
         n_mer +
-        mass_mods -
+        mass_mods +
+        n_iso * ISOTOPE_MASS_SHIFT_DALTONS -
         (n_charges * charge_sign) * electron_mass) /
-        n_charges +
-        n_iso * ISOTOPE_MASS_SHIFT_DALTONS
+        n_charges
       out_valid <- out[valid_idx]
       out_valid[idx] <- mz_sub
       out[valid_idx] <- out_valid
@@ -446,14 +442,14 @@ calculate_neutral_mass_formula <- function(
   electron_mass
 ) {
   # Physically-correct neutral mass inversion with signed electron correction:
-  # m/z = (n_mer * M + mass_modifications - z * m_e) / |z| + isotope_shift
+  # m/z = (n_mer * M + mass_modifications + isotope_shift - z * m_e) / |z|
   # z = charge_sign * n_charges
-  # => M = (|z| * (m/z - isotope_shift) - mass_modifications + z * m_e) / n_mer
+  # => M = (|z| * m/z - isotope_shift - mass_modifications + z * m_e) / n_mer
 
   isotope_shift <- n_iso * ISOTOPE_MASS_SHIFT_DALTONS
   z_signed <- n_charges * charge_sign
 
-  charged_mass <- n_charges * (mz - isotope_shift)
+  charged_mass <- n_charges * mz - isotope_shift
   corrected_mass <- charged_mass - mass_modifications + z_signed * electron_mass
   neutral_mass <- corrected_mass / n_mer
 
@@ -531,7 +527,7 @@ calculate_mz_from_mass <- function(
   }
 
   # Calculate m/z using inverse formula with signed electron correction.
-  # m/z = (n_mer * M + mass_modifications - z * m_e) / |z| + isotope_shift
+  # m/z = (n_mer * M + mass_modifications + isotope_shift - z * m_e) / |z|
   # with z = charge_sign * n_charges.
 
   isotope_shift <- n_iso * ISOTOPE_MASS_SHIFT_DALTONS
@@ -539,9 +535,10 @@ calculate_mz_from_mass <- function(
 
   total_mass <- neutral_mass *
     n_mer +
-    mass_modifications -
+    mass_modifications +
+    isotope_shift -
     z_signed * electron_mass
-  mz <- (total_mass / n_charges) + isotope_shift
+  mz <- total_mass / n_charges
 
   mz
 }

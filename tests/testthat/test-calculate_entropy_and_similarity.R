@@ -597,4 +597,41 @@ test_that("calculate_entropy_and_similarity handles NA query precursors and empt
   expect_equal(nrow(out), 1L)
   expect_equal(out$feature_id[[1L]], 3L)
   expect_equal(out$target_id[[1L]], 10L)
+
+  # All query precursors NA -> hits else branch (!any(valid_q_prec))
+  out_all_na <- calculate_entropy_and_similarity(
+    lib_ids = c(10L, 20L),
+    lib_precursors = c(61.0, 73.0),
+    lib_spectra = list(sp_acetic, sp_propane),
+    query_ids = c(1L, 2L),
+    query_precursors = c(NA_real_, NA_real_),
+    query_spectra = list(sp_acetic, sp_propane),
+    method = "gnps",
+    dalton = 0.01,
+    ppm = 10,
+    threshold = 0.5,
+    approx = FALSE
+  )
+  expect_true(all(is.na(out_all_na$feature_id)))
+
+  # Fallback loop when gnps_chain_dp_batch_wrapper returns NULL and a library spectrum is empty,
+  # plus 500th query progress logging
+  local_mocked_bindings(
+    gnps_chain_dp_batch_wrapper = function(...) NULL
+  )
+  out_500 <- calculate_entropy_and_similarity(
+    lib_ids = c(10L, 20L),
+    lib_precursors = c(30.05, 30.05),
+    lib_spectra = list(matrix(numeric(0), ncol = 2L), sp_ethane),
+    query_ids = seq_len(500L),
+    query_precursors = c(rep(999.0, 499L), 30.05),
+    query_spectra = rep(list(sp_ethane), 500L),
+    method = "gnps",
+    dalton = 0.01,
+    ppm = 10,
+    threshold = 0.5,
+    approx = FALSE
+  )
+  expect_equal(nrow(out_500), 1L)
+  expect_equal(out_500$feature_id[[1L]], 500L)
 })

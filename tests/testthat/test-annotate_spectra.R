@@ -843,6 +843,7 @@ test_that("annotate_spectra returns empty template when polarity filtering remov
 
   local_mocked_bindings(
     get_params = function(step) list(),
+    export_params = function(...) invisible(NULL),
     resolve_annotation_output = function(output) output,
     assert_choice = function(...) invisible(NULL),
     assert_flag = function(...) invisible(NULL),
@@ -891,6 +892,7 @@ test_that("annotate_spectra returns empty template when cleaned library is empty
 
   local_mocked_bindings(
     get_params = function(step) list(),
+    export_params = function(...) invisible(NULL),
     resolve_annotation_output = function(output) output,
     assert_choice = function(...) invisible(NULL),
     assert_flag = function(...) invisible(NULL),
@@ -953,6 +955,7 @@ test_that("annotate_spectra returns empty template when precursor reduction remo
 
   local_mocked_bindings(
     get_params = function(step) list(),
+    export_params = function(...) invisible(NULL),
     resolve_annotation_output = function(output) output,
     assert_choice = function(...) invisible(NULL),
     assert_flag = function(...) invisible(NULL),
@@ -2038,4 +2041,466 @@ test_that("resolve_ms1_query_adduct_map, compute_similarity_safe, and finalize_r
     )
   )
   expect_identical(nrow(zero_rows_suppressed), 0L)
+})
+
+test_that("annotate_spectra and helpers cover validation, preflight, RDS libraries, and edge cases", {
+  td <- withr::local_tempdir()
+  q_mgf <- file.path(td, "query.mgf")
+  lib_mgf <- file.path(td, "lib_pos.mgf")
+  out_tsv <- file.path(td, "out.tsv")
+
+  writeLines(
+    c(
+      "BEGIN IONS",
+      "FEATURE_ID=Q1",
+      "PEPMASS=101.0073",
+      "CHARGE=1+",
+      "ADDUCT=[M+H]+",
+      "MSLEVEL=2",
+      "40.0 100",
+      "50.0 200",
+      "60.0 300",
+      "101.0073 1000",
+      "END IONS",
+      ""
+    ),
+    q_mgf
+  )
+  writeLines(
+    c(
+      "BEGIN IONS",
+      "SPECTRUM_ID=LIB1",
+      "PEPMASS=101.0073",
+      "CHARGE=1+",
+      "ADDUCT=[M+H]+",
+      "MSLEVEL=2",
+      "SMILES=CCO",
+      "NAME=Ethanol",
+      "LIBRARY=GNPS",
+      "40.0 100",
+      "50.0 200",
+      "60.0 300",
+      "101.0073 1000",
+      "END IONS",
+      ""
+    ),
+    lib_mgf
+  )
+
+  # 1. Invalid cutoff (< 0) and empty libraries error
+  expect_error(
+    annotate_spectra(
+      input = q_mgf,
+      libraries = lib_mgf,
+      polarity = "pos",
+      output = out_tsv,
+      cutoff = -1
+    ),
+    "must be non-negative or NULL"
+  )
+  expect_error(
+    annotate_spectra(
+      input = q_mgf,
+      libraries = character(0),
+      polarity = "pos",
+      output = out_tsv
+    ),
+    "at least one library must be provided"
+  )
+
+  # 2. Missing input file errors via .preflight_mgf_fatal_issues
+  expect_error(
+    annotate_spectra(
+      input = file.path(td, "missing.mgf"),
+      libraries = lib_mgf,
+      polarity = "pos",
+      output = out_tsv
+    ),
+    "Input data validation failed"
+  )
+
+  # 3. Recoverable empty MGF & MS1-only MGF return template output
+  empty_mgf <- file.path(td, "empty.mgf")
+  writeLines(character(0), empty_mgf)
+  expect_warning(
+    res_empty <- annotate_spectra(
+      input = empty_mgf,
+      libraries = lib_mgf,
+      polarity = "pos",
+      output = out_tsv
+    ),
+    "No MS2 spectra"
+  )
+  expect_true(file.exists(res_empty))
+
+  ms1_only_mgf <- file.path(td, "ms1_only.mgf")
+  writeLines(
+    c(
+      "BEGIN IONS",
+      "FEATURE_ID=Q_MS1",
+      "PEPMASS=101.0073",
+      "MSLEVEL=1",
+      "101.0073 1000",
+      "END IONS",
+      ""
+    ),
+    ms1_only_mgf
+  )
+  expect_warning(
+    res_ms1 <- annotate_spectra(
+      input = ms1_only_mgf,
+      libraries = lib_mgf,
+      polarity = "pos",
+      output = out_tsv
+    ),
+    "MS1"
+  )
+  expect_true(file.exists(res_ms1))
+
+  # 4. Mixed MS1+MS2 query MGF + real match + ms1_annotations file (producing both positive match and 0.00 row)
+  mixed_mgf <- file.path(td, "mixed.mgf")
+  writeLines(
+    c(
+      "BEGIN IONS",
+      "FEATURE_ID=Q_MS1",
+      "PEPMASS=101.0073",
+      "MSLEVEL=1",
+      "101.0073 1000",
+      "END IONS",
+      "",
+      "BEGIN IONS",
+      "FEATURE_ID=Q1",
+      "PEPMASS=101.0073",
+      "CHARGE=1+",
+      "ADDUCT=[M+H]+",
+      "MSLEVEL=2",
+      "40.0 100",
+      "50.0 200",
+      "60.0 300",
+      "101.0073 1000",
+      "END IONS",
+      "",
+      "BEGIN IONS",
+      "FEATURE_ID=Q2",
+      "PEPMASS=101.0073",
+      "CHARGE=1+",
+      "ADDUCT=[M+H]+",
+      "MSLEVEL=2",
+      "70.0 100",
+      "75.0 200",
+      "80.0 300",
+      "END IONS",
+      ""
+    ),
+    mixed_mgf
+  )
+  ms1_file <- file.path(td, "ms1_ann.tsv")
+  tidytable::fwrite(
+    tidytable::tidytable(
+      feature_id = c("Q1", "Q2"),
+      candidate_structure_smiles_no_stereo = c("CCO", "CCO"),
+      candidate_adduct = c("[M+H]+", "[M+H]+"),
+      candidate_structure_error_mz = c("0.0001", "0.0001"),
+      candidate_structure_name = c("Ethanol", "Ethanol")
+    ),
+    ms1_file,
+    sep = "\t"
+  )
+  expect_warning(
+    res_mixed <- annotate_spectra(
+      input = mixed_mgf,
+      libraries = lib_mgf,
+      polarity = "pos",
+      output = out_tsv,
+      threshold = 0,
+      ms1_annotations = ms1_file
+    ),
+    "MS1"
+  )
+  df_mixed <- tidytable::fread(res_mixed)
+  expect_true(all(c("Q1", "Q2") %in% df_mixed$feature_id))
+  expect_true(any(df_mixed$candidate_score_similarity == 0))
+
+  # 5. Also cover annotate_spectra when ONLY ms1_zero_rows are produced (no positive hits above threshold)
+  zero_only_mgf <- file.path(td, "zero_only.mgf")
+  writeLines(
+    c(
+      "BEGIN IONS",
+      "FEATURE_ID=Q_MS1",
+      "PEPMASS=101.0073",
+      "MSLEVEL=1",
+      "101.0073 1000",
+      "END IONS",
+      "",
+      "BEGIN IONS",
+      "FEATURE_ID=Q2",
+      "PEPMASS=101.0073",
+      "CHARGE=1+",
+      "ADDUCT=[M+H]+",
+      "MSLEVEL=2",
+      "70.0 100",
+      "75.0 200",
+      "80.0 300",
+      "END IONS",
+      ""
+    ),
+    zero_only_mgf
+  )
+  expect_warning(
+    res_zero_only <- annotate_spectra(
+      input = zero_only_mgf,
+      libraries = lib_mgf,
+      polarity = "pos",
+      output = out_tsv,
+      threshold = 0,
+      ms1_annotations = ms1_file
+    ),
+    "MS1"
+  )
+  expect_true(file.exists(res_zero_only))
+
+  # 6. .preflight_mgf_fatal_issues with non-character issues and .annotate_spectra_warn_no_ms2 mixed
+  expect_identical(
+    .preflight_mgf_fatal_issues(list(valid = FALSE, issues = 123L)),
+    character(0L)
+  )
+  expect_warning(
+    .annotate_spectra_warn_no_ms2(
+      c("No spectra found", "No MS2 spectra found"),
+      c("a.mgf", "b.mgf")
+    ),
+    "One or more input files are empty"
+  )
+
+  # 7. import_and_clean_library_collection with .rds (valid Spectra, non-Spectra RDS, and multiple libraries)
+  sp_lib_obj <- import_spectra(lib_mgf)
+  rds_valid <- file.path(td, "lib_valid.rds")
+  rds_invalid <- file.path(td, "lib_invalid.rds")
+  saveRDS(sp_lib_obj, rds_valid)
+  saveRDS(list(not_spectra = 1), rds_invalid)
+
+  expect_identical(
+    import_and_clean_library_collection(
+      character(0),
+      dalton = 0.01,
+      polarity = "pos",
+      ppm = 10
+    ),
+    list()
+  )
+  expect_error(
+    import_and_clean_library_collection(
+      rds_invalid,
+      dalton = 0.01,
+      polarity = "pos",
+      ppm = 10
+    ),
+    "library source did not produce a Spectra object",
+    class = "tima_validation_error"
+  )
+  sp_multi <- suppressWarnings(import_and_clean_library_collection(
+    c(rds_valid, lib_mgf),
+    dalton = 0.01,
+    polarity = "pos",
+    ppm = 10
+  ))
+  expect_s4_class(sp_multi, "Spectra")
+  expect_identical(length(sp_multi), 2L)
+
+  testthat::with_mocked_bindings(
+    reduce_library_by_precursor = function(...) stop("mock_reduce_err"),
+    {
+      sp_err_red <- suppressWarnings(import_and_clean_library_collection(
+        rds_valid,
+        dalton = 0.01,
+        polarity = "pos",
+        ppm = 10,
+        approx = FALSE,
+        query_precursors = 101.0073
+      ))
+      expect_s4_class(sp_err_red, "Spectra")
+    }
+  )
+  expect_identical(
+    nrow(compute_similarity_safe(
+      lib_sp = sp_lib_obj,
+      query_sp = sp_lib_obj,
+      method = "gnps",
+      dalton = 0.01,
+      ppm = 10,
+      threshold = 0.99,
+      approx = FALSE,
+      query_precursors = 999.0
+    )),
+    0L
+  )
+
+  # 8. extract_vector edge cases: case-insensitive match, length == 1, length < len, length > len
+  sp_ev <- sp_lib_obj
+  sp_ev@backend@spectraData$CUSTOM_CI <- "val_ci"
+  expect_identical(
+    extract_vector(sp_ev, "custom_ci", length(sp_ev), NA_character_),
+    "val_ci"
+  )
+  # Multiple spectra to test length == 1, length < len, length > len
+  sp_ev2 <- suppressWarnings(Spectra::concatenateSpectra(
+    sp_lib_obj,
+    sp_lib_obj
+  ))
+  expect_identical(
+    extract_vector(sp_ev, "CUSTOM_CI", 2L, NA_character_),
+    c("val_ci", "val_ci")
+  )
+  expect_identical(
+    extract_vector(sp_ev2, "SPECTRUM_ID", 3L, "FILL"),
+    c("LIB1", "LIB1", "FILL")
+  )
+  expect_identical(
+    extract_vector(sp_ev2, "SPECTRUM_ID", 1L, "FILL", subset_idx = 1L),
+    "LIB1"
+  )
+
+  # 9. build_library_metadata with target_adduct_raw (subset and full length)
+  meta_sub <- build_library_metadata(
+    sp_ev2,
+    c(101.0073, 101.0073),
+    target_ids = 1L,
+    target_adduct_raw = "[M+H]+"
+  )
+  expect_identical(nrow(meta_sub), 1L)
+  meta_full <- build_library_metadata(
+    sp_ev2,
+    c(101.0073, 101.0073),
+    target_ids = 1:2,
+    target_adduct_raw = c("[M+H]+", "[M+Na]+")
+  )
+  expect_identical(nrow(meta_full), 2L)
+
+  # 10. init_ms1_zero_tracker / update_ms1_zero_tracker / finalize_ms1_zero_tracker edge cases
+  qmeta_1 <- tidytable::tidytable(
+    feature_id = "Q1",
+    query_precursorMz = 101.0073
+  )
+  expect_null(init_ms1_zero_tracker(NULL, qmeta_1, 0.01, 10))
+  expect_null(init_ms1_zero_tracker(123L, qmeta_1, 0.01, 10))
+  bad_ms1_file <- file.path(td, "bad_ms1.tsv")
+  tidytable::fwrite(tidytable::tidytable(other_col = "x"), bad_ms1_file)
+  expect_null(init_ms1_zero_tracker(bad_ms1_file, qmeta_1, 0.01, 10))
+  expect_null(init_ms1_zero_tracker(
+    tidytable::tidytable(other_col = "x"),
+    qmeta_1,
+    0.01,
+    10
+  ))
+  expect_null(init_ms1_zero_tracker(
+    tidytable::tidytable(
+      feature_id = "NO_MATCH",
+      candidate_structure_smiles_no_stereo = "CCO"
+    ),
+    qmeta_1,
+    0.01,
+    10
+  ))
+
+  # Duplicate (feature_id, smiles) and filtered rows, plus missing error_mz / structure_name / query_adduct
+  trk_dup <- init_ms1_zero_tracker(
+    tidytable::tidytable(
+      feature_id = c("Q1", "Q1", "OTHER"),
+      candidate_structure_smiles_no_stereo = c("CCO", "CCO", "CCC")
+    ),
+    qmeta_1,
+    0.01,
+    10
+  )
+  expect_identical(length(trk_dup$feature_id), 1L)
+  expect_true(is.na(trk_dup$query_adduct))
+  expect_true(is.na(trk_dup$error_mz))
+  expect_true(is.na(trk_dup$structure_name))
+
+  trk_cadd <- init_ms1_zero_tracker(
+    tidytable::tidytable(
+      feature_id = "Q1",
+      candidate_structure_smiles_no_stereo = "CCO",
+      candidate_adduct = "[M+H]+"
+    ),
+    qmeta_1,
+    0.01,
+    10
+  )
+  expect_identical(trk_cadd$query_adduct, "[M+H]+")
+
+  # update_ms1_zero_tracker with empty spectra, non-matching smiles, non-finite precursors, partial valid precursors, and duplicate library smiles
+  expect_null(update_ms1_zero_tracker(NULL, sp_ev2))
+  expect_null(update_ms1_zero_tracker(trk_dup, sp_ev2[integer(0)]))
+  sp_nomatch <- sp_ev2
+  sp_nomatch@backend@spectraData$SMILES <- c("C1CCCCC1", "C1CCCCC1")
+  expect_null(update_ms1_zero_tracker(trk_dup, sp_nomatch))
+
+  sp_naprec <- sp_ev2
+  sp_naprec@backend@spectraData$precursorMz <- c(NA_real_, -1)
+  expect_null(update_ms1_zero_tracker(trk_dup, sp_naprec))
+
+  # Partial valid precursors (1 NA, 1 out-of-window) -> hits !all(valid_lp) and length(matched_unm) == 0L
+  sp_partial <- sp_ev2
+  sp_partial@backend@spectraData$precursorMz <- c(NA_real_, 500.0)
+  sp_partial@backend@spectraData$SMILES <- c("CCO", "CCO")
+  expect_null(update_ms1_zero_tracker(trk_dup, sp_partial))
+  expect_false(trk_dup$measured[[1L]])
+
+  # Duplicate SMILES in library where first spectrum precursor is far (200.0) and second matches (101.0073)
+  sp_dup_sm <- sp_ev2
+  sp_dup_sm@backend@spectraData$precursorMz <- c(200.0, 101.0073)
+  sp_dup_sm@backend@spectraData$SMILES <- c("CCO", "CCO")
+  update_ms1_zero_tracker(trk_dup, sp_dup_sm)
+  expect_true(trk_dup$measured[[1L]])
+  # Calling update again when all measured returns NULL early
+  expect_null(update_ms1_zero_tracker(trk_dup, sp_dup_sm))
+  expect_identical(
+    nrow(finalize_ms1_zero_tracker(NULL, tidytable::tidytable())),
+    0L
+  )
+
+  # 11. convert_precursor_for_matching with unparseable adduct and convert_precursor_to_neutral_if_possible empty
+  expect_identical(
+    convert_precursor_for_matching(c(100, 200), c("NOT_AN_ADDUCT", "[0M+H]+")),
+    c(100, 200)
+  )
+  expect_identical(
+    convert_precursor_to_neutral_if_possible(numeric(0), NULL),
+    numeric(0)
+  )
+
+  # 12. finalize_results missing query_adduct / query_neutral_mass in both query_meta and df_sim
+  fin_min <- finalize_results(
+    df_sim = tidytable::tidytable(
+      feature_id = "Q1",
+      target_id = 1L,
+      candidate_score_similarity = 0.9,
+      candidate_spectrum_entropy = 1.0,
+      candidate_count_similarity_peaks_matched = 2L
+    ),
+    meta = meta_sub,
+    query_meta = tidytable::tidytable(feature_id = "Q1")
+  )
+  expect_identical(nrow(fin_min), 1L)
+  fin_min2 <- finalize_results(
+    df_sim = tidytable::tidytable(
+      feature_id = "Q1",
+      target_id = 1L,
+      candidate_score_similarity = 0.9,
+      candidate_spectrum_entropy = 1.0,
+      candidate_count_similarity_peaks_matched = 2L
+    ),
+    meta = meta_sub,
+    query_meta = NULL
+  )
+  expect_identical(nrow(fin_min2), 1L)
+
+  # 13. log_library_stats with multiple ID columns where first has NAs and second fills them
+  sp_stats <- sp_ev2
+  sp_stats@backend@spectraData$library <- c("GNPS", "ISDB")
+  sp_stats@backend@spectraData$smiles_no_stereo <- c(NA_character_, "CCO")
+  sp_stats@backend@spectraData$smiles <- c("CCC", "CCO")
+  sp_stats@backend@spectraData$inchikey <- c("IK1", "IK2")
+  expect_null(log_library_stats(sp_stats))
 })

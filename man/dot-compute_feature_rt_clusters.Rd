@@ -2,7 +2,7 @@
 % Please edit documentation in R/clean_chemo_candidates.R
 \name{.compute_feature_rt_clusters}
 \alias{.compute_feature_rt_clusters}
-\title{Compute single-linkage RT cluster IDs per feature}
+\title{Compute complete-linkage (diameter-bounded) RT cluster IDs per feature}
 \usage{
 .compute_feature_rt_clusters(
   fids,
@@ -11,6 +11,6 @@
 )
 }
 \description{
-Compute single-linkage RT cluster IDs per feature
+Compute complete-linkage (diameter-bounded) RT cluster IDs per feature
 }
 \keyword{internal}

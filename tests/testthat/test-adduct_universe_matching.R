@@ -180,7 +180,7 @@ test_that("calculate_mz_from_lookup adds n_iso isotope shifts per row", {
       m + proton,
       m + proton + ISOTOPE_MASS_SHIFT_DALTONS,
       m + proton + 2 * ISOTOPE_MASS_SHIFT_DALTONS,
-      (m + 2 * proton) / 2 + ISOTOPE_MASS_SHIFT_DALTONS
+      (m + 2 * proton + ISOTOPE_MASS_SHIFT_DALTONS) / 2
     ),
     tolerance = 1e-9
   )
@@ -397,4 +397,132 @@ test_that(".fast_component_count_keys and .fast_single_component_increments matc
     .fast_single_component_increments(comp_list, integer(), integer()),
     character(0L)
   )
+
+  # Negative component count returns NA_integer_ in tots and falls back to single_component_increment
+  comp_neg <- list(c(H2O = -1L), c(H2O = 1L))
+  expect_identical(
+    .fast_single_component_increments(comp_neg, 1L, 2L),
+    NA_character_
+  )
+})
+
+test_that("adduct_universe_matching and adduct_universe_config cover all edge cases", {
+  # 1. build_adduct_lookup without adduct_mass_per_monomer column
+  uni_no_ampm <- structured_universe(carriers = "H")
+  uni_no_ampm$adduct_mass_per_monomer <- NULL
+  lu_no_ampm <- build_adduct_lookup(uni_no_ampm)
+  expect_equal(lu_no_ampm$adduct_mass_per_monomer, 0)
+
+  # 2. calculate_neutral_mass_from_lookup with fallback = TRUE on unmatched adduct,
+  # and calculate_mz_from_lookup with adduct_lookup = NULL
+  m_fb <- calculate_neutral_mass_from_lookup(
+    mzs = c(100 + proton, 100 + mass_na - ELECTRON_MASS_DA),
+    adducts = c("[M+H]+", "[M+Na]+"),
+    adduct_lookup = lu_no_ampm,
+    fallback = TRUE
+  )
+  expect_equal(m_fb, c(100, 100), tolerance = 1e-6)
+
+  mz_null_lu <- calculate_mz_from_lookup(
+    neutral_mass = 100,
+    adducts = "[M+H]+",
+    adduct_lookup = NULL
+  )
+  expect_equal(mz_null_lu, 100 + proton, tolerance = 1e-6)
+
+  # 3. build_universe_transition_tables when cluster/loss transitions have multi-step diffs only (keep_labels empty)
+  uni_multi_cl <- tidytable::tidytable(
+    adduct = c("[M+H2O+H]+", "[M+CH3OH+H]+"),
+    n_mer = c(1L, 1L),
+    n_iso = c(0L, 0L),
+    z = c(1L, 1L),
+    adduct_mass = c(18.01 + proton, 32.04 + proton),
+    adduct_mass_per_monomer = c(0, 0),
+    carriers = list(c(H = 1L), c(H = 1L)),
+    clusters = list(c(H2O = 1L), c(CH3OH = 1L)),
+    losses = list(integer(), integer())
+  )
+  tr_multi_cl <- build_universe_transition_tables(uni_multi_cl)
+  expect_identical(nrow(tr_multi_cl$cluster_transitions), 0L)
+
+  uni_multi_lo <- tidytable::tidytable(
+    adduct = c("[M-H2O+H]+", "[M-CH3OH+H]+"),
+    n_mer = c(1L, 1L),
+    n_iso = c(0L, 0L),
+    z = c(1L, 1L),
+    adduct_mass = c(-18.01 + proton, -32.04 + proton),
+    adduct_mass_per_monomer = c(0, 0),
+    carriers = list(c(H = 1L), c(H = 1L)),
+    clusters = list(integer(), integer()),
+    losses = list(c(H2O = 1L), c(CH3OH = 1L))
+  )
+  tr_multi_lo <- build_universe_transition_tables(uni_multi_lo)
+  expect_identical(nrow(tr_multi_lo$loss_transitions), 0L)
+
+  # 4. adduct_to_string validation and generate_adduct_hypotheses edge cases
+  expect_error(
+    adduct_to_string(0L, c(H = 1L), integer(), integer(), 1L),
+    "n_mer must be a positive integer",
+    class = "tima_validation_error"
+  )
+  expect_error(
+    adduct_to_string(1L, c(H = 1L), integer(), integer(), 0L),
+    "z must be a non-zero integer",
+    class = "tima_validation_error"
+  )
+  expect_error(
+    generate_adduct_hypotheses(
+      list(M = 1L, charge_carriers = list(pos = character()), charges = list()),
+      polarity = "pos"
+    ),
+    "empty charge_carriers/charges",
+    class = "tima_validation_error"
+  )
+  expect_error(
+    generate_adduct_hypotheses(
+      list(
+        M = 1L,
+        charge_carriers = list(pos = "???"),
+        charges = list(pos = 1L)
+      ),
+      polarity = "pos"
+    ),
+    "Unparseable charge carrier",
+    class = "tima_validation_error"
+  )
+
+  # Negative mode normalization + max_clusters_per_adduct = 0 + max_losses_per_adduct = 0
+  u_neg <- generate_adduct_hypotheses(
+    list(
+      M = 1L,
+      charge_carriers = list(neg = c("H", "Na")),
+      charges = list(neg = -1L)
+    ),
+    polarity = "neg",
+    max_clusters_per_adduct = 0L,
+    max_losses_per_adduct = 0L
+  )
+  expect_true("[M-H]-" %in% u_neg$adduct)
+
+  # Out-of-bounds z (z_abs > 6) or impossible plausible_mz_range -> empty_adduct_universe()
+  u_empty_z <- generate_adduct_hypotheses(
+    list(
+      M = 1L,
+      charge_carriers = list(pos = "H"),
+      charges = list(pos = 7L)
+    ),
+    polarity = "pos"
+  )
+  expect_identical(nrow(u_empty_z), 0L)
+
+  u_empty_mz <- generate_adduct_hypotheses(
+    list(
+      M = 1L,
+      charge_carriers = list(pos = "K"),
+      charges = list(pos = 1L)
+    ),
+    polarity = "pos",
+    plausible_mz_range = c(1, 10)
+  )
+  expect_identical(nrow(u_empty_mz), 0L)
 })

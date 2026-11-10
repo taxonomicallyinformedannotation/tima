@@ -2405,4 +2405,56 @@ test_that("resolve_cross_rt_duplicate_candidates handles exact ties without rand
     ],
     "Promoted to rank 1: cross-RT duplicate InChIKey IK_A tied with feature F2"
   )
+
+  # Edge cases for .attach_candidate_counts, .restore_annotation_notes (duplicate keys & missing feature_id), and retain_promoted_rank1_in_filtered
+  cnt_na <- .attach_candidate_counts(
+    tidytable::tidytable(
+      feature_id = "F1",
+      candidate_structure_inchikey_connectivity_layer = NA_character_
+    ),
+    tidytable::tidytable(
+      feature_id = "F1",
+      candidates_evaluated = 3L,
+      candidates_best = 2L
+    )
+  )
+  expect_true(is.na(cnt_na$candidates_best))
+
+  # .restore_annotation_notes without feature_id in join cols, and with duplicate lookup keys
+  res_nofid <- .restore_annotation_notes(
+    tidytable::tidytable(rank_final = 1L),
+    tidytable::tidytable(rank_final = 1L, annotation_note = "note1")
+  )
+  expect_identical(res_nofid$annotation_note, "note1")
+
+  res_dup_notes1 <- .restore_annotation_notes(
+    tidytable::tidytable(feature_id = "F1", annotation_note = NA_character_),
+    tidytable::tidytable(
+      feature_id = c("F1", "F1"),
+      annotation_note = c("n1", "n1")
+    )
+  )
+  expect_true(all(res_dup_notes1$annotation_note == "n1"))
+
+  res_dup_notes2 <- .restore_annotation_notes(
+    tidytable::tidytable(feature_id = "F1"),
+    tidytable::tidytable(
+      feature_id = c("F1", "F1"),
+      annotation_note = c("n1", "n1")
+    )
+  )
+  expect_true(all(res_dup_notes2$annotation_note == "n1"))
+
+  # retain_promoted_rank1_in_filtered when promoted feature_id is NA
+  df_f_na <- tidytable::tidytable(feature_id = "F1", rank_final = 1L)
+  expect_identical(
+    retain_promoted_rank1_in_filtered(
+      df_f_na,
+      tidytable::tidytable(
+        feature_id = NA_character_,
+        annotation_note = "Promoted to rank 1: anchor"
+      )
+    ),
+    df_f_na
+  )
 })

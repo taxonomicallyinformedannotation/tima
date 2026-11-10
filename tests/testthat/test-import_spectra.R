@@ -258,3 +258,75 @@ test_that("import_spectra calls sanitize_spectra when sanitize is TRUE", {
     .package = "tima"
   )
 })
+
+test_that("import_spectra covers precursorCharge=0, TITLE id extraction, msLevel filter, neg polarity, SLAW_ID combine, and RDS fast path", {
+  # 1. Non-Spectra RDS errors in .prepare_rds_spectra_fast
+  bad_rds <- withr::local_tempfile(fileext = ".rds")
+  base::saveRDS(list(a = 1), file = bad_rds)
+  expect_error(
+    .prepare_rds_spectra_fast(list(a = 1), polarity = NA_character_),
+    "RDS file did not contain a Spectra object",
+    class = "tima_validation_error"
+  )
+
+  # 2. Fast RDS path with MSLEVEL, PRECURSOR_MZ, spectrum_id, and TITLE id extraction
+  spec_fast <- make_test_spectra(data.frame(
+    MSLEVEL = 2L,
+    PRECURSOR_MZ = 150.1,
+    precursorCharge = -1L,
+    spectrum_id = 101L,
+    TITLE = "id:42, rt:10.0",
+    mz = I(list(c(50, 100))),
+    intensity = I(list(c(100, 200)))
+  ))
+  fast_rds <- withr::local_tempfile(fileext = ".rds")
+  base::saveRDS(spec_fast, file = fast_rds)
+  out_fast <- import_spectra(
+    file = fast_rds,
+    polarity = "neg",
+    sanitize = FALSE,
+    combine = FALSE
+  )
+  expect_identical(out_fast$FEATURE_ID, "42")
+  expect_identical(out_fast$spectrum_id, "101")
+
+  # 3. Full path (sanitize = TRUE or combine = TRUE) with precursorCharge = 0, msLevel = c(1L, 2L),
+  # TITLE id extraction, and negative polarity
+  spec_full <- make_test_spectra(data.frame(
+    MSLEVEL = c(1L, 2L, 2L),
+    PRECURSOR_MZ = c(150.1, 150.1, 150.1),
+    precursorCharge = c(0L, 0L, -1L),
+    spectrum_id = c(1L, 2L, 3L),
+    TITLE = c("id:10", "id:20", "id:20"),
+    mz = I(list(c(50, 100), c(50, 100), c(50, 100))),
+    intensity = I(list(c(100, 200), c(100, 200), c(100, 200)))
+  ))
+  full_rds <- withr::local_tempfile(fileext = ".rds")
+  base::saveRDS(spec_full, file = full_rds)
+  out_full <- import_spectra(
+    file = full_rds,
+    polarity = "neg",
+    sanitize = FALSE,
+    combine = TRUE
+  )
+  expect_equal(attr(out_full, "tima_ms1_skipped"), 1L)
+
+  # 4. Combine by SLAW_ID
+  spec_slaw <- make_test_spectra(data.frame(
+    msLevel = c(2L, 2L),
+    precursorMz = c(150.1, 150.1),
+    precursorCharge = c(1L, 1L),
+    SLAW_ID = c("S1", "S1"),
+    mz = I(list(c(50, 100), c(50, 100))),
+    intensity = I(list(c(100, 200), c(100, 200)))
+  ))
+  slaw_rds <- withr::local_tempfile(fileext = ".rds")
+  base::saveRDS(spec_slaw, file = slaw_rds)
+  out_slaw <- import_spectra(
+    file = slaw_rds,
+    polarity = "pos",
+    sanitize = FALSE,
+    combine = TRUE
+  )
+  expect_equal(length(out_slaw), 1L)
+})

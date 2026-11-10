@@ -50,31 +50,6 @@ match_pairs_to_mass_diffs <- function(pairs, diffs, diff_col) {
         tidytable::mutate(!!as.name(diff_col) := character())
     )
   }
-  if (all(c("mass", "adduct", "adduct_dest") %in% colnames(diffs))) {
-    pairs_t <- tidytable::as_tidytable(pairs)[,
-      .(feature_id, feature_id_dest, delta_min, delta_max)
-    ]
-    diffs_t <- tidytable::as_tidytable(diffs)
-    out <- diffs_t[
-      pairs_t,
-      on = .(mass >= delta_min, mass <= delta_max),
-      nomatch = 0L,
-      allow.cartesian = TRUE
-    ][,
-      .(
-        feature_id,
-        mass,
-        feature_id_dest,
-        adduct,
-        adduct_dest,
-        modifier = get(diff_col)
-      )
-    ] |>
-      tidytable::as_tidytable() |>
-      tidytable::rename(!!as.name(diff_col) := modifier) |>
-      tidytable::distinct()
-    return(out)
-  }
   diffs_norm <- diffs |>
     tidytable::rename(loss = !!as.name(diff_col))
   out <- join_couples_with_neutral_losses(
@@ -91,9 +66,6 @@ match_pairs_to_mass_diffs <- function(pairs, diffs, diff_col) {
 #' @noRd
 .fast_group_median <- function(vals, groups) {
   n <- length(vals)
-  if (n == 0L) {
-    return(list(groups = character(), medians = numeric(), per_obs = numeric()))
-  }
   u_g <- unique(groups)
   g_id <- if (anyNA(u_g)) match(groups, u_g) else fastmatch::fmatch(groups, u_g)
   ord <- order(g_id, vals, method = "radix")
@@ -131,7 +103,8 @@ solve_consistent_adduct_assignments <- function(
   features_table,
   tolerance_ppm,
   tolerance_dalton,
-  adduct_lookup = NULL
+  adduct_lookup = NULL,
+  baseline_adduct = NULL
 ) {
   if (nrow(adduct_edges) == 0L || nrow(features_table) == 0L) {
     return(list(
@@ -148,41 +121,17 @@ solve_consistent_adduct_assignments <- function(
     ))
   }
 
-  features_min <- if (anyDuplicated(features_table$feature_id) == 0L) {
-    features_table[, c("feature_id", "mz"), drop = FALSE]
-  } else {
-    features_table |> tidytable::distinct(feature_id, mz)
-  }
-
-  if (anyDuplicated(features_min$feature_id) == 0L) {
-    m_src_idx <- fastmatch::fmatch(
-      adduct_edges$feature_id,
-      features_min$feature_id
-    )
-    m_dest_idx <- fastmatch::fmatch(
-      adduct_edges$feature_id_dest,
-      features_min$feature_id
-    )
-    mz_src_vec <- as.numeric(features_min$mz[m_src_idx])
-    mz_dest_vec <- as.numeric(features_min$mz[m_dest_idx])
-    valid_mz <- !is.na(mz_src_vec) & !is.na(mz_dest_vec)
-    edges <- adduct_edges[which(valid_mz), , drop = FALSE]
-    edges$mz_src <- mz_src_vec[valid_mz]
-    edges$mz_dest <- mz_dest_vec[valid_mz]
-  } else {
-    edges <- adduct_edges |>
-      tidytable::left_join(
-        features_min,
-        by = c("feature_id")
-      ) |>
-      tidytable::rename(mz_src = mz) |>
-      tidytable::left_join(
-        features_min |>
-          tidytable::rename(feature_id_dest = feature_id, mz_dest = mz),
-        by = c("feature_id_dest")
-      ) |>
-      tidytable::filter(!is.na(mz_src) & !is.na(mz_dest))
-  }
+  keep_f <- !duplicated(features_table$feature_id)
+  f_ids_min <- features_table$feature_id[keep_f]
+  f_mzs_min <- as.numeric(features_table$mz[keep_f])
+  m_src_idx <- fastmatch::fmatch(adduct_edges$feature_id, f_ids_min)
+  m_dest_idx <- fastmatch::fmatch(adduct_edges$feature_id_dest, f_ids_min)
+  mz_src_vec <- f_mzs_min[m_src_idx]
+  mz_dest_vec <- f_mzs_min[m_dest_idx]
+  valid_mz <- !is.na(mz_src_vec) & !is.na(mz_dest_vec)
+  edges <- adduct_edges[which(valid_mz), , drop = FALSE]
+  edges$mz_src <- mz_src_vec[valid_mz]
+  edges$mz_dest <- mz_dest_vec[valid_mz]
 
   if (nrow(edges) == 0L) {
     return(list(
@@ -232,7 +181,7 @@ solve_consistent_adduct_assignments <- function(
   # Example: F2 cannot be both M+Na (M≈100) and M-H2O (M≈200) simultaneously
   consistent <- enforce_global_m_consistency(
     consistent_edges = consistent,
-    features_table = features_min,
+    features_table = features_table,
     tolerance_ppm = tolerance_ppm,
     tolerance_dalton = tolerance_dalton,
     adduct_lookup = adduct_lookup
@@ -260,28 +209,13 @@ solve_consistent_adduct_assignments <- function(
   )
   comp_info <- igraph::components(g)
   all_nodes <- names(comp_info$membership)
-  if (length(all_nodes) == 0L) {
-    return(list(
-      consistent_edges = consistent[0L, ],
-      feature_m_map = tidytable::tidytable(
-        feature_id = character(),
-        neutral_mass = numeric(),
-        component_id = character()
-      )
-    ))
-  }
-
   comp_labels <- paste0("comp_", comp_info$membership)
 
   # Vectorized neutral mass computation across all consistent edges using fmatch
   src_ids <- as.character(consistent$feature_id)
   dest_ids <- as.character(consistent$feature_id_dest)
-  src_mz <- as.numeric(
-    features_min$mz[fastmatch::fmatch(src_ids, features_min$feature_id)]
-  )
-  dest_mz <- as.numeric(
-    features_min$mz[fastmatch::fmatch(dest_ids, features_min$feature_id)]
-  )
+  src_mz <- f_mzs_min[fastmatch::fmatch(src_ids, f_ids_min)]
+  dest_mz <- f_mzs_min[fastmatch::fmatch(dest_ids, f_ids_min)]
 
   all_f_ids <- c(src_ids, dest_ids)
   all_m_vals <- c(
@@ -302,24 +236,6 @@ solve_consistent_adduct_assignments <- function(
     feature_id = med_res$groups,
     neutral_mass = med_res$medians
   )
-
-  # For nodes with no valid M, use baseline M ([M+H]+)
-  missing_nodes <- setdiff(all_nodes, m_values$feature_id)
-  if (length(missing_nodes) > 0L) {
-    baseline_m <- features_table |>
-      tidytable::filter(
-        !is.na(fastmatch::fmatch(feature_id, missing_nodes))
-      ) |>
-      tidytable::transmute(
-        feature_id,
-        neutral_mass = calculate_neutral_mass_from_lookup(
-          mzs = as.numeric(mz),
-          adducts = "[M+H]+",
-          adduct_lookup = adduct_lookup
-        )
-      )
-    m_values <- tidytable::bind_rows(m_values, baseline_m)
-  }
 
   feature_m_map <- m_values |>
     tidytable::mutate(
@@ -365,44 +281,19 @@ enforce_global_m_consistency <- function(
     return(consistent_edges)
   }
 
-  features_min <- if (anyDuplicated(features_table$feature_id) == 0L) {
-    features_table[, c("feature_id", "mz"), drop = FALSE]
-  } else {
-    features_table |> tidytable::distinct(feature_id, mz)
-  }
-
-  if (anyDuplicated(features_min$feature_id) == 0L) {
-    m_src_idx <- fastmatch::fmatch(
-      consistent_edges$feature_id,
-      features_min$feature_id
-    )
-    m_dest_idx <- fastmatch::fmatch(
-      consistent_edges$feature_id_dest,
-      features_min$feature_id
-    )
-    mz_src_vec <- as.numeric(features_min$mz[m_src_idx])
-    mz_dest_vec <- as.numeric(features_min$mz[m_dest_idx])
-    valid_mz <- !is.na(mz_src_vec) & !is.na(mz_dest_vec)
-    edge_with_m <- tidytable::as_tidytable(
-      consistent_edges[which(valid_mz), , drop = FALSE]
-    )
-    edge_with_m$mz_src <- mz_src_vec[valid_mz]
-    edge_with_m$mz_dest <- mz_dest_vec[valid_mz]
-  } else {
-    edge_with_m <- consistent_edges |>
-      tidytable::left_join(
-        features_min,
-        by = c("feature_id")
-      ) |>
-      tidytable::rename(mz_src = mz) |>
-      tidytable::left_join(
-        features_min |>
-          tidytable::rename(feature_id_dest = feature_id, mz_dest = mz),
-        by = c("feature_id_dest")
-      ) |>
-      tidytable::filter(!is.na(mz_src) & !is.na(mz_dest)) |>
-      tidytable::as_tidytable()
-  }
+  keep_f <- !duplicated(features_table$feature_id)
+  f_ids_min <- features_table$feature_id[keep_f]
+  f_mzs_min <- as.numeric(features_table$mz[keep_f])
+  m_src_idx <- fastmatch::fmatch(consistent_edges$feature_id, f_ids_min)
+  m_dest_idx <- fastmatch::fmatch(consistent_edges$feature_id_dest, f_ids_min)
+  mz_src_vec <- f_mzs_min[m_src_idx]
+  mz_dest_vec <- f_mzs_min[m_dest_idx]
+  valid_mz <- !is.na(mz_src_vec) & !is.na(mz_dest_vec)
+  edge_with_m <- tidytable::as_tidytable(
+    consistent_edges[which(valid_mz), , drop = FALSE]
+  )
+  edge_with_m$mz_src <- mz_src_vec[valid_mz]
+  edge_with_m$mz_dest <- mz_dest_vec[valid_mz]
 
   edge_with_m$m_src <- calculate_neutral_mass_from_lookup(
     mzs = as.numeric(edge_with_m$mz_src),
@@ -431,29 +322,59 @@ enforce_global_m_consistency <- function(
     prev_n_edges <- nrow(edge_with_m)
 
     feature_ids <- c(edge_with_m$feature_id, edge_with_m$feature_id_dest)
+    nb_ids <- c(edge_with_m$feature_id_dest, edge_with_m$feature_id)
     m_values <- c(edge_with_m$m_src, edge_with_m$m_dest)
+    edge_err <- abs(edge_with_m$m_src - edge_with_m$m_dest)
+    edge_errs <- c(edge_err, edge_err)
     edge_ids <- c(edge_with_m$edge_id, edge_with_m$edge_id)
 
     valid <- !is.na(feature_ids) & !is.na(m_values)
     feature_ids <- feature_ids[valid]
+    nb_ids <- nb_ids[valid]
     m_values <- m_values[valid]
+    edge_errs <- edge_errs[valid]
     edge_ids <- edge_ids[valid]
 
-    if (length(m_values) == 0L) {
-      break
-    }
-
-    feature_medians <- .fast_group_median(m_values, feature_ids)$per_obs
-    abs_diff <- abs(m_values - feature_medians)
     dalton_tol <- tolerance_dalton %||% 0.0025
-    ppm_tol <- if (
+    ppm_scale <- if (
       is.null(tolerance_ppm) || is.na(tolerance_ppm) || tolerance_ppm <= 0
     ) {
       0
     } else {
-      tolerance_ppm * 1e-6 * pmax(abs(feature_medians), 1e-12)
+      tolerance_ppm * 1e-6
     }
+
+    med_res <- .fast_group_median(m_values, feature_ids)
+    feature_medians <- med_res$per_obs
+    abs_diff <- abs(m_values - feature_medians)
+    ppm_tol <- ppm_scale * pmax(abs(feature_medians), 1e-12)
     obs_consistent <- abs_diff <= ppm_tol | abs_diff <= dalton_tol
+
+    if (!all(obs_consistent)) {
+      u_f <- med_res$groups
+      f_id <- fastmatch::fmatch(feature_ids, u_f)
+      nb_id <- fastmatch::fmatch(nb_ids, u_f)
+      n_deg <- tabulate(f_id, nbins = length(u_f))
+      conf_f <- unique(f_id[!obs_consistent])
+      for (cf in conf_f) {
+        idx_f <- which(f_id == cf)
+        ord_m <- order(m_values[idx_f])
+        idx_s <- idx_f[ord_m]
+        m_s <- m_values[idx_s]
+        tol_s <- pmax(dalton_tol, ppm_scale * pmax(abs(m_s), 1e-12))
+        cl_s <- cumsum(c(TRUE, diff(m_s) > tol_s[-1L]))
+        nb_deg <- ifelse(is.na(nb_id[idx_s]), 1L, n_deg[nb_id[idx_s]])
+        acc_w <- 1 /
+          (1 + tidytable::coalesce(edge_errs[idx_s], 0) / pmax(tol_s, 1e-12))
+        w_s <- 1 + 0.1 * pmin(nb_deg, 10L) + 0.01 * acc_w
+        cl_w <- rowsum.default(w_s, cl_s, reorder = FALSE)
+        best_cl <- which.max(cl_w)
+        feature_medians[idx_f] <- stats::median(m_s[cl_s == best_cl])
+      }
+      abs_diff <- abs(m_values - feature_medians)
+      ppm_tol <- ppm_scale * pmax(abs(feature_medians), 1e-12)
+      obs_consistent <- abs_diff <= ppm_tol | abs_diff <= dalton_tol
+    }
 
     edges_to_remove <- unique(edge_ids[!obs_consistent])
     if (length(edges_to_remove) == 0L) {
@@ -516,7 +437,8 @@ collect_node_adduct_hypotheses <- function(
     features_table = features_table,
     tolerance_ppm = tolerance_ppm,
     tolerance_dalton = tolerance_dalton,
-    adduct_lookup = adduct_lookup
+    adduct_lookup = adduct_lookup,
+    baseline_adduct = baseline_adducts[[1L]]
   )
   consistent_edges <- consistency_result$consistent_edges
   feature_m_map <- consistency_result$feature_m_map
@@ -893,9 +815,6 @@ collect_node_adduct_hypotheses <- function(
 
   hill_formula <- function(counts) {
     counts <- Filter(function(x) x > 0L, counts)
-    if (length(counts) == 0L) {
-      return("")
-    }
     els <- names(counts)
     ord <- order(
       ifelse(els == "C", 0L, ifelse(els == "H", 1L, 2L)),
@@ -936,9 +855,6 @@ collect_node_adduct_hypotheses <- function(
 
       tok_re <- "([+-])(\\d*)([A-Za-z][A-Za-z0-9]*)"
       tokens <- regmatches(mods, gregexpr(tok_re, mods, perl = TRUE))[[1L]]
-      if (length(tokens) == 0L) {
-        return(adduct)
-      }
 
       remainder <- gsub(tok_re, "", mods, perl = TRUE)
       if (!identical(remainder, "")) {
@@ -957,16 +873,13 @@ collect_node_adduct_hypotheses <- function(
         abs(a)
       }
       gcd_vec <- function(x) {
-        if (length(x) == 0L) {
-          return(1L)
-        }
         g <- as.integer(abs(x[[1L]]))
         if (length(x) > 1L) {
           for (k in 2:length(x)) {
             g <- gcd2(g, as.integer(abs(x[[k]])))
           }
         }
-        if (g == 0L) 1L else g
+        g
       }
 
       carrier_net <- list()
@@ -999,21 +912,6 @@ collect_node_adduct_hypotheses <- function(
           mod_emp_atoms[[emp_f]] <- emp_atoms
           prev_m <- mod_emp_net[[emp_f]] %||% 0L
           mod_emp_net[[emp_f]] <- prev_m + sign * mult * g
-        }
-      }
-
-      h_keys <- intersect(names(carrier_net), c("H", "H2", "H3"))
-      if (length(h_keys) > 0L) {
-        h_vals <- unlist(carrier_net[h_keys], use.names = FALSE)
-        if (any(h_vals > 0L) && any(h_vals < 0L)) {
-          h_mults <- c(H = 1L, H2 = 2L, H3 = 3L)[h_keys]
-          total_h <- sum(as.integer(h_vals) * as.integer(h_mults))
-          for (hk in h_keys) {
-            carrier_net[[hk]] <- NULL
-          }
-          if (total_h != 0L) {
-            carrier_net[["H"]] <- total_h
-          }
         }
       }
 
@@ -1089,18 +987,10 @@ collect_node_adduct_hypotheses <- function(
   }
   u_a <- unique(adducts)
   u_m <- unique(mods)
-  a_id <- if (anyNA(u_a)) {
-    match(adducts, u_a)
-  } else {
-    fastmatch::fmatch(adducts, u_a)
-  }
-  m_id <- if (anyNA(u_m)) match(mods, u_m) else fastmatch::fmatch(mods, u_m)
+  a_id <- match(adducts, u_a)
+  m_id <- match(mods, u_m)
   n_m <- max(1L, length(u_m))
-  pair_code <- if (as.double(length(u_a)) * n_m < .Machine$integer.max) {
-    (a_id - 1L) * n_m + m_id
-  } else {
-    as.double(a_id - 1L) * n_m + m_id
-  }
+  pair_code <- as.double(a_id - 1L) * n_m + m_id
   u_code <- unique(pair_code)
   first_pos <- fastmatch::fmatch(u_code, pair_code)
 
@@ -1382,31 +1272,14 @@ dedupe_node_hypotheses <- function(node_hypotheses) {
   a_col <- node_hypotheses$adduct
   u_f <- unique(f_col)
   u_a <- unique(a_col)
-  f_id <- if (anyNA(u_f)) {
-    match(f_col, u_f)
-  } else {
-    fastmatch::fmatch(f_col, u_f)
-  }
-  a_id <- if (anyNA(u_a)) {
-    match(a_col, u_a)
-  } else {
-    fastmatch::fmatch(a_col, u_a)
-  }
+  f_id <- match(f_col, u_f)
+  a_id <- match(a_col, u_a)
   n_a <- length(u_a)
-  use_int_key <- as.double(length(u_f)) * n_a < .Machine$integer.max
-  pair_key <- if (use_int_key) {
-    (f_id - 1L) * n_a + a_id
-  } else {
-    as.double(f_id - 1L) * n_a + a_id
-  }
+  pair_key <- as.double(f_id - 1L) * n_a + a_id
 
   ord <- order(src_rank, -add_supp, method = "radix")
   pair_key_ord <- pair_key[ord]
-  is_dup <- if (use_int_key) {
-    duplicated(pair_key_ord)
-  } else {
-    fastmatch::fmatch(pair_key_ord, pair_key_ord) != seq_along(pair_key_ord)
-  }
+  is_dup <- duplicated(pair_key_ord)
 
   if (any(is_dup)) {
     kept_pos <- which(!is_dup)
@@ -1526,9 +1399,6 @@ discover_evidence_adduct_signal <- function(
     exact_masses = exact_masses,
     max_hypotheses_per_feature = Inf
   )
-  if (nrow(hyps) == 0L) {
-    return(list(hypotheses = empty_hyp, edges = empty_edges))
-  }
 
   supported <- hyps |>
     tidytable::filter(candidate_adduct_origin == "supported")
@@ -1545,7 +1415,8 @@ discover_evidence_adduct_signal <- function(
 
   evidence_edges <- build_evidence_edges(
     supported,
-    tolerance_ppm = tolerance_ppm
+    tolerance_ppm = tolerance_ppm,
+    tolerance_dalton = tolerance_dalton
   ) |>
     tidytable::distinct()
   list(hypotheses = evidence_hyp, edges = evidence_edges)
@@ -1803,148 +1674,65 @@ generate_multi_hypotheses_from_node_masses <- function(
 
   u_ma <- unique(multi_adducts$adduct)
   n_ma <- length(u_ma)
-  if (n_ma == 0L) {
-    return(empty_out)
-  }
 
   nh_fids <- node_hypotheses$feature_id
   nh_mz <- node_hypotheses$mz
   nh_rt <- node_hypotheses$rt
-  if (anyDuplicated(nh_fids) == 0L) {
-    fm_fids <- nh_fids
-    fm_mz <- nh_mz
-    fm_rt <- nh_rt
+  first_f <- !duplicated(nh_fids)
+  fm_fids <- nh_fids[first_f]
+  fm_mz <- nh_mz[first_f]
+  fm_rt <- nh_rt[first_f]
+
+  in_bm <- which(!is.na(fastmatch::fmatch(fm_fids, bm_fids)))
+  fm_fids <- fm_fids[in_bm]
+  fm_mz <- fm_mz[in_bm]
+  fm_rt <- fm_rt[in_bm]
+  fm_mz_num <- as.numeric(fm_mz)
+  n_fm <- length(fm_fids)
+
+  all_m <- calculate_neutral_mass_from_lookup(
+    mzs = rep(fm_mz_num, each = n_ma),
+    adducts = rep(u_ma, times = n_fm),
+    adduct_lookup = adduct_lookup
+  )
+  bm_fm_id <- fastmatch::fmatch(bm_fids, fm_fids)
+  ord_bm <- order(bm_fm_id, method = "radix")
+  bm_fm_id <- bm_fm_id[ord_bm]
+  bm_masses <- bm_masses[ord_bm]
+
+  n_bm <- length(bm_fm_id)
+  cand_idx <- rep((bm_fm_id - 1L) * n_ma, each = n_ma) +
+    rep.int(seq_len(n_ma), n_bm)
+  cand_m <- all_m[cand_idx]
+  ref_m <- rep(bm_masses, each = n_ma)
+
+  valid_m <- !is.na(cand_m) & is.finite(cand_m) & cand_m > 0
+  diff <- abs(cand_m - ref_m)
+  ppm <- diff * 1e6 / ref_m
+  ppm_pass <- is.finite(ppm) & ppm <= tolerance_ppm
+  dalton_pass <- if (is.null(tolerance_dalton)) {
+    FALSE
   } else {
-    first_f <- !duplicated(nh_fids)
-    f_idx <- fastmatch::fmatch(nh_fids, nh_fids[first_f])
-    if (
-      identical(nh_mz, nh_mz[first_f][f_idx]) &&
-        identical(nh_rt, nh_rt[first_f][f_idx])
-    ) {
-      fm_fids <- nh_fids[first_f]
-      fm_mz <- nh_mz[first_f]
-      fm_rt <- nh_rt[first_f]
-    } else {
-      fm_df <- tidytable::distinct(node_hypotheses, feature_id, mz, rt)
-      fm_fids <- fm_df$feature_id
-      fm_mz <- fm_df$mz
-      fm_rt <- fm_df$rt
-    }
+    !is.na(diff) & diff <= tolerance_dalton
   }
-
-  if (anyDuplicated(fm_fids) == 0L) {
-    in_bm <- which(!is.na(fastmatch::fmatch(fm_fids, bm_fids)))
-    if (length(in_bm) == 0L) {
-      return(empty_out)
-    }
-    fm_fids <- fm_fids[in_bm]
-    fm_mz <- fm_mz[in_bm]
-    fm_rt <- fm_rt[in_bm]
-    fm_mz_num <- as.numeric(fm_mz)
-    n_fm <- length(fm_fids)
-
-    all_m <- calculate_neutral_mass_from_lookup(
-      mzs = rep(fm_mz_num, each = n_ma),
-      adducts = rep(u_ma, times = n_fm),
-      adduct_lookup = adduct_lookup
-    )
-    bm_fm_id <- fastmatch::fmatch(bm_fids, fm_fids)
-    ord_bm <- order(bm_fm_id, method = "radix")
-    bm_fm_id <- bm_fm_id[ord_bm]
-    bm_masses <- bm_masses[ord_bm]
-
-    n_bm <- length(bm_fm_id)
-    cand_idx <- rep((bm_fm_id - 1L) * n_ma, each = n_ma) +
-      rep.int(seq_len(n_ma), n_bm)
-    cand_m <- all_m[cand_idx]
-    ref_m <- rep(bm_masses, each = n_ma)
-
-    valid_m <- !is.na(cand_m) & is.finite(cand_m) & cand_m > 0
-    diff <- abs(cand_m - ref_m)
-    ppm <- diff * 1e6 / ref_m
-    ppm_pass <- is.finite(ppm) & ppm <= tolerance_ppm
-    dalton_pass <- if (is.null(tolerance_dalton)) {
-      FALSE
-    } else {
-      !is.na(diff) & diff <= tolerance_dalton
-    }
-    pass <- which(valid_m & (ppm_pass | dalton_pass))
-    if (length(pass) == 0L) {
-      return(empty_out)
-    }
-    hit_cand_idx <- sort(unique(cand_idx[pass]))
-    hit_fm <- (hit_cand_idx - 1L) %/% n_ma + 1L
-    hit_ma <- (hit_cand_idx - 1L) %% n_ma + 1L
-
-    out <- tidytable::tidytable(
-      feature_id = fm_fids[hit_fm],
-      adduct = u_ma[hit_ma],
-      source = "multi",
-      adduct_support = 0L,
-      mz = fm_mz[hit_fm],
-      rt = fm_rt[hit_fm],
-      mass = all_m[hit_cand_idx]
-    ) |>
-      tidytable::distinct()
-    return(out)
-  }
-
-  base_mass_by_feature <- tidytable::tidytable(
-    feature_id = bm_fids,
-    neutral_mass_ref = bm_masses
-  )
-
-  feature_meta <- tidytable::tidytable(
-    feature_id = fm_fids,
-    mz = fm_mz,
-    rt = fm_rt
-  )
-
-  multi_candidates <- feature_meta |>
-    tidytable::cross_join(tidytable::tidytable(adduct = u_ma)) |>
-    tidytable::mutate(
-      source = "multi",
-      adduct_support = 0L,
-      mass = calculate_neutral_mass_from_lookup(
-        mzs = as.numeric(mz),
-        adducts = adduct,
-        adduct_lookup = adduct_lookup
-      )
-    ) |>
-    tidytable::filter(!is.na(mass) & is.finite(mass) & mass > 0)
-  if (nrow(multi_candidates) == 0L) {
+  pass <- which(valid_m & (ppm_pass | dalton_pass))
+  if (length(pass) == 0L) {
     return(empty_out)
   }
+  hit_cand_idx <- sort(unique(cand_idx[pass]))
+  hit_fm <- (hit_cand_idx - 1L) %/% n_ma + 1L
+  hit_ma <- (hit_cand_idx - 1L) %% n_ma + 1L
 
-  kept <- multi_candidates |>
-    tidytable::inner_join(base_mass_by_feature, by = "feature_id") |>
-    tidytable::mutate(
-      ppm = abs(mass - neutral_mass_ref) * 1E6 / neutral_mass_ref,
-      dalton_diff = abs(mass - neutral_mass_ref),
-      ppm_pass = is.finite(ppm) & ppm <= tolerance_ppm,
-      dalton_pass = if (is.null(tolerance_dalton)) {
-        FALSE
-      } else {
-        (dalton_diff <= tolerance_dalton)
-      },
-      passes_tolerance = ppm_pass | dalton_pass
-    ) |>
-    tidytable::filter(passes_tolerance) |>
-    tidytable::select(
-      feature_id,
-      adduct,
-      source,
-      adduct_support,
-      mz,
-      rt,
-      mass
-    ) |>
+  tidytable::tidytable(
+    feature_id = fm_fids[hit_fm],
+    adduct = u_ma[hit_ma],
+    source = "multi",
+    adduct_support = 0L,
+    mz = fm_mz[hit_fm],
+    rt = fm_rt[hit_fm],
+    mass = all_m[hit_cand_idx]
+  ) |>
     tidytable::distinct()
-
-  if (nrow(kept) == 0L) {
-    return(empty_out)
-  }
-  kept
 }
 
 #' Match candidate (feature, adduct, mass) rows against the library
@@ -2093,13 +1881,6 @@ prune_candidates_by_network_consensus <- function(
   sm_key <- as.character(state_map$state_key)
   sm_key[is.na(sm_key)] <- sm_add[is.na(sm_key)]
 
-  safe_max_support <- function(x) {
-    if (length(x) == 0L || all(is.na(x))) {
-      return(0L)
-    }
-    as.integer(max(x, na.rm = TRUE))
-  }
-
   supp_raw <- compute_feature_adduct_support(adduct_edges)
   net_support <- integer(n_in)
   if (nrow(supp_raw) > 0L) {
@@ -2111,7 +1892,7 @@ prune_candidates_by_network_consensus <- function(
     )
     support <- supp_raw |>
       tidytable::summarize(
-        net_support = safe_max_support(adduct_support),
+        net_support = as.integer(max(adduct_support, na.rm = TRUE)),
         .by = c(feature_id, adduct_state_key)
       )
     in_supp_f <- !is.na(fastmatch::fmatch(
@@ -2145,7 +1926,7 @@ prune_candidates_by_network_consensus <- function(
   f_col <- matched$feature_id
   u_f <- unique(f_col)
   n_f <- length(u_f)
-  f_id <- if (anyNA(u_f)) match(f_col, u_f) else fastmatch::fmatch(f_col, u_f)
+  f_id <- match(f_col, u_f)
 
   # Feature has max_support == 0L iff no row for that feature has net_support > 0L
   feat_has_pos_supp <- logical(n_f)
@@ -2155,11 +1936,7 @@ prune_candidates_by_network_consensus <- function(
   # Feature has >1 distinct adduct iff some row has adduct != first adduct of feature
   add_col <- matched$adduct
   u_a <- unique(add_col)
-  a_id <- if (anyNA(u_a)) {
-    match(add_col, u_a)
-  } else {
-    fastmatch::fmatch(add_col, u_a)
-  }
+  a_id <- match(add_col, u_a)
   first_idx <- which(!duplicated(f_id))
   first_a_per_f <- integer(n_f)
   first_a_per_f[f_id[first_idx]] <- a_id[first_idx]
@@ -2204,18 +1981,8 @@ prune_candidates_by_network_consensus <- function(
   if (any(drop)) {
     drop_idx <- which(drop)
     n_a <- max(1L, length(u_a))
-    if (as.numeric(n_f) * as.numeric(n_a) < 2e9) {
-      pair_code <- (f_id[drop_idx] - 1L) * n_a + a_id[drop_idx]
-      n_unique <- sum(tabulate(pair_code, nbins = n_f * n_a) > 0L)
-    } else {
-      n_unique <- nrow(
-        tidytable::tidytable(
-          feature_id = f_col[drop_idx],
-          adduct = add_col[drop_idx]
-        ) |>
-          tidytable::distinct()
-      )
-    }
+    pair_code <- as.double(f_id[drop_idx] - 1L) * n_a + a_id[drop_idx]
+    n_unique <- sum(!duplicated(pair_code))
     log_info(
       paste0(
         "Network-consensus pruning dropped %d (feature, adduct) ",
@@ -2316,18 +2083,10 @@ propagate_annotations_across_m_cliques <- function(
       by = "feature_id"
     )
 
-  if (nrow(matched_with_component) == 0L) {
-    return(annotations)
-  }
-
   source_comps <- unique(matched_with_component$source_component)
   component_features <- comp_mem_multi[
     !is.na(fastmatch::fmatch(comp_mem_multi$component_id, source_comps)),
   ]
-
-  if (nrow(component_features) == 0L) {
-    return(annotations)
-  }
 
   # Create source->target mapping via equijoin on component_id (not cross_join)
   propagation_map <- matched_with_component |>
@@ -2347,10 +2106,6 @@ propagate_annotations_across_m_cliques <- function(
     ) |>
     tidytable::filter(source_feature != target_feature) |>
     tidytable::select(source_feature, target_feature, source_component, adduct)
-
-  if (nrow(propagation_map) == 0L) {
-    return(annotations)
-  }
 
   # Get target metadata and M values in single operations
   target_meta <- node_hypotheses |>

@@ -167,13 +167,13 @@ calculate_similarity <- function(
     return(if (return_matched_peaks) result else result[1L])
   }
 
-  # Cosine: use fused GNPS chain DP for matching + scoring (same as GNPS)
+  # Cosine: direct unshifted peak matching + cosine scoring (disable precursor shift)
   result <- tryCatch(
     .gnps_chain_dp_call(
       query_spectrum = query_spectrum,
       target_spectrum = target_spectrum,
-      query_precursor = query_precursor,
-      target_precursor = target_precursor,
+      query_precursor = NA_real_,
+      target_precursor = NA_real_,
       dalton = dalton,
       ppm = ppm
     ),

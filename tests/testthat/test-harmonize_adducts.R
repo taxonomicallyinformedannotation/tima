@@ -497,3 +497,46 @@ test_that("harmonize_adducts unifies (+H3N,+H) to +H4N and collapses opposite-si
     )
   )
 })
+
+test_that("harmonize_adducts and helpers cover factor input, logging, Hill rebuild, subtract, and canonicalize edge cases", {
+  df_fac <- data.frame(
+    adduct = factor(rep(c("M+H", "[M+H]+", "M+Na"), length.out = 1000L))
+  )
+  res_fac <- harmonize_adducts(
+    df_fac,
+    adducts_translations = c("M+H" = "[M+H]+", "M+Na" = "[M+Na]+")
+  )
+  expect_identical(
+    res_fac$adduct[1:3],
+    c("[M+H]+", "[M+H]+", "[M+Na]+")
+  )
+
+  expect_identical(rebuild_hill_formula(c(H = 0L)), "")
+  expect_null(subtract_atomic_formula("???", "H3N"))
+  expect_null(subtract_atomic_formula("H2O", "H3N"))
+
+  empty_net <- data.frame(
+    formula = character(0),
+    signed_n = integer(0),
+    stringsAsFactors = FALSE
+  )
+  expect_identical(reduce_ammonium_loss_pairs(empty_net), empty_net)
+
+  # Increment existing H4N andH when reducing (+H3N, +H) and (+H4N, -H3N)
+  net_inc <- data.frame(
+    formula = c("H3N", "H", "H4N", "H2O"),
+    signed_n = c(1L, 1L, 1L, -1L),
+    stringsAsFactors = FALSE
+  )
+  res_inc <- reduce_ammonium_loss_pairs(net_inc)
+  expect_true("H4N" %in% res_inc$formula)
+
+  expect_identical(canonicalize_adduct_notation(""), "")
+  # Hit cache on second call and non-empty remainder fallback
+  expect_identical(canonicalize_adduct_notation("[M+H]+"), "[M+H]+")
+  expect_identical(canonicalize_adduct_notation("[M+H]+"), "[M+H]+")
+  expect_identical(
+    canonicalize_adduct_notation("[M+H+(H2O)]+"),
+    "[M+H+(H2O)]+"
+  )
+})

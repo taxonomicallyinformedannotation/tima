@@ -114,10 +114,23 @@ test_that("implied_neutral_mass subtracts the 13C isotope shift per n_iso", {
     mono - 2 * EVIDENCE_ISOTOPE_SHIFT_DA,
     tolerance = 1e-9
   )
-  # ... and it is removed *before* dividing by n_mer.
+  # ... and in m/z space the isotope shift scales by 1/|z| (and 1/n_mer per monomer):
+  # for a doubly-charged monomer [M+2H]2+ (n_mer = 1, z = 2), +1 13C shifts m/z by delta/2
   expect_equal(
     implied_neutral_mass(
-      190.0 + EVIDENCE_ISOTOPE_SHIFT_DA,
+      95.0 + EVIDENCE_ISOTOPE_SHIFT_DA / 2,
+      1L,
+      2L,
+      2.01456,
+      n_iso = 1L
+    ),
+    187.98544,
+    tolerance = 1e-9
+  )
+  # for [2M+2H]2+ (n_mer = 2, z = 2), +1 13C shifts m/z by delta/2 and M by delta/2
+  expect_equal(
+    implied_neutral_mass(
+      190.0 + EVIDENCE_ISOTOPE_SHIFT_DA / 2,
       2L,
       2L,
       2.01456,

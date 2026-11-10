@@ -4,7 +4,12 @@
 \alias{transform_score_sirius_csi}
 \title{Transform SIRIUS CSI score}
 \usage{
-transform_score_sirius_csi(csi_score = NULL, K = 100, scale = 20)
+transform_score_sirius_csi(
+  csi_score = NULL,
+  K = 100,
+  scale = 20,
+  zodiac_score = NULL
+)
 }
 \arguments{
 \item{csi_score}{\link{numeric} SIRIUS CSI score (expected mostly <= 0;
@@ -15,6 +20,10 @@ can be negative, NA, NULL, or absent)}
 
 \item{scale}{\link{numeric} Scale parameter controlling sigmoid steepness
 (default: 20)}
+
+\item{zodiac_score}{\link{numeric} Optional SIRIUS Zodiac molecular formula
+network score in \verb{[0, 1]}. When provided and finite, modulates the
+transformed CSI score by the formula confidence.}
 }
 \value{
 Numeric transformed score in the range (0, 1), or NA if input is

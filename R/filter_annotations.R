@@ -575,13 +575,8 @@ filter_ms1_redundancy <- function(
           fastmatch::fmatch(s2, u_iks)
         }
         n_ik <- length(u_iks)
-        if (as.double(length(u_fids)) * n_ik < .Machine$integer.max) {
-          spec_k <- unique((fid_id_s - 1L) * n_ik + ik_id_s)
-          ms1_k <- (fid_id_m - 1L) * n_ik + ik_id_m
-        } else {
-          spec_k <- unique(as.double(fid_id_s - 1L) * n_ik + ik_id_s)
-          ms1_k <- as.double(fid_id_m - 1L) * n_ik + ik_id_m
-        }
+        spec_k <- unique(as.double(fid_id_s - 1L) * n_ik + ik_id_s)
+        ms1_k <- as.double(fid_id_m - 1L) * n_ik + ik_id_m
         matched <- !is.na(fastmatch::fmatch(ms1_k, spec_k))
         if (any(matched)) {
           keep_mask <- !logical(n_ms1_before)
@@ -620,34 +615,18 @@ filter_ms1_redundancy <- function(
       z1 <- annotations_tables_spectral[[c1]][zero_idx]
       z2 <- annotations_tables_spectral[[c2]][zero_idx]
       u_zf <- unique(z1)
-      m_zf <- if (anyNA(u_zf)) {
-        match(ms1_tbl[[c1]], u_zf)
-      } else {
-        fastmatch::fmatch(ms1_tbl[[c1]], u_zf)
-      }
+      m_zf <- fastmatch::fmatch(ms1_tbl[[c1]], u_zf)
       z_cand <- which(!is.na(m_zf))
       if (length(z_cand) > 0L) {
         u_zi <- unique(z2)
-        m_zi <- if (anyNA(u_zi)) {
-          match(ms1_tbl[[c2]][z_cand], u_zi)
-        } else {
-          fastmatch::fmatch(ms1_tbl[[c2]][z_cand], u_zi)
-        }
+        m_zi <- fastmatch::fmatch(ms1_tbl[[c2]][z_cand], u_zi)
         z_both <- which(!is.na(m_zi))
         if (length(z_both) > 0L) {
           z_sub <- z_cand[z_both]
           zf_m <- m_zf[z_sub]
           zi_m <- m_zi[z_both]
-          zf_s <- if (anyNA(u_zf)) {
-            match(z1, u_zf)
-          } else {
-            fastmatch::fmatch(z1, u_zf)
-          }
-          zi_s <- if (anyNA(u_zi)) {
-            match(z2, u_zi)
-          } else {
-            fastmatch::fmatch(z2, u_zi)
-          }
+          zf_s <- fastmatch::fmatch(z1, u_zf)
+          zi_s <- fastmatch::fmatch(z2, u_zi)
           n_zi <- length(u_zi)
           z_spec_k <- as.double(zf_s - 1L) * n_zi + zi_s
           z_ms1_k <- as.double(zf_m - 1L) * n_zi + zi_m
@@ -675,13 +654,10 @@ filter_ms1_redundancy <- function(
                 if (any(na_rel)) {
                   fill_rows <- ms1_hit_rows[na_rel]
                   fill_vals <- spec_v[na_rel]
-                  if (is.character(cur_v)) {
-                    cur_v[fill_rows] <- as.character(fill_vals)
-                  } else if (is.integer(cur_v)) {
-                    cur_v[fill_rows] <- as.integer(fill_vals)
-                  } else {
-                    cur_v[fill_rows] <- as.numeric(fill_vals)
-                  }
+                  cur_v[fill_rows] <- as.vector(
+                    fill_vals,
+                    mode = typeof(cur_v)
+                  )
                   data.table::set(ms1_tbl, j = z_col, value = cur_v)
                 }
               } else {
@@ -1058,14 +1034,6 @@ enforce_ms1_adduct_semantics <- function(
     c(single_idx, multi_idx)
   }
   rm(sf_int, sa_int, fa_int, u_fa_pos, u_sf_int)
-
-  if (length(chosen_strong_idx) == 0L) {
-    out$candidate_adduct_match_mode <- tidytable::coalesce(
-      out$candidate_adduct_match_mode,
-      tidytable::if_else(is_ms1_row, "ms1_reference", "unconstrained")
-    )
-    return(out)
-  }
 
   strong_f_int <- f_int[chosen_strong_idx]
   strong_adducts <- as.character(cand_adducts[chosen_strong_idx])

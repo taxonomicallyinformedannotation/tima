@@ -5,7 +5,7 @@
 \title{Greedy ppm-tolerance clustering of a sorted numeric vector. NA values
 each get their own singleton cluster.}
 \usage{
-.ppm_cluster_sorted(values, tolerance_ppm)
+.ppm_cluster_sorted(values, tolerance_ppm, tolerance_dalton = NULL)
 }
 \description{
 Sorted ascending values, single-link clustering at a

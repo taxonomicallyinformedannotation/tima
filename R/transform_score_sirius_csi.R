@@ -38,6 +38,9 @@
 #'     (default: 100, midpoint at score = -100)
 #' @param scale [numeric] Scale parameter controlling sigmoid steepness
 #'     (default: 20)
+#' @param zodiac_score [numeric] Optional SIRIUS Zodiac molecular formula
+#'     network score in `[0, 1]`. When provided and finite, modulates the
+#'     transformed CSI score by the formula confidence.
 #'
 #' @return Numeric transformed score in the range (0, 1), or NA if input is
 #'     NA/NULL/absent
@@ -61,7 +64,12 @@
 #' # Handle missing/absent score
 #' transform_score_sirius_csi()
 #' }
-transform_score_sirius_csi <- function(csi_score = NULL, K = 100, scale = 20) {
+transform_score_sirius_csi <- function(
+  csi_score = NULL,
+  K = 100,
+  scale = 20,
+  zodiac_score = NULL
+) {
   if (is.null(csi_score)) {
     return(NA_real_)
   }
@@ -80,5 +88,23 @@ transform_score_sirius_csi <- function(csi_score = NULL, K = 100, scale = 20) {
   # This maps the shifted and scaled score to (0, 1)
   # NA values are preserved automatically
   score_dbl <- if (is.double(csi_score)) csi_score else as.double(csi_score)
-  1 / (1 + exp(-(score_dbl + K) / scale))
+  out <- 1 / (1 + exp(-(score_dbl + K) / scale))
+
+  if (!is.null(zodiac_score)) {
+    if (!is.numeric(zodiac_score)) {
+      cli::cli_abort(
+        "zodiac_score must be numeric, NA, or NULL",
+        class = c("tima_validation_error", "tima_error"),
+        call = NULL
+      )
+    }
+    z_dbl <- rep_len(as.double(zodiac_score), length(out))
+    ok_z <- !is.na(z_dbl) & is.finite(z_dbl)
+    if (any(ok_z)) {
+      z_clamped <- pmin(pmax(z_dbl[ok_z], 0), 1)
+      out[ok_z] <- out[ok_z] * z_clamped
+    }
+  }
+
+  out
 }

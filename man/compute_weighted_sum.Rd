@@ -4,7 +4,7 @@
 \alias{compute_weighted_sum}
 \title{Compute weighted scores from evidence components}
 \usage{
-compute_weighted_sum(..., weights)
+compute_weighted_sum(..., weights, na_prior = 0)
 }
 \arguments{
 \item{...}{\link{numeric} Columns/vectors of component values (passed as
@@ -12,6 +12,9 @@ separate arguments).}
 
 \item{weights}{\link{numeric} Vector of non-negative weights (one per
 component).}
+
+\item{na_prior}{\link{numeric} Prior value for missing (\code{NA})
+modalities (default \code{0}).}
 }
 \value{
 Numeric vector of weighted scores, or NA for rows with no evidence.

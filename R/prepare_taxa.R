@@ -37,6 +37,8 @@
 #' @param taxon [character] Organism name to enforce for all
 #'     features
 #'     (e.g., "Homo sapiens"). If provided, overrides metadata-based assignment.
+#' @param min_rel_intensity [numeric] Minimum relative intensity fraction
+#'     (default 0.01) to retain an organism attribution in aligned samples.
 #'
 #' @return Character string path to the prepared taxa file
 #'
@@ -76,7 +78,8 @@ prepare_taxa <- function(
     step = "prepare_taxa"
   )$files$libraries$sop$merged$organisms$taxonomies$ott,
   output = get_params(step = "prepare_taxa")$files$metadata$prepared,
-  taxon = get_params(step = "prepare_taxa")$organisms$taxon
+  taxon = get_params(step = "prepare_taxa")$organisms$taxon,
+  min_rel_intensity = 0.01
 ) {
   ctx <- log_operation("prepare_taxa", taxon = taxon)
 
@@ -160,7 +163,7 @@ prepare_taxa <- function(
   wanted_feat_cols <- if (!is.null(taxon)) {
     intersect("feature_id", hdr_feat)
   } else {
-    intersect(c("feature_id", "sample"), hdr_feat)
+    intersect(c("feature_id", "sample", "intensity"), hdr_feat)
   }
 
   feature_table_0 <- if (length(wanted_feat_cols) > 0L) {
@@ -445,20 +448,14 @@ prepare_taxa <- function(
     taxed_features_table <- tidytable::as_tidytable(out_list)
   } else {
     if (!is.null(taxon)) {
-      feat_min <- if ("feature_id" %in% names(feature_table_0)) {
-        tidytable::tidytable(feature_id = unique(feature_table_0$feature_id))
-      } else {
-        feature_table_0
-      }
       metadata_table_joined <- tidytable::inner_join(
-        x = feat_min |>
+        x = feature_table_0 |>
           tidytable::mutate(join = "x"),
         y = biological_metadata |>
           tidytable::select(organismOriginal = organism_name) |>
           tidytable::mutate(join = "x")
       ) |>
         tidytable::select(-join)
-      rm(feat_min)
     } else {
       if (!"sample" %in% names(feature_table_0)) {
         cli::cli_abort(
@@ -494,6 +491,21 @@ prepare_taxa <- function(
         )
       }
 
+      has_int_col <- "intensity" %in%
+        names(feature_table_0) &&
+        !is.null(min_rel_intensity) &&
+        is.numeric(min_rel_intensity) &&
+        length(min_rel_intensity) == 1L &&
+        !is.na(min_rel_intensity) &&
+        min_rel_intensity > 0
+      int_vals <- if (has_int_col) {
+        suppressWarnings(as.double(feature_table_0$intensity))
+      } else {
+        NULL
+      }
+      use_int_filter <- has_int_col &&
+        any(!is.na(int_vals) & is.finite(int_vals) & int_vals > 0)
+
       feat_cols_keep <- intersect(
         c("feature_id", "sample"),
         names(feature_table_0)
@@ -518,10 +530,35 @@ prepare_taxa <- function(
       }
       rm(meta_distinct, meta_selected)
 
-      feat_distinct <- .fast_distinct_with_key_guard(
-        tidytable::as_tidytable(as.list(feature_table_0)[feat_cols_keep]),
-        feat_cols_keep
-      )
+      if (use_int_filter) {
+        # Aggregate positive sample intensity per (feature_id, sample) before
+        # mapping to organisms, then retain organisms with relative intensity >=
+        # min_rel_intensity (always keeping the highest-intensity organism per feature).
+        f_raw <- as.character(feature_table_0$feature_id)
+        s_raw <- as.character(feature_table_0$sample)
+        w_raw <- ifelse(
+          !is.na(int_vals) & is.finite(int_vals) & int_vals > 0,
+          int_vals,
+          0
+        )
+        fs_dt <- data.table::data.table(
+          feature_id = f_raw,
+          sample = s_raw,
+          intensity = w_raw
+        )[, list(intensity = sum(intensity)), by = c("feature_id", "sample")]
+        feat_distinct <- tidytable::as_tidytable(fs_dt[, c(
+          "feature_id",
+          "sample"
+        )])
+        fs_int <- fs_dt$intensity
+        rm(fs_dt, f_raw, s_raw, w_raw)
+      } else {
+        feat_distinct <- .fast_distinct_with_key_guard(
+          tidytable::as_tidytable(as.list(feature_table_0)[feat_cols_keep]),
+          feat_cols_keep
+        )
+        fs_int <- NULL
+      }
       if (
         name_filename %in%
           names(meta_expanded) &&
@@ -529,25 +566,31 @@ prepare_taxa <- function(
       ) {
         fn_key <- meta_expanded[[name_filename]]
         s_key <- feat_distinct$sample
-        m_meta <- if (anyNA(fn_key) || anyNA(s_key)) {
-          match(s_key, fn_key)
-        } else {
-          fastmatch::fmatch(s_key, fn_key)
-        }
+        m_meta <- match(s_key, fn_key)
         metadata_table_joined <- tidytable::as_tidytable(as.list(feat_distinct))
         data.table::set(
           metadata_table_joined,
           j = "organismOriginal",
           value = meta_expanded$organismOriginal[m_meta]
         )
+        if (use_int_filter) {
+          data.table::set(
+            metadata_table_joined,
+            j = ".int_w",
+            value = fs_int
+          )
+        }
         col_ord_j <- intersect(
-          c("feature_id", "organismOriginal", "sample"),
+          c("feature_id", "organismOriginal", "sample", ".int_w"),
           names(metadata_table_joined)
         )
         if (!identical(names(metadata_table_joined), col_ord_j)) {
           data.table::setcolorder(metadata_table_joined, col_ord_j)
         }
       } else {
+        if (use_int_filter) {
+          data.table::set(feat_distinct, j = ".int_w", value = fs_int)
+        }
         metadata_table_joined <-
           tidytable::left_join(
             x = feat_distinct,
@@ -560,7 +603,43 @@ prepare_taxa <- function(
             tidyselect::everything()
           )
       }
-      rm(meta_expanded, feat_distinct)
+      rm(meta_expanded, feat_distinct, fs_int)
+
+      if (
+        use_int_filter &&
+          nrow(metadata_table_joined) > 0L &&
+          ".int_w" %in% names(metadata_table_joined)
+      ) {
+        fo_dt <- data.table::as.data.table(metadata_table_joined)
+        fo_agg <- fo_dt[
+          !is.na(organismOriginal),
+          list(org_int = sum(.int_w, na.rm = TRUE)),
+          by = c("feature_id", "organismOriginal")
+        ]
+        if (nrow(fo_agg) > 0L) {
+          fo_agg[, feat_tot := sum(org_int), by = "feature_id"]
+          fo_agg[, feat_max := max(org_int), by = "feature_id"]
+          keep_fo <- fo_agg[
+            feat_tot <= 0 |
+              org_int >= feat_max |
+              (org_int / feat_tot) >= min_rel_intensity
+          ]
+          keep_keys <- paste(
+            keep_fo$feature_id,
+            keep_fo$organismOriginal,
+            sep = "\r"
+          )
+          row_keys <- paste(
+            metadata_table_joined$feature_id,
+            metadata_table_joined$organismOriginal,
+            sep = "\r"
+          )
+          keep_mask <- is.na(metadata_table_joined$organismOriginal) |
+            !is.na(fastmatch::fmatch(row_keys, keep_keys))
+          metadata_table_joined <- metadata_table_joined[which(keep_mask), ]
+        }
+        data.table::set(metadata_table_joined, j = ".int_w", value = NULL)
+      }
 
       if (nrow(metadata_table_joined) == 0L) {
         log_warn(
@@ -613,12 +692,7 @@ prepare_taxa <- function(
       org_trimmed <- if (identical(u_org_trim, u_org_raw)) {
         org_raw
       } else {
-        m_o <- if (anyNA(u_org_raw)) {
-          match(org_raw, u_org_raw)
-        } else {
-          fastmatch::fmatch(org_raw, u_org_raw)
-        }
-        u_org_trim[m_o]
+        u_org_trim[match(org_raw, u_org_raw)]
       }
       feat_org <- tidytable::tidytable(
         feature_id = metadata_table_joined$feature_id,

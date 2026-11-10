@@ -91,7 +91,7 @@ test_that("compute_weighted_sum returns NA when all weights are zero", {
   expect_true(all(is.na(result)))
 })
 
-test_that("compute_weighted_sum does not expose coverage anymore", {
+test_that("compute_weighted_components computes evidence coverage", {
   bio_score <- c(0.9, 0.9, 0.9) # same bio score
   initial_score <- c(0.9, NA, NA) # MS1-only have NA
 
@@ -104,7 +104,7 @@ test_that("compute_weighted_sum does not expose coverage anymore", {
   expect_equal(components$score[1], 0.9)
   expect_equal(components$score[2], 0.45)
   expect_equal(components$score[3], 0.45)
-  expect_true(all(is.na(components$coverage)))
+  expect_equal(components$coverage, c(1.0, 0.5, 0.5))
 })
 
 test_that("compute_weighted_sum with unequal weights and NA", {
@@ -145,13 +145,66 @@ test_that("compute_weighted_sum real-world MS1 scenario", {
   # No NAs (each row has at least one non-NA component)
   expect_true(!anyNA(result))
 
-  expect_true(all(is.na(
+  expect_equal(
     compute_weighted_components(
       bio_scores,
       initial_scores,
       weights = c(w_bio, w_spec)
-    )$coverage
-  )))
+    )$coverage,
+    c(1.0, 0.5, 0.5)
+  )
+})
+
+test_that("compute_weighted_components supports na_prior shrinkage and compute_rt_mz_penalty", {
+  v1 <- c(0.8, 0.4, NA)
+  v2 <- c(0.6, NA, 0.6)
+  res_mean <- compute_weighted_components(
+    v1,
+    v2,
+    weights = c(0.5, 0.5),
+    na_prior = "mean"
+  )
+  expect_equal(res_mean$score, c(0.7, 0.5, 0.6))
+  expect_equal(res_mean$coverage, c(1.0, 0.5, 0.5))
+
+  res_vec <- compute_weighted_sum(
+    v1,
+    v2,
+    weights = c(0.5, 0.5),
+    na_prior = c(0.2, 0.4)
+  )
+  expect_equal(res_vec, c(0.7, 0.4, 0.4))
+
+  # Scalar recycling and all-NA vector with na_prior = "mean"
+  res_recycle_all_na <- compute_weighted_components(
+    0.8,
+    c(NA_real_, NA_real_),
+    weights = c(0.5, 0.5),
+    na_prior = "mean"
+  )
+  expect_equal(res_recycle_all_na$score, c(0.4, 0.4))
+  expect_equal(res_recycle_all_na$coverage, c(0.5, 0.5))
+
+  pen <- compute_rt_mz_penalty(
+    error_rt = c(0, 0.05, NA),
+    error_mz = c(0, 0.005, 0),
+    rt_half_min = 0.05,
+    mz_half_da = 0.005
+  )
+  expect_equal(pen, c(1.0, 0.25, 1.0))
+  expect_equal(compute_rt_mz_penalty(), numeric(0L))
+  expect_error(
+    compute_rt_mz_penalty(error_rt = 0.1, rt_half_min = 0),
+    class = "tima_validation_error"
+  )
+  expect_error(
+    compute_rt_mz_penalty(error_mz = 0.01, mz_half_da = -1),
+    class = "tima_validation_error"
+  )
+  expect_error(
+    compute_weighted_components(v1, v2, weights = c(1, 1), na_prior = -0.1),
+    class = "tima_validation_error"
+  )
 })
 
 test_that("compute_weighted_components rejects invalid inputs", {

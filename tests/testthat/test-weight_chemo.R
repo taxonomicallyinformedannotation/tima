@@ -535,4 +535,61 @@ test_that("weight_chemo matches $-delimited multi-token predictions without subs
     ],
     0.4
   )
+
+  # Validation: negative weight summing to 1.0, invalid score_chemical_*, and weight_by_pred_score = TRUE
+  expect_error(
+    weight_chemo(
+      annot_table_wei_bio_clean = annot,
+      weight_spectral = -0.2,
+      weight_biological = 0.6,
+      weight_chemical = 0.6,
+      score_chemical_cla_kingdom = 0.1,
+      score_chemical_cla_superclass = 0.2,
+      score_chemical_cla_class = 0.3,
+      score_chemical_cla_parent = 0.4,
+      score_chemical_npc_pathway = 0.1,
+      score_chemical_npc_superclass = 0.2,
+      score_chemical_npc_class = 0.3
+    ),
+    "weights must be non-negative",
+    class = "tima_validation_error"
+  )
+  expect_error(
+    weight_chemo(
+      annot_table_wei_bio_clean = annot,
+      weight_spectral = 0.2,
+      weight_biological = 0.4,
+      weight_chemical = 0.4,
+      score_chemical_cla_kingdom = 1.5,
+      score_chemical_cla_superclass = 0.2,
+      score_chemical_cla_class = 0.3,
+      score_chemical_cla_parent = 0.4,
+      score_chemical_npc_pathway = 0.1,
+      score_chemical_npc_superclass = 0.2,
+      score_chemical_npc_class = 0.3
+    ),
+    "score_chemical_cla_kingdom out of valid range",
+    class = "tima_validation_error"
+  )
+  annot$feature_pred_tax_cla_04dirpar_score <- c(0.5, 0.5, 0.5)
+  res_pred <- weight_chemo(
+    annot_table_wei_bio_clean = annot,
+    weight_spectral = 0,
+    weight_biological = 0,
+    weight_chemical = 1,
+    score_chemical_cla_kingdom = 0.1,
+    score_chemical_cla_superclass = 0.2,
+    score_chemical_cla_class = 0.3,
+    score_chemical_cla_parent = 0.8,
+    score_chemical_npc_pathway = 0.1,
+    score_chemical_npc_superclass = 0.2,
+    score_chemical_npc_class = 0.3,
+    weight_by_pred_score = TRUE
+  )
+  expect_equal(
+    res_pred$score_chemical[
+      res_pred$candidate_structure_inchikey_connectivity_layer == "IK3"
+    ],
+    0.4
+  )
 })

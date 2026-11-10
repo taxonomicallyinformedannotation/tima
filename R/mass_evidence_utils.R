@@ -59,7 +59,7 @@ implied_neutral_mass <- function(
   adduct_mass_per_monomer = 0
 ) {
   iso_shift <- as.integer(n_iso) * EVIDENCE_ISOTOPE_SHIFT_DA
-  (abs(as.integer(z)) * (as.numeric(mz) - iso_shift) - adduct_mass) /
+  (abs(as.integer(z)) * as.numeric(mz) - iso_shift - adduct_mass) /
     as.integer(n_mer) -
     adduct_mass_per_monomer
 }
@@ -155,7 +155,11 @@ implied_neutral_mass <- function(
 #' relative tolerance reduces to consecutive-pair gap tests + cumsum.
 #'
 #' @keywords internal
-.ppm_cluster_sorted <- function(values, tolerance_ppm) {
+.ppm_cluster_sorted <- function(
+  values,
+  tolerance_ppm,
+  tolerance_dalton = NULL
+) {
   n <- length(values)
   if (n == 0L) {
     return(integer(0L))
@@ -164,13 +168,34 @@ implied_neutral_mass <- function(
     return(1L)
   }
   tol <- tolerance_ppm * 1e-6
+  tol_da <- if (!is.null(tolerance_dalton) && is.finite(tolerance_dalton)) {
+    as.numeric(tolerance_dalton)
+  } else {
+    0
+  }
   # New-cluster mask: TRUE wherever the gap to the previous (sorted) value
-  # exceeds tol * current value, or either side is NA.
+  # exceeds max(tol_da, tol * current value), or either side is NA.
   prev_v <- c(NA_real_, values[-n])
   gap <- values - prev_v
-  boundary <- is.na(values) | is.na(prev_v) | (gap > tol * values)
+  step_tol <- pmax(tol_da, tol * values)
+  boundary <- is.na(values) | is.na(prev_v) | (gap > step_tol)
   # First element always starts a cluster.
   boundary[1L] <- TRUE
+  if (any(!boundary[-1L] & !boundary[-n])) {
+    cl_id <- 1L
+    anchor <- values[1L]
+    out <- integer(n)
+    out[1L] <- 1L
+    for (i in 2L:n) {
+      v_i <- values[i]
+      if (boundary[i] || is.na(anchor) || (v_i - anchor) > step_tol[i]) {
+        cl_id <- cl_id + 1L
+        anchor <- v_i
+      }
+      out[i] <- cl_id
+    }
+    return(out)
+  }
   cumsum(boundary)
 }
 

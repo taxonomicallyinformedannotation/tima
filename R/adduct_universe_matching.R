@@ -197,9 +197,11 @@ build_adduct_lookup <- function(universe) {
   abs_z <- abs(out$z)
   out$adduct_mass_per_monomer <- am_pm
   out$mz_slope <- out$n_mer / abs_z
-  out$mz_offset <- (out$n_mer * am_pm + out$adduct_mass) /
-    abs_z +
-    out$n_iso * isotope_shift
+  out$mz_offset <- (out$n_mer *
+    am_pm +
+    out$adduct_mass +
+    out$n_iso * isotope_shift) /
+    abs_z
   out$carrier_key <- .fast_component_count_keys(out$carriers)
   out$cluster_key <- .fast_component_count_keys(out$clusters)
   out$loss_key <- .fast_component_count_keys(out$losses)
@@ -224,18 +226,15 @@ calculate_neutral_mass_from_lookup <- function(
     matched <- !is.na(idx)
     if (any(matched)) {
       m_idx <- idx[matched]
-      am_pm_col <- adduct_lookup$adduct_mass_per_monomer
+      am_pm_col <- adduct_lookup$adduct_mass_per_monomer %||%
+        rep(0, nrow(adduct_lookup))
       out[matched] <- implied_neutral_mass(
         mz = mzs[matched],
         n_mer = adduct_lookup$n_mer[m_idx],
         z = adduct_lookup$z[m_idx],
         adduct_mass = adduct_lookup$adduct_mass[m_idx],
         n_iso = adduct_lookup$n_iso[m_idx],
-        adduct_mass_per_monomer = if (is.null(am_pm_col)) {
-          0
-        } else {
-          am_pm_col[m_idx]
-        }
+        adduct_mass_per_monomer = am_pm_col[m_idx]
       )
     }
     if (!fallback || all(matched)) {
@@ -279,19 +278,17 @@ calculate_mz_from_lookup <- function(
     matched <- !is.na(idx)
     if (any(matched)) {
       m_idx <- idx[matched]
-      am_pm_col <- adduct_lookup$adduct_mass_per_monomer
+      am_pm_col <- adduct_lookup$adduct_mass_per_monomer %||%
+        rep(0, nrow(adduct_lookup))
       out[matched] <- calculate_mz_from_neutral_mass(
         neutral_mass = neutral_mass[matched],
         n_mer = adduct_lookup$n_mer[m_idx],
         z = adduct_lookup$z[m_idx],
         adduct_mass = adduct_lookup$adduct_mass[m_idx],
-        adduct_mass_per_monomer = if (is.null(am_pm_col)) {
-          0
-        } else {
-          am_pm_col[m_idx]
-        }
+        adduct_mass_per_monomer = am_pm_col[m_idx]
       ) +
-        adduct_lookup$n_iso[m_idx] * isotope_shift
+        (adduct_lookup$n_iso[m_idx] * isotope_shift) /
+          abs(adduct_lookup$z[m_idx])
     }
     if (!fallback || all(matched)) {
       return(out)

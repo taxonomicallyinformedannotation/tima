@@ -668,7 +668,7 @@ test_that("prepare_taxa high-volume combination collapse (>256 rows) matches sma
   writeLines(
     paste(
       "filename\torganism",
-      "s1\tOrg1|Org2",
+      "s1\tOrg1 | Org2",
       "s2\tOrg1",
       "s3\tOrg2",
       sep = "\n"
@@ -719,4 +719,181 @@ test_that("prepare_taxa high-volume combination collapse (>256 rows) matches sma
   expect_equal(nrow(df_s), 300L)
   expect_identical(df_s$feature_id, f_ids_s)
   expect_identical(df_s$sample_organism_name[1:2], c("Org1", "Org2"))
+})
+
+test_that("prepare_taxa covers intensity filtering, missing OTT lookups, missing columns, and >256 mixed batching", {
+  ott <- temp_test_path("ott-cov.tsv")
+  writeLines(
+    paste0(
+      "organism_name\torganism_taxonomy_ottid\torganism_taxonomy_01domain\t",
+      "organism_taxonomy_02kingdom\torganism_taxonomy_03phylum\t",
+      "organism_taxonomy_04class\torganism_taxonomy_05order\t",
+      "organism_taxonomy_06family\torganism_taxonomy_07tribe\t",
+      "organism_taxonomy_08genus\torganism_taxonomy_09species\t",
+      "organism_taxonomy_10varietas\n",
+      "Org1\t1001\tEukaryota\tPlantae\tNA\tNA\tNA\tNA\tNA\tGenus1\tOrg1\tNA\n",
+      "Org2\t1002\tEukaryota\tPlantae\tNA\tNA\tNA\tNA\tNA\tGenus2\tOrg2\tNA"
+    ),
+    ott
+  )
+
+  # 1. Missing feature_id column in features file with single taxon -> hits wanted_feat_cols == 0,
+  # else (!is.null(taxon)) branch, and missing_select_cols abort
+  input_nofid <- temp_test_path("features-nofid.tsv")
+  output_nofid <- temp_test_path("output-nofid.tsv")
+  writeLines("rt\tmz\n1.5\t200.0", input_nofid)
+  expect_error(
+    prepare_taxa(
+      input = input_nofid,
+      org_tax_ott = ott,
+      taxon = "Org1",
+      output = output_nofid,
+      extension = TRUE,
+      metadata = NULL
+    ),
+    "Missing columns"
+  )
+
+  # 2. Metadata column present but all organism values NA/empty -> exports ND taxonomy
+  input_nd <- temp_test_path("features-nd.tsv")
+  meta_nd <- temp_test_path("meta-nd.tsv")
+  output_nd <- temp_test_path("output-nd.tsv")
+  writeLines("feature_id\tsample\nFT1\ts1", input_nd)
+  writeLines("filename\torganism\ns1\t", meta_nd)
+  prepare_taxa(
+    input = input_nd,
+    org_tax_ott = ott,
+    taxon = NULL,
+    metadata = meta_nd,
+    name_filename = "filename",
+    colname = "organism",
+    output = output_nd,
+    extension = TRUE
+  )
+  df_nd <- tidytable::fread(output_nd)
+  expect_identical(df_nd$sample_organism_name, "ND")
+
+  # 3. Missing organism in OTT triggers get_organism_taxonomy_ott
+  local_mocked_bindings(
+    get_organism_taxonomy_ott = function(df) {
+      tidytable::tidytable(
+        organism_name = df$organism,
+        organism_taxonomy_ottid = "9999",
+        organism_taxonomy_01domain = "Eukaryota",
+        organism_taxonomy_02kingdom = "Plantae",
+        organism_taxonomy_03phylum = NA_character_,
+        organism_taxonomy_04class = NA_character_,
+        organism_taxonomy_05order = NA_character_,
+        organism_taxonomy_06family = NA_character_,
+        organism_taxonomy_07tribe = NA_character_,
+        organism_taxonomy_08genus = "Genus3",
+        organism_taxonomy_09species = df$organism,
+        organism_taxonomy_10varietas = NA_character_
+      )
+    }
+  )
+  meta_new <- temp_test_path("meta-new.tsv")
+  output_new <- temp_test_path("output-new.tsv")
+  writeLines("filename\torganism\ns1\tOrg1|Org3", meta_new)
+  prepare_taxa(
+    input = input_nd,
+    org_tax_ott = ott,
+    taxon = NULL,
+    metadata = meta_new,
+    name_filename = "filename",
+    colname = "organism",
+    output = output_new,
+    extension = TRUE
+  )
+  df_new <- tidytable::fread(output_new)
+  expect_true(grepl("Org3", df_new$sample_organism_name))
+
+  # 4. Intensity-weighted taxon attribution (both unique-filename and pipe-expanded metadata)
+  input_int <- temp_test_path("features-int.tsv")
+  meta_int1 <- temp_test_path("meta-int1.tsv")
+  meta_int2 <- temp_test_path("meta-int2.tsv")
+  output_int1 <- temp_test_path("output-int1.tsv")
+  output_int2 <- temp_test_path("output-int2.tsv")
+  writeLines(
+    "feature_id\tsample\tintensity\nFT1\ts1\t1000\nFT1\ts2\t1\nFT2\ts1\t500",
+    input_int
+  )
+  writeLines("filename\torganism\ns1\tOrg1\ns2\tOrg2", meta_int1)
+  prepare_taxa(
+    input = input_int,
+    org_tax_ott = ott,
+    taxon = NULL,
+    metadata = meta_int1,
+    name_filename = "filename",
+    colname = "organism",
+    output = output_int1,
+    extension = TRUE,
+    min_rel_intensity = 0.05
+  )
+  df_int1 <- tidytable::fread(output_int1)
+  expect_identical(
+    df_int1$sample_organism_name[df_int1$feature_id == "FT1"],
+    "Org1"
+  )
+
+  writeLines("filename\torganism\ns1\tOrg1|Org2\ns2\tOrg2", meta_int2)
+  prepare_taxa(
+    input = input_int,
+    org_tax_ott = ott,
+    taxon = NULL,
+    metadata = meta_int2,
+    name_filename = "filename",
+    colname = "organism",
+    output = output_int2,
+    extension = TRUE,
+    min_rel_intensity = 0.05
+  )
+  expect_true(file.exists(output_int2))
+
+  # 5. 0-row features with metadata -> exports ND taxonomy
+  input_empty_f <- temp_test_path("features-empty.tsv")
+  output_empty_f <- temp_test_path("output-empty.tsv")
+  writeLines("feature_id\tsample\tintensity", input_empty_f)
+  prepare_taxa(
+    input = input_empty_f,
+    org_tax_ott = ott,
+    taxon = NULL,
+    metadata = meta_int1,
+    name_filename = "filename",
+    colname = "organism",
+    output = output_empty_f,
+    extension = TRUE
+  )
+  expect_equal(nrow(tidytable::fread(output_empty_f)), 0L)
+
+  # 6. >256 rows with whitespace in organism, NA organism (unmatched sample), and mixed 1- and 2-org features in interleaved order
+  input_mix <- temp_test_path("features-mix.tsv")
+  meta_mix <- temp_test_path("meta-mix.tsv")
+  output_mix <- temp_test_path("output-mix.tsv")
+  f_interleaved <- c(
+    sprintf("FTM%04d", 1:200),
+    sprintf("FTM%04d", 1:100)
+  )
+  s_interleaved <- c(
+    rep(c("s1", "s_unmatched"), length.out = 200L),
+    rep("s2", 100L)
+  )
+  tidytable::fwrite(
+    tidytable::tidytable(feature_id = f_interleaved, sample = s_interleaved),
+    input_mix,
+    sep = "\t"
+  )
+  writeLines("filename\torganism\ns1\t Org1 \ns2\tOrg2", meta_mix)
+  prepare_taxa(
+    input = input_mix,
+    org_tax_ott = ott,
+    taxon = NULL,
+    metadata = meta_mix,
+    name_filename = "filename",
+    colname = "organism",
+    output = output_mix,
+    extension = TRUE
+  )
+  df_mix <- tidytable::fread(output_mix)
+  expect_equal(nrow(df_mix), 200L)
 })

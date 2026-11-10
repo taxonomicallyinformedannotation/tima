@@ -30,7 +30,11 @@ empty_evidence_table <- function() {
 #' an m/z chain inside the cluster — O(n) edges per cluster instead of O(n^2).
 #'
 #' @keywords internal
-build_evidence_edges <- function(hyps, tolerance_ppm = 5) {
+build_evidence_edges <- function(
+  hyps,
+  tolerance_ppm = 5,
+  tolerance_dalton = NULL
+) {
   if (nrow(hyps) == 0L) {
     return(tidytable::tidytable(
       feature_id = character(),
@@ -72,14 +76,6 @@ build_evidence_edges <- function(hyps, tolerance_ppm = 5) {
     ))
   }
   idx_cl <- idx_cl[!is.na(fastmatch::fmatch(cl_sub, dup_cl))]
-  if (length(idx_cl) < 2L) {
-    return(tidytable::tidytable(
-      feature_id = character(),
-      adduct = character(),
-      feature_id_dest = character(),
-      adduct_dest = character()
-    ))
-  }
 
   f_sub <- as.character(hyps$feature_id[idx_cl])
   mz_sub <- as.numeric(hyps$mz[idx_cl])
@@ -146,7 +142,12 @@ build_evidence_edges <- function(hyps, tolerance_ppm = 5) {
   m_max <- pmax.int(m_src, m_dst)
   na_m <- is.na(m_src) | is.na(m_dst)
   ppm_tol <- tolerance_ppm * 1e-6 * m_max
-  m_ok <- na_m | (m_diff <= ppm_tol)
+  tol <- if (!is.null(tolerance_dalton) && is.finite(tolerance_dalton)) {
+    pmax(ppm_tol, as.numeric(tolerance_dalton))
+  } else {
+    ppm_tol
+  }
+  m_ok <- na_m | (m_diff <= tol)
   keep_idx <- same_cl[m_ok]
   if (length(keep_idx) == 0L) {
     return(tidytable::tidytable(

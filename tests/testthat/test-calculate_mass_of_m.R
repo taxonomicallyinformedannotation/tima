@@ -1098,7 +1098,7 @@ test_that("calculate_mz_from_mass_batch matches hand-computed m/z", {
     (m[[3L]] + 2 * H_MASS) / 2,
     m[[4L]] - H_MASS,
     m[[5L]] + H_MASS + ISOTOPE_MASS_SHIFT_DALTONS,
-    (m[[6L]] + 2 * H_MASS) / 2 + 2 * ISOTOPE_MASS_SHIFT_DALTONS
+    (m[[6L]] + 2 * H_MASS + 2 * ISOTOPE_MASS_SHIFT_DALTONS) / 2
   )
 
   out <- calculate_mz_from_mass_batch(neutral_masses = m, adducts = adducts)

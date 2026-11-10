@@ -15,7 +15,8 @@ weight_chemo(
   score_chemical_cla_parent,
   score_chemical_npc_pathway,
   score_chemical_npc_superclass,
-  score_chemical_npc_class
+  score_chemical_npc_class,
+  weight_by_pred_score = FALSE
 )
 }
 \arguments{
@@ -50,6 +51,9 @@ superclass match (0-1)}
 
 \item{score_chemical_npc_class}{\link{numeric} Score for NPC class match (0-1,
 highest)}
+
+\item{weight_by_pred_score}{\link{logical} If \code{TRUE}, weights predicted chemical
+class frequencies by their CANOPUS/CSI prediction probabilities.}
 }
 \value{
 Data frame with chemically weighted annotations including chemical

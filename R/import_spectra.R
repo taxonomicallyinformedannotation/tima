@@ -135,13 +135,6 @@ import_spectra <- function(
         },
         "msp" = {
           log_debug("Reading MSP file...")
-          if (!requireNamespace("MsBackendMsp", quietly = TRUE)) {
-            cli::cli_abort(
-              "Package {.pkg MsBackendMsp} is required to read MSP files.",
-              class = c("tima_runtime_error", "tima_error"),
-              call = NULL
-            )
-          }
           MsBackendMsp::readMsp(f = file) |>
             Spectra::Spectra()
         },
@@ -197,23 +190,14 @@ import_spectra <- function(
 
   # Harmonize legacy metadata fields to standard names
   spec_cols <- colnames(spectra@backend@spectraData)
-  if ("MSLEVEL" %in% spec_cols) {
-    spectra$msLevel <- as.integer(spectra$MSLEVEL)
+  for (col in intersect(c("MSLEVEL", "MS_LEVEL"), spec_cols)) {
+    spectra$msLevel <- as.integer(spectra[[col]])
   }
-  if ("MS_LEVEL" %in% spec_cols) {
-    spectra$msLevel <- as.integer(spectra$MS_LEVEL)
-  }
-  if ("PRECURSOR_MZ" %in% spec_cols) {
-    spectra$precursorMz <- as.numeric(spectra$PRECURSOR_MZ)
-  }
-  if ("PrecursorMZ" %in% spec_cols) {
-    spectra$precursorMz <- as.numeric(spectra$PrecursorMZ)
-  }
-  if ("PrecursorMz" %in% spec_cols) {
-    spectra$precursorMz <- as.numeric(spectra$PrecursorMz)
-  }
-  if ("precursor_mz" %in% spec_cols) {
-    spectra$precursorMz <- as.numeric(spectra$precursor_mz)
+  for (col in intersect(
+    c("PRECURSOR_MZ", "PrecursorMZ", "PrecursorMz", "precursor_mz"),
+    spec_cols
+  )) {
+    spectra$precursorMz <- as.numeric(spectra[[col]])
   }
   if ("spectrum_id" %in% spec_cols) {
     spectra$spectrum_id <- as.character(spectra$spectrum_id)
@@ -251,7 +235,11 @@ import_spectra <- function(
   n_ms1_skipped <- 0L
 
   # Filter to MS2 spectra only if msLevel available
-  if ("msLevel" %in% spec_cols) {
+  if (
+    "msLevel" %in%
+      colnames(spectra@backend@spectraData) &&
+      !all(is.na(spectra@backend@spectraData$msLevel))
+  ) {
     n_before <- length(spectra)
     spectra <- Spectra::filterMsLevel(object = spectra, msLevel. = 2L)
     n_after <- length(spectra)
@@ -381,24 +369,14 @@ import_spectra <- function(
   }
 
   spec_cols <- colnames(spectra@backend@spectraData)
-
-  if ("MSLEVEL" %in% spec_cols) {
-    spectra$msLevel <- as.integer(spectra$MSLEVEL)
+  for (col in intersect(c("MSLEVEL", "MS_LEVEL"), spec_cols)) {
+    spectra$msLevel <- as.integer(spectra[[col]])
   }
-  if ("MS_LEVEL" %in% spec_cols) {
-    spectra$msLevel <- as.integer(spectra$MS_LEVEL)
-  }
-  if ("PRECURSOR_MZ" %in% spec_cols) {
-    spectra$precursorMz <- as.numeric(spectra$PRECURSOR_MZ)
-  }
-  if ("PrecursorMZ" %in% spec_cols) {
-    spectra$precursorMz <- as.numeric(spectra$PrecursorMZ)
-  }
-  if ("PrecursorMz" %in% spec_cols) {
-    spectra$precursorMz <- as.numeric(spectra$PrecursorMz)
-  }
-  if ("precursor_mz" %in% spec_cols) {
-    spectra$precursorMz <- as.numeric(spectra$precursor_mz)
+  for (col in intersect(
+    c("PRECURSOR_MZ", "PrecursorMZ", "PrecursorMz", "precursor_mz"),
+    spec_cols
+  )) {
+    spectra$precursorMz <- as.numeric(spectra[[col]])
   }
   if ("spectrum_id" %in% spec_cols) {
     spectra$spectrum_id <- as.character(spectra$spectrum_id)

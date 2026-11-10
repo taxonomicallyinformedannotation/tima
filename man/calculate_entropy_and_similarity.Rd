@@ -19,7 +19,9 @@ calculate_entropy_and_similarity(
   query_adducts = NULL,
   lib_adducts = NULL,
   compute_forward_reverse = TRUE,
-  compute_entropy = TRUE
+  compute_entropy = TRUE,
+  query_window_masses = NULL,
+  lib_window_masses = NULL
 )
 }
 \arguments{

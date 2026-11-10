@@ -164,4 +164,19 @@ test_that("transform_score_sirius_csi validates K and scale as scalars", {
   expect_error(transform_score_sirius_csi(-10, scale = -1), "scale")
   # K may be negative.
   expect_no_error(transform_score_sirius_csi(-10, K = -100))
+
+  # zodiac_score modulation and validation
+  base_out <- transform_score_sirius_csi(c(-50, -50, -50))
+  zod_out <- transform_score_sirius_csi(
+    c(-50, -50, -50),
+    zodiac_score = c(0.8, NA_real_, 1.5)
+  )
+  expect_equal(zod_out[1], base_out[1] * 0.8)
+  expect_equal(zod_out[2], base_out[2])
+  expect_equal(zod_out[3], base_out[3])
+  expect_error(
+    transform_score_sirius_csi(-10, zodiac_score = "bad"),
+    "zodiac_score",
+    class = "tima_validation_error"
+  )
 })
