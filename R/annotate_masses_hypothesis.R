@@ -915,6 +915,21 @@ collect_node_adduct_hypotheses <- function(
         }
       }
 
+      h_keys <- intersect(names(carrier_net), c("H", "H2", "H3"))
+      if (length(h_keys) > 0L) {
+        h_vals <- unlist(carrier_net[h_keys], use.names = FALSE)
+        if (any(h_vals > 0L) && any(h_vals < 0L)) {
+          h_mults <- c(H = 1L, H2 = 2L, H3 = 3L)[h_keys]
+          total_h <- sum(as.integer(h_vals) * as.integer(h_mults))
+          for (hk in h_keys) {
+            carrier_net[[hk]] <- NULL
+          }
+          if (total_h != 0L) {
+            carrier_net[["H"]] <- total_h
+          }
+        }
+      }
+
       neg_modifier_atomic_net <- list()
       pos_modifier_atomic_net <- list()
       for (emp_f in names(mod_emp_net)) {

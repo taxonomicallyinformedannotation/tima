@@ -2891,6 +2891,7 @@ test_that("annotate_masses internal helpers cover primary/secondary, weak hypoth
   )
 
   expect_identical(harmonize_adduct_vector(character(0)), character(0))
+  expect_identical(.simplify_adduct_after_modifier("[M-H2+H]+"), "[M-H]+")
   expect_identical(nrow(build_adduct_lookup_from_strings(character(0))), 0L)
   expect_identical(nrow(build_adduct_lookup_from_strings("NOT_AN_ADDUCT")), 0L)
   expect_identical(
