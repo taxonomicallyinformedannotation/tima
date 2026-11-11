@@ -575,7 +575,8 @@ test_that("sample_candidates_per_group handles missing candidate_score_pseudo_in
       "IK_ANCHOR",
       "IK_OTHER2"
     ),
-    mz = c(mz_pos_h, mz_pos_na, mz_pos_na, mz_pos_na)
+    mz = c(mz_pos_h, mz_pos_na, mz_pos_na, mz_pos_na),
+    candidate_structure_error_mz = c(0.1, 0.2, 0.1, 0.3)
   )
 
   res <- sample_candidates_per_group(
@@ -992,6 +993,15 @@ test_that("clean_chemo_candidates helpers cover edge cases, complete linkage, an
     row_prio_rank = c(1L, 2L),
     row_weights = c(1.0, 0.9)
   ))
+  expect_null(.solve_optimal_rt_cluster_assignment(
+    fids = c("F1", "F2"),
+    rt_cid = c(1L, 2L),
+    iks = c("IK1", "IK2"),
+    valid_ik = c(TRUE, TRUE),
+    col_rk = c(1L, 1L),
+    row_prio_rank = c(1L, 2L),
+    row_weights = c(1.0, 0.9)
+  ))
 
   # Multi-step conflict closure + unused IK in active component + exact cross-RT tie + fallback
   df_closure_and_tie <- tidytable::tidytable(
@@ -1110,7 +1120,7 @@ test_that("clean_chemo_candidates helpers cover edge cases, complete linkage, an
     3L
   )
 
-  # drop_cross_rt_duplicate_final_candidates with displaced IK, tied IK, NA IK row, and fallback min_rem_rk
+  # drop_cross_rt_duplicate_final_candidates with displaced IK, tied IK, NA IK row, and all-dropped feature
   df_filt_cross <- tidytable::tidytable(
     feature_id = c(
       "F1",
@@ -1118,6 +1128,7 @@ test_that("clean_chemo_candidates helpers cover edge cases, complete linkage, an
       "F2",
       "F2",
       "F2",
+      "F_DROP",
       "T1",
       "T1",
       "T2",
@@ -1129,6 +1140,7 @@ test_that("clean_chemo_candidates helpers cover edge cases, complete linkage, an
       4.0,
       4.0,
       4.0,
+      6.0,
       7.0,
       7.0,
       9.0,
@@ -1141,6 +1153,7 @@ test_that("clean_chemo_candidates helpers cover edge cases, complete linkage, an
       2L,
       3L,
       1L,
+      1L,
       2L,
       1L,
       2L
@@ -1151,6 +1164,7 @@ test_that("clean_chemo_candidates helpers cover edge cases, complete linkage, an
       "IK_1",
       "IK_2B",
       NA_character_,
+      "IK_1",
       "IK_TIE",
       "IK_T1B",
       "IK_TIE",
@@ -1162,12 +1176,16 @@ test_that("clean_chemo_candidates helpers cover edge cases, complete linkage, an
       0.85,
       0.75,
       0.50,
+      0.40,
       0.90,
       0.70,
       0.90,
       0.70
     ),
-    annotation_note = rep(NA_character_, 9L)
+    candidate_score_sirius_csi = rep(-5.0, 10L),
+    candidate_score_pseudo_initial = rep(0.6, 10L),
+    candidate_adduct = rep("[M+H]+", 10L),
+    annotation_note = rep(NA_character_, 10L)
   )
   out_filt_cross <- drop_cross_rt_duplicate_final_candidates(df_filt_cross)
   expect_true(nrow(out_filt_cross) < nrow(df_filt_cross))
@@ -1218,6 +1236,22 @@ test_that("clean_chemo_candidates helpers cover edge cases, complete linkage, an
     1L
   )
   expect_identical(
+    nrow(build_mini_results_table(
+      features_table = tidytable::tidytable(
+        feature_id = "F1",
+        rt = 1.0,
+        mz = 100.0
+      ),
+      df_classes_mini = tidytable::tidytable(),
+      results_filtered = tidytable::tidytable(
+        feature_id = "F1",
+        rank_final = 1L,
+        score_initial = 0.8
+      )
+    )),
+    1L
+  )
+  expect_identical(
     nrow(enforce_cluster_entity_consensus(
       tidytable::tidytable(),
       tidytable::tidytable(feature_id = "F1", component_id = "C1")
@@ -1246,7 +1280,60 @@ test_that("clean_chemo_candidates helpers cover edge cases, complete linkage, an
     3L
   )
   expect_identical(
+    nrow(enforce_cluster_entity_consensus(
+      df_ranked = tidytable::tidytable(
+        feature_id = c("F1", "F2"),
+        rt = c(1.0, 1.0),
+        rank_final = c(1L, 1L),
+        candidate_structure_exact_mass = c(180.06, 180.06),
+        candidate_structure_inchikey_connectivity_layer = c("IK_A", "IK_A"),
+        score_weighted_chemo = c(0.95, 0.80)
+      ),
+      components_table = tidytable::tidytable(
+        feature_id = c("F1", "F2"),
+        component_id = c("C1", "C1")
+      )
+    )),
+    2L
+  )
+  expect_identical(
     nrow(resolve_cross_rt_duplicate_candidates(tidytable::tidytable())),
     0L
   )
+
+  # Two unrelated mass families co-eluting in the same global RT window (1.00 & 1.01)
+  df_coelute_unrel <- tidytable::tidytable(
+    feature_id = c(
+      "M1_early",
+      "M1_early",
+      "M1_late",
+      "M1_late",
+      "M2_early",
+      "M2_early",
+      "M2_late",
+      "M2_late"
+    ),
+    rt = c(1.00, 1.00, 5.00, 5.00, 1.01, 1.01, 8.00, 8.00),
+    rank_final = c(1L, 2L, 1L, 2L, 1L, 2L, 1L, 2L),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "IK_M1_A",
+      "IK_M1_B",
+      "IK_M1_A",
+      "IK_M1_B",
+      "IK_M2_A",
+      "IK_M2_B",
+      "IK_M2_A",
+      "IK_M2_B"
+    ),
+    score_weighted_chemo = c(0.60, 0.55, 0.90, 0.50, 0.99, 0.50, 0.80, 0.75)
+  )
+  res_coelute <- resolve_cross_rt_duplicate_candidates(df_coelute_unrel)
+  r1_m1_early <- res_coelute$candidate_structure_inchikey_connectivity_layer[
+    res_coelute$feature_id == "M1_early" & res_coelute$rank_final == 1L
+  ]
+  r1_m2_early <- res_coelute$candidate_structure_inchikey_connectivity_layer[
+    res_coelute$feature_id == "M2_early" & res_coelute$rank_final == 1L
+  ]
+  expect_identical(r1_m1_early, "IK_M1_B")
+  expect_identical(r1_m2_early, "IK_M2_A")
 })
