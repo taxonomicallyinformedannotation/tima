@@ -601,4 +601,15 @@ test_that("create_components helpers cover large character dedup, dual peak cols
     seed = 1L
   )
   expect_equal(nrow(self_res$components_table), 2L)
+
+  # Symmetric min(source_peaks, target_peaks) matched-peak denominator
+  w_sym <- .resolve_edge_weights(tidytable::tidytable(
+    feature_source = "A",
+    feature_target = "B",
+    similarity = 1.0,
+    matched_peaks = 4,
+    source_feature_spectrum_peaks = 4,
+    target_feature_spectrum_peaks = 10
+  ))
+  expect_equal(w_sym, 1.0, tolerance = 1e-12)
 })

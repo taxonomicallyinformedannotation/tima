@@ -566,4 +566,10 @@ test_that("build_evidence_supported_hypotheses covers edge cases and baseline fa
     )),
     0L
   )
+
+  # Bounded-diameter clustering in .ppm_cluster_sorted splits transitive chains
+  expect_identical(
+    .ppm_cluster_sorted(c(100.0, 100.0008, 100.0016), tolerance_ppm = 10),
+    c(1L, 1L, 2L)
+  )
 })

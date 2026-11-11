@@ -1159,4 +1159,33 @@ test_that("validate_electron_mass bounds the electron mass", {
   ))
   expect_error(validate_electron_mass(0.002))
   expect_error(validate_electron_mass(-1e-4))
+
+  # Doubly charged isotopologue round-trip: isotope shift is divided by |z|,
+  # not subtracted directly from m/z before multiplying by |z|.
+  m_iso2 <- 400.0
+  mz_iso2 <- calculate_mz_from_mass(m_iso2, "[M1+2H]2+")
+  expect_equal(
+    mz_iso2,
+    (m_iso2 + 2 * H_MASS + ISOTOPE_MASS_SHIFT_DALTONS) / 2,
+    tolerance = 1e-10
+  )
+  expect_equal(
+    calculate_mass_of_m(mz_iso2, "[M1+2H]2+"),
+    m_iso2,
+    tolerance = 1e-10
+  )
+  mz_iso2_alt <- calculate_mz_from_mass(
+    m_iso2,
+    "[M1+2H]2+",
+    electron_mass = ALT_ELECTRON_MASS
+  )
+  expect_equal(
+    calculate_mass_of_m(
+      mz_iso2_alt,
+      "[M1+2H]2+",
+      electron_mass = ALT_ELECTRON_MASS
+    ),
+    m_iso2,
+    tolerance = 1e-10
+  )
 })
