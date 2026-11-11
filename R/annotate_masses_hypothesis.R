@@ -955,9 +955,13 @@ collect_node_adduct_hypotheses <- function(
 
       # Negative carrier terms
       neg_carriers <- Filter(function(x) x < 0L, carrier_net)
-      for (nm in sort(names(neg_carriers))) {
-        n <- abs(neg_carriers[[nm]])
-        new_mods <- c(new_mods, paste0("-", if (n > 1L) n else "", nm))
+      if (length(neg_carriers) > 0L) {
+        nms_neg <- sort(names(neg_carriers))
+        ns_neg <- abs(unlist(neg_carriers[nms_neg], use.names = FALSE))
+        new_mods <- c(
+          new_mods,
+          paste0("-", ifelse(ns_neg > 1L, as.character(ns_neg), ""), nms_neg)
+        )
       }
 
       # Positive atomic term (addition)
@@ -969,9 +973,13 @@ collect_node_adduct_hypotheses <- function(
 
       # Positive carrier terms
       pos_carriers <- Filter(function(x) x > 0L, carrier_net)
-      for (nm in sort(names(pos_carriers))) {
-        n <- pos_carriers[[nm]]
-        new_mods <- c(new_mods, paste0("+", if (n > 1L) n else "", nm))
+      if (length(pos_carriers) > 0L) {
+        nms_pos <- sort(names(pos_carriers))
+        ns_pos <- unlist(pos_carriers[nms_pos], use.names = FALSE)
+        new_mods <- c(
+          new_mods,
+          paste0("+", ifelse(ns_pos > 1L, as.character(ns_pos), ""), nms_pos)
+        )
       }
 
       paste0("[", core, paste0(new_mods, collapse = ""), "]", suffix)

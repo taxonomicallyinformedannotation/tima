@@ -739,27 +739,19 @@ calculate_net_mod_mass_from_text <- function(adduct) {
   if (length(tokens) == 0L) {
     return(NA_real_)
   }
-  total <- 0
-  for (tok in tokens) {
-    sign <- if (startsWith(tok, "+")) 1 else -1
-    body <- substr(tok, 2L, nchar(tok))
-    coef_match <- regmatches(body, regexpr("^[0-9]+", body, perl = TRUE))
-    coef <- if (length(coef_match) == 0L || coef_match[[1L]] == "") {
-      1
-    } else {
-      as.numeric(coef_match[[1L]])
-    }
-    formula <- sub("^[0-9]+", "", body, perl = TRUE)
-    if (!nzchar(formula)) {
-      return(NA_real_)
-    }
-    mass <- suppressWarnings(calculate_formula_mass(formula))
-    if (!is.finite(mass)) {
-      return(NA_real_)
-    }
-    total <- total + (sign * coef * mass)
+  signs <- ifelse(startsWith(tokens, "+"), 1, -1)
+  bodies <- substr(tokens, 2L, nchar(tokens))
+  formulas <- sub("^[0-9]+", "", bodies, perl = TRUE)
+  if (!all(nzchar(formulas))) {
+    return(NA_real_)
   }
-  total
+  coef_str <- substr(bodies, 1L, nchar(bodies) - nchar(formulas))
+  coefs <- ifelse(nzchar(coef_str), as.numeric(coef_str), 1)
+  masses <- suppressWarnings(calculate_formula_mass(formulas))
+  if (!all(is.finite(masses))) {
+    return(NA_real_)
+  }
+  sum(signs * coefs * masses)
 }
 
 #' Join RT/mz couple windows with neutral losses using binary search instead of cartesian join.

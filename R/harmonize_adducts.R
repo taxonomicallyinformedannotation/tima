@@ -317,19 +317,17 @@ reduce_ammonium_loss_pairs <- function(net) {
       break
     }
 
-    reducible_idx <- NA_integer_
-    reducible_residual <- NULL
-    for (i in neg_idx) {
-      residual <- subtract_atomic_formula(net$formula[[i]], "H3N")
-      if (!is.null(residual)) {
-        reducible_idx <- i
-        reducible_residual <- residual
-        break
-      }
-    }
-    if (is.na(reducible_idx)) {
+    residuals <- lapply(
+      net$formula[neg_idx],
+      subtract_atomic_formula,
+      sub = "H3N"
+    )
+    hit <- which(!vapply(residuals, is.null, logical(1L)))
+    if (length(hit) == 0L) {
       break
     }
+    reducible_idx <- neg_idx[[hit[[1L]]]]
+    reducible_residual <- residuals[[hit[[1L]]]]
 
     net$signed_n[[reducible_idx]] <- as.integer(
       net$signed_n[[reducible_idx]] + 1L

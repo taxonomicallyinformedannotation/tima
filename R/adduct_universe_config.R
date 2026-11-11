@@ -385,16 +385,14 @@ generate_adduct_hypotheses <- function(
         )
 
         if (length(rows_out) > 0L) {
-          for (row in rows_out) {
-            row_i <- row_i + 1L
-            rows[[row_i]] <- row
-          }
+          row_i <- row_i + 1L
+          rows[[row_i]] <- rows_out
         }
       }
     }
   }
 
-  rows
+  unlist(rows, recursive = FALSE)
 }
 
 .adduct_carrier_state <- function(
@@ -403,20 +401,23 @@ generate_adduct_hypotheses <- function(
   parsed_carriers,
   carrier_mass
 ) {
-  per_atom <- integer()
-  base_carrier_offset <- 0
-  for (slot in carrier_idx) {
-    if (counts[[slot]] == 0L) {
-      next
-    }
-    token_symbols <- parsed_carriers[[slot]]$symbols
-    for (sym in names(token_symbols)) {
-      inc <- counts[[slot]] * token_symbols[[sym]]
-      per_atom[sym] <- (if (is.na(per_atom[sym])) 0L else per_atom[sym]) + inc
-    }
-    base_carrier_offset <- base_carrier_offset +
-      counts[[slot]] * carrier_mass[[slot]]
-  }
+  counts_int <- as.integer(counts)
+  active <- which(counts_int != 0L)
+  c_act <- counts_int[active]
+  base_carrier_offset <- sum(c_act * carrier_mass[active])
+  sym_list <- Map(
+    function(cnt, pc) cnt * pc$symbols,
+    c_act,
+    parsed_carriers[active]
+  )
+  all_syms <- unlist(sym_list)
+  els <- names(all_syms)
+  u_els <- unique(els)
+  per_atom <- vapply(
+    split(unname(all_syms), factor(els, levels = u_els)),
+    sum,
+    integer(1L)
+  )
   per_atom <- per_atom[per_atom != 0L]
   carriers_named <- if (length(per_atom) == 0L) integer() else per_atom
   list(

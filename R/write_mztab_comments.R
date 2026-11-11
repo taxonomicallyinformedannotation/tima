@@ -748,17 +748,16 @@
 #' @return Single character URI string, or `"null"`.
 #' @keywords internal
 .mztab_pick_best_uri <- function(rows) {
-  priority_prefixes <- .MZTAB_XREF_PRIORITY_PREFIXES
-
-  for (pfx in priority_prefixes) {
-    match_rows <- rows[rows$prefix == pfx, , drop = FALSE]
-    if (nrow(match_rows) > 0L) {
-      id <- as.character(match_rows$id[[1L]])
-      info <- .XREF_KNOWN_PREFIXES[[pfx]]
-      if (!is.null(info)) {
-        return(paste0(info$uri, id))
-      }
-    }
+  priority_prefixes <- intersect(
+    .MZTAB_XREF_PRIORITY_PREFIXES,
+    names(.XREF_KNOWN_PREFIXES)
+  )
+  m <- match(priority_prefixes, rows$prefix, nomatch = 0L)
+  m <- m[m > 0L]
+  if (length(m) > 0L) {
+    row_idx <- m[[1L]]
+    info <- .XREF_KNOWN_PREFIXES[[rows$prefix[[row_idx]]]]
+    return(paste0(info$uri, as.character(rows$id[[row_idx]])))
   }
 
   "null"
@@ -784,15 +783,17 @@
       ),
       "wikidata"
     )
-
-    for (pfx in priority_prefixes) {
-      match_rows <- rows[rows$prefix == pfx, , drop = FALSE]
-      if (nrow(match_rows) > 0L) {
-        id <- as.character(match_rows$id[[1L]])
-        info <- .XREF_KNOWN_PREFIXES[[pfx]]
-        if (!is.null(info) && !is.na(id) && nzchar(id)) {
-          return(paste0(info$prefix, ":", id))
-        }
+    ids <- as.character(rows$id)
+    ok <- !is.na(ids) &
+      nzchar(ids) &
+      rows$prefix %in% names(.XREF_KNOWN_PREFIXES)
+    if (any(ok)) {
+      m <- match(priority_prefixes, rows$prefix[ok], nomatch = 0L)
+      m <- m[m > 0L]
+      if (length(m) > 0L) {
+        idx <- which(ok)[[m[[1L]]]]
+        info <- .XREF_KNOWN_PREFIXES[[rows$prefix[[idx]]]]
+        return(paste0(info$prefix, ":", ids[[idx]]))
       }
     }
   }

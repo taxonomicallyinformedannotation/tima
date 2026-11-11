@@ -553,14 +553,17 @@ calculate_formula_mass <- function(x) {
   res[non_na] <- u_mass[m_idx]
   if (!all(u_valid)) {
     bad_pos <- which(!u_valid[m_idx])
-    for (bp in bad_pos) {
-      warning(
-        "The given formula '",
-        x_sub[[bp]],
-        "' contains invalid symbols.",
-        call. = FALSE
-      )
-    }
+    lapply(
+      x_sub[bad_pos],
+      function(bad_f) {
+        warning(
+          "The given formula '",
+          bad_f,
+          "' contains invalid symbols.",
+          call. = FALSE
+        )
+      }
+    )
   }
   stats::setNames(res, x)
 }

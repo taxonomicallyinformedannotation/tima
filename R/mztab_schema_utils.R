@@ -134,39 +134,23 @@ MZTAB_TERM_FALLBACKS <- list(
     if (!is.na(text) && nzchar(text)) {
       pattern <- "\\{\\{([A-Za-z0-9_]+)\\}\\}"
       matches <- gregexpr(pattern, text, perl = TRUE)
-      match_positions <- as.integer(matches[[1L]])
-      match_lengths <- attr(matches[[1L]], "match.length")
+      tokens <- regmatches(text, matches)[[1L]]
 
-      if (length(match_positions) > 0L && match_positions[[1L]] != -1L) {
-        parts <- character()
-        cursor <- 1L
-
-        for (i in seq_along(match_positions)) {
-          start <- match_positions[[i]]
-          length_ <- match_lengths[[i]]
-          if (start > cursor) {
-            parts <- c(parts, substr(text, cursor, start - 1L))
-          }
-
-          token <- substr(text, start, start + length_ - 1L)
-          key <- sub("^\\{\\{([A-Za-z0-9_]+)\\}\\}$", "\\1", token)
-          value <- values[[key]]
-          replacement <- if (
-            !is.null(value) && length(value) == 1L && !is.na(value)
-          ) {
-            as.character(value)
-          } else {
-            token
-          }
-          parts <- c(parts, replacement)
-          cursor <- start + length_
-        }
-
-        if (cursor <= nchar(text)) {
-          parts <- c(parts, substr(text, cursor, nchar(text)))
-        }
-
-        return(paste(parts, collapse = ""))
+      if (length(tokens) > 0L) {
+        keys <- substr(tokens, 3L, nchar(tokens) - 2L)
+        regmatches(text, matches) <- list(vapply(
+          seq_along(tokens),
+          function(i) {
+            value <- values[[keys[[i]]]]
+            if (!is.null(value) && length(value) == 1L && !is.na(value)) {
+              as.character(value)
+            } else {
+              tokens[[i]]
+            }
+          },
+          character(1L)
+        ))
+        return(text)
       }
     }
     return(text)

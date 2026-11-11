@@ -876,7 +876,8 @@ read_mztab <- function(
     spec_int_raw != "null"
   both_raw <- which(valid_mz_raw & valid_int_raw)
 
-  peak_blocks <- vector("list", n_entries)
+  peak_vals <- character(0)
+  peak_ids <- integer(0)
   if (length(both_raw) > 0L) {
     mz_sp <- strsplit(spec_mz_raw[both_raw], "|", fixed = TRUE)
     int_sp <- strsplit(spec_int_raw[both_raw], "|", fixed = TRUE)
@@ -923,37 +924,29 @@ read_mztab <- function(
         mz_fmt <- format_num_vec(flat_mz_num)
         int_fmt <- format_num_vec(flat_int_num)
         rm(flat_mz_num, flat_int_num)
-        peak_str <- paste(mz_fmt, int_fmt)
+        peak_vals <- paste(mz_fmt, int_fmt)
+        peak_ids <- idx_hp[spec_grp]
         rm(mz_fmt, int_fmt)
-
-        n_hp <- length(idx_hp)
-        grp_fac <- structure(
-          spec_grp,
-          levels = as.character(seq_len(n_hp)),
-          class = "factor"
-        )
-        split_peaks <- split.default(peak_str, grp_fac)
-        names(split_peaks) <- NULL
-        peak_blocks[idx_hp] <- split_peaks
       }
     }
   }
 
   # ── Assemble MGF entries ─────────────────────────────────────────────────
-  out_entries <- vector("list", n_entries)
-  for (i in seq_len(n_entries)) {
-    out_entries[[i]] <- c(
-      "BEGIN IONS",
-      title_lines[[i]],
-      if (has_fid_all[[i]]) fid_lines[[i]],
-      pepmass_lines[[i]],
-      if (valid_rt[[i]]) rt_lines[[i]],
-      if (valid_mslevel[[i]]) mslevel_lines[[i]],
-      peak_blocks[[i]],
-      "END IONS",
-      ""
-    )
-  }
+  hdr_mat <- rbind(
+    "BEGIN IONS",
+    title_lines,
+    fid_lines,
+    pepmass_lines,
+    rt_lines,
+    mslevel_lines
+  )
+  hdr_keep <- !is.na(hdr_mat)
+  hdr_vals <- hdr_mat[hdr_keep]
+  hdr_ids <- col(hdr_mat)[hdr_keep]
+  ftr_vals <- rep.int(c("END IONS", ""), n_entries)
+  ftr_ids <- rep(seq_len(n_entries), each = 2L)
 
-  unlist(out_entries, use.names = FALSE)
+  all_vals <- c(hdr_vals, peak_vals, ftr_vals)
+  all_ids <- c(hdr_ids, peak_ids, ftr_ids)
+  all_vals[order(all_ids, method = "radix")]
 }
