@@ -540,15 +540,13 @@ parse_modification_components <- function(modifications_clean) {
   # computing count * average mass (e.g., 13 * 12.0 = 156).
   # Per IUPAC and PSI-OBO conventions, digits >= 10 immediately before an
   # element symbol in adduct notation denote an isotopic label, not a count.
-  for (i in seq_along(mod_elements)) {
-    if (
-      mod_multiplicities[i] >= 10L &&
-        grepl("^[A-Z][a-z]?$", mod_elements[i])
-    ) {
-      mod_elements[i] <- paste0(mod_multiplicities[i], mod_elements[i])
-      mod_multiplicities[i] <- 1L
-    }
-  }
+  iso_mask <- mod_multiplicities >= 10L &
+    grepl("^[A-Z][a-z]?$", mod_elements, perl = TRUE)
+  mod_elements[iso_mask] <- paste0(
+    mod_multiplicities[iso_mask],
+    mod_elements[iso_mask]
+  )
+  mod_multiplicities[iso_mask] <- 1L
 
   list(
     valid = TRUE,

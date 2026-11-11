@@ -954,28 +954,18 @@ append_component_weak_hypotheses <- function(
   ))
   mz_exp_mat <- matrix(all_mz_exp, nrow = n_u, ncol = n_uta)
 
-  has_dalton <- !is.null(tolerance_dalton)
-  hit_u_list <- vector("list", n_tpl)
-  hit_t_list <- vector("list", n_tpl)
-  for (t_i in seq_len(n_tpl)) {
-    col_i <- match(tpl_adduct[[t_i]], u_tpl_ads)
-    mz_exp <- mz_exp_mat[, col_i]
-    mz_diff <- abs(u_mz - mz_exp)
-    ppm_diff <- mz_diff * 1e6 / pmax(u_mz, mz_exp)
-    ok <- (is.finite(ppm_diff) & ppm_diff <= tolerance_ppm) |
-      (if (has_dalton) !is.na(mz_diff) & mz_diff <= tolerance_dalton else FALSE)
-    w_ok <- which(ok)
-    if (length(w_ok) > 0L) {
-      hit_u_list[[t_i]] <- w_ok
-      hit_t_list[[t_i]] <- rep.int(t_i, length(w_ok))
-    }
-  }
-
-  hit_u <- unlist(hit_u_list, use.names = FALSE)
-  if (length(hit_u) == 0L) {
+  tol_da <- tolerance_dalton %||% -1
+  mz_diff_mat <- abs(u_mz - mz_exp_mat)
+  ppm_diff_mat <- mz_diff_mat * 1e6 / pmax(u_mz, mz_exp_mat)
+  ok_mat <- (is.finite(ppm_diff_mat) & ppm_diff_mat <= tolerance_ppm) |
+    (!is.na(mz_diff_mat) & mz_diff_mat <= tol_da)
+  tpl_col_idx <- fastmatch::fmatch(tpl_adduct, u_tpl_ads)
+  hits_mat <- which(ok_mat[, tpl_col_idx, drop = FALSE], arr.ind = TRUE)
+  if (nrow(hits_mat) == 0L) {
     return(node_hypotheses)
   }
-  hit_t <- unlist(hit_t_list, use.names = FALSE)
+  hit_u <- hits_mat[, 1L]
+  hit_t <- hits_mat[, 2L]
 
   weak_all <- tidytable::tidytable(
     feature_id = u_fids[hit_u],
@@ -1792,31 +1782,38 @@ align_carrier_multiplicity_adducts <- function(adducts, reference_adducts) {
   if (length(adducts) == 0L) {
     return(adducts)
   }
-  pairs <- list(
-    c("[M+2H]2+", "[M+H2]2+"),
-    c("[M+3H]3+", "[M+H3]3+"),
-    c("[M-2H]2-", "[M-H2]2-"),
-    c("[M-3H]3-", "[M-H3]3-"),
-    c("[M+2Na]2+", "[M+Na2]2+"),
-    c("[M+3Na]3+", "[M+Na3]3+"),
-    c("[M+2K]2+", "[M+K2]2+"),
-    c("[M+3K]3+", "[M+K3]3+"),
-    c("[M+2Cu]2+", "[M+Cu2]2+"),
-    c("[M+2H4N]2+", "[M+H8N2]2+")
+  pref_vec <- c(
+    "[M+2H]2+",
+    "[M+3H]3+",
+    "[M-2H]2-",
+    "[M-3H]3-",
+    "[M+2Na]2+",
+    "[M+3Na]3+",
+    "[M+2K]2+",
+    "[M+3K]3+",
+    "[M+2Cu]2+",
+    "[M+2H4N]2+"
+  )
+  sub_vec <- c(
+    "[M+H2]2+",
+    "[M+H3]3+",
+    "[M-H2]2-",
+    "[M-H3]3-",
+    "[M+Na2]2+",
+    "[M+Na3]3+",
+    "[M+K2]2+",
+    "[M+K3]3+",
+    "[M+Cu2]2+",
+    "[M+H8N2]2+"
   )
   ref_set <- unique(as.character(reference_adducts))
+  use_pref <- (pref_vec %in% ref_set) & !(sub_vec %in% ref_set)
+  from_vec <- ifelse(use_pref, sub_vec, pref_vec)
+  to_vec <- ifelse(use_pref, pref_vec, sub_vec)
   out <- as.character(adducts)
-  for (p in pairs) {
-    p_pref <- p[[1L]]
-    p_sub <- p[[2L]]
-    has_pref <- p_pref %in% ref_set
-    has_sub <- p_sub %in% ref_set
-    if (has_pref && !has_sub) {
-      out[!is.na(out) & out == p_sub] <- p_pref
-    } else {
-      out[!is.na(out) & out == p_pref] <- p_sub
-    }
-  }
+  m_idx <- fastmatch::fmatch(out, from_vec)
+  hit <- which(!is.na(m_idx))
+  out[hit] <- to_vec[m_idx[hit]]
   out
 }
 

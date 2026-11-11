@@ -356,8 +356,9 @@ enforce_global_m_consistency <- function(
       nb_id <- fastmatch::fmatch(nb_ids, u_f)
       n_deg <- tabulate(f_id, nbins = length(u_f))
       conf_f <- unique(f_id[!obs_consistent])
-      for (cf in conf_f) {
-        idx_f <- which(f_id == cf)
+      in_conf <- which(f_id %in% conf_f)
+      idx_by_cf <- split(in_conf, f_id[in_conf])
+      for (idx_f in idx_by_cf) {
         ord_m <- order(m_values[idx_f])
         idx_s <- idx_f[ord_m]
         m_s <- m_values[idx_s]
@@ -873,13 +874,7 @@ collect_node_adduct_hypotheses <- function(
         abs(a)
       }
       gcd_vec <- function(x) {
-        g <- as.integer(abs(x[[1L]]))
-        if (length(x) > 1L) {
-          for (k in 2:length(x)) {
-            g <- gcd2(g, as.integer(abs(x[[k]])))
-          }
-        }
-        g
+        Reduce(gcd2, as.integer(abs(x)))
       }
 
       carrier_net <- list()
@@ -921,9 +916,7 @@ collect_node_adduct_hypotheses <- function(
         if (any(h_vals > 0L) && any(h_vals < 0L)) {
           h_mults <- c(H = 1L, H2 = 2L, H3 = 3L)[h_keys]
           total_h <- sum(as.integer(h_vals) * as.integer(h_mults))
-          for (hk in h_keys) {
-            carrier_net[[hk]] <- NULL
-          }
+          carrier_net[h_keys] <- NULL
           if (total_h != 0L) {
             carrier_net[["H"]] <- total_h
           }

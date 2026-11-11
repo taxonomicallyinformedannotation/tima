@@ -72,10 +72,15 @@
       e <- new.env(parent = emptyenv())
       s <- new.env(parent = emptyenv())
       ord <- as.character(existing_df$key)
-      for (i in seq_along(ord)) {
-        k <- ord[[i]]
-        e[[k]] <- as.character(existing_df$value[[i]])
-        s[[k]] <- TRUE
+      if (length(ord) > 0L) {
+        list2env(
+          stats::setNames(as.list(as.character(existing_df$value)), ord),
+          envir = e
+        )
+        list2env(
+          stats::setNames(rep(list(TRUE), length(ord)), ord),
+          envir = s
+        )
       }
       list(env = e, seen = s, order = as.list(ord))
     } else {

@@ -107,20 +107,18 @@ parse_atomic_formula <- function(formula) {
   m <- gregexpr("([A-Z][a-z]?)([0-9]*)", formula, perl = TRUE)
   matches <- regmatches(formula, m)[[1L]]
   matches <- matches[nzchar(matches)]
-  if (length(matches) == 0L) {
+  els <- sub("^([A-Z][a-z]?).*$", "\\1", matches, perl = TRUE)
+  if (length(els) == 0L || !all(els %in% names(ATOMIC_MONOISOTOPIC_MASS))) {
     return(NULL)
   }
-  out <- integer()
-  for (tok in matches) {
-    el <- sub("^([A-Z][a-z]?).*$", "\\1", tok, perl = TRUE)
-    cnt <- sub("^[A-Z][a-z]?([0-9]*)$", "\\1", tok, perl = TRUE)
-    cnt <- if (!nzchar(cnt)) 1L else as.integer(cnt)
-    if (!el %in% names(ATOMIC_MONOISOTOPIC_MASS)) {
-      return(NULL)
-    }
-    out[el] <- (if (is.na(out[el])) 0L else out[el]) + cnt
-  }
-  out
+  cnt_str <- sub("^[A-Z][a-z]?([0-9]*)$", "\\1", matches, perl = TRUE)
+  cnts <- ifelse(nzchar(cnt_str), as.integer(cnt_str), 1L)
+  u_els <- unique(els)
+  vapply(
+    split(cnts, factor(els, levels = u_els)),
+    sum,
+    integer(1L)
+  )
 }
 
 #' Compute the monoisotopic mass of a parsed atomic-formula vector.
@@ -159,30 +157,23 @@ parse_carrier_token <- function(token) {
     return(NULL)
   }
 
-  symbols <- integer()
-  z <- 0L
-  for (i in seq_along(parts)) {
-    p <- parts[[i]]
-    sign <- if (startsWith(p, "-")) -1L else 1L
-    body <- sub("^[+-]", "", p)
-    coef_match <- regmatches(body, regexpr("^[0-9]+", body, perl = TRUE))
-    coef <- if (length(coef_match) == 0L || !nzchar(coef_match)) {
-      1L
-    } else {
-      as.integer(coef_match[[1L]])
-    }
-    sym <- sub("^[0-9]+", "", body, perl = TRUE)
-    # Normalise NH4 → H4N (IUPAC Hill order) so charge lookup works.
-    if (sym == "NH4") {
-      sym <- "H4N"
-    }
-    if (!sym %in% names(CARRIER_INTRINSIC_CHARGE)) {
-      return(NULL)
-    }
-    symbols[sym] <- (if (is.na(symbols[sym])) 0L else symbols[sym]) +
-      sign * coef
-    z <- z + sign * coef * CARRIER_INTRINSIC_CHARGE[[sym]]
+  signs <- ifelse(startsWith(parts, "-"), -1L, 1L)
+  bodies <- sub("^[+-]", "", parts, perl = TRUE)
+  coef_str <- sub("^([0-9]*).*$", "\\1", bodies, perl = TRUE)
+  coefs <- ifelse(nzchar(coef_str), as.integer(coef_str), 1L)
+  syms <- sub("^[0-9]+", "", bodies, perl = TRUE)
+  syms[syms == "NH4"] <- "H4N"
+  if (!all(syms %in% names(CARRIER_INTRINSIC_CHARGE))) {
+    return(NULL)
   }
+  signed_coefs <- as.integer(signs * coefs)
+  u_syms <- unique(syms)
+  symbols <- vapply(
+    split(signed_coefs, factor(syms, levels = u_syms)),
+    sum,
+    integer(1L)
+  )
+  z <- sum(signed_coefs * unname(CARRIER_INTRINSIC_CHARGE[syms]))
   list(symbols = symbols, z_contribution = as.integer(z))
 }
 
@@ -194,23 +185,20 @@ carrier_token_mass <- function(parsed_carrier) {
   if (is.null(parsed_carrier)) {
     return(NA_real_)
   }
-  total <- 0
-  for (sym in names(parsed_carrier$symbols)) {
-    cnt <- parsed_carrier$symbols[[sym]]
-    if (sym == "H4N") {
-      # ammonium: 4*H + N
-      total <- total +
-        cnt *
-          (4 *
-            ATOMIC_MONOISOTOPIC_MASS[["H"]] +
-            ATOMIC_MONOISOTOPIC_MASS[["N"]])
-    } else if (sym %in% names(ATOMIC_MONOISOTOPIC_MASS)) {
-      total <- total + cnt * ATOMIC_MONOISOTOPIC_MASS[[sym]]
-    } else {
-      return(NA_real_)
-    }
+  syms <- names(parsed_carrier$symbols)
+  cnts <- as.numeric(parsed_carrier$symbols)
+  nh4_mass <- 4 *
+    ATOMIC_MONOISOTOPIC_MASS[["H"]] +
+    ATOMIC_MONOISOTOPIC_MASS[["N"]]
+  sym_masses <- ifelse(
+    syms == "H4N",
+    nh4_mass,
+    unname(ATOMIC_MONOISOTOPIC_MASS[syms])
+  )
+  if (anyNA(sym_masses)) {
+    return(NA_real_)
   }
-  total
+  sum(cnts * sym_masses)
 }
 
 # ---------------------------------------------------------------------------
@@ -230,16 +218,12 @@ carrier_token_mass <- function(parsed_carrier) {
   }
   ord <- order(-vec, names(vec))
   vec <- vec[ord]
-  parts <- vapply(
-    seq_along(vec),
-    function(i) {
-      cnt <- vec[[i]]
-      coef <- if (cnt == 1L) "" else as.character(cnt)
-      paste0(sign_char, coef, names(vec)[[i]])
-    },
-    character(1L)
+  paste0(
+    sign_char,
+    ifelse(vec == 1L, "", as.character(vec)),
+    names(vec),
+    collapse = ""
   )
-  paste(parts, collapse = "")
 }
 
 #' Format all negative modification terms (neutral losses + negative carrier
@@ -267,16 +251,10 @@ carrier_token_mass <- function(parsed_carrier) {
   }
   # Sort alphabetically by formula name (matches canonicalize_adduct_notation)
   terms <- terms[order(names(terms))]
-  paste(
-    vapply(
-      seq_along(terms),
-      function(i) {
-        n <- as.integer(terms[[i]])
-        coef <- if (n == 1L) "" else as.character(n)
-        paste0("-", coef, names(terms)[[i]])
-      },
-      character(1L)
-    ),
+  paste0(
+    "-",
+    ifelse(terms == 1L, "", as.character(terms)),
+    names(terms),
     collapse = ""
   )
 }
@@ -301,15 +279,7 @@ carrier_token_mass <- function(parsed_carrier) {
     cl <- cl[order(names(cl))]
     parts <- c(
       parts,
-      vapply(
-        seq_along(cl),
-        function(i) {
-          n <- as.integer(cl[[i]])
-          coef <- if (n == 1L) "" else as.character(n)
-          paste0("+", coef, names(cl)[[i]])
-        },
-        character(1L)
-      )
+      paste0("+", ifelse(cl == 1L, "", as.character(cl)), names(cl))
     )
   }
   # Positive carriers last, alphabetical
@@ -322,15 +292,7 @@ carrier_token_mass <- function(parsed_carrier) {
     ca <- ca[order(names(ca))]
     parts <- c(
       parts,
-      vapply(
-        seq_along(ca),
-        function(i) {
-          n <- as.integer(ca[[i]])
-          coef <- if (n == 1L) "" else as.character(n)
-          paste0("+", coef, names(ca)[[i]])
-        },
-        character(1L)
-      )
+      paste0("+", ifelse(ca == 1L, "", as.character(ca)), names(ca))
     )
   }
   paste(parts, collapse = "")

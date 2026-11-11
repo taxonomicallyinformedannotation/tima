@@ -170,22 +170,27 @@ build_annotate_masses_coverage_report <- function(
     "adduct_only"
   )
 
-  best_tier_per_feat <- rep(8L, all_features)
-  any_n_feat <- integer(7L)
   any_n_ann <- tabulate(tier, nbins = 7L)
-  for (t in 1L:7L) {
-    if (any_n_ann[t] > 0L) {
-      f_in_t <- tabulate(f_id[tier == t], nbins = all_features) > 0L
-      any_n_feat[t] <- sum(f_in_t)
-      best_tier_per_feat[f_in_t & best_tier_per_feat > t] <- t
-    }
-  }
+  ft_key <- (tier - 1L) * all_features + f_id
+  u_ft <- which(!duplicated(ft_key))
+  any_n_feat <- tabulate(tier[u_ft], nbins = 7L)
+
+  ord_ft <- u_ft[order(tier[u_ft])]
+  first_f <- ord_ft[!duplicated(f_id[ord_ft])]
+  best_tier_per_feat <- rep.int(8L, all_features)
+  best_tier_per_feat[f_id[first_f]] <- tier[first_f]
 
   best_n_feat <- tabulate(best_tier_per_feat, nbins = 7L)
-  best_n_ann <- integer(7L)
-  for (t in which(best_n_feat > 0L)) {
-    best_n_ann[t] <- sum(feat_n_ann[best_tier_per_feat == t])
-  }
+  in_best <- which(best_tier_per_feat <= 7L)
+  best_n_ann <- as.integer(vapply(
+    split(
+      feat_n_ann[in_best],
+      factor(best_tier_per_feat[in_best], levels = 1L:7L)
+    ),
+    sum,
+    integer(1L),
+    USE.NAMES = FALSE
+  ))
 
   keep_best <- which(best_n_feat > 0L)
   best_summary <- tidytable::tidytable(
