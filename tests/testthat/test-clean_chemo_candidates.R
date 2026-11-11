@@ -1008,6 +1008,7 @@ test_that("clean_chemo_candidates helpers cover edge cases, complete linkage, an
     feature_id = c(
       "C1_A",
       "C1_A",
+      "C1_A",
       "C1_B",
       "C2_A",
       "C2_A",
@@ -1019,6 +1020,7 @@ test_that("clean_chemo_candidates helpers cover edge cases, complete linkage, an
       "T2"
     ),
     rt = c(
+      1.0,
       1.0,
       1.0,
       1.01,
@@ -1034,6 +1036,7 @@ test_that("clean_chemo_candidates helpers cover edge cases, complete linkage, an
     rank_final = c(
       1L,
       2L,
+      3L,
       2L,
       1L,
       2L,
@@ -1047,6 +1050,7 @@ test_that("clean_chemo_candidates helpers cover edge cases, complete linkage, an
     candidate_structure_inchikey_connectivity_layer = c(
       "IK_AB",
       "IK_BC",
+      "IK_C1_R3",
       NA_character_,
       "IK_AB",
       "IK_UNUSED",
@@ -1060,6 +1064,7 @@ test_that("clean_chemo_candidates helpers cover edge cases, complete linkage, an
     score_weighted_chemo = c(
       0.95,
       0.85,
+      0.75,
       0.50,
       0.90,
       0.10,
@@ -1336,4 +1341,43 @@ test_that("clean_chemo_candidates helpers cover edge cases, complete linkage, an
   ]
   expect_identical(r1_m1_early, "IK_M1_B")
   expect_identical(r1_m2_early, "IK_M2_A")
+
+  # Co-eluting features at RT 2.00 & 2.01 where F2 has non-conflicting rank-1 IK_B
+  # and shares rank-2 IK_A with conflicting F1 (2.00) and F3 (8.00)
+  df_coelute_shared_r2 <- tidytable::tidytable(
+    feature_id = c("F1", "F1", "F2", "F2", "F3", "F3"),
+    rt = c(2.00, 2.00, 2.01, 2.01, 8.00, 8.00),
+    rank_final = c(1L, 2L, 1L, 2L, 1L, 2L),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "IK_A",
+      "IK_C",
+      "IK_B",
+      "IK_A",
+      "IK_A",
+      "IK_D"
+    ),
+    score_weighted_chemo = c(0.95, 0.50, 0.60, 0.20, 0.80, 0.75)
+  )
+  res_shared_r2 <- resolve_cross_rt_duplicate_candidates(df_coelute_shared_r2)
+  expect_identical(
+    res_shared_r2$candidate_structure_inchikey_connectivity_layer[
+      res_shared_r2$feature_id == "F2" & res_shared_r2$rank_final == 1L
+    ],
+    "IK_B"
+  )
+  expect_identical(
+    res_shared_r2$candidate_structure_inchikey_connectivity_layer[
+      res_shared_r2$feature_id == "F3" & res_shared_r2$rank_final == 1L
+    ],
+    "IK_D"
+  )
+  filt_shared_r2 <- drop_cross_rt_duplicate_final_candidates(
+    df_coelute_shared_r2
+  )
+  expect_identical(
+    filt_shared_r2$candidate_structure_inchikey_connectivity_layer[
+      filt_shared_r2$feature_id == "F2" & filt_shared_r2$rank_final == 1L
+    ],
+    "IK_B"
+  )
 })

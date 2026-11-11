@@ -106,12 +106,18 @@ validate_weight_annotations_inputs <- function(
     canopus = canopus,
     formula = formula
   )
-  for (name in names(optional_files)) {
-    path <- optional_files[[name]]
-    if (!is.null(path) && !file.exists(path)) {
-      log_warn("Optional file '%s' not found at: %s", name, path)
-    }
-  }
+  missing_opt <- names(optional_files)[vapply(
+    optional_files,
+    function(path) !is.null(path) && !file.exists(path),
+    logical(1L)
+  )]
+  lapply(missing_opt, function(name) {
+    log_warn(
+      "Optional file '%s' not found at: %s",
+      name,
+      optional_files[[name]]
+    )
+  })
 
   assert_choice(minimal_ms1_condition, c("OR", "AND"), "minimal_ms1_condition")
 
@@ -363,36 +369,25 @@ load_structure_organism_pairs <- function(
 
   joined <- tidytable::as_tidytable(library_table)
   rm(library_table)
-  for (i in seq_along(supp_tables)) {
-    tbl <- supp_tables[[i]]
-    supp_tables[[i]] <- tidytable::tidytable()
+  join_one_supp <- function(joined_tbl, tbl) {
     if (nrow(tbl) == 0L) {
-      if (
-        i == 1L &&
-          length(needed_structures) > 0L &&
-          "structure_inchikey_connectivity_layer" %in% names(joined)
-      ) {
-        keep_j <- which(
-          !is.na(fastmatch::fmatch(
-            joined$structure_inchikey_connectivity_layer,
-            needed_structures
-          ))
-        )
-        joined <- joined[keep_j, ]
-      }
-      next
+      return(joined_tbl)
     }
-    by_cols <- intersect(names(joined), names(tbl))
+    by_cols <- intersect(names(joined_tbl), names(tbl))
     if (
       length(by_cols) == 1L &&
         anyDuplicated(tbl[[by_cols]]) == 0L &&
         !anyNA(tbl[[by_cols]])
     ) {
       key_col <- by_cols[[1L]]
-      m_idx <- fastmatch::fmatch(joined[[key_col]], tbl[[key_col]])
+      m_idx <- fastmatch::fmatch(joined_tbl[[key_col]], tbl[[key_col]])
       new_cols <- setdiff(names(tbl), key_col)
-      for (col in new_cols) {
-        data.table::set(joined, j = col, value = tbl[[col]][m_idx])
+      if (length(new_cols) > 0L) {
+        data.table::set(
+          joined_tbl,
+          j = new_cols,
+          value = lapply(as.list(tbl)[new_cols], `[`, m_idx)
+        )
       }
     } else if (
       length(by_cols) == 2L &&
@@ -401,35 +396,41 @@ load_structure_organism_pairs <- function(
     ) {
       k1 <- by_cols[[1L]]
       k2 <- by_cols[[2L]]
-      m_idx <- fastmatch::fmatch(joined[[k1]], tbl[[k1]])
-      v1 <- joined[[k2]]
+      m_idx <- fastmatch::fmatch(joined_tbl[[k1]], tbl[[k1]])
+      v1 <- joined_tbl[[k2]]
       v2 <- tbl[[k2]][m_idx]
       ok_k2 <- !is.na(m_idx) &
         ((is.na(v1) & is.na(v2)) | (!is.na(v1) & !is.na(v2) & v1 == v2))
       m_idx[!ok_k2] <- NA_integer_
       new_cols <- setdiff(names(tbl), by_cols)
-      for (col in new_cols) {
-        data.table::set(joined, j = col, value = tbl[[col]][m_idx])
+      if (length(new_cols) > 0L) {
+        data.table::set(
+          joined_tbl,
+          j = new_cols,
+          value = lapply(as.list(tbl)[new_cols], `[`, m_idx)
+        )
       }
     } else if (length(by_cols) > 0L) {
-      joined <- tidytable::left_join(x = joined, y = tbl, by = by_cols)
+      joined_tbl <- tidytable::left_join(x = joined_tbl, y = tbl, by = by_cols)
     }
-    rm(tbl)
-
-    if (
-      i == 1L &&
-        length(needed_structures) > 0L &&
-        "structure_inchikey_connectivity_layer" %in% names(joined)
-    ) {
-      keep_j <- which(
-        !is.na(fastmatch::fmatch(
-          joined$structure_inchikey_connectivity_layer,
-          needed_structures
-        ))
-      )
-      joined <- joined[keep_j, ]
-    }
+    joined_tbl
   }
+
+  joined <- join_one_supp(joined, supp_tables[[1L]])
+  supp_tables[[1L]] <- tidytable::tidytable()
+  if (
+    length(needed_structures) > 0L &&
+      "structure_inchikey_connectivity_layer" %in% names(joined)
+  ) {
+    keep_j <- which(
+      !is.na(fastmatch::fmatch(
+        joined$structure_inchikey_connectivity_layer,
+        needed_structures
+      ))
+    )
+    joined <- joined[keep_j, ]
+  }
+  joined <- join_one_supp(joined, supp_tables[[2L]])
   rm(supp_tables)
   select_structure_organism_pair_columns(joined)
 }
@@ -608,44 +609,40 @@ log_annotation_stats <- function(annotation_table) {
   bases_override = NULL
 ) {
   n_dc <- length(dedup_cols)
-  ids_dc <- vector("list", n_dc)
-  bases_dc <- numeric(n_dc)
-  for (i in seq_len(n_dc)) {
-    dc_v <- annotation_table[[dedup_cols[[i]]]]
+  dc_info <- lapply(dedup_cols, function(col_nm) {
+    dc_v <- annotation_table[[col_nm]]
     u_dc <- unique(dc_v)
     id_i <- if (anyNA(u_dc)) {
       match(dc_v, u_dc)
     } else {
       fastmatch::fmatch(dc_v, u_dc)
     }
-    ids_dc[[i]] <- id_i[ord1]
-    bases_dc[[i]] <- as.double(max(1L, length(u_dc)))
-    rm(dc_v, u_dc, id_i)
+    list(id = id_i[ord1], base = as.double(max(1L, length(u_dc))))
+  })
+  ids_dc <- lapply(dc_info, `[[`, "id")
+  bases_dc <- if (is.null(bases_override)) {
+    vapply(dc_info, `[[`, numeric(1L), "base")
+  } else {
+    as.double(bases_override)
   }
-  if (!is.null(bases_override)) {
-    bases_dc <- as.double(bases_override)
-  }
+  rm(dc_info)
   total_combos <- prod(bases_dc)
   if (total_combos < .Machine$integer.max) {
-    k1 <- ids_dc[[1L]]
-    if (n_dc >= 2L) {
-      for (i in 2:n_dc) {
-        bi <- as.integer(bases_dc[[i]])
-        k1 <- (k1 - 1L) * bi + ids_dc[[i]]
-      }
-    }
+    k1 <- Reduce(
+      function(acc, i) (acc - 1L) * as.integer(bases_dc[[i]]) + ids_dc[[i]],
+      seq_len(n_dc)[-1L],
+      init = ids_dc[[1L]]
+    )
     keep1_mask <- !duplicated(k1)
     rm(k1, ids_dc)
     keep1_idx <- ord1[keep1_mask]
     rm(keep1_mask)
   } else if (total_combos < 4503599627370496) {
-    k1 <- as.double(ids_dc[[1L]])
-    if (n_dc >= 2L) {
-      for (i in 2:n_dc) {
-        bi <- bases_dc[[i]]
-        k1 <- (k1 - 1) * bi + ids_dc[[i]]
-      }
-    }
+    k1 <- Reduce(
+      function(acc, i) (acc - 1) * bases_dc[[i]] + ids_dc[[i]],
+      seq_len(n_dc)[-1L],
+      init = as.double(ids_dc[[1L]])
+    )
     keep1_mask <- fastmatch::fmatch(k1, k1) == seq_along(k1)
     rm(k1, ids_dc)
     keep1_idx <- ord1[keep1_mask]
@@ -717,11 +714,11 @@ rearrange_annotations <- function(
   } else {
     integer(0L)
   }
-  sirius_protos <- vector("list", length(sirius_new_cols))
-  names(sirius_protos) <- sirius_new_cols
-  for (col in sirius_new_cols) {
-    sirius_protos[[col]] <- annotation_table[[col]][NA_integer_]
-  }
+  sirius_protos <- lapply(
+    as.list(annotation_table)[sirius_new_cols],
+    `[`,
+    NA_integer_
+  )
   sirius_sub <- NULL
   if (
     length(csi_idx) > 0L &&
@@ -739,11 +736,11 @@ rearrange_annotations <- function(
       "candidate_structure_inchikey_connectivity_layer",
       sirius_new_cols
     ))
-    sirius_sub <- vector("list", length(sirius_keep_cols))
-    names(sirius_sub) <- sirius_keep_cols
-    for (col in sirius_keep_cols) {
-      sirius_sub[[col]] <- annotation_table[[col]][csi_idx]
-    }
+    sirius_sub <- lapply(
+      as.list(annotation_table)[sirius_keep_cols],
+      `[`,
+      csi_idx
+    )
   }
 
   n_in <- nrow(annotation_table)
@@ -866,19 +863,19 @@ rearrange_annotations <- function(
           )
         }
       } else {
-        merged_list <- vector("list", length(t1_cols))
-        names(merged_list) <- t1_cols
-        for (col in t1_cols) {
-          if (col == "candidate_score_similarity") {
-            data.table::set(annotation_table, j = col, value = NULL)
-            merged_list[[col]] <- sim_num[keep1_idx]
-          } else {
-            col_v <- annotation_table[[col]]
-            data.table::set(annotation_table, j = col, value = NULL)
-            merged_list[[col]] <- col_v[keep1_idx]
-            rm(col_v)
-          }
-        }
+        merged_list <- stats::setNames(
+          lapply(t1_cols, function(col) {
+            if (col == "candidate_score_similarity") {
+              data.table::set(annotation_table, j = col, value = NULL)
+              sim_num[keep1_idx]
+            } else {
+              col_v <- annotation_table[[col]]
+              data.table::set(annotation_table, j = col, value = NULL)
+              col_v[keep1_idx]
+            }
+          }),
+          t1_cols
+        )
         annotation_table_merged <- tidytable::as_tidytable(merged_list)
         rm(merged_list)
       }
@@ -895,21 +892,22 @@ rearrange_annotations <- function(
       }
     }
     if (length(zero_transfer_rows) > 0L) {
-      for (z_col in intersect(
+      z_cols <- intersect(
         c(
           "candidate_score_similarity_forward",
           "candidate_score_similarity_reverse",
           "candidate_count_similarity_peaks_matched"
         ),
         names(annotation_table_merged)
-      )) {
+      )
+      lapply(z_cols, function(z_col) {
         zv <- annotation_table_merged[[z_col]]
         na_z <- zero_transfer_rows[is.na(zv[zero_transfer_rows])]
         if (length(na_z) > 0L) {
           zv[na_z] <- as.vector(0, mode = typeof(zv))
           data.table::set(annotation_table_merged, j = z_col, value = zv)
         }
-      }
+      })
     }
     rm(keep1_idx, zero_transfer_rows)
   }
@@ -919,14 +917,19 @@ rearrange_annotations <- function(
   # by (feature_id, candidate_structure_inchikey_connectivity_layer) without
   # copying the entire multi-million-row annotation table via full_join.
   if (length(csi_idx) == 0L) {
-    n_rows <- nrow(annotation_table_merged)
-    for (col in sirius_new_cols) {
-      val <- if (col == "candidate_score_sirius_csi") {
-        rep.int(NA_real_, n_rows)
-      } else {
-        rep.int(sirius_protos[[col]], n_rows)
-      }
-      data.table::set(annotation_table_merged, j = col, value = val)
+    if (length(sirius_new_cols) > 0L) {
+      n_rows <- nrow(annotation_table_merged)
+      data.table::set(
+        annotation_table_merged,
+        j = sirius_new_cols,
+        value = lapply(sirius_new_cols, function(col) {
+          if (col == "candidate_score_sirius_csi") {
+            rep.int(NA_real_, n_rows)
+          } else {
+            rep.int(sirius_protos[[col]], n_rows)
+          }
+        })
+      )
     }
   } else if (!is.null(sirius_sub)) {
     csi_num <- .as_numeric_dedup(sirius_sub[["candidate_score_sirius_csi"]])
@@ -965,14 +968,17 @@ rearrange_annotations <- function(
       m_pos[both_ok] <- fastmatch::fmatch(k_m, k2_u)
     }
     csi_u <- csi_num[keep2_rel]
-    for (col in sirius_new_cols) {
-      val <- if (col == "candidate_score_sirius_csi") {
-        csi_u[m_pos]
-      } else {
-        sirius_sub[[col]][keep2_rel][m_pos]
-      }
-      data.table::set(annotation_table_merged, j = col, value = val)
-    }
+    data.table::set(
+      annotation_table_merged,
+      j = sirius_new_cols,
+      value = lapply(sirius_new_cols, function(col) {
+        if (col == "candidate_score_sirius_csi") {
+          csi_u[m_pos]
+        } else {
+          sirius_sub[[col]][keep2_rel][m_pos]
+        }
+      })
+    )
   }
   rm(sirius_sub, sirius_protos)
 
@@ -998,13 +1004,11 @@ rearrange_annotations <- function(
       fk <- formula_table[[k_col]]
       if (anyDuplicated(fk) == 0L) {
         m_for <- fastmatch::fmatch(annotation_table_merged[[k_col]], fk)
-        for (col in formula_new_cols) {
-          data.table::set(
-            annotation_table_merged,
-            j = col,
-            value = formula_table[[col]][m_for]
-          )
-        }
+        data.table::set(
+          annotation_table_merged,
+          j = formula_new_cols,
+          value = lapply(as.list(formula_table)[formula_new_cols], `[`, m_for)
+        )
         did_fast_formula <- TRUE
       }
     } else if (length(formula_join_by) == 2L) {
@@ -1027,13 +1031,11 @@ rearrange_annotations <- function(
           km <- as.double(m1[both_f] - 1L) * n2 + m2[both_f]
           m_for[both_f] <- fastmatch::fmatch(km, kf)
         }
-        for (col in formula_new_cols) {
-          data.table::set(
-            annotation_table_merged,
-            j = col,
-            value = formula_table[[col]][m_for]
-          )
-        }
+        data.table::set(
+          annotation_table_merged,
+          j = formula_new_cols,
+          value = lapply(as.list(formula_table)[formula_new_cols], `[`, m_for)
+        )
         did_fast_formula <- TRUE
       }
     }
@@ -1062,13 +1064,11 @@ rearrange_annotations <- function(
         annotation_table_merged$feature_id,
         canopus_table$feature_id
       )
-      for (col in canopus_new_cols) {
-        data.table::set(
-          annotation_table_merged,
-          j = col,
-          value = canopus_table[[col]][m_can]
-        )
-      }
+      data.table::set(
+        annotation_table_merged,
+        j = canopus_new_cols,
+        value = lapply(as.list(canopus_table)[canopus_new_cols], `[`, m_can)
+      )
     } else {
       annotation_table_merged <- tidytable::left_join(
         annotation_table_merged,
@@ -1093,11 +1093,15 @@ rearrange_annotations <- function(
       edges_table$feature_source[first_src]
     )
     first_idx <- which(first_src)
-    for (col in intersect(edge_new_cols, names(edges_table))) {
+    edge_cols_present <- intersect(edge_new_cols, names(edges_table))
+    if (length(edge_cols_present) > 0L) {
       data.table::set(
         annotation_table_merged,
-        j = col,
-        value = edges_table[[col]][first_idx][m_edge]
+        j = edge_cols_present,
+        value = lapply(
+          as.list(edges_table)[edge_cols_present],
+          function(col_v) col_v[first_idx][m_edge]
+        )
       )
     }
   }

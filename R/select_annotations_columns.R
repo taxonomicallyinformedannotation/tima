@@ -66,18 +66,13 @@ select_annotations_columns <- function(
     # candidate_structure_molecular_formula appears in both sirius_for and
     # structures column sets).
     projection_columns <- unique(projection_columns)
-    empty <- data.frame(
-      matrix(
-        nrow = 0L,
-        ncol = length(projection_columns),
-        dimnames = list(NULL, projection_columns)
-      )
+    empty <- as.data.frame(
+      stats::setNames(
+        rep(list(character(0L)), length(projection_columns)),
+        projection_columns
+      ),
+      stringsAsFactors = FALSE
     )
-    # Ensure character type for all columns (the non-empty path coerces numerics
-    # to character and normalizes text; use character NA to stay consistent).
-    for (col in projection_columns) {
-      empty[[col]] <- character(0L)
-    }
     return(empty)
   }
 
@@ -117,11 +112,11 @@ select_annotations_columns <- function(
 
   # Clean NULL/NA sentinels in-place while preserving output semantics.
   character_cols <- names(df)[vapply(df, is.character, logical(1L))]
-  for (col in character_cols) {
+  if (length(character_cols) > 0L) {
     data.table::set(
       df,
-      j = col,
-      value = .normalize_annotation_text(df[[col]])
+      j = character_cols,
+      value = lapply(as.list(df)[character_cols], .normalize_annotation_text)
     )
   }
 
@@ -146,8 +141,12 @@ select_annotations_columns <- function(
 
   # Convert all numeric columns to character in-place
   numeric_cols <- names(df)[vapply(df, is.numeric, logical(1L))]
-  for (col in numeric_cols) {
-    data.table::set(df, j = col, value = .num_to_char_fast(df[[col]]))
+  if (length(numeric_cols) > 0L) {
+    data.table::set(
+      df,
+      j = numeric_cols,
+      value = lapply(as.list(df)[numeric_cols], .num_to_char_fast)
+    )
   }
 
   df_complement <- complement_metadata_structures(
@@ -157,8 +156,13 @@ select_annotations_columns <- function(
     str_tax_cla = str_tax_cla,
     str_tax_npc = str_tax_npc
   )
-  for (col in names(df_complement)) {
-    data.table::set(df, j = col, value = df_complement[[col]])
+  comp_cols <- names(df_complement)
+  if (length(comp_cols) > 0L) {
+    data.table::set(
+      df,
+      j = comp_cols,
+      value = as.list(df_complement)
+    )
   }
 
   df <- df |>
@@ -303,10 +307,13 @@ recompute_structure_fields_from_smiles <- function(df, cache = NULL) {
     "candidate_structure_xlogp"
   )
   n_rows <- nrow(df)
-  for (col in ensure_cols) {
-    if (!col %in% names(df)) {
-      data.table::set(df, j = col, value = rep.int(NA_character_, n_rows))
-    }
+  missing_ensure <- setdiff(ensure_cols, names(df))
+  if (length(missing_ensure) > 0L) {
+    data.table::set(
+      df,
+      j = missing_ensure,
+      value = rep(list(rep.int(NA_character_, n_rows)), length(missing_ensure))
+    )
   }
 
   idx <- fastmatch::fmatch(smiles_vec, lookup$.input_smiles)

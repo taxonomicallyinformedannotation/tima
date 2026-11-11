@@ -165,34 +165,36 @@ stri_replace_all_fixed <- function(
     return(x)
   }
 
-  for (i in seq_len(n)) {
-    pat <- patterns[(i - 1L) %% length(patterns) + 1L]
-    repl <- replacements[(i - 1L) %% length(replacements) + 1L]
-    if (case_insensitive) {
-      pat <- gsub(
-        pattern = "([][{}()+*^$.|\\\\?])",
-        replacement = "\\\\\\1",
-        x = pat,
-        perl = TRUE
-      )
-      x <- gsub(
-        pattern = pat,
-        replacement = repl,
-        x = x,
-        perl = TRUE,
-        ignore.case = TRUE
-      )
-    } else {
-      x <- gsub(
-        pattern = pat,
-        replacement = repl,
-        x = x,
-        fixed = TRUE
-      )
-    }
-  }
-
-  x
+  Reduce(
+    function(cur, i) {
+      pat <- patterns[(i - 1L) %% length(patterns) + 1L]
+      repl <- replacements[(i - 1L) %% length(replacements) + 1L]
+      if (case_insensitive) {
+        pat <- gsub(
+          pattern = "([][{}()+*^$.|\\\\?])",
+          replacement = "\\\\\\1",
+          x = pat,
+          perl = TRUE
+        )
+        gsub(
+          pattern = pat,
+          replacement = repl,
+          x = cur,
+          perl = TRUE,
+          ignore.case = TRUE
+        )
+      } else {
+        gsub(
+          pattern = pat,
+          replacement = repl,
+          x = cur,
+          fixed = TRUE
+        )
+      }
+    },
+    seq_len(n),
+    init = x
+  )
 }
 
 stri_replace_all_regex <- function(
@@ -210,16 +212,18 @@ stri_replace_all_regex <- function(
     return(x)
   }
 
-  for (i in seq_len(n)) {
-    x <- gsub(
-      pattern = patterns[(i - 1L) %% length(patterns) + 1L],
-      replacement = replacements[(i - 1L) %% length(replacements) + 1L],
-      x = x,
-      perl = TRUE
-    )
-  }
-
-  x
+  Reduce(
+    function(cur, i) {
+      gsub(
+        pattern = patterns[(i - 1L) %% length(patterns) + 1L],
+        replacement = replacements[(i - 1L) %% length(replacements) + 1L],
+        x = cur,
+        perl = TRUE
+      )
+    },
+    seq_len(n),
+    init = x
+  )
 }
 
 stri_extract_all_regex <- function(str, pattern) {

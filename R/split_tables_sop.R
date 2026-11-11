@@ -110,13 +110,15 @@ split_tables_sop <- function(table, cache) {
       table_structural$structure_smiles_initial,
       table_structural_standardized$structure_smiles_initial
     )
-    for (col in std_cols) {
-      data.table::set(
-        table_structural,
-        j = col,
-        value = table_structural_standardized[[col]][s_idx]
+    data.table::set(
+      table_structural,
+      j = std_cols,
+      value = lapply(
+        as.list(table_structural_standardized)[std_cols],
+        `[`,
+        s_idx
       )
-    }
+    )
   }
   table_structural <- tidytable::distinct(table_structural)
   log_debug(
@@ -298,13 +300,19 @@ split_tables_sop <- function(table, cache) {
 
     idx1 <- which(r_m == 1L)
     u_g <- g_ord[idx1]
-    acc <- v_ord[idx1]
-    if (max_r > 1L) {
-      for (k in 2L:max_r) {
-        idx_k <- which(r_m == k)
-        pos_k <- fastmatch::fmatch(g_ord[idx_k], u_g)
-        acc[pos_k] <- paste(acc[pos_k], v_ord[idx_k], sep = " $ ")
-      }
+    acc <- if (max_r > 1L) {
+      Reduce(
+        function(cur, k) {
+          idx_k <- which(r_m == k)
+          pos_k <- fastmatch::fmatch(g_ord[idx_k], u_g)
+          cur[pos_k] <- paste(cur[pos_k], v_ord[idx_k], sep = " $ ")
+          cur
+        },
+        2L:max_r,
+        init = v_ord[idx1]
+      )
+    } else {
+      v_ord[idx1]
     }
     out[u_g] <- acc
     out
@@ -427,25 +435,35 @@ split_tables_sop <- function(table, cache) {
     npc_single <- table_structures_taxonomy_npc
     npc_multi <- table_structures_taxonomy_npc[0L, ]
   }
-  for (col in npc_cols) {
-    v_col <- as.character(npc_single[[col]])
+  .fill_na_not_classified <- function(x) {
+    v_col <- as.character(x)
     v_col[is.na(v_col)] <- "notClassified"
-    data.table::set(npc_single, j = col, value = v_col)
+    v_col
   }
+  data.table::set(
+    npc_single,
+    j = npc_cols,
+    value = lapply(as.list(npc_single)[npc_cols], .fill_na_not_classified)
+  )
   if (nrow(npc_multi) > 0L) {
     u_sm_m <- unique(npc_multi$structure_smiles)
     n_npc_m <- length(u_sm_m)
     grp_npc_m <- fastmatch::fmatch(npc_multi$structure_smiles, u_sm_m)
-    npc_multi_list <- list(structure_smiles = u_sm_m)
-    for (col in npc_cols) {
-      npc_multi_list[[col]] <- .collapse_delimited_col(
-        grp_npc_m,
-        n_npc_m,
-        npc_multi[[col]],
-        ignore_case = FALSE,
-        na_default = "notClassified"
+    npc_multi_list <- c(
+      list(structure_smiles = u_sm_m),
+      lapply(
+        stats::setNames(npc_cols, npc_cols),
+        function(col) {
+          .collapse_delimited_col(
+            grp_npc_m,
+            n_npc_m,
+            npc_multi[[col]],
+            ignore_case = FALSE,
+            na_default = "notClassified"
+          )
+        }
       )
-    }
+    )
     npc_multi <- tidytable::as_tidytable(npc_multi_list)
     table_structures_taxonomy_npc <- tidytable::bind_rows(
       npc_single,
@@ -491,25 +509,30 @@ split_tables_sop <- function(table, cache) {
     cla_single <- table_structures_taxonomy_cla
     cla_multi <- table_structures_taxonomy_cla[0L, ]
   }
-  for (col in cla_cols) {
-    v_col <- as.character(cla_single[[col]])
-    v_col[is.na(v_col)] <- "notClassified"
-    data.table::set(cla_single, j = col, value = v_col)
-  }
+  data.table::set(
+    cla_single,
+    j = cla_cols,
+    value = lapply(as.list(cla_single)[cla_cols], .fill_na_not_classified)
+  )
   if (nrow(cla_multi) > 0L) {
     u_ik_c <- unique(cla_multi$structure_inchikey)
     n_cla_m <- length(u_ik_c)
     grp_cla_m <- fastmatch::fmatch(cla_multi$structure_inchikey, u_ik_c)
-    cla_multi_list <- list(structure_inchikey = u_ik_c)
-    for (col in cla_cols) {
-      cla_multi_list[[col]] <- .collapse_delimited_col(
-        grp_cla_m,
-        n_cla_m,
-        cla_multi[[col]],
-        ignore_case = FALSE,
-        na_default = "notClassified"
+    cla_multi_list <- c(
+      list(structure_inchikey = u_ik_c),
+      lapply(
+        stats::setNames(cla_cols, cla_cols),
+        function(col) {
+          .collapse_delimited_col(
+            grp_cla_m,
+            n_cla_m,
+            cla_multi[[col]],
+            ignore_case = FALSE,
+            na_default = "notClassified"
+          )
+        }
       )
-    }
+    )
     cla_multi <- tidytable::as_tidytable(cla_multi_list)
     table_structures_taxonomy_cla <- tidytable::bind_rows(
       cla_single,
@@ -527,14 +550,17 @@ split_tables_sop <- function(table, cache) {
   )
 
   keep_ott <- which(!is.na(table_organisms$organism_taxonomy_ottid))
-  table_org_tax_ott <- table_organisms[keep_ott, ]
-  for (col in names(table_org_tax_ott)) {
-    v_col <- table_org_tax_ott[[col]]
-    if (is.character(v_col) && anyNA(v_col)) {
-      v_col[is.na(v_col)] <- "notClassified"
-      data.table::set(table_org_tax_ott, j = col, value = v_col)
-    }
-  }
+  table_org_tax_ott <- tidytable::as_tidytable(
+    lapply(
+      as.list(table_organisms[keep_ott, ]),
+      function(v_col) {
+        if (is.character(v_col) && anyNA(v_col)) {
+          v_col[is.na(v_col)] <- "notClassified"
+        }
+        v_col
+      }
+    )
+  )
   rm(table_organisms)
 
   tables <-

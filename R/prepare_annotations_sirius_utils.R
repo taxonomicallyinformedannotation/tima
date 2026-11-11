@@ -297,26 +297,29 @@ create_empty_sirius_annotations <- function() {
   if (n_keys == 1L) {
     comp_key <- id1
   } else {
-    comp_key <- as.double(id1 - 1L)
-    total_space <- as.double(length(u1) + 1L)
-    ids <- list(id1)
-    for (i in 2:n_keys) {
-      ki <- df[[present_keys[[i]]]]
+    rest_info <- lapply(present_keys[-1L], function(k_nm) {
+      ki <- df[[k_nm]]
       ui <- unique(ki)
       idi <- if (anyNA(ui)) match(ki, ui) else fastmatch::fmatch(ki, ui)
-      ids[[i]] <- idi
-      bi <- as.double(length(ui) + 1L)
-      total_space <- total_space * bi
-      if (total_space < max_radix_space) {
-        comp_key <- comp_key * bi + (idi - 1L)
-      } else {
-        use_paste <- TRUE
+      list(id = idi, base = as.double(length(ui) + 1L))
+    })
+    ids <- c(list(id1), lapply(rest_info, `[[`, "id"))
+    bases_rest <- vapply(rest_info, `[[`, numeric(1L), "base")
+    total_space <- as.double(length(u1) + 1L) * prod(bases_rest)
+    if (total_space < max_radix_space) {
+      comp_key <- Reduce(
+        function(acc, idx_r) {
+          acc * bases_rest[[idx_r]] + (ids[[idx_r + 1L]] - 1L)
+        },
+        seq_along(bases_rest),
+        init = as.double(id1 - 1L)
+      )
+      if (total_space <= .Machine$integer.max) {
+        comp_key <- as.integer(comp_key)
       }
-    }
-    if (use_paste) {
+    } else {
+      use_paste <- TRUE
       comp_key <- do.call(paste, c(ids, list(sep = ":")))
-    } else if (total_space <= .Machine$integer.max) {
-      comp_key <- as.integer(comp_key)
     }
   }
 
@@ -337,15 +340,15 @@ create_empty_sirius_annotations <- function() {
     }
     ref_idx <- first_idx[ck_id]
     non_keys <- setdiff(names(df), present_keys)
-    bad_row <- logical(n)
-    for (col in non_keys) {
-      v <- df[[col]]
-      v_ref <- v[ref_idx]
-      diff_c <- (is.na(v) != is.na(v_ref)) | (!is.na(v) & v != v_ref)
-      if (any(diff_c)) {
-        bad_row <- bad_row | diff_c
-      }
-    }
+    bad_row <- Reduce(
+      `|`,
+      lapply(non_keys, function(col) {
+        v <- df[[col]]
+        v_ref <- v[ref_idx]
+        (is.na(v) != is.na(v_ref)) | (!is.na(v) & v != v_ref)
+      }),
+      init = logical(n)
+    )
     if (!any(bad_row)) {
       return(df[first_idx, ])
     }
@@ -398,13 +401,7 @@ create_empty_sirius_annotations <- function() {
     return(y_first[m])
   }
 
-  y_ids <- vector("list", length(by))
-  x_ids <- vector("list", length(by))
-  bases <- integer(length(by))
-  valid_x <- rep(TRUE, nx)
-
-  for (i in seq_along(by)) {
-    k <- by[[i]]
+  key_info <- lapply(by, function(k) {
     yk <- y[[k]]
     if (!is.character(yk)) {
       yk <- as.character(yk)
@@ -421,11 +418,16 @@ create_empty_sirius_annotations <- function() {
       yi <- fastmatch::fmatch(yk, uk)
       xi <- fastmatch::fmatch(xk, uk)
     }
-    valid_x <- valid_x & !is.na(xi)
-    y_ids[[i]] <- yi
-    x_ids[[i]] <- xi
-    bases[[i]] <- length(uk) + 1L
-  }
+    list(yi = yi, xi = xi, base = length(uk) + 1L)
+  })
+  y_ids <- lapply(key_info, `[[`, "yi")
+  x_ids <- lapply(key_info, `[[`, "xi")
+  bases <- vapply(key_info, `[[`, integer(1L), "base")
+  valid_x <- Reduce(
+    `&`,
+    lapply(x_ids, function(xi) !is.na(xi)),
+    init = rep(TRUE, nx)
+  )
 
   if (!any(valid_x)) {
     return(rep(NA_integer_, nx))
@@ -434,13 +436,16 @@ create_empty_sirius_annotations <- function() {
   vx_idx <- which(valid_x)
   total_space <- prod(as.double(bases))
   if (total_space < max_radix_space) {
-    y_key <- as.double(y_ids[[1L]] - 1L)
-    x_key <- as.double(x_ids[[1L]][vx_idx] - 1L)
-    for (i in 2:length(by)) {
-      b <- as.double(bases[[i]])
-      y_key <- y_key * b + (y_ids[[i]] - 1L)
-      x_key <- x_key * b + (x_ids[[i]][vx_idx] - 1L)
-    }
+    y_key <- Reduce(
+      function(acc, i) acc * as.double(bases[[i]]) + (y_ids[[i]] - 1L),
+      2:length(by),
+      init = as.double(y_ids[[1L]] - 1L)
+    )
+    x_key <- Reduce(
+      function(acc, i) acc * as.double(bases[[i]]) + (x_ids[[i]][vx_idx] - 1L),
+      2:length(by),
+      init = as.double(x_ids[[1L]][vx_idx] - 1L)
+    )
   } else {
     y_key <- do.call(paste, c(y_ids, list(sep = ":")))
     x_sub <- lapply(x_ids, `[`, vx_idx)
@@ -671,37 +676,34 @@ merge_sirius_structures_with_spectral <- function(
     has_ov <- which(!is.na(m_ov))
     ov_rows <- m_ov[has_ov]
     sp_cols <- setdiff(names(spectral_overlap_keyed), join_key)
-    for (col in sp_cols) {
-      if (col %in% st_orig_cols) {
-        cur <- structures_keyed[[col]]
-        sp_v <- spectral_overlap_keyed[[col]][ov_rows]
-        if (!identical(typeof(cur), typeof(sp_v))) {
-          full_sp <- spectral_overlap_keyed[[col]][m_ov]
-          cur <- tidytable::coalesce(cur, full_sp)
-          data.table::set(structures_keyed, j = col, value = cur)
-        } else {
-          na_cur <- is.na(cur[has_ov])
-          if (any(na_cur)) {
-            cur[has_ov[na_cur]] <- sp_v[na_cur]
-            data.table::set(structures_keyed, j = col, value = cur)
+    data.table::set(
+      structures_keyed,
+      j = sp_cols,
+      value = lapply(sp_cols, function(col) {
+        if (col %in% st_orig_cols) {
+          cur <- structures_keyed[[col]]
+          sp_v <- spectral_overlap_keyed[[col]][ov_rows]
+          if (!identical(typeof(cur), typeof(sp_v))) {
+            tidytable::coalesce(cur, spectral_overlap_keyed[[col]][m_ov])
+          } else {
+            na_cur <- is.na(cur[has_ov])
+            if (any(na_cur)) {
+              cur[has_ov[na_cur]] <- sp_v[na_cur]
+            }
+            cur
           }
+        } else {
+          spectral_overlap_keyed[[col]][m_ov]
         }
-      } else {
-        data.table::set(
-          structures_keyed,
-          j = col,
-          value = spectral_overlap_keyed[[col]][m_ov]
-        )
-      }
-    }
-  } else {
-    for (col in sp_only_cols) {
-      data.table::set(
-        structures_keyed,
-        j = col,
-        value = spectral_keyed[[col]][rep(NA_integer_, nrow(structures_keyed))]
-      )
-    }
+      })
+    )
+  } else if (length(sp_only_cols) > 0L) {
+    na_sp_idx <- rep(NA_integer_, nrow(structures_keyed))
+    data.table::set(
+      structures_keyed,
+      j = sp_only_cols,
+      value = lapply(as.list(spectral_keyed)[sp_only_cols], `[`, na_sp_idx)
+    )
   }
 
   target_order <- c(
@@ -824,9 +826,11 @@ merge_sirius_structures_with_spectral <- function(
   # Keep only one row per key, preferring the first occurrence
   m <- .fast_match_rows(x, y, by = by)
   out <- tidytable::as_tidytable(as.list(x))
-  for (col in new_cols) {
-    data.table::set(out, j = col, value = y[[col]][m])
-  }
+  data.table::set(
+    out,
+    j = new_cols,
+    value = lapply(as.list(y)[new_cols], `[`, m)
+  )
   out
 }
 

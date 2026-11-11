@@ -345,6 +345,17 @@ test_that("select_annotations_columns helpers cover cache resolution and process
     feature_id = "F1",
     candidate_structure_smiles_no_stereo = "CCO"
   )
+  df_blank <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_structure_smiles_no_stereo = c("   ", NA_character_)
+  )
+  expect_identical(recompute_structure_fields_from_smiles(df_blank), df_blank)
+  df_partial <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    candidate_structure_smiles_no_stereo = c("CCO", NA_character_)
+  )
+  res_partial <- recompute_structure_fields_from_smiles(df_partial)
+  expect_true(is.na(res_partial$candidate_structure_inchikey_no_stereo[[2L]]))
   testthat::with_mocked_bindings(
     process_smiles = function(...) stop("simulated RDKit error"),
     expect_identical(recompute_structure_fields_from_smiles(df_smi), df_smi)

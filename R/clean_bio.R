@@ -198,22 +198,33 @@ clean_bio <- function(
     tidytable::as_tidytable(base_df)
   }
   fids <- result$feature_id
-  for (right_df in consistency_list) {
-    val_cols <- setdiff(names(right_df), "feature_source")
-    if (nrow(right_df) == 0L) {
-      for (col in val_cols) {
-        data.table::set(
-          result,
-          j = col,
-          value = rep.int(right_df[[col]][NA_integer_], length(fids))
-        )
+  n_fids <- length(fids)
+  merged_cols <- unlist(
+    lapply(
+      consistency_list,
+      function(right_df) {
+        val_cols <- setdiff(names(right_df), "feature_source")
+        if (nrow(right_df) == 0L) {
+          lapply(
+            as.list(right_df)[val_cols],
+            function(col_v) rep.int(col_v[NA_integer_], n_fids)
+          )
+        } else {
+          m <- fastmatch::fmatch(fids, right_df$feature_source)
+          lapply(as.list(right_df)[val_cols], `[`, m)
+        }
       }
-    } else {
-      m <- fastmatch::fmatch(fids, right_df$feature_source)
-      for (col in val_cols) {
-        data.table::set(result, j = col, value = right_df[[col]][m])
-      }
-    }
+    ),
+    recursive = FALSE
+  )
+  if (length(merged_cols) > 0L) {
+    keep_last <- !duplicated(names(merged_cols), fromLast = TRUE)
+    merged_cols <- merged_cols[keep_last]
+    data.table::set(
+      result,
+      j = names(merged_cols),
+      value = unname(merged_cols)
+    )
   }
 
   if ("feature_id" %in% names(result) && names(result)[[1L]] != "feature_id") {
@@ -272,19 +283,36 @@ clean_bio <- function(
 
   if (length(missing_cols) > 0L) {
     n_rows <- nrow(out)
-    for (col in missing_cols) {
-      data.table::set(out, j = col, value = rep.int(defaults[[col]], n_rows))
-    }
+    data.table::set(
+      out,
+      j = missing_cols,
+      value = lapply(defaults[missing_cols], rep.int, n_rows)
+    )
   }
 
-  for (col in existing_cols) {
-    def_val <- defaults[[col]]
-    if (!is.na(def_val)) {
-      col_v <- out[[col]]
-      if (anyNA(col_v)) {
-        col_v[is.na(col_v)] <- def_val
-        data.table::set(out, j = col, value = col_v)
-      }
+  non_na_existing <- existing_cols[
+    !vapply(defaults[existing_cols], is.na, logical(1L))
+  ]
+  if (length(non_na_existing) > 0L) {
+    has_na <- vapply(
+      as.list(out)[non_na_existing],
+      anyNA,
+      logical(1L)
+    )
+    cols_to_fill <- non_na_existing[has_na]
+    if (length(cols_to_fill) > 0L) {
+      data.table::set(
+        out,
+        j = cols_to_fill,
+        value = lapply(
+          cols_to_fill,
+          function(col) {
+            col_v <- out[[col]]
+            col_v[is.na(col_v)] <- defaults[[col]]
+            col_v
+          }
+        )
+      )
     }
   }
 

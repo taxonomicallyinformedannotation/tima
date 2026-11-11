@@ -924,4 +924,29 @@ test_that(".normalize_enrichment_text handles sentinels and preserves valid n/e 
   )
   expect_true(all(is.na(.resolve_numeric_lookup(1L, 1L, NA_character_))))
   expect_true(all(is.na(.resolve_numeric_lookup(1L, 1L, "not_num"))))
+
+  csr_mixed <- .build_csr_index(c("K1", "K2", "K2"))
+  expect_identical(.query_csr_index(csr_mixed, "K1"), 1L)
+
+  res_ident <- .resolve_structure_identifiers(
+    tidytable::tidytable(
+      candidate_structure_inchikey_connectivity_layer = c("IK1", "IK2"),
+      candidate_structure_inchikey_no_stereo = c("IK1-N", "IK2-N"),
+      candidate_structure_smiles_no_stereo = c("C", "CC")
+    ),
+    stereo_i_conn = tidytable::tidytable(
+      candidate_structure_inchikey_connectivity_layer = "IK1",
+      candidate_structure_smiles_no_stereo_ic = "C",
+      candidate_structure_inchikey_no_stereo_ic = "IK1-N"
+    ),
+    stereo_s = tidytable::tidytable(
+      candidate_structure_inchikey_connectivity_layer_s = "IK1",
+      candidate_structure_inchikey_no_stereo_s = "IK1-N",
+      candidate_structure_smiles_no_stereo = "C"
+    )
+  )
+  expect_equal(
+    res_ident$candidate_structure_inchikey_no_stereo,
+    c("IK1-N", "IK2-N")
+  )
 })

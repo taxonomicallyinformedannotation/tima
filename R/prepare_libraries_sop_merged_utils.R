@@ -310,13 +310,20 @@ export_library_tables <- function(
 .apply_col_mapping <- function(df, col_mapping) {
   df_names <- names(df)
   targets_needed <- setdiff(names(col_mapping), df_names)
-  for (target in targets_needed) {
-    src <- intersect(col_mapping[[target]], df_names)
-    if (length(src) > 0L) {
-      df_names[df_names == src[[1L]]] <- target
-    }
+  first_srcs <- vapply(
+    targets_needed,
+    function(target) {
+      src <- intersect(col_mapping[[target]], df_names)
+      if (length(src) > 0L) src[[1L]] else NA_character_
+    },
+    character(1L)
+  )
+  valid <- !is.na(first_srcs)
+  if (any(valid)) {
+    m <- match(first_srcs[valid], df_names)
+    df_names[m] <- targets_needed[valid]
+    names(df) <- df_names
   }
-  names(df) <- df_names
   df
 }
 
@@ -343,6 +350,15 @@ export_library_tables <- function(
   list(cache_data = cache_data, taxonomy_table = taxonomy_table)
 }
 
+.clean_not_classified_col <- function(x) {
+  x <- as.character(x)
+  nc_mask <- !is.na(x) & x == "notClassified"
+  if (any(nc_mask)) {
+    x[nc_mask] <- NA_character_
+  }
+  x
+}
+
 # Helper function: Normalize and write cache file
 .normalize_and_write_cache <- function(
   cache_data,
@@ -353,24 +369,9 @@ export_library_tables <- function(
   tryCatch(
     {
       keep_cols <- intersect(expected_cols, names(cache_data))
-      cache_clean <- tidytable::as_tidytable(as.list(cache_data)[keep_cols])
-      for (col in keep_cols) {
-        x <- cache_clean[[col]]
-        if (!is.character(x)) {
-          x <- as.character(x)
-          nc_mask <- !is.na(x) & x == "notClassified"
-          if (any(nc_mask)) {
-            x[nc_mask] <- NA_character_
-          }
-          data.table::set(cache_clean, j = col, value = x)
-        } else {
-          nc_mask <- !is.na(x) & x == "notClassified"
-          if (any(nc_mask)) {
-            x[nc_mask] <- NA_character_
-            data.table::set(cache_clean, j = col, value = x)
-          }
-        }
-      }
+      cache_clean <- tidytable::as_tidytable(
+        lapply(as.list(cache_data)[keep_cols], .clean_not_classified_col)
+      )
       cache_clean <- tidytable::distinct(cache_clean)
 
       compress_method <- if (grepl("\\.gz$", cache_path, ignore.case = TRUE)) {
@@ -414,6 +415,15 @@ export_library_tables <- function(
   }
 }
 
+.subset_with_expected_cols <- function(df, expected_cols) {
+  df_list <- as.list(df)
+  missing_cols <- setdiff(expected_cols, names(df_list))
+  if (length(missing_cols) > 0L) {
+    df_list[missing_cols] <- list(rep.int(NA_character_, nrow(df)))
+  }
+  tidytable::as_tidytable(df_list[expected_cols])
+}
+
 # Helper function: Prepare cache supplement
 .prepare_cache_supplement <- function(
   cache_data,
@@ -455,15 +465,8 @@ export_library_tables <- function(
   }
 
   # Select only matching columns, filling missing with NA
-  missing_cols <- setdiff(expected_cols, names(cache_supplement))
-  for (col in missing_cols) {
-    cache_supplement[[col]] <- NA_character_
-  }
-  cache_supplement <- cache_supplement |>
-    tidytable::select(tidyselect::all_of(expected_cols)) |>
+  .subset_with_expected_cols(cache_supplement, expected_cols) |>
     tidytable::distinct()
-
-  cache_supplement
 }
 
 # Helper function: Read taxonomy cache file with automatic delimiter and
@@ -567,13 +570,14 @@ export_library_tables <- function(
   if (!identical(names(cache_data), expected_cols)) {
     return(TRUE)
   }
-  for (col in expected_cols) {
-    x <- cache_data[[col]]
-    if (is.character(x) && any(!is.na(x) & x == "notClassified")) {
-      return(TRUE)
-    }
-  }
-  FALSE
+  any(vapply(
+    expected_cols,
+    function(col) {
+      x <- cache_data[[col]]
+      is.character(x) && any(!is.na(x) & x == "notClassified")
+    },
+    logical(1L)
+  ))
 }
 
 # Helper function: Write back enriched taxonomy to cache
@@ -635,13 +639,9 @@ export_library_tables <- function(
 
       # Keep only expected columns from existing cache
       if (nrow(existing_cache) > 0) {
-        for (col in expected_cols) {
-          if (!col %in% names(existing_cache)) {
-            existing_cache[[col]] <- NA_character_
-          }
-        }
-        existing_cache <- tidytable::as_tidytable(
-          as.list(existing_cache)[expected_cols]
+        existing_cache <- .subset_with_expected_cols(
+          existing_cache,
+          expected_cols
         )
       }
 
@@ -651,12 +651,7 @@ export_library_tables <- function(
       cache_to_write <- if (
         !is.null(source_for_new) && nrow(source_for_new) > 0L
       ) {
-        for (col in expected_cols) {
-          if (!col %in% names(source_for_new)) {
-            source_for_new[[col]] <- NA_character_
-          }
-        }
-        tidytable::as_tidytable(as.list(source_for_new)[expected_cols])
+        .subset_with_expected_cols(source_for_new, expected_cols)
       } else {
         tidytable::tidytable()
       }
@@ -666,23 +661,9 @@ export_library_tables <- function(
       } else {
         existing_cache
       }
-      for (col in names(combined_cache)) {
-        x <- combined_cache[[col]]
-        if (!is.character(x)) {
-          x <- as.character(x)
-          nc_mask <- !is.na(x) & x == "notClassified"
-          if (any(nc_mask)) {
-            x[nc_mask] <- NA_character_
-          }
-          data.table::set(combined_cache, j = col, value = x)
-        } else {
-          nc_mask <- !is.na(x) & x == "notClassified"
-          if (any(nc_mask)) {
-            x[nc_mask] <- NA_character_
-            data.table::set(combined_cache, j = col, value = x)
-          }
-        }
-      }
+      combined_cache <- tidytable::as_tidytable(
+        lapply(as.list(combined_cache), .clean_not_classified_col)
+      )
       combined_cache <- if (
         !is.null(key_col) && key_col %in% names(combined_cache)
       ) {

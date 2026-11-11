@@ -150,14 +150,20 @@ complement_metadata_structures <- function(
   # actually supplied by the caller.
   orig_cols <- names(df)
   df <- tidytable::as_tidytable(as.list(df))
-  for (id_col in c(
-    "candidate_structure_inchikey_connectivity_layer",
-    "candidate_structure_inchikey_no_stereo",
-    "candidate_structure_smiles_no_stereo"
-  )) {
-    if (!id_col %in% names(df)) {
-      data.table::set(df, j = id_col, value = rep.int(NA_character_, nrow(df)))
-    }
+  missing_id_cols <- setdiff(
+    c(
+      "candidate_structure_inchikey_connectivity_layer",
+      "candidate_structure_inchikey_no_stereo",
+      "candidate_structure_smiles_no_stereo"
+    ),
+    names(df)
+  )
+  if (length(missing_id_cols) > 0L) {
+    data.table::set(
+      df,
+      j = missing_id_cols,
+      value = rep.int(NA_character_, nrow(df))
+    )
   }
   log_debug("Starting key resolution joins on %d rows", nrow(df))
 
@@ -395,36 +401,31 @@ complement_metadata_structures <- function(
     sm_csr <- .build_csr_index(stereo_full$structure_smiles_no_stereo)
 
     # Pre-normalize all lookup columns once so repeated batches skip text normalization
-    for (col in c(".lk_molecular_formula", ".lk_exact_mass")) {
-      if (col %in% names(met_lookup_full)) {
-        v <- .normalize_enrichment_text(met_lookup_full[[col]])
-        attr(v, "normalized") <- TRUE
-        data.table::set(met_lookup_full, j = col, value = v)
-      }
+    norm_set_cols <- function(tbl, cols) {
+      cols <- intersect(cols, names(tbl))
+      data.table::set(
+        tbl,
+        j = cols,
+        value = lapply(cols, function(col) {
+          v <- .normalize_enrichment_text(tbl[[col]])
+          attr(v, "normalized") <- TRUE
+          v
+        })
+      )
     }
-    for (col in c(".lk_name", ".lk_tag", ".lk_xlogp")) {
-      if (col %in% names(nam_lookup_full)) {
-        v <- .normalize_enrichment_text(nam_lookup_full[[col]])
-        attr(v, "normalized") <- TRUE
-        data.table::set(nam_lookup_full, j = col, value = v)
-      }
-    }
-    for (col in setdiff(
-      names(tax_cla_lookup_full),
-      "candidate_structure_inchikey"
-    )) {
-      v <- .normalize_enrichment_text(tax_cla_lookup_full[[col]])
-      attr(v, "normalized") <- TRUE
-      data.table::set(tax_cla_lookup_full, j = col, value = v)
-    }
-    for (col in setdiff(
-      names(tax_npc_lookup_full),
-      "candidate_structure_smiles"
-    )) {
-      v <- .normalize_enrichment_text(tax_npc_lookup_full[[col]])
-      attr(v, "normalized") <- TRUE
-      data.table::set(tax_npc_lookup_full, j = col, value = v)
-    }
+    norm_set_cols(
+      met_lookup_full,
+      c(".lk_molecular_formula", ".lk_exact_mass")
+    )
+    norm_set_cols(nam_lookup_full, c(".lk_name", ".lk_tag", ".lk_xlogp"))
+    norm_set_cols(
+      tax_cla_lookup_full,
+      setdiff(names(tax_cla_lookup_full), "candidate_structure_inchikey")
+    )
+    norm_set_cols(
+      tax_npc_lookup_full,
+      setdiff(names(tax_npc_lookup_full), "candidate_structure_smiles")
+    )
 
     # Pre-warm fastmatch hash tables in the cached lookup tables
     if (nrow(met_lookup_full) > 0L) {
@@ -541,19 +542,23 @@ complement_metadata_structures <- function(
   present_inchikey_cols <- intersect(inchikey_cols, names(df))
   present_smiles_cols <- intersect(smiles_cols, names(df))
 
-  inchikey <- character()
-  for (col in present_inchikey_cols) {
-    u <- unique(df[[col]])
-    inchikey <- c(inchikey, u[!is.na(u)])
-  }
-  inchikey <- unique(inchikey)
+  inchikey <- unique(unlist(
+    lapply(present_inchikey_cols, function(col) {
+      u <- unique(df[[col]])
+      u[!is.na(u)]
+    }),
+    use.names = FALSE
+  )) %||%
+    character()
 
-  smiles <- character()
-  for (col in present_smiles_cols) {
-    u <- unique(df[[col]])
-    smiles <- c(smiles, u[!is.na(u)])
-  }
-  smiles <- unique(smiles)
+  smiles <- unique(unlist(
+    lapply(present_smiles_cols, function(col) {
+      u <- unique(df[[col]])
+      u[!is.na(u)]
+    }),
+    use.names = FALSE
+  )) %||%
+    character()
 
   list(inchikey = inchikey, smiles = smiles)
 }
@@ -958,22 +963,27 @@ complement_metadata_structures <- function(
     )
   )
 
-  for (target_col in names(enrichment_map)) {
-    enrich_col <- enrichment_map[[target_col]][[1L]]
-    existing_col <- enrichment_map[[target_col]][[2L]]
-    enr_norm <- .normalize_enrichment_text(key_lookup[[enrich_col]])
-    res <- enr_norm[idx]
-    if (is.null(orig_cols) || existing_col %in% orig_cols) {
-      existing_vec <- out[[existing_col]]
-      if (!is.null(existing_vec)) {
-        na_pos <- which(is.na(res) & !is.na(existing_vec))
-        if (length(na_pos) > 0L) {
-          res[na_pos] <- .normalize_enrichment_text(existing_vec[na_pos])
+  target_cols <- names(enrichment_map)
+  data.table::set(
+    out,
+    j = target_cols,
+    value = lapply(target_cols, function(target_col) {
+      enrich_col <- enrichment_map[[target_col]][[1L]]
+      existing_col <- enrichment_map[[target_col]][[2L]]
+      enr_norm <- .normalize_enrichment_text(key_lookup[[enrich_col]])
+      res <- enr_norm[idx]
+      if (is.null(orig_cols) || existing_col %in% orig_cols) {
+        existing_vec <- out[[existing_col]]
+        if (!is.null(existing_vec)) {
+          na_pos <- which(is.na(res) & !is.na(existing_vec))
+          if (length(na_pos) > 0L) {
+            res[na_pos] <- .normalize_enrichment_text(existing_vec[na_pos])
+          }
         }
       }
-    }
-    data.table::set(out, j = target_col, value = res)
-  }
+      res
+    })
+  )
 
   out
 }
@@ -993,10 +1003,7 @@ complement_metadata_structures <- function(
   if (!data.table::is.data.table(df)) {
     df <- tidytable::as_tidytable(df)
   }
-  na_col <- rep.int(NA_character_, nrow(df))
-  for (col in needed) {
-    data.table::set(df, j = col, value = na_col)
-  }
+  data.table::set(df, j = needed, value = rep.int(NA_character_, nrow(df)))
   df
 }
 
@@ -1189,11 +1196,16 @@ complement_metadata_structures <- function(
   u_g <- g_ord[idx1]
   acc <- v_ord[idx1]
   if (max_r > 1L) {
-    for (k in 2L:max_r) {
-      idx_k <- which(r_m == k)
-      pos_k <- fastmatch::fmatch(g_ord[idx_k], u_g)
-      acc[pos_k] <- paste(acc[pos_k], v_ord[idx_k], sep = sep)
-    }
+    acc <- Reduce(
+      function(cur_acc, k) {
+        idx_k <- which(r_m == k)
+        pos_k <- fastmatch::fmatch(g_ord[idx_k], u_g)
+        cur_acc[pos_k] <- paste(cur_acc[pos_k], v_ord[idx_k], sep = sep)
+        cur_acc
+      },
+      2L:max_r,
+      init = acc
+    )
   }
   out[u_g] <- acc
   out

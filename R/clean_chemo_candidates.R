@@ -677,17 +677,9 @@ coerce_score_columns <- function(annot_table_wei_chemo) {
     return(annot_table_wei_chemo)
   }
 
-  annot_table_wei_chemo <- tidytable::as_tidytable(
-    as.list(annot_table_wei_chemo)
-  )
-  for (col in needs_convert) {
-    val <- annot_table_wei_chemo[[col]]
-    u <- unique(val)
-    u_num <- as.numeric(u)
-    idx <- if (anyNA(u)) match(val, u) else fastmatch::fmatch(val, u)
-    data.table::set(annot_table_wei_chemo, j = col, value = u_num[idx])
-  }
-  annot_table_wei_chemo
+  as_list <- as.list(annot_table_wei_chemo)
+  as_list[needs_convert] <- lapply(as_list[needs_convert], .as_numeric_dedup)
+  tidytable::as_tidytable(as_list)
 }
 
 #' Select the clean_chemo working columns
@@ -852,11 +844,6 @@ build_mini_taxonomy_table <- function(
   )
   missing_tax_cols <- setdiff(required_tax_cols, names(df_percentile))
   n_pct <- nrow(df_percentile)
-  if (length(missing_tax_cols) > 0L) {
-    for (col in missing_tax_cols) {
-      df_percentile[[col]] <- rep.int(NA_character_, n_pct)
-    }
-  }
   required_pred_tax_cols <- c(
     "feature_pred_tax_cla_01kin_val",
     "feature_pred_tax_cla_01kin_score",
@@ -874,23 +861,20 @@ build_mini_taxonomy_table <- function(
     "feature_pred_tax_npc_03cla_score"
   )
   missing_pred_tax_cols <- setdiff(required_pred_tax_cols, names(df_percentile))
-  if (length(missing_pred_tax_cols) > 0L) {
-    missing_pred_val_cols <- grep("_val$", missing_pred_tax_cols, value = TRUE)
-    missing_pred_score_cols <- grep(
-      "_score$",
-      missing_pred_tax_cols,
-      value = TRUE
+  if (length(missing_tax_cols) > 0L || length(missing_pred_tax_cols) > 0L) {
+    pct_list <- as.list(df_percentile)
+    missing_char_cols <- c(
+      missing_tax_cols,
+      grep("_val$", missing_pred_tax_cols, value = TRUE)
     )
-    if (length(missing_pred_val_cols) > 0L) {
-      for (col in missing_pred_val_cols) {
-        df_percentile[[col]] <- rep.int(NA_character_, n_pct)
-      }
+    missing_num_cols <- grep("_score$", missing_pred_tax_cols, value = TRUE)
+    if (length(missing_char_cols) > 0L) {
+      pct_list[missing_char_cols] <- list(rep.int(NA_character_, n_pct))
     }
-    if (length(missing_pred_score_cols) > 0L) {
-      for (col in missing_pred_score_cols) {
-        df_percentile[[col]] <- rep.int(NA_real_, n_pct)
-      }
+    if (length(missing_num_cols) > 0L) {
+      pct_list[missing_num_cols] <- list(rep.int(NA_real_, n_pct))
     }
+    df_percentile <- tidytable::as_tidytable(pct_list)
   }
 
   normalize_tax_label_dedup <- function(x) {
@@ -1667,22 +1651,19 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
     return(cid_sl)
   }
   # General case: split whenever diameter from current cluster start > tol
-  cid <- integer(n_x)
-  cur_id <- 1L
-  cur_start <- x_sorted[[1L]]
-  cid[[1L]] <- 1L
-  has_grp <- !is.null(group_sorted)
-  for (i in 2L:n_x) {
-    if (
-      (has_grp && group_sorted[[i]] != group_sorted[[i - 1L]]) ||
-        (x_sorted[[i]] - cur_start) > tol
-    ) {
-      cur_id <- cur_id + 1L
-      cur_start <- x_sorted[[i]]
+  starts <- starts_sl[cid_sl]
+  idx_all <- seq_len(n_x)
+  repeat {
+    exceed <- which((x_sorted - x_sorted[starts]) > tol)
+    if (length(exceed) == 0L) {
+      break
     }
-    cid[[i]] <- cur_id
+    first_ex <- exceed[starts[exceed] != c(0L, starts[exceed[-length(exceed)]])]
+    new_s <- starts
+    new_s[first_ex] <- first_ex
+    starts <- cummax(new_s)
   }
-  cid
+  match(starts, unique(starts))
 }
 
 #' Compute complete-linkage (diameter-bounded) RT cluster IDs per feature
@@ -1911,7 +1892,8 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
   row_prio_rank,
   row_weights
 ) {
-  r1_rows <- which(col_rk == 1L & valid_ik & !is.na(rt_cid))
+  base_rt_cid <- rt_cid
+  r1_rows <- which(col_rk == 1L & valid_ik & !is.na(base_rt_cid))
   if (length(r1_rows) < 2L) {
     return(NULL)
   }
@@ -1920,74 +1902,143 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
     return(NULL)
   }
 
-  # Identify InChIKeys that appear at rank 1 in >= 2 distinct RT clusters
-  u_r1_pair <- !duplicated(paste(r1_iks, rt_cid[r1_rows], sep = "\r"))
+  # Identify InChIKeys that appear at rank 1 in >= 2 distinct base RT clusters
+  r1_cids <- base_rt_cid[r1_rows]
+  r1_fids <- fids[r1_rows]
+  u_r1_pair <- !duplicated(paste(r1_iks, r1_cids, sep = "\r"))
   r1_iks_distinct <- r1_iks[u_r1_pair]
   conflict_iks <- sort(unique(r1_iks_distinct[duplicated(r1_iks_distinct)]))
   if (length(conflict_iks) == 0L) {
     return(NULL)
   }
 
-  # Expand conflict closure over features so unrelated co-eluting features at
-  # the same RT (sharing no candidates with conflicting features) are excluded.
-  active_fids <- sort(unique(fids[r1_rows[r1_iks %in% conflict_iks]]))
-  valid_rows <- which(valid_ik & !is.na(rt_cid))
+  # Expand conflict closure over features using the pigeonhole candidate frontier
+  # so low-rank candidates below a component's size k_comp never trigger
+  # cascading pulls of unrelated features across the dataset.
+  active_fids <- sort(unique(r1_fids[r1_iks %in% conflict_iks]))
+  valid_rows <- which(valid_ik & !is.na(base_rt_cid))
   v_fids <- fids[valid_rows]
-  v_iks <- iks[valid_rows]
-  v_cids <- rt_cid[valid_rows]
+
   repeat {
-    in_act <- v_fids %in% active_fids
-    pool_iks <- unique(v_iks[in_act])
-    pool_cids <- unique(v_cids[in_act])
-    new_r1_fids <- fids[r1_rows[r1_iks %in% pool_iks]]
-    coelute_shared_fids <- v_fids[v_cids %in% pool_cids & v_iks %in% pool_iks]
-    merged_fids <- sort(unique(c(
-      active_fids,
-      new_r1_fids,
-      coelute_shared_fids
-    )))
+    af_v_rows <- valid_rows[v_fids %in% active_fids]
+    n_af <- length(active_fids)
+    af_pos_v <- fastmatch::fmatch(fids[af_v_rows], active_fids)
+
+    # Split co-eluting active features that do not share any rank-1 InChIKey
+    # into distinct rt_cid rows while keeping co-eluting features that share a
+    # rank-1 InChIKey in the same rt_cid row.
+    af_r1_rows <- af_v_rows[col_rk[af_v_rows] == 1L]
+    af_r1_iks <- sort(unique(iks[af_r1_rows]))
+    n_r1_ik <- length(af_r1_iks)
+    r1_af_pos <- fastmatch::fmatch(fids[af_r1_rows], active_fids)
+    r1_ik_pos <- fastmatch::fmatch(iks[af_r1_rows], af_r1_iks)
+    r1_edge_key <- (r1_af_pos - 1L) * n_r1_ik + r1_ik_pos
+    u_r1_edge <- !duplicated(r1_edge_key)
+    g_r1 <- igraph::make_graph(
+      edges = rbind(r1_af_pos[u_r1_edge], n_af + r1_ik_pos[u_r1_edge]),
+      n = n_af + n_r1_ik,
+      directed = FALSE
+    )
+    r1_comp_af <- as.integer(igraph::components(g_r1)$membership[seq_len(n_af)])
+    first_v_by_af <- af_v_rows[match(seq_len(n_af), af_pos_v)]
+    af_base_cid <- base_rt_cid[first_v_by_af]
+    r1_cid_key <- paste(af_base_cid, r1_comp_af, sep = ":")
+    u_r1_cid <- unique(r1_cid_key)
+    af_local_cid <- fastmatch::fmatch(r1_cid_key, u_r1_cid)
+    n_cids <- length(u_r1_cid)
+    v_local_cid <- af_local_cid[af_pos_v]
+
+    # Rank distinct (local_cid, ik) pairs within each local_cid by best weight
+    ord_v <- order(
+      v_local_cid,
+      -row_weights[af_v_rows],
+      row_prio_rank[af_v_rows],
+      method = "radix"
+    )
+    v_rows_s <- af_v_rows[ord_v]
+    v_cid_s <- v_local_cid[ord_v]
+    v_ik_s <- iks[v_rows_s]
+    cid_ik_key <- paste(v_cid_s, v_ik_s, sep = "\r")
+    u_cid_ik <- !duplicated(cid_ik_key)
+    u_cid <- v_cid_s[u_cid_ik]
+    u_ik <- v_ik_s[u_cid_ik]
+    u_w <- row_weights[v_rows_s[u_cid_ik]]
+    n_u <- length(u_cid)
+    start_u <- which(c(TRUE, u_cid[-1L] != u_cid[-n_u]))
+    pos_in_cid <- seq_len(n_u) -
+      rep.int(start_u, diff(c(start_u, n_u + 1L))) +
+      1L
+    new_w_u <- c(
+      TRUE,
+      u_cid[-1L] != u_cid[-n_u] | (u_w[-n_u] - u_w[-1L]) > 1e-12
+    )
+    w_rk_u <- pos_in_cid[cummax(ifelse(new_w_u, seq_len(n_u), 1L))]
+    end_u <- c(start_u[-1L] - 1L, n_u)
+    max_rk_by_cid <- w_rk_u[end_u]
+    k_limit <- pmin(2L, max_rk_by_cid)
+
+    all_u_iks <- sort(unique(u_ik))
+    m_u_iks <- length(all_u_iks)
+    u_ik_id <- fastmatch::fmatch(u_ik, all_u_iks)
+
+    repeat {
+      keep_u <- w_rk_u <= k_limit[u_cid]
+      g_fr <- igraph::make_graph(
+        edges = rbind(u_cid[keep_u], n_cids + u_ik_id[keep_u]),
+        n = n_cids + m_u_iks,
+        directed = FALSE
+      )
+      comp_cid <- as.integer(
+        igraph::components(g_fr)$membership[seq_len(n_cids)]
+      )
+      comp_sz <- tabulate(comp_cid, nbins = max(comp_cid))
+      new_k_limit <- pmin(max_rk_by_cid, pmax(k_limit, comp_sz[comp_cid]))
+      if (identical(new_k_limit, k_limit)) {
+        break
+      }
+      k_limit <- new_k_limit
+    }
+
+    cid_base_map <- af_base_cid[match(seq_len(n_cids), af_local_cid)]
+    exp_ik <- u_ik[keep_u]
+    exp_base_cid <- cid_base_map[u_cid[keep_u]]
+    ord_exp_min <- order(exp_ik, exp_base_cid, method = "radix")
+    ord_exp_max <- order(exp_ik, -exp_base_cid, method = "radix")
+    u_exp_min <- !duplicated(exp_ik[ord_exp_min])
+    u_exp_max <- !duplicated(exp_ik[ord_exp_max])
+    exp_iks_u <- exp_ik[ord_exp_min][u_exp_min]
+    min_bcid <- exp_base_cid[ord_exp_min][u_exp_min]
+    max_bcid <- exp_base_cid[ord_exp_max][u_exp_max]
+
+    r1_m <- fastmatch::fmatch(r1_iks, exp_iks_u)
+    has_m <- !is.na(r1_m)
+    cross_r1 <- has_m &
+      (min_bcid[r1_m] != r1_cids | max_bcid[r1_m] != r1_cids)
+    merged_fids <- sort(unique(c(active_fids, r1_fids[cross_r1])))
     if (length(merged_fids) == length(active_fids)) {
       break
     }
     active_fids <- merged_fids
   }
 
-  act_rows <- valid_rows[v_fids %in% active_fids]
-  act_iks <- sort(unique(iks[act_rows]))
-  n_af <- length(active_fids)
-  m_all <- length(act_iks)
-
-  af_pos <- fastmatch::fmatch(fids[act_rows], active_fids)
-  ik_pos <- fastmatch::fmatch(iks[act_rows], act_iks)
-
-  # Partition (active_fids, act_iks) into candidate-connected components so
-  # unrelated mass families that happen to co-eluting at the same RT never merge.
-  edge_key <- (af_pos - 1L) * m_all + ik_pos
-  u_edge <- !duplicated(edge_key)
-  g_bip <- igraph::make_graph(
-    edges = rbind(af_pos[u_edge], n_af + ik_pos[u_edge]),
-    n = n_af + m_all,
-    directed = FALSE
-  )
-  comp_of_af <- as.integer(igraph::components(g_bip)$membership[seq_len(n_af)])
-  comp_id <- max(comp_of_af)
-
-  # Refine rt_cid by candidate component so co-eluting features of different
-  # mass families receive distinct cluster IDs.
-  first_act_by_af <- act_rows[match(seq_len(n_af), af_pos)]
-  af_orig_cid <- rt_cid[first_act_by_af]
-  comp_cid_key <- paste(comp_of_af, af_orig_cid, sep = ":")
-  u_comp_cid <- unique(comp_cid_key)
-  u_orig_cid <- af_orig_cid[match(u_comp_cid, comp_cid_key)]
-  max_cid <- max(rt_cid, na.rm = TRUE)
+  # Assign distinct rt_cid integers to split co-eluting clusters
+  u_orig_cid <- cid_base_map
+  max_cid <- max(base_rt_cid, na.rm = TRUE)
   dup_mask <- duplicated(u_orig_cid)
   u_orig_cid[dup_mask] <- max_cid + seq_len(sum(dup_mask))
-  af_new_cid <- u_orig_cid[fastmatch::fmatch(comp_cid_key, u_comp_cid)]
+  af_new_cid <- u_orig_cid[af_local_cid]
   in_af <- fastmatch::fmatch(fids, active_fids)
-  has_af <- !is.na(in_af)
-  rt_cid[has_af] <- af_new_cid[in_af[has_af]]
+  rt_cid <- af_new_cid[in_af]
 
-  active_cids <- sort(unique(rt_cid[act_rows]))
+  kept_keys <- cid_ik_key[u_cid_ik][keep_u]
+  act_rows <- v_rows_s[cid_ik_key %in% kept_keys]
+  act_iks <- sort(unique(iks[act_rows]))
+  m_all <- length(act_iks)
+  ik_pos <- fastmatch::fmatch(iks[act_rows], act_iks)
+  act_local_cid <- af_local_cid[fastmatch::fmatch(fids[act_rows], active_fids)]
+  comp_id <- max(comp_cid)
+
+  active_cids <- sort(unique(u_orig_cid))
   k_all <- length(active_cids)
 
   target_iks_by_cid <- stats::setNames(
@@ -2005,7 +2056,7 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
 
   rows_by_comp <- split(
     seq_along(act_rows),
-    factor(comp_of_af[af_pos], levels = seq_len(comp_id))
+    factor(comp_cid[act_local_cid], levels = seq_len(comp_id))
   )
 
   for (cc in seq_len(comp_id)) {
@@ -2033,18 +2084,6 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
     sub_best_row <- matrix(NA_integer_, nrow = k_sub, ncol = m_sub)
     sub_w[best_cells] <- row_weights[best_rows]
     sub_best_row[best_cells] <- best_rows
-
-    # By the pigeonhole principle, row ii can never be matched in an optimal
-    # assignment to a column strictly below row ii's k_sub-th largest weight.
-    if (m_sub > k_sub) {
-      for (ii in seq_len(k_sub)) {
-        row_fin <- sub_w[ii, is.finite(sub_w[ii, ])]
-        if (length(row_fin) > k_sub) {
-          kth_w <- sort(row_fin, decreasing = TRUE)[[k_sub]]
-          sub_w[ii, sub_w[ii, ] < kth_w - 1e-9] <- -Inf
-        }
-      }
-    }
 
     # Collapse columns with identical weight profiles across the component rows
     col_keys <- do.call(
@@ -2109,19 +2148,25 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
     }
     opt_edge <- opt_grp[, col_grp, drop = FALSE]
 
-    for (ii in seq_len(k_sub)) {
-      opt_jj <- which(opt_edge[ii, ])
-      target_iks_by_cid[[sub_ci_global[[ii]]]] <- act_iks[sub_js[opt_jj]]
-    }
-    for (jj in which(colSums(opt_edge) > 0L)) {
-      ij <- sub_js[[jj]]
-      opt_ii <- which(opt_edge[, jj])
-      cids_opt <- sub_cids[opt_ii]
-      optimal_cids_by_ik[[ij]] <- cids_opt
-      holders <- fids[sub_best_row[cbind(opt_ii, jj)]]
-      names(holders) <- as.character(cids_opt)
-      holder_fids_by_ik[[ij]] <- holders
-    }
+    target_iks_by_cid[sub_ci_global] <- lapply(
+      seq_len(k_sub),
+      function(ii) act_iks[sub_js[which(opt_edge[ii, ])]]
+    )
+    pos_jj <- which(colSums(opt_edge) > 0L)
+    optimal_cids_by_ik[sub_js[pos_jj]] <- lapply(
+      pos_jj,
+      function(jj) sub_cids[which(opt_edge[, jj])]
+    )
+    holder_fids_by_ik[sub_js[pos_jj]] <- lapply(
+      pos_jj,
+      function(jj) {
+        opt_ii <- which(opt_edge[, jj])
+        stats::setNames(
+          fids[sub_best_row[cbind(opt_ii, jj)]],
+          as.character(sub_cids[opt_ii])
+        )
+      }
+    )
   }
 
   list(
@@ -2281,7 +2326,10 @@ resolve_cross_rt_duplicate_candidates <- function(
   holder_ik_names <- names(holder_fids_by_ik)
   assigned_iks <- names(optimal_cids_by_ik)[lengths(optimal_cids_by_ik) > 0L]
 
-  act_fids <- unique(fids[!is.na(rt_cid) & rt_cid %in% active_cids])
+  act_fids <- intersect(
+    unique(fids[!is.na(rt_cid) & rt_cid %in% active_cids]),
+    unique(fids[col_rk == 1L & valid_ik])
+  )
   act_fid_pos <- fastmatch::fmatch(act_fids, row_fid_names)
   reordered_mask <- logical(length(act_fids))
   for (f_idx in seq_along(act_fids)) {
@@ -2291,9 +2339,6 @@ resolve_cross_rt_duplicate_candidates <- function(
     target_iks <- target_iks_by_cid[[fastmatch::fmatch(cid, active_cids)]]
 
     r1_f <- f_rows[col_rk[f_rows] == 1L & valid_ik[f_rows]]
-    if (length(r1_f) == 0L) {
-      next
-    }
     r1_f_ord <- r1_f[order(row_prio_rank[r1_f])]
     orig_iks <- unique(iks[r1_f_ord])
 
@@ -2343,7 +2388,11 @@ resolve_cross_rt_duplicate_candidates <- function(
       next
     }
 
-    displaced_iks <- orig_iks[!(orig_iks %in% new_top_iks)]
+    displaced_iks <- orig_iks[
+      !(orig_iks %in% new_top_iks) &
+        !(orig_iks %in% target_iks) &
+        (orig_iks %in% assigned_iks)
+    ]
     if (length(displaced_iks) > 0L) {
       displaced_ik <- displaced_iks[[1L]]
       holders <- holder_fids_by_ik[[fastmatch::fmatch(
@@ -2352,9 +2401,10 @@ resolve_cross_rt_duplicate_candidates <- function(
       )]]
       other_holders <- holders[names(holders) != cid_chr]
       holder_fid <- unname(other_holders[[1L]])
+      r1_promoted <- r1_new[!(iks[r1_new] %in% orig_iks)]
       col_prom[f_rows] <- FALSE
-      col_prom[r1_new] <- TRUE
-      col_note[r1_new] <- paste0(
+      col_prom[r1_promoted] <- TRUE
+      col_note[r1_promoted] <- paste0(
         "Promoted to rank 1: cross-RT duplicate InChIKey ",
         displaced_ik,
         " assigned to feature ",
@@ -2362,7 +2412,10 @@ resolve_cross_rt_duplicate_candidates <- function(
       )
       reordered_mask[[f_idx]] <- TRUE
     } else {
-      tied_ik <- orig_iks[[1L]]
+      tied_iks <- orig_iks[
+        (orig_iks %in% target_iks) & lengths(optimal_cids_by_ik[orig_iks]) > 1L
+      ]
+      tied_ik <- tied_iks[[1L]]
       holders <- holder_fids_by_ik[[fastmatch::fmatch(
         tied_ik,
         holder_ik_names
@@ -2543,25 +2596,35 @@ drop_cross_rt_duplicate_final_candidates <- function(
         !(length(orig_iks) == length(new_top_iks) &&
           all(orig_iks %in% new_top_iks))
     ) {
-      displaced_iks <- orig_iks[!(orig_iks %in% new_top_iks)]
+      displaced_iks <- orig_iks[
+        !(orig_iks %in% new_top_iks) &
+          !(orig_iks %in% target_iks) &
+          (orig_iks %in% assigned_iks)
+      ]
       if (length(displaced_iks) > 0L) {
         displaced_ik <- displaced_iks[[1L]]
         holders <- holder_fids_by_ik[[displaced_ik]]
         other_holders <- holders[names(holders) != cid_chr]
         holder_fid <- unname(other_holders[[1L]])
+        r1_promoted <- r1_new[!(iks[r1_new] %in% orig_iks)]
         note_str <- paste0(
           "Promoted to rank 1: cross-RT duplicate InChIKey ",
           displaced_ik,
           " assigned to feature ",
           holder_fid
         )
-        na_note <- is.na(col_note[r1_new]) | !nzchar(trimws(col_note[r1_new]))
+        na_note <- is.na(col_note[r1_promoted]) |
+          !nzchar(trimws(col_note[r1_promoted]))
         if (any(na_note)) {
-          col_note[r1_new[na_note]] <- note_str
+          col_note[r1_promoted[na_note]] <- note_str
           added_note <- TRUE
         }
       } else {
-        tied_ik <- orig_iks[[1L]]
+        tied_iks <- orig_iks[
+          (orig_iks %in% target_iks) &
+            lengths(optimal_cids_by_ik[orig_iks]) > 1L
+        ]
+        tied_ik <- tied_iks[[1L]]
         holders <- holder_fids_by_ik[[tied_ik]]
         other_holders <- holders[names(holders) != cid_chr]
         tied_fid <- unname(other_holders[[1L]])
