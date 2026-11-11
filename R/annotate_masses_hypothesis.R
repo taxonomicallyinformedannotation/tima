@@ -1107,12 +1107,15 @@ propagate_modifier_src_to_dest <- function(
       identical(mod_col, "loss") &&
       identical(mod_sign, "+")
   ) {
-    keep_loss <- mapply(
+    pair_key <- paste(joined$adduct, joined[[mod_col]], sep = "\r")
+    u_idx <- which(!duplicated(pair_key))
+    u_keep <- mapply(
       adduct_has_explicit_loss,
-      joined$adduct,
-      joined[[mod_col]],
+      joined$adduct[u_idx],
+      joined[[mod_col]][u_idx],
       USE.NAMES = FALSE
     )
+    keep_loss <- u_keep[fastmatch::fmatch(pair_key, pair_key[u_idx])]
     joined <- joined[which(keep_loss), , drop = FALSE]
   }
   if (nrow(joined) == 0L) {
@@ -1193,12 +1196,15 @@ propagate_modifier_dest_to_src <- function(
       identical(mod_col, "cluster") &&
       identical(mod_sign, "-")
   ) {
-    keep_clu <- mapply(
+    pair_key <- paste(joined$adduct, joined[[mod_col]], sep = "\r")
+    u_idx <- which(!duplicated(pair_key))
+    u_keep <- mapply(
       adduct_has_explicit_cluster,
-      joined$adduct,
-      joined[[mod_col]],
+      joined$adduct[u_idx],
+      joined[[mod_col]][u_idx],
       USE.NAMES = FALSE
     )
+    keep_clu <- u_keep[fastmatch::fmatch(pair_key, pair_key[u_idx])]
     joined <- joined[which(keep_clu), , drop = FALSE]
   }
   if (nrow(joined) == 0L) {

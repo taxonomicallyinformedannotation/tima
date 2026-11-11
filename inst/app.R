@@ -5,9 +5,14 @@
   {
     frames <- sys.frames()
     ofiles <- Filter(Negate(is.null), lapply(frames, `[[`, "ofile"))
-    for (f in rev(ofiles)) {
-      d <- dirname(normalizePath(f, mustWork = FALSE))
-      if (file.exists(file.path(d, "app_ui.R"))) return(d)
+    dirs <- vapply(
+      rev(ofiles),
+      function(f) dirname(normalizePath(f, mustWork = FALSE)),
+      character(1L)
+    )
+    hit <- dirs[file.exists(file.path(dirs, "app_ui.R"))]
+    if (length(hit) > 0L) {
+      return(hit[[1L]])
     }
     system.file(package = "tima")
   },

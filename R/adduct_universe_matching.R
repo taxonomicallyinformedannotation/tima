@@ -70,16 +70,9 @@ single_component_increment <- function(from, to) {
   }
   single_idx <- non_empty[lens[non_empty] == 1L]
   if (length(single_idx) > 0L) {
-    vals <- vapply(
-      comp_list[single_idx],
-      function(x) as.integer(x[[1L]]),
-      integer(1L)
-    )
-    nms <- vapply(
-      comp_list[single_idx],
-      function(x) names(x)[[1L]] %||% "",
-      character(1L)
-    )
+    unlisted_s <- unlist(comp_list[single_idx], recursive = FALSE)
+    vals <- as.integer(unname(unlisted_s))
+    nms <- names(unlisted_s) %||% rep.int("", length(vals))
     valid_s <- !is.na(vals) & vals != 0L & !is.na(nms) & nzchar(nms)
     if (any(valid_s)) {
       s_ok <- single_idx[valid_s]
@@ -132,11 +125,9 @@ single_component_increment <- function(from, to) {
 
   simple_01 <- which(l_from == 0L & l_to == 1L & !is.na(t_to) & t_to == 1L)
   if (length(simple_01) > 0L) {
-    nms <- vapply(
-      comp_list[to_idx[simple_01]],
-      function(x) names(x)[[1L]] %||% NA_character_,
-      character(1L)
-    )
+    unlisted_01 <- unlist(comp_list[to_idx[simple_01]], recursive = FALSE)
+    nms <- names(unlisted_01) %||% rep.int(NA_character_, length(simple_01))
+    nms[!nzchar(nms)] <- NA_character_
     out[simple_01] <- nms
   }
 

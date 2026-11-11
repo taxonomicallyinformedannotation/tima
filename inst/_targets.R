@@ -6,12 +6,16 @@
   # 1. Inspect source() frames for an _targets.R path and validate candidates.
   frames <- sys.frames()
   ofiles <- Filter(Negate(is.null), lapply(frames, `[[`, "ofile"))
-  for (f in rev(ofiles)) {
-    candidate <- file.path(
-      dirname(normalizePath(f, mustWork = FALSE)),
-      "targets"
-    )
-    if (dir.exists(candidate)) return(candidate)
+  candidates <- vapply(
+    rev(ofiles),
+    function(f) {
+      file.path(dirname(normalizePath(f, mustWork = FALSE)), "targets")
+    },
+    character(1L)
+  )
+  hit <- candidates[dir.exists(candidates)]
+  if (length(hit) > 0L) {
+    return(hit[[1L]])
   }
   # 2. Installed package path.
   pkg <- system.file("targets", package = "tima")
