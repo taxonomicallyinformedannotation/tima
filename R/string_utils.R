@@ -106,16 +106,20 @@ stri_match_first_regex <- function(str, pattern) {
   match_len <- attr(m, "match.length")
   out[hit, 1L] <- substr(str[hit], m[hit], m[hit] + match_len[hit] - 1L)
 
-  for (j in seq_len(n_caps)) {
-    cs <- cap_start[hit, j]
-    cl <- cap_len[hit, j]
-    valid_cap <- cs > 0L
-    if (any(valid_cap)) {
-      h_idx <- hit[valid_cap]
-      out[h_idx, j + 1L] <- substr(
-        str[h_idx],
-        cs[valid_cap],
-        cs[valid_cap] + cl[valid_cap] - 1L
+  if (n_caps > 0L) {
+    cs_sub <- cap_start[hit, , drop = FALSE]
+    cl_sub <- cap_len[hit, , drop = FALSE]
+    valid_pos <- which(cs_sub > 0L)
+    if (length(valid_pos) > 0L) {
+      n_hit <- length(hit)
+      h_rows <- hit[(valid_pos - 1L) %% n_hit + 1L]
+      c_cols <- (valid_pos - 1L) %/% n_hit + 2L
+      cs_v <- cs_sub[valid_pos]
+      cl_v <- cl_sub[valid_pos]
+      out[h_rows + (c_cols - 1L) * n] <- substr(
+        str[h_rows],
+        cs_v,
+        cs_v + cl_v - 1L
       )
     }
   }

@@ -84,36 +84,35 @@
     rep.int(TRUE, length(row_idx))
   }
 
-  out <- vector("list", length(id_cols) + length(multi_cols))
-  names(out) <- c(id_cols, multi_cols)
-
   # Expand id (non-multi) columns by simple indexing
-  for (col in id_cols) {
-    out[[col]] <- results[[col]][row_idx]
-  }
+  out_id <- lapply(results[id_cols], `[`, row_idx)
 
   # Expand multi-value columns directly (only adjusting rows with mismatched length)
-  for (col_idx in seq_along(multi_cols)) {
-    parts <- split_values[[col_idx]]
-    col_lens <- lengths_list[[col_idx]]
-    if (is.character(parts)) {
-      expanded <- parts[row_idx]
-      if (!all(first_in_row)) {
-        expanded[!first_in_row] <- NA_character_
+  out_multi <- Map(
+    function(parts, col_lens) {
+      if (is.character(parts)) {
+        expanded <- parts[row_idx]
+        if (!all(first_in_row)) {
+          expanded[!first_in_row] <- NA_character_
+        }
+        expanded
+      } else {
+        mismatch <- which(col_lens != n_vals_per_row)
+        if (length(mismatch) > 0L) {
+          parts[mismatch] <- Map(
+            function(v, n_v) v[seq_len(n_v)],
+            parts[mismatch],
+            n_vals_per_row[mismatch]
+          )
+        }
+        unlist(parts, use.names = FALSE)
       }
-      out[[multi_cols[[col_idx]]]] <- expanded
-    } else {
-      mismatch <- which(col_lens != n_vals_per_row)
-      if (length(mismatch) > 0L) {
-        parts[mismatch] <- Map(
-          function(v, n_v) v[seq_len(n_v)],
-          parts[mismatch],
-          n_vals_per_row[mismatch]
-        )
-      }
-      out[[multi_cols[[col_idx]]]] <- unlist(parts, use.names = FALSE)
-    }
-  }
+    },
+    split_values,
+    lengths_list
+  )
+  names(out_multi) <- multi_cols
+  out <- c(out_id, out_multi)
 
   out_df <- as.data.frame(out, stringsAsFactors = FALSE, check.names = FALSE)
   original_colnames <- colnames(results)
@@ -187,20 +186,34 @@
     check.names = FALSE
   )
 
-  for (col in extra_feat_cols) {
-    val <- as.character(first_rows[[col]])
-    val[
-      is.na(val) | !nzchar(val) | val == "NA" | val == "null" | val == "NULL"
-    ] <- "null"
-
-    base_name <- .mztab_opt_colname(col)
-    out_name <- base_name
-    idx <- 1L
-    while (out_name %in% colnames(smf_canonical)) {
-      idx <- idx + 1L
-      out_name <- paste0(base_name, "_", idx)
-    }
-    smf_canonical[[out_name]] <- val
+  if (length(extra_feat_cols) > 0L) {
+    base_names <- vapply(
+      extra_feat_cols,
+      .mztab_opt_colname,
+      character(1L),
+      USE.NAMES = FALSE
+    )
+    all_names <- c(colnames(smf_canonical), base_names)
+    occ <- stats::ave(seq_along(all_names), all_names, FUN = seq_along)
+    out_names <- ifelse(
+      occ > 1L,
+      paste0(all_names, "_", occ),
+      all_names
+    )[(ncol(smf_canonical) + 1L):length(all_names)]
+    smf_canonical[out_names] <- lapply(
+      first_rows[extra_feat_cols],
+      function(col_v) {
+        val <- as.character(col_v)
+        val[
+          is.na(val) |
+            !nzchar(val) |
+            val == "NA" |
+            val == "null" |
+            val == "NULL"
+        ] <- "null"
+        val
+      }
+    )
   }
 
   rm(
@@ -482,9 +495,7 @@
     final_names <- make.unique(c(colnames(sme), base_names), sep = "_")[
       (length(colnames(sme)) + 1L):(length(colnames(sme)) + length(base_names))
     ]
-    for (i in seq_along(extra_cols)) {
-      sme[[final_names[[i]]]] <- .mztab_safe_scalar(ann[[extra_cols[[i]]]])
-    }
+    sme[final_names] <- lapply(ann[extra_cols], .mztab_safe_scalar)
   }
 
   tidytable::as_tidytable(sme)
@@ -767,10 +778,7 @@
       u_v <- unique(v)
       if (length(u_v) == 1L) {
         val1 <- u_v[[1L]]
-        for (b in len_buckets) {
-          out_v[b$f_pos] <- paste(rep.int(val1, b$L), collapse = "|")
-        }
-        return(out_v)
+        return(paste0(strrep(paste0(val1, "|"), grp_len - 1L), val1))
       }
       for (b in len_buckets) {
         cols_b <- lapply(b$row_offsets, function(idx) v[idx])

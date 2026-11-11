@@ -418,15 +418,18 @@ prepare_features_tables <- function(
   n_feat <- nrow(tbl)
   if (n_feat > 0L && anyDuplicated(feature_ids) == 0L) {
     n_samp <- length(intensity_cols)
-    num_mat <- matrix(NA_real_, nrow = n_feat, ncol = n_samp)
-    for (j in seq_len(n_samp)) {
-      col <- tbl[[intensity_cols[[j]]]]
-      num_mat[, j] <- if (is.double(col)) {
-        col
-      } else {
-        suppressWarnings(as.numeric(col))
-      }
-    }
+    num_mat <- matrix(
+      vapply(
+        intensity_cols,
+        function(col_nm) {
+          col <- tbl[[col_nm]]
+          if (is.double(col)) col else suppressWarnings(as.numeric(col))
+        },
+        numeric(n_feat)
+      ),
+      nrow = n_feat,
+      ncol = n_samp
+    )
 
     work_mat <- num_mat
     work_mat[is.na(work_mat)] <- -Inf
@@ -474,9 +477,11 @@ prepare_features_tables <- function(
           stringsAsFactors = FALSE,
           check.names = FALSE
         )
-        for (ec in extra_cols) {
-          empty_tbl[[ec]] <- vector("list", 0L)
-        }
+        empty_tbl[extra_cols] <- replicate(
+          length(extra_cols),
+          vector("list", 0L),
+          simplify = FALSE
+        )
         return(empty_tbl)
       }
       kept_c_all <- unlist(col_idx_list, use.names = FALSE)

@@ -182,19 +182,15 @@ implied_neutral_mass <- function(
   # First element always starts a cluster.
   boundary[1L] <- TRUE
   if (any(!boundary[-1L] & !boundary[-n])) {
-    cl_id <- 1L
-    anchor <- values[1L]
-    out <- integer(n)
-    out[1L] <- 1L
-    for (i in 2L:n) {
-      v_i <- values[i]
-      if (boundary[i] || is.na(anchor) || (v_i - anchor) > step_tol[i]) {
-        cl_id <- cl_id + 1L
-        anchor <- v_i
+    seq_n <- seq_len(n)
+    repeat {
+      run_start <- cummax(ifelse(boundary, seq_n, 0L))
+      idx_over <- which(!boundary & (values - values[run_start]) > step_tol)
+      if (length(idx_over) == 0L) {
+        break
       }
-      out[i] <- cl_id
+      boundary[idx_over[!duplicated(run_start[idx_over])]] <- TRUE
     }
-    return(out)
   }
   cumsum(boundary)
 }

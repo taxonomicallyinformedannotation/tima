@@ -709,30 +709,24 @@ summarize_results <- function(
     rep.int(NA_character_, length(sop_keep))
   }
 
-  matched_pair_list <- vector("list", length(taxonomy_cols))
-  matched_doi_list <- vector("list", length(taxonomy_cols))
-
-  for (idx in seq_along(taxonomy_cols)) {
-    tc <- taxonomy_cols[[idx]]
-    v <- structure_organism_pairs_table[[tc]][sop_keep]
-    occ_m <- fastmatch::fmatch(v, u_occ)
-    keep <- which(!is.na(occ_m))
-    if (length(keep) > 0L) {
-      pid <- (as.numeric(ik_sop[keep] - 1L) * n_occ) + occ_m[keep]
-      in_df <- !is.na(fastmatch::fmatch(pid, u_pair_ids))
-      if (any(in_df)) {
-        k2 <- keep[in_df]
-        matched_pair_list[[idx]] <- pid[in_df]
-        matched_doi_list[[idx]] <- doi_sop[k2]
-      }
-    }
-  }
-
-  all_pids <- unlist(matched_pair_list, use.names = FALSE)
-  if (length(all_pids) == 0L) {
+  n_sop <- length(sop_keep)
+  all_v <- unlist(
+    lapply(
+      taxonomy_cols,
+      function(tc) structure_organism_pairs_table[[tc]][sop_keep]
+    ),
+    use.names = FALSE
+  )
+  occ_m_all <- fastmatch::fmatch(all_v, u_occ)
+  keep_all <- which(!is.na(occ_m_all))
+  row_k <- (keep_all - 1L) %% n_sop + 1L
+  pid_all <- (as.numeric(ik_sop[row_k] - 1L) * n_occ) + occ_m_all[keep_all]
+  in_df <- which(!is.na(fastmatch::fmatch(pid_all, u_pair_ids)))
+  if (length(in_df) == 0L) {
     return(empty_lookup())
   }
-  all_dois <- unlist(matched_doi_list, use.names = FALSE)
+  all_pids <- pid_all[in_df]
+  all_dois <- doi_sop[row_k[in_df]]
 
   # Collapse reference_doi ONCE per unique (inchikey, occurrence) pair,
   # BEFORE expanding across feature_id.

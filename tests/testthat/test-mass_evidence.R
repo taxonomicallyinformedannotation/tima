@@ -549,6 +549,19 @@ test_that("build_evidence_supported_hypotheses covers edge cases and baseline fa
     )),
     0L
   )
+  # Baseline present in universe and implied > 0 -> materialized baseline row
+  expect_identical(
+    nrow(build_evidence_supported_hypotheses(
+      df_fea_min = feats_out,
+      universe = u,
+      tolerance_ppm = 10,
+      tolerance_rt = 0.05,
+      ms_mode = "pos",
+      min_neutral_mass = 500,
+      max_hypotheses_per_feature = Inf
+    )),
+    1L
+  )
   # Baseline present in universe, but implied mass <= 0 -> empty_evidence_table()
   expect_identical(
     nrow(build_evidence_supported_hypotheses(
@@ -572,4 +585,30 @@ test_that("build_evidence_supported_hypotheses covers edge cases and baseline fa
     .ppm_cluster_sorted(c(100.0, 100.0008, 100.0016), tolerance_ppm = 10),
     c(1L, 1L, 2L)
   )
+
+  # Bounded-diameter RT clustering splits transitive RT chains (with/without prefilter)
+  feats_rt_chain <- tidytable::tidytable(
+    feature_id = c("F_RT1", "F_RT2", "F_RT3"),
+    rt = c(1.00, 1.08, 1.16),
+    mz = c(180.0634 + 1.007276, 180.0634 + 22.989221, 180.0634 + 38.963158),
+    sample = c("S1", "S1", "S1")
+  )
+  res_chain_pre <- build_evidence_supported_hypotheses(
+    df_fea_min = feats_rt_chain,
+    universe = u,
+    tolerance_ppm = 10,
+    tolerance_rt = 0.10,
+    ms_mode = "pos",
+    exact_masses = 180.0634
+  )
+  expect_gt(nrow(res_chain_pre), 0L)
+  res_chain_nopre <- build_evidence_supported_hypotheses(
+    df_fea_min = feats_rt_chain,
+    universe = u,
+    tolerance_ppm = 10,
+    tolerance_rt = 0.10,
+    ms_mode = "pos",
+    exact_masses = NULL
+  )
+  expect_gt(nrow(res_chain_nopre), 0L)
 })

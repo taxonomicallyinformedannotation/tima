@@ -130,27 +130,16 @@ adduct_to_string <- function(
 #' at least 0), used to enumerate carrier multisets with replacement.
 #' @keywords internal
 .compositions <- function(target, k) {
-  # Return a tidytable with unique, deterministic column names V1..Vk for
-  # k parts. The previous implementation used cbind(i, sub) which could
-  # produce duplicate column names ('i') when 'sub' contained a column named
-  # 'i'. That triggered tibble name-repair messages. Use explicit column
-  # naming to avoid duplicate names.
   if (k == 1L) {
-    return(tidytable::tidytable(V1 = as.integer(target)))
+    return(matrix(as.integer(target), nrow = 1L, ncol = 1L))
   }
-
-  out <- vector("list", target + 1L)
-  for (i in seq.int(0L, target)) {
-    sub <- .compositions(target - i, k - 1L)
-    # Ensure sub columns are renamed to V2..V(k) so binding is deterministic
-    sub_df <- as.data.frame(sub, stringsAsFactors = FALSE)
-    if (ncol(sub_df) > 0L) {
-      colnames(sub_df) <- paste0("V", seq.int(2L, ncol(sub_df) + 1L))
-    }
-    first_col <- data.frame(V1 = as.integer(i), stringsAsFactors = FALSE)
-    out[[i + 1L]] <- cbind(first_col, sub_df)
-  }
-  tidytable::bind_rows(out)
+  do.call(
+    rbind,
+    lapply(seq.int(0L, target), function(i) {
+      sub <- .compositions(target - i, k - 1L)
+      cbind(rep.int(as.integer(i), nrow(sub)), sub, deparse.level = 0L)
+    })
+  )
 }
 
 #' Resolve a possibly-legacy adduct configuration to a unified structured
@@ -339,60 +328,62 @@ generate_adduct_hypotheses <- function(
   plausible_mz_range
 ) {
   carrier_idx <- seq_len(n_carriers)
-  rows <- list()
-  row_i <- 0L
+  z_valid_mask <- abs(charges_polarity) >= 1L & abs(charges_polarity) <= 6L
+  valid_z_vals <- charges_polarity[z_valid_mask]
 
-  for (m_val in m_vals) {
-    for (z_val in charges_polarity) {
-      z_abs <- abs(z_val)
-      if (z_abs < 1L || z_abs > 6L) {
-        next
-      }
-      comp <- tidytable::bind_rows(lapply(
-        seq_len(z_abs),
-        .compositions,
-        k = n_carriers
-      ))
-      for (ri in seq_len(nrow(comp))) {
-        counts <- comp[ri, ]
-        z_net <- as.integer(sum(counts * carrier_zcontrib))
-        if (z_net != z_val) {
-          next
-        }
+  states_by_z <- lapply(valid_z_vals, function(z_val) {
+    z_abs <- abs(z_val)
+    comp_mat <- do.call(
+      rbind,
+      lapply(seq_len(z_abs), .compositions, k = n_carriers)
+    )
+    z_net_vec <- as.integer(comp_mat %*% carrier_zcontrib)
+    valid_ri <- which(z_net_vec == z_val)
+    lapply(valid_ri, function(ri) {
+      .adduct_carrier_state(
+        counts = comp_mat[ri, ],
+        carrier_idx = carrier_idx,
+        parsed_carriers = parsed_carriers,
+        carrier_mass = carrier_mass
+      )
+    })
+  })
 
-        carrier_state <- .adduct_carrier_state(
-          counts = counts,
-          carrier_idx = carrier_idx,
-          parsed_carriers = parsed_carriers,
-          carrier_mass = carrier_mass
-        )
+  rows_nested <- lapply(m_vals, function(m_val) {
+    unlist(
+      Map(
+        function(z_val, z_states) {
+          z_abs <- abs(z_val)
+          unlist(
+            lapply(z_states, function(carrier_state) {
+              .enumerate_cluster_loss_scope_rows(
+                m_val = m_val,
+                z_val = z_val,
+                z_abs = z_abs,
+                carriers_named = carrier_state$carriers_named,
+                base_carrier_offset = carrier_state$base_carrier_offset,
+                cluster_parsed = cluster_parsed,
+                cluster_formulas = cluster_formulas,
+                cluster_mass = cluster_mass,
+                loss_parsed = loss_parsed,
+                loss_formulas = loss_formulas,
+                loss_mass = loss_mass,
+                max_clusters_per_adduct = max_clusters_per_adduct,
+                max_losses_per_adduct = max_losses_per_adduct,
+                plausible_mz_range = plausible_mz_range
+              )
+            }),
+            recursive = FALSE
+          )
+        },
+        valid_z_vals,
+        states_by_z
+      ),
+      recursive = FALSE
+    )
+  })
 
-        rows_out <- .enumerate_cluster_loss_scope_rows(
-          m_val = m_val,
-          z_val = z_val,
-          z_abs = z_abs,
-          carriers_named = carrier_state$carriers_named,
-          base_carrier_offset = carrier_state$base_carrier_offset,
-          cluster_parsed = cluster_parsed,
-          cluster_formulas = cluster_formulas,
-          cluster_mass = cluster_mass,
-          loss_parsed = loss_parsed,
-          loss_formulas = loss_formulas,
-          loss_mass = loss_mass,
-          max_clusters_per_adduct = max_clusters_per_adduct,
-          max_losses_per_adduct = max_losses_per_adduct,
-          plausible_mz_range = plausible_mz_range
-        )
-
-        if (length(rows_out) > 0L) {
-          row_i <- row_i + 1L
-          rows[[row_i]] <- rows_out
-        }
-      }
-    }
-  }
-
-  unlist(rows, recursive = FALSE)
+  unlist(rows_nested, recursive = FALSE)
 }
 
 .adduct_carrier_state <- function(
@@ -412,12 +403,8 @@ generate_adduct_hypotheses <- function(
   )
   all_syms <- unlist(sym_list)
   els <- names(all_syms)
-  u_els <- unique(els)
-  per_atom <- vapply(
-    split(unname(all_syms), factor(els, levels = u_els)),
-    sum,
-    integer(1L)
-  )
+  rs <- rowsum.default(unname(all_syms), els, reorder = FALSE)
+  per_atom <- stats::setNames(as.integer(rs[, 1L]), rownames(rs))
   per_atom <- per_atom[per_atom != 0L]
   carriers_named <- if (length(per_atom) == 0L) integer() else per_atom
   list(
@@ -442,95 +429,77 @@ generate_adduct_hypotheses <- function(
   max_losses_per_adduct,
   plausible_mz_range
 ) {
-  out <- list()
-  out_i <- 0L
+  c_idx <- c(0L, if (max_clusters_per_adduct >= 1L) seq_along(cluster_parsed))
+  l_idx <- c(0L, if (max_losses_per_adduct >= 1L) seq_along(loss_parsed))
 
-  # Determine available cluster and loss choices early
-  cluster_choices <- if (max_clusters_per_adduct < 1L) {
-    list(NULL)
-  } else {
-    c(list(NULL), as.list(seq_along(cluster_parsed)))
-  }
-  loss_choices <- if (max_losses_per_adduct < 1L) {
-    list(NULL)
-  } else {
-    c(list(NULL), as.list(seq_along(loss_parsed)))
-  }
-
-  for (ci in cluster_choices) {
-    for (li in loss_choices) {
-      clusters_named <- integer()
-      losses_named <- integer()
-      cluster_mass_val <- 0
-      loss_mass_val <- 0
-      if (!is.null(ci)) {
-        clusters_named <- 1L
-        names(clusters_named) <- cluster_formulas[[ci]]
-        cluster_mass_val <- cluster_mass[[ci]]
-      }
-      if (!is.null(li)) {
-        losses_named <- 1L
-        names(losses_named) <- loss_formulas[[li]]
-        loss_mass_val <- loss_mass[[li]]
-      }
-
-      carrier_offset_signed <- base_carrier_offset - (z_val * ELECTRON_MASS_DA)
-      scopes <- .adduct_scope_options(
+  ci_pair <- rep(c_idx, each = length(l_idx))
+  li_pair <- rep.int(l_idx, length(c_idx))
+  scopes_list <- Map(
+    function(ci, li) {
+      .adduct_scope_options(
         m_val = m_val,
-        has_loss = !is.null(li),
-        has_cluster = !is.null(ci)
+        has_loss = li > 0L,
+        has_cluster = ci > 0L
       )
+    },
+    ci_pair,
+    li_pair
+  )
+  s_lens <- lengths(scopes_list)
+  ci_v <- rep.int(ci_pair, s_lens)
+  li_v <- rep.int(li_pair, s_lens)
+  scopes_flat <- unlist(scopes_list, recursive = FALSE)
+  loss_in_v <- vapply(scopes_flat, function(s) isTRUE(s$loss), logical(1L))
+  clus_in_v <- vapply(scopes_flat, function(s) isTRUE(s$cluster), logical(1L))
 
-      for (scope in scopes) {
-        per_monomer_mass <- 0
-        outside_mass <- 0
-        if (isTRUE(scope$cluster)) {
-          per_monomer_mass <- per_monomer_mass + cluster_mass_val
-        } else {
-          outside_mass <- outside_mass + cluster_mass_val
-        }
-        if (isTRUE(scope$loss)) {
-          per_monomer_mass <- per_monomer_mass - loss_mass_val
-        } else {
-          outside_mass <- outside_mass - loss_mass_val
-        }
+  cl_m <- ifelse(ci_v == 0L, 0, cluster_mass[pmax.int(1L, ci_v)])
+  lo_m <- ifelse(li_v == 0L, 0, loss_mass[pmax.int(1L, li_v)])
+  per_monomer_v <- ifelse(clus_in_v, cl_m, 0) - ifelse(loss_in_v, lo_m, 0)
+  outside_v <- ifelse(clus_in_v, 0, cl_m) - ifelse(loss_in_v, 0, lo_m)
 
-        adduct_mass <- carrier_offset_signed + outside_mass
-        mz_high <- as.numeric(plausible_mz_range[[2L]])
-        neutral_high <- (z_abs * mz_high - adduct_mass) /
-          m_val -
-          per_monomer_mass
-        if (!is.finite(neutral_high) || neutral_high <= 0) {
-          next
-        }
+  carrier_offset_signed <- base_carrier_offset - (z_val * ELECTRON_MASS_DA)
+  adduct_mass_v <- carrier_offset_signed + outside_v
+  mz_high <- as.numeric(plausible_mz_range[[2L]])
+  neutral_high_v <- (z_abs * mz_high - adduct_mass_v) / m_val - per_monomer_v
+  keep <- which(is.finite(neutral_high_v) & neutral_high_v > 0)
 
-        adduct <- adduct_to_string(
-          n_mer = m_val,
-          carriers = carriers_named,
-          clusters = clusters_named,
-          losses = losses_named,
-          z = z_val,
-          loss_inside_multimer = isTRUE(scope$loss),
-          cluster_inside_multimer = isTRUE(scope$cluster)
-        )
+  cl_named_lut <- c(
+    list(integer()),
+    lapply(cluster_formulas, function(f) stats::setNames(1L, f))
+  )
+  lo_named_lut <- c(
+    list(integer()),
+    lapply(loss_formulas, function(f) stats::setNames(1L, f))
+  )
 
-        out_i <- out_i + 1L
-        out[[out_i]] <- list(
-          adduct = adduct,
-          n_mer = as.integer(m_val),
-          n_iso = 0L,
-          z = as.integer(z_val),
-          adduct_mass = as.numeric(adduct_mass),
-          adduct_mass_per_monomer = as.numeric(per_monomer_mass),
-          carriers = list(carriers_named),
-          clusters = list(clusters_named),
-          losses = list(losses_named)
-        )
-      }
-    }
-  }
+  m_int <- as.integer(m_val)
+  z_int <- as.integer(z_val)
+  carriers_box <- list(carriers_named)
 
-  out
+  lapply(keep, function(k) {
+    clusters_named <- cl_named_lut[[ci_v[[k]] + 1L]]
+    losses_named <- lo_named_lut[[li_v[[k]] + 1L]]
+    adduct <- adduct_to_string(
+      n_mer = m_val,
+      carriers = carriers_named,
+      clusters = clusters_named,
+      losses = losses_named,
+      z = z_val,
+      loss_inside_multimer = loss_in_v[[k]],
+      cluster_inside_multimer = clus_in_v[[k]]
+    )
+    list(
+      adduct = adduct,
+      n_mer = m_int,
+      n_iso = 0L,
+      z = z_int,
+      adduct_mass = as.numeric(adduct_mass_v[[k]]),
+      adduct_mass_per_monomer = as.numeric(per_monomer_v[[k]]),
+      carriers = carriers_box,
+      clusters = list(clusters_named),
+      losses = list(losses_named)
+    )
+  })
 }
 
 .adduct_scope_options <- function(m_val, has_loss, has_cluster) {

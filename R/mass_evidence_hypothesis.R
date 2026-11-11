@@ -130,90 +130,34 @@ build_evidence_supported_hypotheses <- function(
     ifelse(is.finite(cap_eff), as.character(cap_eff), "Inf")
   )
 
-  # Hypothesis generation per adduct row.
-  # Hot path uses a CHEAP inclusion check (two findIntervals) -- no nearest
-  # distance computation. The actual ppm error is computed in ONE batched
-  # call after the loop, on the (much smaller) kept set.
-  kept_feat_idx <- vector("list", K)
-  kept_aidx <- vector("list", K)
-  kept_M <- vector("list", K)
-  kept_lengths <- integer(K)
-  filled <- 0L
-
-  # Pre-allocate working vectors to avoid repeated allocation in loop
-  n_feat <- length(feature_ids)
-  implied_work <- numeric(n_feat)
-  ok_work <- logical(n_feat)
-
+  # Vectorized hypothesis generation across all (feature, adduct) pairs.
+  # Hot path uses a single matrix evaluation and one batched inclusion check.
   t_loop <- Sys.time()
-  log_every <- max(1L, K %/% 10L)
-
-  for (ui in seq_len(K)) {
-    iso_shift <- niso_v[ui] * EVIDENCE_ISOTOPE_SHIFT_DA
-    z_abs <- abs(z_v[ui])
-    am_u <- am_v[ui]
-    n_mer_u <- n_mer_v[ui]
-    am_pm_u <- am_pm_v[ui]
-
-    # Vectorized implied mass computation
-    implied_work <- (z_abs * feature_mzs - iso_shift - am_u) /
-      n_mer_u -
-      am_pm_u
-
-    # Vectorized bounds check
-    ok_work <- is.finite(implied_work) &
-      implied_work >= min_neutral_mass &
-      implied_work <= max_neutral_mass
-    if (!any(ok_work)) {
-      next
-    }
-
-    # Get valid indices in one pass
-    implied_ok <- implied_work[ok_work]
-
-    if (use_library_prefilter) {
-      hit <- .has_library_match_within_tolerance(
-        masses = implied_ok,
-        exact_masses_sorted = exact_masses_sorted,
-        tolerance_ppm = tol_ppm_num,
-        tolerance_dalton = tolerance_dalton
-      )
-      if (!any(hit)) {
-        next
-      }
-      # Use which.ok_work to get positions - more efficient than which(ok)[hit]
-      which_ok <- which(ok_work)
-      pos <- which_ok[hit]
-      implied_ok <- implied_ok[hit]
-    } else {
-      pos <- which(ok_work)
-    }
-
-    filled <- filled + 1L
-    kept_feat_idx[[filled]] <- pos
-    kept_aidx[[filled]] <- rep.int(ui, length(pos))
-    kept_M[[filled]] <- implied_ok
-    kept_lengths[filled] <- length(pos)
-
-    if (ui %% log_every == 0L) {
-      log_debug(
-        "Evidence pass: %d/%d adducts processed (%.1fs)",
-        ui,
-        K,
-        as.numeric(Sys.time() - t_loop, units = "secs")
-      )
-    }
+  slope_v <- abs(z_v) / n_mer_v
+  offset_v <- (niso_v * EVIDENCE_ISOTOPE_SHIFT_DA + am_v) / n_mer_v + am_pm_v
+  implied_mat <- outer(feature_mzs, slope_v) - rep(offset_v, each = n_feat)
+  ok_idx <- which(
+    is.finite(implied_mat) &
+      implied_mat >= min_neutral_mass &
+      implied_mat <= max_neutral_mass
+  )
+  if (length(ok_idx) > 0L && use_library_prefilter) {
+    hit <- .has_library_match_within_tolerance(
+      masses = implied_mat[ok_idx],
+      exact_masses_sorted = exact_masses_sorted,
+      tolerance_ppm = tol_ppm_num,
+      tolerance_dalton = tolerance_dalton
+    )
+    ok_idx <- ok_idx[hit]
   }
   log_debug(
-    "Evidence pass loop: %d adducts in %.2fs (%d kept hypotheses)",
+    "Evidence pass: %d adducts in %.2fs (%d kept hypotheses)",
     K,
     as.numeric(Sys.time() - t_loop, units = "secs"),
-    sum(lengths(kept_feat_idx))
+    length(ok_idx)
   )
 
-  total_kept <- sum(lengths(kept_feat_idx))
-
-  if (filled == 0L || total_kept == 0L) {
+  if (length(ok_idx) == 0L) {
     return(.materialize_baseline_only(
       feature_ids = feature_ids,
       feature_rts = feature_rts,
@@ -224,10 +168,10 @@ build_evidence_supported_hypotheses <- function(
     ))
   }
 
-  f_idx_vec <- unlist(kept_feat_idx[seq_len(filled)], use.names = FALSE)
-  a_idx_vec <- unlist(kept_aidx[seq_len(filled)], use.names = FALSE)
-  m_vec <- unlist(kept_M[seq_len(filled)], use.names = FALSE)
-  rm(kept_feat_idx, kept_aidx, kept_M)
+  f_idx_vec <- (ok_idx - 1L) %% n_feat + 1L
+  a_idx_vec <- (ok_idx - 1L) %/% n_feat + 1L
+  m_vec <- implied_mat[ok_idx]
+  rm(implied_mat, ok_idx)
   log_info(
     "Evidence engine candidate materialization: %d rows",
     length(f_idx_vec)
@@ -366,15 +310,7 @@ build_evidence_supported_hypotheses <- function(
       is.na(prev_rt) |
       is.na(rt_vec) |
       (rt_vec - prev_rt) > tolerance_rt
-    if (n_h > 2L && any(!step_rt[-1L] & !step_rt[-n_h])) {
-      anchor_rt <- rt_vec[1L]
-      for (i in 2L:n_h) {
-        if (step_rt[i] || (rt_vec[i] - anchor_rt) > tolerance_rt) {
-          step_rt[i] <- TRUE
-          anchor_rt <- rt_vec[i]
-        }
-      }
-    }
+    step_rt <- .split_transitive_rt_runs(step_rt, rt_vec, tolerance_rt)
     cs_step <- cumsum(step_rt)
     grp_base <- cummax(ifelse(!same_sm, cs_step, 0L))
     rt_cl <- cs_step - grp_base + 1L
@@ -441,15 +377,7 @@ build_evidence_supported_hypotheses <- function(
       is.na(prev_rt) |
       is.na(rt_vec) |
       (rt_vec - prev_rt) > tolerance_rt
-    if (n_h > 2L && any(!step_rt[-1L] & !step_rt[-n_h])) {
-      anchor_rt <- rt_vec[1L]
-      for (i in 2L:n_h) {
-        if (step_rt[i] || (rt_vec[i] - anchor_rt) > tolerance_rt) {
-          step_rt[i] <- TRUE
-          anchor_rt <- rt_vec[i]
-        }
-      }
-    }
+    step_rt <- .split_transitive_rt_runs(step_rt, rt_vec, tolerance_rt)
     cs_step <- cumsum(step_rt)
     grp_base <- cummax(ifelse(!same_sm, cs_step, 0L))
     rt_cl <- cs_step - grp_base + 1L
@@ -618,6 +546,22 @@ build_evidence_supported_hypotheses <- function(
 #' found. Keeps the pipeline robust: every feature still receives the
 #' protonated/deprotonated form as a fallback.
 #' @keywords internal
+.split_transitive_rt_runs <- function(step_rt, rt_vec, tolerance_rt) {
+  n_h <- length(step_rt)
+  if (n_h > 2L && any(!step_rt[-1L] & !step_rt[-n_h])) {
+    seq_h <- seq_len(n_h)
+    repeat {
+      run_start <- cummax(ifelse(step_rt, seq_h, 0L))
+      idx_over <- which(!step_rt & (rt_vec - rt_vec[run_start]) > tolerance_rt)
+      if (length(idx_over) == 0L) {
+        break
+      }
+      step_rt[idx_over[!duplicated(run_start[idx_over])]] <- TRUE
+    }
+  }
+  step_rt
+}
+
 .materialize_baseline_only <- function(
   feature_ids,
   feature_rts,
