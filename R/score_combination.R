@@ -232,8 +232,12 @@ expand_combined_scores_for_filtering <- function(
     result <- tidytable::as_tidytable(as.list(
       select_clean_chemo_working_columns(wide_bio_table)
     ))
-    for (col in chemo_cols_to_add) {
-      data.table::set(result, j = col, value = wide_chemo_table[[col]])
+    if (length(chemo_cols_to_add) > 0L) {
+      data.table::set(
+        result,
+        j = chemo_cols_to_add,
+        value = as.list(wide_chemo_table)[chemo_cols_to_add]
+      )
     }
     if ("score_final" %in% names(combined_scores)) {
       data.table::set(

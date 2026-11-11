@@ -73,19 +73,16 @@ round_reals <- function(
     if (is.numeric(x)) {
       return(round(x, digits = dig))
     }
-    if (is.character(x) && length(x) > 1024L) {
-      ux <- unique(x)
-      if (length(ux) * 2L < length(x)) {
-        rux <- round(as.numeric(ux), digits = dig)
-        return(rux[fastmatch::fmatch(x, ux)])
-      }
-    }
     round(as.numeric(x), digits = dig)
   }
 
   out <- tidytable::as_tidytable(as.list(df))
-  for (col in matching_cols) {
-    data.table::set(out, j = col, value = .round_col(out[[col]]))
+  if (length(matching_cols) > 0L) {
+    data.table::set(
+      out,
+      j = matching_cols,
+      value = lapply(as.list(out)[matching_cols], .round_col)
+    )
   }
   out
 }

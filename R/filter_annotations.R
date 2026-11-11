@@ -161,13 +161,11 @@ filter_annotations <- function(
       annotation_table$feature_id,
       features_table$feature_id
     )
-    for (col in extra_feat_cols) {
-      data.table::set(
-        annotation_table,
-        j = col,
-        value = features_table[[col]][f_idx]
-      )
-    }
+    data.table::set(
+      annotation_table,
+      j = extra_feat_cols,
+      value = lapply(as.list(features_table)[extra_feat_cols], `[`, f_idx)
+    )
     features_annotated_table_1 <- annotation_table
   } else {
     features_annotated_table_1 <- annotation_table |>
@@ -636,7 +634,7 @@ filter_ms1_redundancy <- function(
             ms1_hit_rows <- z_sub[has_z_match]
             spec_hit_rows <- zero_idx[z_match[has_z_match]]
             ms1_tbl <- tidytable::as_tidytable(as.list(ms1_tbl))
-            for (z_col in intersect(
+            z_cols <- intersect(
               c(
                 "candidate_score_similarity",
                 "candidate_score_similarity_forward",
@@ -646,25 +644,37 @@ filter_ms1_redundancy <- function(
                 "candidate_spectrum_entropy"
               ),
               names(annotations_tables_spectral)
-            )) {
-              spec_v <- annotations_tables_spectral[[z_col]][spec_hit_rows]
-              if (z_col %in% names(ms1_tbl)) {
-                cur_v <- ms1_tbl[[z_col]]
-                na_rel <- is.na(cur_v[ms1_hit_rows])
-                if (any(na_rel)) {
-                  fill_rows <- ms1_hit_rows[na_rel]
-                  fill_vals <- spec_v[na_rel]
-                  cur_v[fill_rows] <- as.vector(
-                    fill_vals,
-                    mode = typeof(cur_v)
-                  )
-                  data.table::set(ms1_tbl, j = z_col, value = cur_v)
-                }
-              } else {
-                new_v <- spec_v[rep.int(NA_integer_, nrow(ms1_tbl))]
-                new_v[ms1_hit_rows] <- spec_v
-                data.table::set(ms1_tbl, j = z_col, value = new_v)
-              }
+            )
+            if (length(z_cols) > 0L) {
+              n_ms1_rows <- nrow(ms1_tbl)
+              ms1_names <- names(ms1_tbl)
+              data.table::set(
+                ms1_tbl,
+                j = z_cols,
+                value = lapply(
+                  z_cols,
+                  function(z_col) {
+                    spec_v <- annotations_tables_spectral[[z_col]][
+                      spec_hit_rows
+                    ]
+                    if (z_col %in% ms1_names) {
+                      cur_v <- ms1_tbl[[z_col]]
+                      na_rel <- is.na(cur_v[ms1_hit_rows])
+                      if (any(na_rel)) {
+                        cur_v[ms1_hit_rows[na_rel]] <- as.vector(
+                          spec_v[na_rel],
+                          mode = typeof(cur_v)
+                        )
+                      }
+                      cur_v
+                    } else {
+                      new_v <- spec_v[rep.int(NA_integer_, n_ms1_rows)]
+                      new_v[ms1_hit_rows] <- spec_v
+                      new_v
+                    }
+                  }
+                )
+              )
             }
           }
         }
@@ -810,12 +820,16 @@ apply_rt_filter <- function(features_annotated_table, rt_table, tolerance_rt) {
         (if (anyNA(u1)) match(c1, u1) else fastmatch::fmatch(c1, u1)) - 1L
       )
       if (length(dedup_cols) >= 2L) {
-        for (k_i in 2:length(dedup_cols)) {
-          ck <- out[[dedup_cols[[k_i]]]]
-          uk <- unique(ck)
-          idk <- if (anyNA(uk)) match(ck, uk) else fastmatch::fmatch(ck, uk)
-          comp_key <- comp_key * (length(uk) + 1L) + (idk - 1L)
-        }
+        comp_key <- Reduce(
+          function(cur_k, k_i) {
+            ck <- out[[dedup_cols[[k_i]]]]
+            uk <- unique(ck)
+            idk <- if (anyNA(uk)) match(ck, uk) else fastmatch::fmatch(ck, uk)
+            cur_k * (length(uk) + 1L) + (idk - 1L)
+          },
+          2:length(dedup_cols),
+          init = comp_key
+        )
       }
       if (anyDuplicated(comp_key) > 0L) {
         n_before_out <- nrow(out)

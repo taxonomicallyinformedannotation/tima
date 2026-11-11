@@ -190,14 +190,20 @@ import_spectra <- function(
 
   # Harmonize legacy metadata fields to standard names
   spec_cols <- colnames(spectra@backend@spectraData)
-  for (col in intersect(c("MSLEVEL", "MS_LEVEL"), spec_cols)) {
-    spectra$msLevel <- as.integer(spectra[[col]])
+  ms_level_cols <- intersect(c("MSLEVEL", "MS_LEVEL"), spec_cols)
+  if (length(ms_level_cols) > 0L) {
+    spectra$msLevel <- as.integer(spectra[[ms_level_cols[[length(
+      ms_level_cols
+    )]]]])
   }
-  for (col in intersect(
+  prec_mz_cols <- intersect(
     c("PRECURSOR_MZ", "PrecursorMZ", "PrecursorMz", "precursor_mz"),
     spec_cols
-  )) {
-    spectra$precursorMz <- as.numeric(spectra[[col]])
+  )
+  if (length(prec_mz_cols) > 0L) {
+    spectra$precursorMz <- as.numeric(spectra[[prec_mz_cols[[length(
+      prec_mz_cols
+    )]]]])
   }
   if ("spectrum_id" %in% spec_cols) {
     spectra$spectrum_id <- as.character(spectra$spectrum_id)
@@ -369,14 +375,20 @@ import_spectra <- function(
   }
 
   spec_cols <- colnames(spectra@backend@spectraData)
-  for (col in intersect(c("MSLEVEL", "MS_LEVEL"), spec_cols)) {
-    spectra$msLevel <- as.integer(spectra[[col]])
+  ms_level_cols <- intersect(c("MSLEVEL", "MS_LEVEL"), spec_cols)
+  if (length(ms_level_cols) > 0L) {
+    spectra$msLevel <- as.integer(spectra[[ms_level_cols[[length(
+      ms_level_cols
+    )]]]])
   }
-  for (col in intersect(
+  prec_mz_cols <- intersect(
     c("PRECURSOR_MZ", "PrecursorMZ", "PrecursorMz", "precursor_mz"),
     spec_cols
-  )) {
-    spectra$precursorMz <- as.numeric(spectra[[col]])
+  )
+  if (length(prec_mz_cols) > 0L) {
+    spectra$precursorMz <- as.numeric(spectra[[prec_mz_cols[[length(
+      prec_mz_cols
+    )]]]])
   }
   if ("spectrum_id" %in% spec_cols) {
     spectra$spectrum_id <- as.character(spectra$spectrum_id)

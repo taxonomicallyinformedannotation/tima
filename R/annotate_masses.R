@@ -614,13 +614,17 @@ annotate_masses <- function(
     idx_hi[idx_hi >= 1L & idx_hi <= nb],
     top_idx
   ))
-  for (dig in 3L:12L) {
-    ch_lo_p <- formatC(0 + breaks[probe_lo], digits = dig, width = 1L)
-    ch_hi_p <- formatC(0 + breaks[probe_lo + 1L], digits = dig, width = 1L)
-    if (all(ch_lo_p != ch_hi_p)) {
-      break
-    }
-  }
+  dig_candidates <- 3L:12L
+  dig_ok <- vapply(
+    dig_candidates,
+    function(d) {
+      ch_lo_p <- formatC(0 + breaks[probe_lo], digits = d, width = 1L)
+      ch_hi_p <- formatC(0 + breaks[probe_lo + 1L], digits = d, width = 1L)
+      all(ch_lo_p != ch_hi_p)
+    },
+    logical(1L)
+  )
+  dig <- if (any(dig_ok)) dig_candidates[which(dig_ok)[1L]] else 12L
   nt <- length(top_idx)
   ch_top <- formatC(
     0 + breaks[c(top_idx, top_idx + 1L)],

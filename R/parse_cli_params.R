@@ -533,14 +533,19 @@ parse_cli_params <- function(arguments, parameters) {
     x
   }
 
-  for (arg_name in names(mappings)) {
-    if (!is.null(arguments[[arg_name]])) {
-      parameters <- .modify_nested(
-        parameters,
-        mappings[[arg_name]]$path,
-        mappings[[arg_name]]$type(arguments[[arg_name]])
-      )
-    }
-  }
-  parameters
+  Reduce(
+    function(cur_params, arg_name) {
+      if (!is.null(arguments[[arg_name]])) {
+        .modify_nested(
+          cur_params,
+          mappings[[arg_name]]$path,
+          mappings[[arg_name]]$type(arguments[[arg_name]])
+        )
+      } else {
+        cur_params
+      }
+    },
+    names(mappings),
+    init = parameters
+  )
 }

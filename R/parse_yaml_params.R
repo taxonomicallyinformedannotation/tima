@@ -112,18 +112,19 @@ merge_lists_recursive <- function(default, user) {
     return(user)
   }
 
-  result <- default
-
-  for (name in names(user)) {
-    value <- user[[name]]
-    if (
-      name %in% names(default) && is.list(default[[name]]) && is.list(value)
-    ) {
-      result[[name]] <- merge_lists_recursive(default[[name]], value)
-    } else {
-      result[[name]] <- value
-    }
-  }
-
-  result
+  Reduce(
+    function(res, name) {
+      value <- user[[name]]
+      if (
+        name %in% names(default) && is.list(default[[name]]) && is.list(value)
+      ) {
+        res[[name]] <- merge_lists_recursive(default[[name]], value)
+      } else {
+        res[[name]] <- value
+      }
+      res
+    },
+    names(user),
+    init = default
+  )
 }

@@ -310,19 +310,31 @@ rank_and_deduplicate <- function(df) {
     "score_chemical"
   )
 
-  for (col in score_cols) {
-    if (col %in% names(df)) {
-      df[[col]] <- .as_numeric_dedup(df[[col]])
-    } else {
-      df[[col]] <- rep(NA_real_, nrow(df))
-    }
-  }
-
-  if (!("candidate_adduct_match_mode" %in% names(df))) {
-    df[["candidate_adduct_match_mode"]] <- rep(NA_character_, nrow(df))
-  }
-
   df <- tidytable::as_tidytable(df)
+  n_df <- nrow(df)
+  df_names <- names(df)
+  data.table::set(
+    df,
+    j = score_cols,
+    value = lapply(
+      score_cols,
+      function(col) {
+        if (col %in% df_names) {
+          .as_numeric_dedup(df[[col]])
+        } else {
+          rep(NA_real_, n_df)
+        }
+      }
+    )
+  )
+
+  if (!("candidate_adduct_match_mode" %in% df_names)) {
+    data.table::set(
+      df,
+      j = "candidate_adduct_match_mode",
+      value = rep(NA_character_, n_df)
+    )
+  }
 
   # Compute rank_final (min_rank on combined score) and deduplicate per
   # (feature_id, candidate_structure_inchikey_connectivity_layer), keeping each

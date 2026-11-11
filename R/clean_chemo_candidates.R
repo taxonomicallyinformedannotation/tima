@@ -889,21 +889,21 @@ build_mini_taxonomy_table <- function(
   }
 
   coalesce_tax_labels <- function(cols) {
-    n_rows <- nrow(df_percentile)
-    out <- rep(NA_character_, n_rows)
-    rem <- seq_len(n_rows)
-    for (col in cols) {
-      if (length(rem) == 0L) {
-        break
-      }
-      vals <- normalize_tax_label_dedup(df_percentile[[col]][rem])
-      ok <- !is.na(vals)
-      if (any(ok)) {
-        out[rem[ok]] <- vals[ok]
-        rem <- rem[!ok]
-      }
-    }
-    out
+    Reduce(
+      function(out, col) {
+        rem <- which(is.na(out))
+        if (length(rem) > 0L) {
+          vals <- normalize_tax_label_dedup(df_percentile[[col]][rem])
+          ok <- !is.na(vals)
+          if (any(ok)) {
+            out[rem[ok]] <- vals[ok]
+          }
+        }
+        out
+      },
+      cols,
+      init = rep(NA_character_, nrow(df_percentile))
+    )
   }
 
   fids <- df_percentile$feature_id

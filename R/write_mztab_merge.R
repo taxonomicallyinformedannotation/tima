@@ -379,17 +379,20 @@
 
     u_bidx <- unique(base_idx)
     b_f <- factor(base_idx, levels = u_bidx)
-    for (col in ref_cols) {
-      grouped <- split(new_vals[[col]][dup_idx], b_f)
-      sml_df[[col]][u_bidx] <- unlist(
-        Map(
-          function(cur, vals) Reduce(.mztab_union_ref_ids, vals, init = cur),
-          sml_df[[col]][u_bidx],
-          unname(grouped)
-        ),
-        use.names = FALSE
-      )
-    }
+    sml_df[u_bidx, ref_cols] <- lapply(
+      ref_cols,
+      function(col) {
+        grouped <- split(new_vals[[col]][dup_idx], b_f)
+        unlist(
+          Map(
+            function(cur, vals) Reduce(.mztab_union_ref_ids, vals, init = cur),
+            sml_df[[col]][u_bidx],
+            unname(grouped)
+          ),
+          use.names = FALSE
+        )
+      }
+    )
 
     sml_all <- tidytable::as_tidytable(sml_df)
   }
@@ -467,13 +470,18 @@
         idx1_m <- which(new_fm)
         u_fid_m <- mm_u[idx1_m]
         grp_len_m <- n_mm_all[u_fid_m]
-        for (L in sort(unique(grp_len_m))) {
-          f_pos <- which(grp_len_m == L)
-          f_ids_L <- u_fid_m[f_pos]
-          starts <- idx1_m[f_pos]
-          cols_L <- lapply(0L:(L - 1L), function(off) mm_sml[starts + off])
-          lookup_refs[f_ids_L] <- do.call(paste, c(cols_L, list(sep = "|")))
-        }
+        lookup_refs <- Reduce(
+          function(cur_refs, L) {
+            f_pos <- which(grp_len_m == L)
+            f_ids_L <- u_fid_m[f_pos]
+            starts <- idx1_m[f_pos]
+            cols_L <- lapply(0L:(L - 1L), function(off) mm_sml[starts + off])
+            cur_refs[f_ids_L] <- do.call(paste, c(cols_L, list(sep = "|")))
+            cur_refs
+          },
+          sort(unique(grp_len_m)),
+          init = lookup_refs
+        )
       }
     }
   }
@@ -616,13 +624,18 @@
       idx1_r <- which(new_fr)
       u_fid_r <- fid_r[idx1_r]
       grp_len_r <- n_r_all[u_fid_r]
-      for (L in sort(unique(grp_len_r))) {
-        f_pos <- which(grp_len_r == L)
-        f_ids_L <- u_fid_r[f_pos]
-        starts <- idx1_r[f_pos]
-        cols_L <- lapply(0L:(L - 1L), function(off) r_sub[starts + off])
-        lookup_refs[f_ids_L] <- do.call(paste, c(cols_L, list(sep = "|")))
-      }
+      lookup_refs <- Reduce(
+        function(cur_refs, L) {
+          f_pos <- which(grp_len_r == L)
+          f_ids_L <- u_fid_r[f_pos]
+          starts <- idx1_r[f_pos]
+          cols_L <- lapply(0L:(L - 1L), function(off) r_sub[starts + off])
+          cur_refs[f_ids_L] <- do.call(paste, c(cols_L, list(sep = "|")))
+          cur_refs
+        },
+        sort(unique(grp_len_r)),
+        init = lookup_refs
+      )
 
       gt1_fids <- u_fid_r[grp_len_r > 1L]
       if (length(gt1_fids) > 0L) {

@@ -131,8 +131,9 @@ rank_candidates <- function(df) {
     j = "rank_initial",
     value = .fast_min_rank_desc(fid_keep, si_keep, n_keep)
   )
-  for (drop_col in intersect(c("score_final", "score_initial"), names(df))) {
-    data.table::set(df, j = drop_col, value = NULL)
+  drop_cols <- intersect(c("score_final", "score_initial"), names(df))
+  if (length(drop_cols) > 0L) {
+    data.table::set(df, j = drop_cols, value = NULL)
   }
   df
 }

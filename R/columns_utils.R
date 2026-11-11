@@ -430,13 +430,19 @@ clean_collapse <- function(grouped_df, cols = NULL, separator = " $ ") {
     max_r <- max(r_m)
     idx1 <- which(r_m == 1L)
     u_g_pres <- g_ok[idx1]
-    acc <- v_ok[idx1]
-    if (max_r > 1L) {
-      for (r in 2L:max_r) {
-        idx_r <- which(r_m == r)
-        pos <- fastmatch::fmatch(g_ok[idx_r], u_g_pres)
-        acc[pos] <- paste(acc[pos], v_ok[idx_r], sep = separator)
-      }
+    acc <- if (max_r > 1L) {
+      Reduce(
+        function(cur_acc, r) {
+          idx_r <- which(r_m == r)
+          pos <- fastmatch::fmatch(g_ok[idx_r], u_g_pres)
+          cur_acc[pos] <- paste(cur_acc[pos], v_ok[idx_r], sep = separator)
+          cur_acc
+        },
+        2L:max_r,
+        init = v_ok[idx1]
+      )
+    } else {
+      v_ok[idx1]
     }
     u_acc <- unique(acc)
     u_trim <- trimws(u_acc)
@@ -445,8 +451,12 @@ clean_collapse <- function(grouped_df, cols = NULL, separator = " $ ") {
     res
   }
 
-  for (col in cols_val) {
-    data.table::set(out, j = col, value = collapse_one_col(grouped_df[[col]]))
+  if (length(cols_val) > 0L) {
+    data.table::set(
+      out,
+      j = cols_val,
+      value = lapply(as.list(grouped_df)[cols_val], collapse_one_col)
+    )
   }
   out
 }

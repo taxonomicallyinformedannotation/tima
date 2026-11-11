@@ -193,13 +193,11 @@ clean_chemo <- function(
   ) {
     .ft_fids <- features_table$feature_id
     .m_ft <- fastmatch::fmatch(annot_table_wei_chemo$feature_id, .ft_fids)
-    for (.col in .missing_from_ft) {
-      data.table::set(
-        annot_table_wei_chemo,
-        j = .col,
-        value = features_table[[.col]][.m_ft]
-      )
-    }
+    data.table::set(
+      annot_table_wei_chemo,
+      j = .missing_from_ft,
+      value = lapply(as.list(features_table)[.missing_from_ft], `[`, .m_ft)
+    )
   }
 
   log_metadata(
@@ -353,16 +351,13 @@ clean_chemo <- function(
 
 .slice_top_n_by_feature <- function(df, n_keep) {
   n <- nrow(df)
-  if (n == 0L) {
-    return(df)
-  }
   ord1 <- order(df$rank_final, na.last = TRUE, method = "radix")
   fids_ord1 <- df$feature_id[ord1]
   u_fids <- unique(fids_ord1)
   fid_id <- fastmatch::fmatch(fids_ord1, u_fids)
   ord2 <- order(fid_id, method = "radix")
   g_sorted <- fid_id[ord2]
-  new_g <- if (n > 1L) c(TRUE, g_sorted[-1L] != g_sorted[-n]) else TRUE
+  new_g <- c(rep.int(TRUE, min(n, 1L)), g_sorted[-1L] != g_sorted[-n])
   pos_in_g <- seq_len(n) - cummax(ifelse(new_g, seq_len(n), 1L)) + 1L
   keep_idx <- ord1[ord2[pos_in_g <= n_keep]]
   df[keep_idx, , drop = FALSE]
@@ -370,11 +365,6 @@ clean_chemo <- function(
 
 .attach_candidate_counts <- function(results, results_candidates) {
   res_list <- as.list(results)
-  if (nrow(results) == 0L) {
-    res_list[["candidates_evaluated"]] <- integer(0L)
-    res_list[["candidates_best"]] <- integer(0L)
-    return(tidytable::as_tidytable(res_list))
-  }
   rc_fids <- results_candidates$feature_id
   idx <- fastmatch::fmatch(results$feature_id, rc_fids)
   c_eval <- results_candidates$candidates_evaluated[idx]

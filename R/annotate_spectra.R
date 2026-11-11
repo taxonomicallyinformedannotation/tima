@@ -175,28 +175,31 @@ annotate_spectra <- function(
   # Genuinely malformed MGFs (mismatched BEGIN/END IONS, parse failures,
   # ...) remain fatal and abort as before.
   log_debug("Running pre-flight checks on input MGF files...")
-  recoverable_issues <- character(0L)
-  for (mgf in input_vec) {
-    pf <- sanitize_mgf(file = mgf, file_type = "MGF spectra")
-    fatal <- .preflight_mgf_fatal_issues(pf)
-    if (length(fatal) > 0L) {
-      tima_abort(
-        problem = "Input data validation failed",
-        received = paste(fatal, collapse = "; "),
-        fix = paste(
-          "1. Review the error messages above",
-          "2. Fix the identified issues in your input files",
-          "3. Re-run the validation",
-          sep = "\n"
-        ),
-        class = c("tima_validation_error", "tima_error")
-      )
-    }
-    recoverable_issues <- c(
-      recoverable_issues,
-      if (length(pf$issues) > 0L) pf$issues else character(0L)
-    )
-  }
+  recoverable_issues <- unlist(
+    lapply(
+      input_vec,
+      function(mgf) {
+        pf <- sanitize_mgf(file = mgf, file_type = "MGF spectra")
+        fatal <- .preflight_mgf_fatal_issues(pf)
+        if (length(fatal) > 0L) {
+          tima_abort(
+            problem = "Input data validation failed",
+            received = paste(fatal, collapse = "; "),
+            fix = paste(
+              "1. Review the error messages above",
+              "2. Fix the identified issues in your input files",
+              "3. Re-run the validation",
+              sep = "\n"
+            ),
+            class = c("tima_validation_error", "tima_error")
+          )
+        }
+        if (length(pf$issues) > 0L) pf$issues else character(0L)
+      }
+    ),
+    use.names = FALSE
+  ) %||%
+    character(0L)
 
   # If every input MGF had no usable MS2 spectra, degrade gracefully: one
   # actionable warning, then return a valid empty template.
@@ -1943,18 +1946,22 @@ log_library_stats <- function(lib_sp) {
     c1 <- sd[[id_cols[1L]]]
     struct_id <- if (is.null(keep_idx)) c1 else c1[keep_idx]
     if (length(id_cols) > 1L && anyNA(struct_id)) {
-      for (col in id_cols[-1L]) {
-        na_pos <- which(is.na(struct_id))
-        if (length(na_pos) == 0L) {
-          break
-        }
-        ck <- sd[[col]]
-        struct_id[na_pos] <- if (is.null(keep_idx)) {
-          ck[na_pos]
-        } else {
-          ck[keep_idx[na_pos]]
-        }
-      }
+      struct_id <- Reduce(
+        function(cur_id, col) {
+          na_pos <- which(is.na(cur_id))
+          if (length(na_pos) > 0L) {
+            ck <- sd[[col]]
+            cur_id[na_pos] <- if (is.null(keep_idx)) {
+              ck[na_pos]
+            } else {
+              ck[keep_idx[na_pos]]
+            }
+          }
+          cur_id
+        },
+        id_cols[-1L],
+        init = struct_id
+      )
     }
   }
 

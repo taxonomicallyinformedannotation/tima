@@ -107,11 +107,16 @@ enrich_with_structure_metadata <- function(combined, structure_table) {
         )),
         .keep_all = TRUE
       )
-    for (cc in avail_struct_cols) {
-      if (is.numeric(struct_unique[[cc]])) {
-        struct_unique[[cc]] <- .fast_num_to_char(struct_unique[[cc]])
-      }
-    }
+    num_st_cols <- avail_struct_cols[vapply(
+      as.list(struct_unique)[avail_struct_cols],
+      is.numeric,
+      logical(1L)
+    )]
+    data.table::set(
+      struct_unique,
+      j = num_st_cols,
+      value = lapply(as.list(struct_unique)[num_st_cols], .fast_num_to_char)
+    )
     taxonomy_table <- NULL
     tax_joined_early <- TRUE
   } else {
@@ -125,11 +130,16 @@ enrich_with_structure_metadata <- function(combined, structure_table) {
         )),
         .keep_all = TRUE
       )
-    for (cc in colnames(struct_unique)) {
-      if (is.numeric(struct_unique[[cc]])) {
-        struct_unique[[cc]] <- .fast_num_to_char(struct_unique[[cc]])
-      }
-    }
+    num_st_cols <- colnames(struct_unique)[vapply(
+      as.list(struct_unique),
+      is.numeric,
+      logical(1L)
+    )]
+    data.table::set(
+      struct_unique,
+      j = num_st_cols,
+      value = lapply(as.list(struct_unique)[num_st_cols], .fast_num_to_char)
+    )
 
     taxonomy_table <- if (has_tax_cols) {
       structure_table |>
@@ -436,9 +446,13 @@ enforce_loss_formula_compatibility <- function(annotations) {
   ))
 
   out_list <- as.list(annotations)
-  for (cc in struct_cols) {
-    out_list[[cc]][idx_drop] <- NA
-  }
+  out_list[struct_cols] <- lapply(
+    out_list[struct_cols],
+    function(v) {
+      v[idx_drop] <- NA
+      v
+    }
+  )
   out <- tidytable::distinct(tidytable::as_tidytable(out_list))
 
   log_info(

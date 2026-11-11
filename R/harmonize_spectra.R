@@ -178,20 +178,26 @@ harmonize_spectra <- function(
   out_cols <- vector("list", length(target_order))
   names(out_cols) <- target_order
 
-  for (std_nm in names(columns_full)) {
-    src_nm <- columns_full[[std_nm]]
-    if (src_nm %in% names(spectra)) {
-      out_cols[[std_nm]] <- spectra[[src_nm]][keep_idx]
-    } else {
-      out_cols[[std_nm]] <- rep(NA_character_, n_keep)
+  spec_names <- names(spectra)
+  out_cols[names(columns_full)] <- lapply(
+    columns_full,
+    function(src_nm) {
+      if (src_nm %in% spec_names) {
+        spectra[[src_nm]][keep_idx]
+      } else {
+        rep(NA_character_, n_keep)
+      }
     }
-  }
-  for (miss_nm in columns_missing) {
-    out_cols[[miss_nm]] <- rep(NA_character_, n_keep)
+  )
+  if (length(columns_missing) > 0L) {
+    out_cols[columns_missing] <- rep(
+      list(rep(NA_character_, n_keep)),
+      length(columns_missing)
+    )
   }
 
   out_cols[["precursorMz"]] <- spectra[["precursorMz"]][keep_idx]
-  if ("precursorCharge" %in% names(spectra)) {
+  if ("precursorCharge" %in% spec_names) {
     pc <- spectra[["precursorCharge"]][keep_idx]
     na_pc <- is.na(pc)
     if (any(na_pc)) {
@@ -202,12 +208,11 @@ harmonize_spectra <- function(
     out_cols[["precursorCharge"]] <- rep(default_charge, n_keep)
   }
 
-  if ("rtime" %in% names(spectra)) {
+  if ("rtime" %in% spec_names) {
     out_cols[["rtime"]] <- spectra[["rtime"]][keep_idx]
   }
-  for (.col in c("mz", "intensity")) {
-    out_cols[[.col]] <- as.list(spectra[[.col]][keep_idx])
-  }
+  out_cols[["mz"]] <- as.list(spectra[["mz"]][keep_idx])
+  out_cols[["intensity"]] <- as.list(spectra[["intensity"]][keep_idx])
 
   out_cols[["library"]] <- rep(metad, n_keep)
 

@@ -251,15 +251,21 @@ filter_high_evidence_only <- function(
           df_src <- data.table::copy(df_src)
           p_sub <- prom_idx[has_anc]
           a_sub <- anchor_u_idx[m_anc[has_anc]]
-          for (col in inherit_cols) {
-            cur_v <- df_src[[col]]
-            anc_v <- cur_v[a_sub]
-            use_anc <- !is.na(anc_v)
-            if (any(use_anc)) {
-              cur_v[p_sub[use_anc]] <- anc_v[use_anc]
-              data.table::set(df_src, j = col, value = cur_v)
-            }
-          }
+          data.table::set(
+            df_src,
+            j = inherit_cols,
+            value = lapply(
+              as.list(df_src)[inherit_cols],
+              function(cur_v) {
+                anc_v <- cur_v[a_sub]
+                use_anc <- !is.na(anc_v)
+                if (any(use_anc)) {
+                  cur_v[p_sub[use_anc]] <- anc_v[use_anc]
+                }
+                cur_v
+              }
+            )
+          )
         }
       }
     }
@@ -298,11 +304,13 @@ filter_high_evidence_only <- function(
 
   # SIRIUS confidence and spectral similarity filtering
   # ALWAYS filter out spectral similarity = 0 (invalid MS2 data) if column exists
-  for (sim_col in c("candidate_score_similarity", "candidate_similarity")) {
-    csim <- .num_col(sim_col)
-    if (!is.null(csim)) {
-      keep <- keep & (is.na(csim) | csim > 0)
-    }
+  csim1 <- .num_col("candidate_score_similarity")
+  if (!is.null(csim1)) {
+    keep <- keep & (is.na(csim1) | csim1 > 0)
+  }
+  csim2 <- .num_col("candidate_similarity")
+  if (!is.null(csim2)) {
+    keep <- keep & (is.na(csim2) | csim2 > 0)
   }
 
   # Apply threshold filters with OR logic if set

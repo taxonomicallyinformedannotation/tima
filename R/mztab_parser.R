@@ -224,13 +224,15 @@ NULL
   if (all(raw_lens == target_raw_len)) {
     flat <- unlist(raw_splits, use.names = FALSE)
     mat <- matrix(flat, nrow = target_raw_len, ncol = n_rows)
-    out_list <- vector("list", n_cols)
-    for (j in seq_len(n_cols)) {
-      col_vec <- mat[j + 1L, ]
-      u <- unique(col_vec)
-      u_norm <- .normalize_mztab_value(u)
-      out_list[[j]] <- u_norm[fastmatch::fmatch(col_vec, u)]
-    }
+    out_list <- lapply(
+      seq_len(n_cols),
+      function(j) {
+        col_vec <- mat[j + 1L, ]
+        u <- unique(col_vec)
+        u_norm <- .normalize_mztab_value(u)
+        u_norm[fastmatch::fmatch(col_vec, u)]
+      }
+    )
     names(out_list) <- col_names
     return(tidytable::as_tidytable(out_list))
   }

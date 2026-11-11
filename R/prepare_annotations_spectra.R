@@ -253,9 +253,11 @@ prepare_spectral_annotation_chunk <- function(file, annotation_cols) {
   }
 
   na_col <- rep(NA_character_, nrow(df))
-  for (col in missing_cols) {
-    data.table::set(df, j = col, value = na_col)
-  }
+  data.table::set(
+    df,
+    j = missing_cols,
+    value = rep(list(na_col), length(missing_cols))
+  )
   data.table::setcolorder(df, annotation_cols)
   df
 }

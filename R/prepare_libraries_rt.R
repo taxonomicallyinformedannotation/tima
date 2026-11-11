@@ -196,10 +196,16 @@ prepare_libraries_rt <- function(
 
   polish_df <- function(df, type = "experimental", unit = unit_rt) {
     df_tmp <- tidytable::as_tidytable(df)
-    for (col in c("inchikey", "smiles", "structure_name")) {
-      if (!col %in% colnames(df_tmp)) {
-        data.table::set(df_tmp, j = col, value = NA_character_)
-      }
+    miss_chr <- setdiff(
+      c("inchikey", "smiles", "structure_name"),
+      colnames(df_tmp)
+    )
+    if (length(miss_chr) > 0L) {
+      data.table::set(
+        df_tmp,
+        j = miss_chr,
+        value = rep(list(NA_character_), length(miss_chr))
+      )
     }
     if (!"rt" %in% colnames(df_tmp)) {
       data.table::set(df_tmp, j = "rt", value = NA_real_)
@@ -269,12 +275,21 @@ prepare_libraries_rt <- function(
       df_completed <- df_full
     }
 
-    char_cols <- c("smiles", "inchikey", "structure_name", "type")
-    for (col in intersect(char_cols, names(df_completed))) {
-      v <- df_completed[[col]]
-      v[!is.na(v) & v == "NA"] <- NA_character_
-      data.table::set(df_completed, j = col, value = v)
-    }
+    char_cols <- intersect(
+      c("smiles", "inchikey", "structure_name", "type"),
+      names(df_completed)
+    )
+    data.table::set(
+      df_completed,
+      j = char_cols,
+      value = lapply(
+        as.list(df_completed)[char_cols],
+        function(v) {
+          v[!is.na(v) & v == "NA"] <- NA_character_
+          v
+        }
+      )
+    )
 
     df_completed <- tidytable::tidytable(
       rt = df_completed$rt,

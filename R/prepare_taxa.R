@@ -438,13 +438,14 @@ prepare_taxa <- function(
       ))
     rm(biological_metadata)
 
-    out_list <- vector("list", length(collapse_cols) + 1L)
-    names(out_list) <- c("feature_id", collapse_cols)
-    out_list[[1L]] <- u_fid
     n_fid <- length(u_fid)
-    for (col in collapse_cols) {
-      out_list[[col]] <- rep(one_row[[col]][[1L]], n_fid)
-    }
+    out_list <- c(
+      list(feature_id = u_fid),
+      lapply(
+        as.list(one_row)[collapse_cols],
+        function(col_v) rep(col_v[[1L]], n_fid)
+      )
+    )
     taxed_features_table <- tidytable::as_tidytable(out_list)
   } else {
     if (!is.null(taxon)) {
@@ -745,12 +746,17 @@ prepare_taxa <- function(
           combo_sig[idx1] <- o_key[starts[idx1]]
         }
         u_lens <- sort(unique(counts[counts > 1L]))
-        for (L in u_lens) {
-          idx_L <- which(counts == L)
-          s_L <- starts[idx_L]
-          cols <- lapply(0L:(L - 1L), function(k) o_key[s_L + k])
-          combo_sig[idx_L] <- do.call(paste, c(cols, list(sep = "\r")))
-        }
+        combo_sig <- Reduce(
+          function(cur_sig, L) {
+            idx_L <- which(counts == L)
+            s_L <- starts[idx_L]
+            cols <- lapply(0L:(L - 1L), function(k) o_key[s_L + k])
+            cur_sig[idx_L] <- do.call(paste, c(cols, list(sep = "\r")))
+            cur_sig
+          },
+          u_lens,
+          init = combo_sig
+        )
 
         u_combos <- as.vector(unique(combo_sig))
         combo_id_per_f <- as.vector(fastmatch::fmatch(combo_sig, u_combos))

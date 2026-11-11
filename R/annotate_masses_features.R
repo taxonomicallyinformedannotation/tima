@@ -151,24 +151,34 @@ load_structural_library <- function(
     supp_files,
     supp_names
   )
-  joined <- tidytable::as_tidytable(library_table)
-  for (st in supp_tables) {
-    by_cols <- intersect(names(joined), names(st))
-    if (
-      length(by_cols) == 1L &&
-        anyDuplicated(st[[by_cols]]) == 0L &&
-        !anyNA(st[[by_cols]])
-    ) {
-      key_col <- by_cols[[1L]]
-      m_idx <- fastmatch::fmatch(joined[[key_col]], st[[key_col]])
-      new_cols <- setdiff(names(st), key_col)
-      for (col in new_cols) {
-        data.table::set(joined, j = col, value = st[[col]][m_idx])
+  joined <- Reduce(
+    function(acc, st) {
+      by_cols <- intersect(names(acc), names(st))
+      if (
+        length(by_cols) == 1L &&
+          anyDuplicated(st[[by_cols]]) == 0L &&
+          !anyNA(st[[by_cols]])
+      ) {
+        key_col <- by_cols[[1L]]
+        m_idx <- fastmatch::fmatch(acc[[key_col]], st[[key_col]])
+        new_cols <- setdiff(names(st), key_col)
+        if (length(new_cols) > 0L) {
+          data.table::set(
+            acc,
+            j = new_cols,
+            value = lapply(as.list(st)[new_cols], `[`, m_idx)
+          )
+        }
+        acc
+      } else if (length(by_cols) > 0L) {
+        tidytable::left_join(acc, st, by = by_cols)
+      } else {
+        acc
       }
-    } else if (length(by_cols) > 0L) {
-      joined <- tidytable::left_join(joined, st, by = by_cols)
-    }
-  }
+    },
+    supp_tables,
+    init = tidytable::as_tidytable(library_table)
+  )
   rm(library_table, supp_tables)
 
   structures <- joined[!is.na(joined$structure_exact_mass), ]

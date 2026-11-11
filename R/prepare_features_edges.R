@@ -222,8 +222,12 @@ prepare_features_edges <- function(
     src_ms1 <- step2[[name_source]]
     src_ent <- features_entropy[[name_source]]
     m_ent <- fastmatch::fmatch(src_ms1, src_ent)
-    for (col in extra_ent_cols) {
-      data.table::set(step2, j = col, value = features_entropy[[col]][m_ent])
+    if (length(extra_ent_cols) > 0L) {
+      data.table::set(
+        step2,
+        j = extra_ent_cols,
+        value = lapply(as.list(features_entropy)[extra_ent_cols], `[`, m_ent)
+      )
     }
     unmatched_ent <- is.na(fastmatch::fmatch(src_ent, src_ms1))
     if (any(unmatched_ent)) {
@@ -258,12 +262,20 @@ prepare_features_edges <- function(
       ) {
         ms2_extra_cols <- setdiff(names(edges_ms2), common_cols)
         y_matched_rows <- m12[idx1_matched]
-        for (col in ms2_extra_cols) {
-          col_val <- rep(NA_character_, nrow(step2))
-          col_val[idx1_matched] <- as.character(edges_ms2[[col]][
-            y_matched_rows
-          ])
-          data.table::set(step2, j = col, value = col_val)
+        if (length(ms2_extra_cols) > 0L) {
+          n_step2 <- nrow(step2)
+          data.table::set(
+            step2,
+            j = ms2_extra_cols,
+            value = lapply(
+              as.list(edges_ms2)[ms2_extra_cols],
+              function(col_v) {
+                col_val <- rep(NA_character_, n_step2)
+                col_val[idx1_matched] <- as.character(col_v[y_matched_rows])
+                col_val
+              }
+            )
+          )
         }
         unmatched_ms2 <- which(is.na(m21))
         if (length(unmatched_ms2) > 0L) {

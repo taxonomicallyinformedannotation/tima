@@ -424,12 +424,17 @@ weight_bio <- function(
       structure_organism_pairs_table$organism_taxonomy_10varietas[first_org_idx]
     )
   )
-  for (sp in active_subranks) {
+  if (length(active_subranks) > 0L) {
     data.table::set(
       cand_tax_raw,
-      j = sp$cand_col,
-      value = na_if_empty_chr(
-        structure_organism_pairs_table[[sp$sop_col]][first_org_idx]
+      j = vapply(active_subranks, `[[`, character(1L), "cand_col"),
+      value = lapply(
+        active_subranks,
+        function(sp) {
+          na_if_empty_chr(
+            structure_organism_pairs_table[[sp$sop_col]][first_org_idx]
+          )
+        }
       )
     )
   }
@@ -493,14 +498,13 @@ weight_bio <- function(
     rm(sop_ik_org)
     valid_cand <- which(!is.na(cand_tax_distinct$candidate_organism_name))
     n_vc <- length(valid_cand)
-    df2_list <- vector("list", length(samp_cols) + length(cand_tax_distinct))
-    names(df2_list) <- c(samp_cols, names(cand_tax_distinct))
-    for (sc in samp_cols) {
-      df2_list[[sc]] <- rep.int(sample_tax_distinct[[sc]][1L], n_vc)
-    }
-    for (cc in names(cand_tax_distinct)) {
-      df2_list[[cc]] <- cand_tax_distinct[[cc]][valid_cand]
-    }
+    df2_list <- c(
+      lapply(
+        as.list(sample_tax_distinct)[samp_cols],
+        function(v) rep.int(v[1L], n_vc)
+      ),
+      lapply(as.list(cand_tax_distinct), `[`, valid_cand)
+    )
     df2 <- tidytable::as_tidytable(df2_list)
     rm(sample_tax_distinct, cand_tax_distinct, df2_list)
   } else {
@@ -690,15 +694,20 @@ weight_bio <- function(
     occ[m02] <- as.character(df2$candidate_organism_02_kingdom[m02])
     m01 <- !is.na(sc_bio) & sc_bio == score_biological_domain
     occ[m01] <- as.character(df2$candidate_organism_01_domain[m01])
-    for (sr_i in seq_along(active_subranks)) {
-      sp <- active_subranks[[sr_i]]
-      s_sr <- sr_scores_list[[sr_i]]
-      m_sr <- !is.na(sc_bio) &
-        sc_bio == sp$score &
-        !is.na(s_sr) &
-        s_sr == sp$score
-      occ[m_sr] <- as.character(df2[[sp$cand_col]][m_sr])
-    }
+    occ <- Reduce(
+      function(cur_occ, sr_i) {
+        sp <- active_subranks[[sr_i]]
+        s_sr <- sr_scores_list[[sr_i]]
+        m_sr <- !is.na(sc_bio) &
+          sc_bio == sp$score &
+          !is.na(s_sr) &
+          s_sr == sp$score
+        cur_occ[m_sr] <- as.character(df2[[sp$cand_col]][m_sr])
+        cur_occ
+      },
+      seq_along(active_subranks),
+      init = occ
+    )
     occ[is_biota] <- "Biota"
 
     keep_occ <- which(!is.na(occ))

@@ -458,13 +458,11 @@ weight_annotations <- function(
     } else {
       fastmatch::fmatch(a_fids, t_fids)
     }
-    for (col in taxa_new_cols) {
-      data.table::set(
-        annotation_table_taxed,
-        j = col,
-        value = taxa_table[[col]][m_tax]
-      )
-    }
+    data.table::set(
+      annotation_table_taxed,
+      j = taxa_new_cols,
+      value = lapply(as.list(taxa_table)[taxa_new_cols], `[`, m_tax)
+    )
     rm(t_fids, a_fids, m_tax)
   } else {
     annotation_table_taxed <- {

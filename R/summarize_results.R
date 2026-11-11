@@ -203,17 +203,21 @@ summarize_results <- function(
   feat_add_cols <- setdiff(names(features_min), names(df_joined))
   if (length(feat_add_cols) > 0L && nrow(features_min) > 0L) {
     m_f <- match(fids_j, features_min$feature_id)
-    for (col in feat_add_cols) {
-      data.table::set(df_joined, j = col, value = features_min[[col]][m_f])
-    }
+    data.table::set(
+      df_joined,
+      j = feat_add_cols,
+      value = lapply(as.list(features_min)[feat_add_cols], `[`, m_f)
+    )
   }
 
   comp_add_cols <- setdiff(names(components_min), names(df_joined))
   if (length(comp_add_cols) > 0L && nrow(components_min) > 0L) {
     m_c <- match(fids_j, components_min$feature_id)
-    for (col in comp_add_cols) {
-      data.table::set(df_joined, j = col, value = components_min[[col]][m_c])
-    }
+    data.table::set(
+      df_joined,
+      j = comp_add_cols,
+      value = lapply(as.list(components_min)[comp_add_cols], `[`, m_c)
+    )
   }
 
   org_join_by <- c(
@@ -228,25 +232,22 @@ summarize_results <- function(
       all(org_join_by %in% names(organism_lookup))
   ) {
     if (nrow(organism_lookup) == 0L) {
-      for (col in org_add_cols) {
-        data.table::set(
-          df_joined,
-          j = col,
-          value = rep.int(
-            organism_lookup[[col]][NA_integer_],
-            nrow(df_joined)
-          )
+      n_df_j <- nrow(df_joined)
+      data.table::set(
+        df_joined,
+        j = org_add_cols,
+        value = lapply(
+          as.list(organism_lookup)[org_add_cols],
+          function(col_v) rep.int(col_v[NA_integer_], n_df_j)
         )
-      }
+      )
     } else {
       m_org <- .fast_match_rows(df_joined, organism_lookup, by = org_join_by)
-      for (col in org_add_cols) {
-        data.table::set(
-          df_joined,
-          j = col,
-          value = organism_lookup[[col]][m_org]
-        )
-      }
+      data.table::set(
+        df_joined,
+        j = org_add_cols,
+        value = lapply(as.list(organism_lookup)[org_add_cols], `[`, m_org)
+      )
     }
   }
 
@@ -286,11 +287,15 @@ summarize_results <- function(
           annotation_notes_lookup,
           by = note_join_cols
         )
-        for (col in note_add_cols) {
+        if (length(note_add_cols) > 0L) {
           data.table::set(
             df_joined,
-            j = col,
-            value = annotation_notes_lookup[[col]][m_note]
+            j = note_add_cols,
+            value = lapply(
+              as.list(annotation_notes_lookup)[note_add_cols],
+              `[`,
+              m_note
+            )
           )
         }
         if (
@@ -451,14 +456,21 @@ summarize_results <- function(
     u_new[fastmatch::fmatch(val, u_orig)]
   }
 
-  for (col in char_cols) {
-    data.table::set(df_final, j = col, value = trim_col_fast(df_final[[col]]))
-  }
-  for (col in factor_cols) {
+  if (length(char_cols) > 0L) {
     data.table::set(
       df_final,
-      j = col,
-      value = trim_col_fast(as.character(df_final[[col]]))
+      j = char_cols,
+      value = lapply(as.list(df_final)[char_cols], trim_col_fast)
+    )
+  }
+  if (length(factor_cols) > 0L) {
+    data.table::set(
+      df_final,
+      j = factor_cols,
+      value = lapply(
+        as.list(df_final)[factor_cols],
+        function(v) trim_col_fast(as.character(v))
+      )
     )
   }
 
@@ -626,17 +638,20 @@ summarize_results <- function(
       ),
       "organism_taxonomy_ottid"
     )
-    out <- tidytable::tidytable(
-      candidate_structure_inchikey_connectivity_layer = character(),
-      reference_doi = character()
+    empty_cols <- c(
+      "candidate_structure_inchikey_connectivity_layer",
+      "reference_doi",
+      tax_cols,
+      "feature_id",
+      "candidate_structure_organism_occurrence_closest",
+      "candidate_structure_organism_occurrence_reference"
     )
-    for (tc in tax_cols) {
-      out[[tc]] <- character()
-    }
-    out$feature_id <- character()
-    out$candidate_structure_organism_occurrence_closest <- character()
-    out$candidate_structure_organism_occurrence_reference <- character()
-    out
+    tidytable::as_tidytable(
+      stats::setNames(
+        rep(list(character()), length(empty_cols)),
+        empty_cols
+      )
+    )
   }
 
   if (!has_organism_col) {

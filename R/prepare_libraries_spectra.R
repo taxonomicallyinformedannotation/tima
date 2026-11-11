@@ -72,8 +72,9 @@ harmonize_spectra_polarity <- function(
       nms <- names(lst)
       nms[nms == "precursorMz"] <- "precursor_mz"
       names(lst) <- nms
-      for (.col in intersect(c("mz", "intensity"), nms)) {
-        lst[[.col]] <- as.list(lst[[.col]])
+      mz_int_cols <- intersect(c("mz", "intensity"), nms)
+      if (length(mz_int_cols) > 0L) {
+        lst[mz_int_cols] <- lapply(lst[mz_int_cols], as.list)
       }
       lst
     }

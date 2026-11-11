@@ -219,7 +219,7 @@ select_sirius_columns_structures <- function(df, sirius_version) {
     value = rep.int("SIRIUS", n_rows)
   )
   na_chr <- rep.int(NA_character_, n_rows)
-  for (tax_col in c(
+  sirius_tax_cols <- c(
     "candidate_structure_tax_npc_01pat",
     "candidate_structure_tax_npc_02sup",
     "candidate_structure_tax_npc_03cla",
@@ -228,9 +228,12 @@ select_sirius_columns_structures <- function(df, sirius_version) {
     "candidate_structure_tax_cla_02sup",
     "candidate_structure_tax_cla_03cla",
     "candidate_structure_tax_cla_04dirpar"
-  )) {
-    data.table::set(df, j = tax_col, value = na_chr)
-  }
+  )
+  data.table::set(
+    df,
+    j = sirius_tax_cols,
+    value = rep(list(na_chr), length(sirius_tax_cols))
+  )
   # Normalize SIRIUS adduct spacing (e.g., "[M + H]+" -> "[M+H]+")
   if ("candidate_adduct" %in% names(df)) {
     data.table::set(
@@ -260,19 +263,21 @@ select_sirius_columns_structures <- function(df, sirius_version) {
     "massErrorPrecursor.ppm." = "massErrorPrecursor(ppm)"
   )
 
-  # Cache column names to avoid repeated lookups
   existing_cols <- names(df)
-  for (target in names(alias_map)) {
-    if (target %in% existing_cols) {
-      next
-    }
-    src <- alias_map[[target]]
-    src <- src[src %in% existing_cols]
-    if (length(src) > 0L) {
-      names(df)[names(df) == src[[1L]]] <- target
-      # Update cache after rename
-      existing_cols <- names(df)
-    }
+  targets_needed <- setdiff(names(alias_map), existing_cols)
+  first_srcs <- vapply(
+    targets_needed,
+    function(target) {
+      src <- intersect(alias_map[[target]], existing_cols)
+      if (length(src) > 0L) src[[1L]] else NA_character_
+    },
+    character(1L)
+  )
+  valid <- !is.na(first_srcs)
+  if (any(valid)) {
+    m <- match(first_srcs[valid], existing_cols)
+    existing_cols[m] <- targets_needed[valid]
+    names(df) <- existing_cols
   }
 
   df

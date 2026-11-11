@@ -15,26 +15,22 @@
     return(results)
   }
 
-  # Short-circuit check: skip numeric/integer/logical columns and stop on first hit
-  has_multivalue <- FALSE
-  for (col in multi_cols) {
-    v <- results[[col]]
-    if (is.numeric(v) || is.logical(v)) {
-      next
-    }
-    if (is.factor(v)) {
-      if (any(grepl("|", levels(v), fixed = TRUE))) {
-        has_multivalue <- TRUE
-        break
+  # Short-circuit check: skip numeric/integer/logical columns
+  has_multivalue <- any(vapply(
+    multi_cols,
+    function(col) {
+      v <- results[[col]]
+      if (is.numeric(v) || is.logical(v)) {
+        return(FALSE)
       }
-      next
-    }
-    v_chr <- if (is.character(v)) v else as.character(v)
-    if (any(grepl("|", v_chr, fixed = TRUE), na.rm = TRUE)) {
-      has_multivalue <- TRUE
-      break
-    }
-  }
+      if (is.factor(v)) {
+        return(any(grepl("|", levels(v), fixed = TRUE)))
+      }
+      v_chr <- if (is.character(v)) v else as.character(v)
+      any(grepl("|", v_chr, fixed = TRUE), na.rm = TRUE)
+    },
+    logical(1L)
+  ))
   if (!has_multivalue) {
     return(results)
   }
@@ -49,30 +45,31 @@
   id_cols <- setdiff(colnames(results), multi_cols)
   n_rows <- nrow(results)
 
-  split_values <- vector("list", length(multi_cols))
-  lengths_list <- vector("list", length(multi_cols))
-  for (k in seq_along(multi_cols)) {
-    v <- results[[multi_cols[[k]]]]
-    values <- if (is.character(v)) v else as.character(v)
-    bad_v <- is.na(values) | !nzchar(values)
-    if (any(bad_v)) {
-      values[bad_v] <- NA_character_
+  split_res <- lapply(
+    multi_cols,
+    function(col) {
+      v <- results[[col]]
+      values <- if (is.character(v)) v else as.character(v)
+      bad_v <- is.na(values) | !nzchar(values)
+      if (any(bad_v)) {
+        values[bad_v] <- NA_character_
+      }
+      has_pipe <- !bad_v & grepl("|", values, fixed = TRUE)
+      if (!any(has_pipe)) {
+        list(vals = values, lens = rep.int(1L, n_rows))
+      } else {
+        parts <- as.list(values)
+        p_idx <- which(has_pipe)
+        sp_p <- strsplit(values[p_idx], "|", fixed = TRUE)
+        parts[p_idx] <- sp_p
+        lens <- rep.int(1L, n_rows)
+        lens[p_idx] <- lengths(sp_p)
+        list(vals = parts, lens = lens)
+      }
     }
-    has_pipe <- !bad_v & grepl("|", values, fixed = TRUE)
-    if (!any(has_pipe)) {
-      split_values[[k]] <- values
-      lengths_list[[k]] <- rep.int(1L, n_rows)
-    } else {
-      parts <- as.list(values)
-      p_idx <- which(has_pipe)
-      sp_p <- strsplit(values[p_idx], "|", fixed = TRUE)
-      parts[p_idx] <- sp_p
-      lens <- rep.int(1L, n_rows)
-      lens[p_idx] <- lengths(sp_p)
-      split_values[[k]] <- parts
-      lengths_list[[k]] <- lens
-    }
-  }
+  )
+  split_values <- lapply(split_res, `[[`, "vals")
+  lengths_list <- lapply(split_res, `[[`, "lens")
 
   # Compute number of output rows per input row (elementwise max across cols)
   n_vals_per_row <- do.call(pmax, c(lengths_list, list(1L)))
@@ -294,26 +291,22 @@
     )
   ))
 
-  has_annotation <- logical(n_rows)
-  if (length(ann_signal_cols) > 0L) {
-    unmatched <- seq_len(n_rows)
-    empty_tokens <- c(NA_character_, "", "NA", "null", "NULL")
-    for (col in ann_signal_cols) {
-      x_sub <- ann[[col]][unmatched]
-      hit <- if (is.numeric(x_sub) || is.logical(x_sub)) {
-        !is.na(x_sub)
-      } else {
-        is.na(fastmatch::fmatch(as.character(x_sub), empty_tokens))
-      }
-      if (any(hit)) {
-        has_annotation[unmatched[hit]] <- TRUE
-        unmatched <- unmatched[!hit]
-        if (length(unmatched) == 0L) {
-          break
+  empty_tokens <- c(NA_character_, "", "NA", "null", "NULL")
+  has_annotation <- Reduce(
+    `|`,
+    lapply(
+      ann_signal_cols,
+      function(col) {
+        x_sub <- ann[[col]]
+        if (is.numeric(x_sub) || is.logical(x_sub)) {
+          !is.na(x_sub)
+        } else {
+          is.na(fastmatch::fmatch(as.character(x_sub), empty_tokens))
         }
       }
-    }
-  }
+    ),
+    init = logical(n_rows)
+  )
 
   if (!any(has_annotation)) {
     return(.mztab_empty_sme())
@@ -780,11 +773,15 @@
         val1 <- u_v[[1L]]
         return(paste0(strrep(paste0(val1, "|"), grp_len - 1L), val1))
       }
-      for (b in len_buckets) {
-        cols_b <- lapply(b$row_offsets, function(idx) v[idx])
-        out_v[b$f_pos] <- do.call(paste, c(cols_b, list(sep = "|")))
-      }
-      out_v
+      Reduce(
+        function(cur_v, b) {
+          cols_b <- lapply(b$row_offsets, function(idx) v[idx])
+          cur_v[b$f_pos] <- do.call(paste, c(cols_b, list(sep = "|")))
+          cur_v
+        },
+        len_buckets,
+        init = out_v
+      )
     }
 
     out_db[u_m_fid] <- collapse_vec(db_vec[m_ord])
@@ -817,14 +814,16 @@
         max_rs <- max(r_s)
         idx1_s <- which(r_s == 1L)
         u_sf <- s_fid[idx1_s]
-        acc_s <- s_val[idx1_s]
-        if (max_rs > 1L) {
-          for (k in 2L:max_rs) {
+        acc_s <- Reduce(
+          function(cur_s, k) {
             idx_k <- which(r_s == k)
             pos_k <- fastmatch::fmatch(s_fid[idx_k], u_sf)
-            acc_s[pos_k] <- paste(acc_s[pos_k], s_val[idx_k], sep = "|")
-          }
-        }
+            cur_s[pos_k] <- paste(cur_s[pos_k], s_val[idx_k], sep = "|")
+            cur_s
+          },
+          seq_len(max_rs)[-1L],
+          init = s_val[idx1_s]
+        )
         out_sme_refs[u_sf] <- acc_s
       }
     }
