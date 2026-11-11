@@ -240,36 +240,22 @@ annotate_adduct_universe_metadata <- function(universe, polarity) {
   loss_names <- lapply(out$losses, names)
   cluster_names <- lapply(out$clusters, names)
 
-  has_only_common_carriers <- vapply(
-    X = carrier_names,
-    FUN = function(x) {
-      if (length(x) == 0L) {
-        return(TRUE)
-      }
-      all(x %in% common_carriers)
-    },
-    FUN.VALUE = logical(1L)
-  )
-  has_only_common_losses <- vapply(
-    X = loss_names,
-    FUN = function(x) {
-      if (length(x) == 0L) {
-        return(TRUE)
-      }
-      all(x %in% common_losses)
-    },
-    FUN.VALUE = logical(1L)
-  )
-  has_only_common_clusters <- vapply(
-    X = cluster_names,
-    FUN = function(x) {
-      if (length(x) == 0L) {
-        return(TRUE)
-      }
-      all(x %in% common_clusters)
-    },
-    FUN.VALUE = logical(1L)
-  )
+  .all_in_set <- function(lst, allowed) {
+    n_l <- length(lst)
+    out_ok <- rep.int(TRUE, n_l)
+    lens <- lengths(lst)
+    flat <- unlist(lst, use.names = FALSE)
+    bad <- !(flat %in% allowed)
+    if (any(bad)) {
+      grp <- rep.int(seq_len(n_l), lens)
+      out_ok[unique(grp[bad])] <- FALSE
+    }
+    out_ok
+  }
+
+  has_only_common_carriers <- .all_in_set(carrier_names, common_carriers)
+  has_only_common_losses <- .all_in_set(loss_names, common_losses)
+  has_only_common_clusters <- .all_in_set(cluster_names, common_clusters)
 
   baseline_name <- switch(
     polarity,

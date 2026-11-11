@@ -662,26 +662,29 @@ build_output_edges <- function(
     hit_le <- which(!is.na(fastmatch::fmatch(le_pairs, ae_pairs)))
     if (length(hit_le) > 0L) {
       ae_by_pair <- split(seq_len(nrow(adduct_edges)), ae_pairs)
-      ae_add <- adduct_edges$adduct
-      ae_add_dst <- adduct_edges$adduct_dest
-      drop_redundant <- logical(nrow(loss_edges))
-      drop_redundant[hit_le] <- vapply(
-        hit_le,
-        function(i) {
-          j_vec <- ae_by_pair[[le_pairs[[i]]]]
-          loss_formula <- loss_edges$loss[[i]]
-          any(vapply(
-            j_vec,
-            function(j) {
-              adduct_has_explicit_loss(ae_add[[j]], loss_formula) &&
-                adduct_has_explicit_loss(ae_add_dst[[j]], loss_formula)
-            },
-            logical(1L)
-          ))
-        },
-        logical(1L)
+      sub_sp <- ae_by_pair[le_pairs[hit_le]]
+      i_exp <- rep.int(hit_le, lengths(sub_sp))
+      j_exp <- unlist(sub_sp, use.names = FALSE)
+      loss_exp <- loss_edges$loss[i_exp]
+      src_add_exp <- adduct_edges$adduct[j_exp]
+      dst_add_exp <- adduct_edges$adduct_dest[j_exp]
+
+      all_add <- c(src_add_exp, dst_add_exp)
+      all_lf <- c(loss_exp, loss_exp)
+      pair_k <- paste(all_add, all_lf, sep = "\r")
+      u_idx <- which(!duplicated(pair_k))
+      u_has <- mapply(
+        adduct_has_explicit_loss,
+        all_add[u_idx],
+        all_lf[u_idx],
+        USE.NAMES = FALSE
       )
-      if (any(drop_redundant)) {
+      has_all <- u_has[fastmatch::fmatch(pair_k, pair_k[u_idx])]
+      n_exp <- length(i_exp)
+      both_ok <- has_all[seq_len(n_exp)] & has_all[n_exp + seq_len(n_exp)]
+      if (any(both_ok)) {
+        drop_redundant <- logical(nrow(loss_edges))
+        drop_redundant[unique(i_exp[both_ok])] <- TRUE
         loss_edges <- loss_edges[!drop_redundant, ]
       }
     }

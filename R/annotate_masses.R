@@ -1947,17 +1947,9 @@ normalize_modifier_formula_term <- function(term) {
   }
   els <- names(parsed)
   ord <- order(ifelse(els == "C", 0L, ifelse(els == "H", 1L, 2L)), els)
-  paste0(
-    vapply(
-      els[ord],
-      function(el) {
-        n <- as.integer(parsed[[el]])
-        paste0(el, if (n > 1L) as.character(n) else "")
-      },
-      character(1L)
-    ),
-    collapse = ""
-  )
+  els_o <- els[ord]
+  n_o <- as.integer(parsed[ord])
+  paste0(els_o, ifelse(n_o > 1L, as.character(n_o), ""), collapse = "")
 }
 
 #' Normalize modifier formula terms with memoization for repeated values

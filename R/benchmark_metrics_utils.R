@@ -13,10 +13,7 @@ NULL
   fn <- as.double(fn)
 
   den <- sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
-  if (!is.finite(den) || den == 0) {
-    return(NA_real_)
-  }
-  (tp * tn - fp * fn) / den
+  ifelse(!is.finite(den) | den == 0, NA_real_, (tp * tn - fp * fn) / den)
 }
 
 .benchmark_split_values <- function(x) {
@@ -225,7 +222,7 @@ benchmark_evaluate_predictions <- function(
         metric_family = "top_k",
         threshold = NA_real_,
         k = k,
-        mcc = mapply(.benchmark_compute_mcc, tp, tn, fp, fn)
+        mcc = .benchmark_compute_mcc(tp, tn, fp, fn)
       )
   })
 
@@ -250,7 +247,7 @@ benchmark_evaluate_predictions <- function(
         metric_family = "score_threshold",
         threshold = th,
         k = NA_integer_,
-        mcc = mapply(.benchmark_compute_mcc, tp, tn, fp, fn)
+        mcc = .benchmark_compute_mcc(tp, tn, fp, fn)
       )
   })
 
