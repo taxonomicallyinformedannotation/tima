@@ -180,12 +180,8 @@ decorate_bio <- function(
     if (length(u_sc) <= 64L) {
       sc_id <- fastmatch::fmatch(sc_v, u_sc)
       sc_counts <- tabulate(sc_id, nbins = length(u_sc))
-      max_sc_id_ik <- rep.int(1L, length(u_ik))
-      if (length(u_sc) > 1L) {
-        for (k in 2L:length(u_sc)) {
-          max_sc_id_ik[ik_id[sc_id == k]] <- k
-        }
-      }
+      ord_sc <- order(-sc_id, method = "radix")
+      max_sc_id_ik <- sc_id[ord_sc[!duplicated(ik_id[ord_sc])]]
       u_ik_counts_by_sc_id <- tabulate(max_sc_id_ik, nbins = length(u_sc))
 
       count_stats_at_level <- function(min_score, df) {

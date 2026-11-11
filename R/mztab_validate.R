@@ -126,16 +126,12 @@ NULL
     return(invisible(TRUE))
   }
 
-  missing <- character(0)
-  for (k in cv_labels) {
-    idx <- sub("-label$", "", k)
-    needed <- paste0(idx, c("-full_name", "-uri"))
-    miss <- needed[!(needed %in% metadata_df$key)]
-    if (length(miss) > 0L) {
-      missing <- c(missing, miss)
-    }
-  }
-  missing <- unique(missing)
+  idx <- sub("-label$", "", cv_labels)
+  needed <- as.vector(rbind(
+    paste0(idx, "-full_name"),
+    paste0(idx, "-uri")
+  ))
+  missing <- unique(needed[!(needed %in% metadata_df$key)])
   if (length(missing) == 0L) {
     return(invisible(TRUE))
   }
@@ -294,14 +290,11 @@ NULL
     }
 
     p1 <- count_pipe_parts(sml[[aligned_cols[[1L]]]])
-    has_mismatch <- FALSE
-    for (j in 2L:length(aligned_cols)) {
-      pj <- count_pipe_parts(sml[[aligned_cols[[j]]]])
-      if (any(pj != p1)) {
-        has_mismatch <- TRUE
-        break
-      }
-    }
+    has_mismatch <- any(vapply(
+      aligned_cols[-1L],
+      function(col) any(count_pipe_parts(sml[[col]]) != p1),
+      logical(1L)
+    ))
 
     if (has_mismatch) {
       msg <- paste0(

@@ -219,7 +219,6 @@ loss_term_atom_requirements <- function(loss_term) {
   if (is.null(loss_term) || is.na(loss_term) || !nzchar(loss_term)) {
     return(integer())
   }
-  req <- integer()
   loss_term <- gsub("\n", " ", as.character(loss_term))
   loss_term <- trimws(sub(" .*", "", loss_term))
   coef_match <- regmatches(
@@ -242,11 +241,7 @@ loss_term_atom_requirements <- function(loss_term) {
   if (is.null(parsed) || length(parsed) == 0L) {
     return(integer())
   }
-  for (el in names(parsed)) {
-    req[el] <- (if (is.na(req[el])) 0L else req[el]) +
-      as.integer(parsed[[el]] * coef)
-  }
-  req
+  stats::setNames(as.integer(parsed * coef), names(parsed))
 }
 
 #' Backwards-compatible alias for older tests / callers
@@ -274,16 +269,18 @@ adduct_loss_atom_requirements <- function(adduct) {
   if (length(toks) == 0L) {
     return(integer())
   }
-  req <- integer()
-  for (tok in toks) {
-    if (startsWith(tok, "-")) {
-      tok_req <- loss_term_atom_requirements(substring(tok, 2L))
-      for (el in names(tok_req)) {
-        req[el] <- (if (is.na(req[el])) 0L else req[el]) + tok_req[[el]]
-      }
-    }
+  neg_toks <- substring(toks[startsWith(toks, "-")], 2L)
+  all_reqs <- unlist(lapply(neg_toks, loss_term_atom_requirements))
+  if (length(all_reqs) == 0L) {
+    return(integer())
   }
-  req
+  els <- names(all_reqs)
+  u_els <- unique(els)
+  vapply(
+    split(unname(all_reqs), factor(els, levels = u_els)),
+    sum,
+    integer(1L)
+  )
 }
 
 #' Check whether formula contains all atoms required by adduct losses
@@ -305,12 +302,8 @@ formula_satisfies_loss_requirements <- function(formula, loss_requirements) {
   if (is.null(parsed) || length(parsed) == 0L) {
     return(NA)
   }
-  for (el in names(loss_requirements)) {
-    if (!el %in% names(parsed) || parsed[[el]] < loss_requirements[[el]]) {
-      return(FALSE)
-    }
-  }
-  TRUE
+  m_el <- match(names(loss_requirements), names(parsed), nomatch = 0L)
+  !any(m_el == 0L) && all(parsed[m_el] >= loss_requirements)
 }
 
 #' Demote structural matches whose adduct-loss atoms are absent from formula
@@ -658,19 +651,22 @@ build_output_edges <- function(
       ae_add <- adduct_edges$adduct
       ae_add_dst <- adduct_edges$adduct_dest
       drop_redundant <- logical(nrow(loss_edges))
-      for (i in hit_le) {
-        j_vec <- ae_by_pair[[le_pairs[[i]]]]
-        loss_formula <- loss_edges$loss[[i]]
-        for (j in j_vec) {
-          if (
-            adduct_has_explicit_loss(ae_add[[j]], loss_formula) &&
-              adduct_has_explicit_loss(ae_add_dst[[j]], loss_formula)
-          ) {
-            drop_redundant[[i]] <- TRUE
-            break
-          }
-        }
-      }
+      drop_redundant[hit_le] <- vapply(
+        hit_le,
+        function(i) {
+          j_vec <- ae_by_pair[[le_pairs[[i]]]]
+          loss_formula <- loss_edges$loss[[i]]
+          any(vapply(
+            j_vec,
+            function(j) {
+              adduct_has_explicit_loss(ae_add[[j]], loss_formula) &&
+                adduct_has_explicit_loss(ae_add_dst[[j]], loss_formula)
+            },
+            logical(1L)
+          ))
+        },
+        logical(1L)
+      )
       if (any(drop_redundant)) {
         loss_edges <- loss_edges[!drop_redundant, ]
       }

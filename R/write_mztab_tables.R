@@ -105,9 +105,11 @@
     } else {
       mismatch <- which(col_lens != n_vals_per_row)
       if (length(mismatch) > 0L) {
-        for (i in mismatch) {
-          parts[[i]] <- parts[[i]][seq_len(n_vals_per_row[[i]])]
-        }
+        parts[mismatch] <- Map(
+          function(v, n_v) v[seq_len(n_v)],
+          parts[mismatch],
+          n_vals_per_row[mismatch]
+        )
       }
       out[[multi_cols[[col_idx]]]] <- unlist(parts, use.names = FALSE)
     }

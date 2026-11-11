@@ -105,9 +105,11 @@ NULL
     }
     diff_idx <- which(lens != target_lens)
     if (length(diff_idx) > 0L) {
-      for (i in diff_idx) {
-        parts[[i]] <- .benchmark_pad_to(parts[[i]], target_lens[[i]])
-      }
+      parts[diff_idx] <- Map(
+        .benchmark_pad_to,
+        parts[diff_idx],
+        target_lens[diff_idx]
+      )
     }
     as.character(unlist(parts, use.names = FALSE))
   }

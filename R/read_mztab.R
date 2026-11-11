@@ -885,11 +885,16 @@ read_mztab <- function(
     n_peaks_vec <- pmin.int(len_mz, len_int)
     mismatch_len <- which(len_mz != n_peaks_vec | len_int != n_peaks_vec)
     if (length(mismatch_len) > 0L) {
-      for (idx_m in mismatch_len) {
-        np <- n_peaks_vec[[idx_m]]
-        mz_sp[[idx_m]] <- mz_sp[[idx_m]][seq_len(np)]
-        int_sp[[idx_m]] <- int_sp[[idx_m]][seq_len(np)]
-      }
+      mz_sp[mismatch_len] <- Map(
+        function(v, np) v[seq_len(np)],
+        mz_sp[mismatch_len],
+        n_peaks_vec[mismatch_len]
+      )
+      int_sp[mismatch_len] <- Map(
+        function(v, np) v[seq_len(np)],
+        int_sp[mismatch_len],
+        n_peaks_vec[mismatch_len]
+      )
     }
     has_peaks <- n_peaks_vec > 0L
     if (any(has_peaks)) {

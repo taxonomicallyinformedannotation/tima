@@ -377,16 +377,18 @@
       check.names = FALSE
     )
 
+    u_bidx <- unique(base_idx)
+    b_f <- factor(base_idx, levels = u_bidx)
     for (col in ref_cols) {
-      grouped <- split(new_vals[[col]][dup_idx], base_idx)
-      for (b in names(grouped)) {
-        bidx <- as.integer(b)
-        cur <- sml_df[[col]][[bidx]]
-        for (val in unname(grouped[[b]])) {
-          cur <- .mztab_union_ref_ids(cur, val)
-        }
-        sml_df[[col]][[bidx]] <- cur
-      }
+      grouped <- split(new_vals[[col]][dup_idx], b_f)
+      sml_df[[col]][u_bidx] <- unlist(
+        Map(
+          function(cur, vals) Reduce(.mztab_union_ref_ids, vals, init = cur),
+          sml_df[[col]][u_bidx],
+          unname(grouped)
+        ),
+        use.names = FALSE
+      )
     }
 
     sml_all <- tidytable::as_tidytable(sml_df)
