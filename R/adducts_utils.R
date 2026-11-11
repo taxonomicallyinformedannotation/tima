@@ -519,33 +519,43 @@ calculate_formula_mass <- function(x) {
       text = u_to_parse,
       perl = TRUE
     )
-    for (k in seq_along(need_parse)) {
-      idx_u <- need_parse[[k]]
-      xx <- u_to_parse[[k]]
-      rr <- rx[[k]]
-      clean_len <- nchar(gsub("\\[|\\]", "", xx))
-      if (
-        !nzchar(xx) ||
-          identical(as.integer(rr), -1L) ||
-          sum(attr(rr, "match.length")) != clean_len
-      ) {
-        u_mass[[idx_u]] <- NA_real_
-        u_valid[[idx_u]] <- FALSE
-      } else {
-        n <- length(rr)
-        start <- attr(rr, "capture.start")
-        end <- start + attr(rr, "capture.length") - 1L
-        sbstr <- substring(xx, start, end)
-        sbstr[!nzchar(sbstr)] <- "1"
-        sl <- seq_len(n)
-        els <- sbstr[sl]
-        cnts <- as.integer(sbstr[n + sl])
-        masses <- ISOTOPE_MONOISOTOPIC_MASS[els]
-        val <- sum(cnts * masses)
-        u_mass[[idx_u]] <- val
-        .FORMULA_MASS_CACHE[[xx]] <- val
-        u_valid[[idx_u]] <- TRUE
-      }
+    clean_lens <- nchar(gsub("\\[|\\]", "", u_to_parse))
+    match_lens <- vapply(
+      rx,
+      function(rr) {
+        if (identical(as.integer(rr), -1L)) {
+          -1L
+        } else {
+          sum(attr(rr, "match.length"))
+        }
+      },
+      integer(1L)
+    )
+    ok_parse <- nzchar(u_to_parse) & match_lens == clean_lens
+    u_mass[need_parse[!ok_parse]] <- NA_real_
+    ok_k <- which(ok_parse)
+    if (length(ok_k) > 0L) {
+      rx_ok <- rx[ok_k]
+      tok_lens <- lengths(rx_ok)
+      cs_mat <- do.call(rbind, lapply(rx_ok, attr, "capture.start"))
+      cl_mat <- do.call(rbind, lapply(rx_ok, attr, "capture.length"))
+      rep_xx <- rep.int(u_to_parse[ok_k], tok_lens)
+      els <- substr(rep_xx, cs_mat[, 1L], cs_mat[, 1L] + cl_mat[, 1L] - 1L)
+      cnt_str <- substr(rep_xx, cs_mat[, 2L], cs_mat[, 2L] + cl_mat[, 2L] - 1L)
+      cnts <- ifelse(nzchar(cnt_str), as.integer(cnt_str), 1L)
+      tok_masses <- cnts * unname(ISOTOPE_MONOISOTOPIC_MASS[els])
+      vals <- as.numeric(rowsum.default(
+        tok_masses,
+        rep.int(seq_along(ok_k), tok_lens),
+        reorder = FALSE
+      ))
+      ok_u_idx <- need_parse[ok_k]
+      u_mass[ok_u_idx] <- vals
+      u_valid[ok_u_idx] <- TRUE
+      list2env(
+        as.list(stats::setNames(vals, u_to_parse[ok_k])),
+        envir = .FORMULA_MASS_CACHE
+      )
     }
   }
 

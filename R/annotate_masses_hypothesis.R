@@ -357,21 +357,38 @@ enforce_global_m_consistency <- function(
       n_deg <- tabulate(f_id, nbins = length(u_f))
       conf_f <- unique(f_id[!obs_consistent])
       in_conf <- which(f_id %in% conf_f)
-      idx_by_cf <- split(in_conf, f_id[in_conf])
-      for (idx_f in idx_by_cf) {
-        ord_m <- order(m_values[idx_f])
-        idx_s <- idx_f[ord_m]
-        m_s <- m_values[idx_s]
-        tol_s <- pmax(dalton_tol, ppm_scale * pmax(abs(m_s), 1e-12))
-        cl_s <- cumsum(c(TRUE, diff(m_s) > tol_s[-1L]))
-        nb_deg <- ifelse(is.na(nb_id[idx_s]), 1L, n_deg[nb_id[idx_s]])
-        acc_w <- 1 /
-          (1 + tidytable::coalesce(edge_errs[idx_s], 0) / pmax(tol_s, 1e-12))
-        w_s <- 1 + 0.1 * pmin(nb_deg, 10L) + 0.01 * acc_w
-        cl_w <- rowsum.default(w_s, cl_s, reorder = FALSE)
-        best_cl <- which.max(cl_w)
-        feature_medians[idx_f] <- stats::median(m_s[cl_s == best_cl])
-      }
+      ord_c <- order(f_id[in_conf], m_values[in_conf])
+      idx_s <- in_conf[ord_c]
+      f_s <- f_id[idx_s]
+      m_s <- m_values[idx_s]
+      n_s <- length(idx_s)
+      tol_s <- pmax(dalton_tol, ppm_scale * pmax(abs(m_s), 1e-12))
+      new_f <- c(TRUE, f_s[-1L] != f_s[-n_s])
+      new_cl <- new_f | c(FALSE, (m_s[-1L] - m_s[-n_s]) > tol_s[-1L])
+      cl_s <- cumsum(new_cl)
+      nb_deg <- ifelse(is.na(nb_id[idx_s]), 1L, n_deg[nb_id[idx_s]])
+      acc_w <- 1 /
+        (1 + tidytable::coalesce(edge_errs[idx_s], 0) / pmax(tol_s, 1e-12))
+      w_s <- 1 + 0.1 * pmin(nb_deg, 10L) + 0.01 * acc_w
+      cl_w <- as.numeric(rowsum.default(w_s, cl_s, reorder = FALSE))
+      cl_f <- f_s[new_cl]
+      ord_cl <- order(cl_f, -cl_w, seq_along(cl_w))
+      best_cl_ids <- ord_cl[!duplicated(cl_f[ord_cl])]
+      is_best_cl <- logical(length(cl_w))
+      is_best_cl[best_cl_ids] <- TRUE
+      keep_s <- is_best_cl[cl_s]
+      m_best <- m_s[keep_s]
+      f_best <- f_s[keep_s]
+      n_b <- length(m_best)
+      starts_b <- which(c(TRUE, f_best[-1L] != f_best[-n_b]))
+      ends_b <- c(starts_b[-1L] - 1L, n_b)
+      cnts_b <- ends_b - starts_b + 1L
+      med_b <- 0.5 *
+        (m_best[starts_b + (cnts_b - 1L) %/% 2L] +
+          m_best[starts_b + cnts_b %/% 2L])
+      f_med_lut <- rep(NA_real_, length(u_f))
+      f_med_lut[f_best[starts_b]] <- med_b
+      feature_medians[in_conf] <- f_med_lut[f_id[in_conf]]
       abs_diff <- abs(m_values - feature_medians)
       ppm_tol <- ppm_scale * pmax(abs(feature_medians), 1e-12)
       obs_consistent <- abs_diff <= ppm_tol | abs_diff <= dalton_tol
@@ -877,36 +894,77 @@ collect_node_adduct_hypotheses <- function(
         Reduce(gcd2, as.integer(abs(x)))
       }
 
+      tg_mat <- stri_match_first_regex(tokens, paste0("^", tok_re, "$"))
+      signs <- ifelse(tg_mat[, 2L] == "+", 1L, -1L)
+      mults <- ifelse(nzchar(tg_mat[, 3L]), as.integer(tg_mat[, 3L]), 1L)
+      formulas <- tg_mat[, 4L]
+
+      is_carrier <- formulas %in%
+        carriers |
+        ((has_pos_h4n || has_pos_h) & formulas == "H3N")
+
       carrier_net <- list()
-      mod_emp_net <- list()
-      mod_emp_atoms <- list()
+      if (any(is_carrier)) {
+        rs_c <- rowsum.default(
+          signs[is_carrier] * mults[is_carrier],
+          formulas[is_carrier],
+          reorder = FALSE
+        )
+        carrier_net <- as.list(stats::setNames(
+          as.integer(rs_c[, 1L]),
+          rownames(rs_c)
+        ))
+      }
 
-      for (tok in tokens) {
-        tg <- regmatches(tok, regexec(tok_re, tok, perl = TRUE))[[1L]]
-        sign <- if (tg[[2L]] == "+") 1L else -1L
-        mult <- if (nzchar(tg[[3L]])) as.integer(tg[[3L]]) else 1L
-        formula <- tg[[4L]]
+      mod_idx <- which(!is_carrier)
+      neg_atoms <- list()
+      pos_atoms <- list()
+      if (length(mod_idx) > 0L) {
+        mod_forms <- formulas[mod_idx]
+        atoms_list <- lapply(mod_forms, parse_atomic_formula)
+        if (any(lengths(atoms_list) == 0L)) {
+          return(adduct)
+        }
+        gs <- vapply(atoms_list, gcd_vec, integer(1L))
+        emp_atoms_list <- Map(
+          function(a, g) lapply(a, function(v) as.integer(v) %/% g),
+          atoms_list,
+          gs
+        )
+        emp_fs <- vapply(emp_atoms_list, hill_formula, character(1L))
+        rs_m <- rowsum.default(
+          signs[mod_idx] * mults[mod_idx] * gs,
+          emp_fs,
+          reorder = FALSE
+        )
+        emp_names <- rownames(rs_m)
+        emp_nets <- as.integer(rs_m[, 1L])
+        emp_first <- match(emp_names, emp_fs)
 
-        # Keep NH3 explicit in presence of NH4 or +H so harmonize_adducts can
-        # reduce (-H3N,+H4N) -> +H and (+H3N,+H) -> +H4N.
-        if (
-          formula %in%
-            carriers ||
-            ((has_pos_h4n || has_pos_h) && formula == "H3N")
-        ) {
-          prev <- carrier_net[[formula]] %||% 0L
-          carrier_net[[formula]] <- prev + sign * mult
-        } else {
-          atoms <- parse_atomic_formula(formula)
-          if (is.null(atoms) || length(atoms) == 0L) {
-            return(adduct)
-          }
-          g <- gcd_vec(atoms)
-          emp_atoms <- lapply(atoms, function(v) as.integer(v) %/% g)
-          emp_f <- hill_formula(emp_atoms)
-          mod_emp_atoms[[emp_f]] <- emp_atoms
-          prev_m <- mod_emp_net[[emp_f]] %||% 0L
-          mod_emp_net[[emp_f]] <- prev_m + sign * mult * g
+        neg_e <- which(emp_nets < 0L)
+        if (length(neg_e) > 0L) {
+          neg_ea <- emp_atoms_list[emp_first[neg_e]]
+          neg_els <- unlist(lapply(neg_ea, names), use.names = FALSE)
+          neg_cnts <- unlist(neg_ea, use.names = FALSE) *
+            rep.int(abs(emp_nets[neg_e]), lengths(neg_ea))
+          rs_neg <- rowsum.default(neg_cnts, neg_els, reorder = FALSE)
+          neg_atoms <- as.list(stats::setNames(
+            as.integer(rs_neg[, 1L]),
+            rownames(rs_neg)
+          ))
+        }
+
+        pos_e <- which(emp_nets > 0L)
+        if (length(pos_e) > 0L) {
+          pos_ea <- emp_atoms_list[emp_first[pos_e]]
+          pos_els <- unlist(lapply(pos_ea, names), use.names = FALSE)
+          pos_cnts <- unlist(pos_ea, use.names = FALSE) *
+            rep.int(emp_nets[pos_e], lengths(pos_ea))
+          rs_pos <- rowsum.default(pos_cnts, pos_els, reorder = FALSE)
+          pos_atoms <- as.list(stats::setNames(
+            as.integer(rs_pos[, 1L]),
+            rownames(rs_pos)
+          ))
         }
       }
 
@@ -923,31 +981,9 @@ collect_node_adduct_hypotheses <- function(
         }
       }
 
-      neg_modifier_atomic_net <- list()
-      pos_modifier_atomic_net <- list()
-      for (emp_f in names(mod_emp_net)) {
-        net_m <- mod_emp_net[[emp_f]]
-        if (net_m < 0L) {
-          ea <- mod_emp_atoms[[emp_f]]
-          for (el in names(ea)) {
-            prev <- neg_modifier_atomic_net[[el]] %||% 0L
-            neg_modifier_atomic_net[[el]] <- prev +
-              abs(net_m) * as.integer(ea[[el]])
-          }
-        } else if (net_m > 0L) {
-          ea <- mod_emp_atoms[[emp_f]]
-          for (el in names(ea)) {
-            prev <- pos_modifier_atomic_net[[el]] %||% 0L
-            pos_modifier_atomic_net[[el]] <- prev +
-              net_m * as.integer(ea[[el]])
-          }
-        }
-      }
-
       new_mods <- character()
 
       # Negative atomic term (loss)
-      neg_atoms <- Filter(function(x) x > 0L, neg_modifier_atomic_net)
       if (length(neg_atoms) > 0L) {
         f <- hill_formula(neg_atoms)
         if (nzchar(f)) new_mods <- c(new_mods, paste0("-", f))
@@ -965,7 +1001,6 @@ collect_node_adduct_hypotheses <- function(
       }
 
       # Positive atomic term (addition)
-      pos_atoms <- Filter(function(x) x > 0L, pos_modifier_atomic_net)
       if (length(pos_atoms) > 0L) {
         f <- hill_formula(pos_atoms)
         if (nzchar(f)) new_mods <- c(new_mods, paste0("+", f))

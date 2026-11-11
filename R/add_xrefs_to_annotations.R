@@ -122,7 +122,8 @@ add_xrefs_to_annotations <- function(results_list, xrefs_file) {
   u_prefixes <- unique(f_prefix)
   u_prefixes <- u_prefixes[!is.na(u_prefixes)]
   u_f_ik <- unique(f_ik)
-  in_xrefs_u <- !is.na(fastmatch::fmatch(u_key, u_f_ik))
+  n_up <- length(u_prefixes)
+  n_uf <- length(u_f_ik)
 
   df_u_idx <- if (anyNA(u_raw)) {
     match(raw_ik, u_raw)
@@ -130,54 +131,54 @@ add_xrefs_to_annotations <- function(results_list, xrefs_file) {
     fastmatch::fmatch(raw_ik, u_raw)
   }
 
-  idx_by_prefix <- split(seq_along(f_prefix), f_prefix)
-  added_cols <- list()
-  non_empty_cols <- character(0L)
+  p_id_vec <- fastmatch::fmatch(f_prefix, u_prefixes)
+  ok_p <- which(!is.na(p_id_vec))
+  p_id_sub <- p_id_vec[ok_p]
+  ik_id_sub <- fastmatch::fmatch(f_ik[ok_p], u_f_ik)
+  f_id_sub <- f_id[ok_p]
 
-  for (p in u_prefixes) {
-    p_idx <- idx_by_prefix[[p]]
-    p_ik <- f_ik[p_idx]
-    p_id <- f_id[p_idx]
-    if (anyDuplicated(p_ik) == 0L) {
-      u_p_ik <- p_ik
-      u_p_val <- p_id
-    } else {
-      u_p_ik <- unique(p_ik)
-      p_ik_id <- fastmatch::fmatch(p_ik, u_p_ik)
-      counts <- tabulate(p_ik_id, nbins = length(u_p_ik))
-      u_p_val <- character(length(u_p_ik))
-      single_mask <- counts == 1L
-      if (any(single_mask)) {
-        single_rows <- !duplicated(p_ik_id) & single_mask[p_ik_id]
-        u_p_val[p_ik_id[single_rows]] <- p_id[single_rows]
-      }
-      multi_ids <- which(counts > 1L)
-      if (length(multi_ids) > 0L) {
-        multi_rows <- which(counts[p_ik_id] > 1L)
-        sp <- split(p_id[multi_rows], p_ik_id[multi_rows])
-        u_p_val[as.integer(names(sp))] <- vapply(
-          sp,
-          function(x) paste(unique(x), collapse = " $ "),
-          character(1L),
-          USE.NAMES = FALSE
-        )
-      }
-    }
-    if (!all(is.na(u_p_val))) {
-      non_empty_cols <- c(non_empty_cols, p)
-      m_u <- fastmatch::fmatch(u_key, u_p_ik)
-      u_col <- u_p_val[m_u]
-      u_col[is.na(m_u) & in_xrefs_u] <- ""
-      added_cols[[paste0("candidate_structure_id_", p)]] <- u_col[df_u_idx]
-    }
-  }
-
-  if (length(non_empty_cols) == 0L) {
+  keep_p <- which(tabulate(p_id_sub[!is.na(f_id_sub)], nbins = n_up) > 0L)
+  if (length(keep_p) == 0L) {
     log_debug(
       "No identifier columns with non-empty data. Skipping enrichment for this tier"
     )
     return(df)
   }
+  non_empty_cols <- u_prefixes[keep_p]
+
+  cell_id <- (p_id_sub - 1L) * n_uf + ik_id_sub
+  keep_d <- !duplicated(paste(cell_id, f_id_sub, sep = "\r"))
+  c_d <- cell_id[keep_d]
+  v_d <- f_id_sub[keep_d]
+
+  xref_mat <- matrix("", nrow = n_uf, ncol = n_up)
+  if (anyDuplicated(c_d) == 0L) {
+    xref_mat[c_d] <- v_d
+  } else {
+    u_c <- unique(c_d)
+    c_pos <- fastmatch::fmatch(c_d, u_c)
+    cnts <- tabulate(c_pos, nbins = length(u_c))
+    u_v <- character(length(u_c))
+    s_mask <- cnts == 1L
+    if (any(s_mask)) {
+      s_rows <- s_mask[c_pos]
+      u_v[c_pos[s_rows]] <- v_d[s_rows]
+    }
+    m_rows <- which(cnts[c_pos] > 1L)
+    sp <- split(v_d[m_rows], c_pos[m_rows])
+    u_v[as.integer(names(sp))] <- vapply(
+      sp,
+      paste,
+      character(1L),
+      collapse = " $ ",
+      USE.NAMES = FALSE
+    )
+    xref_mat[u_c] <- u_v
+  }
+
+  m_row <- fastmatch::fmatch(u_key, u_f_ik)[df_u_idx]
+  added_cols <- lapply(keep_p, function(j) xref_mat[m_row, j])
+  names(added_cols) <- paste0("candidate_structure_id_", non_empty_cols)
 
   log_debug(
     "Adding %d identifier columns to result tier: %s",

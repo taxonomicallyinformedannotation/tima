@@ -269,17 +269,20 @@ weight_bio <- function(
     subgenus = score_biological_subgenus,
     subspecies = score_biological_subspecies
   )
-  for (sr_nm in names(subrank_scores)) {
-    sr_val <- subrank_scores[[sr_nm]]
-    if (!is.null(sr_val)) {
-      validate_numeric_range(
-        sr_val,
-        0,
-        1,
-        param_name = paste0("score_biological_", sr_nm)
-      )
+  lapply(
+    names(subrank_scores),
+    function(sr_nm) {
+      sr_val <- subrank_scores[[sr_nm]]
+      if (!is.null(sr_val)) {
+        validate_numeric_range(
+          sr_val,
+          0,
+          1,
+          param_name = paste0("score_biological_", sr_nm)
+        )
+      }
     }
-  }
+  )
 
   log_info("Weighting %d annotations by biological source", n_annotations)
   log_debug(
@@ -646,16 +649,21 @@ weight_bio <- function(
       pmax(s09, s10, na.rm = TRUE),
       na.rm = TRUE
     )
-    sr_scores_list <- vector("list", length(active_subranks))
-    for (sr_i in seq_along(active_subranks)) {
-      sp <- active_subranks[[sr_i]]
-      s_sr <- score_level(
-        df2[[sp$cand_col]],
-        df2[[sp$samp_col]],
-        sp$score
+    sr_scores_list <- lapply(
+      active_subranks,
+      function(sp) {
+        score_level(
+          df2[[sp$cand_col]],
+          df2[[sp$samp_col]],
+          sp$score
+        )
+      }
+    )
+    if (length(sr_scores_list) > 0L) {
+      sc_bio <- do.call(
+        pmax,
+        c(list(sc_bio), sr_scores_list, list(na.rm = TRUE))
       )
-      sr_scores_list[[sr_i]] <- s_sr
-      sc_bio <- pmax(sc_bio, s_sr, na.rm = TRUE)
     }
     is_biota <- !is.na(df2$candidate_organism_01_domain) &
       df2$candidate_organism_01_domain == "Biota"

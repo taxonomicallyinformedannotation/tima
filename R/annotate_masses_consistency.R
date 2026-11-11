@@ -508,18 +508,26 @@ enforce_graph_adduct_consistency <- function(df_add) {
 
         comp_nodes <- unique(c(e_f1, e_f2))
         multi_nodes <- comp_nodes[is_ambig_f[comp_nodes]]
-
         n_multi <- length(multi_nodes)
-        s_sp <- split(seq_along(e_idx), e_f1)
-        d_sp <- split(seq_along(e_idx), e_f2)
-        src_split <- s_sp[fastmatch::fmatch(
-          multi_nodes,
-          as.integer(names(s_sp))
-        )]
-        dst_split <- d_sp[fastmatch::fmatch(
-          multi_nodes,
-          as.integer(names(d_sp))
-        )]
+
+        inc_both_f <- c(e_f1, e_f2)
+        inc_both_nb <- c(e_f2, e_f1)
+        inc_both_nb_s <- c(e_s2, e_s1)
+        inc_both_my_s <- c(e_s1, e_s2)
+        inc_both_sc <- c(e_sc, e_sc)
+        inc_m <- fastmatch::fmatch(inc_both_f, multi_nodes)
+        keep_inc <- which(!is.na(inc_m))
+        inc_sp <- split(keep_inc, inc_m[keep_inc])
+        inc_nb_list <- lapply(inc_sp, function(idx) inc_both_nb[idx])
+        inc_nbs_list <- lapply(inc_sp, function(idx) inc_both_nb_s[idx])
+        inc_sc_list <- lapply(inc_sp, function(idx) inc_both_sc[idx])
+        inc_ck_list <- Map(
+          function(idx, f) {
+            fastmatch::fmatch(inc_both_my_s[idx], cand_list[[f]], nomatch = 0L)
+          },
+          inc_sp,
+          multi_nodes
+        )
 
         last_eval_step <- integer(n_f)
         last_change_step <- integer(n_f)
@@ -529,18 +537,13 @@ enforce_graph_adduct_consistency <- function(df_add) {
           changed <- FALSE
           for (mi in seq_len(n_multi)) {
             f <- multi_nodes[[mi]]
-            s_i <- src_split[[mi]]
-            d_i <- dst_split[[mi]]
+            inc_nb <- inc_nb_list[[mi]]
 
-            if (iter > 1L) {
-              my_eval <- last_eval_step[[f]]
-              nb_changed <- (length(s_i) > 0L &&
-                any(last_change_step[e_f2[s_i]] >= my_eval)) ||
-                (length(d_i) > 0L &&
-                  any(last_change_step[e_f1[d_i]] >= my_eval))
-              if (!nb_changed) {
-                next
-              }
+            if (
+              iter > 1L &&
+                !any(last_change_step[inc_nb] >= last_eval_step[[f]])
+            ) {
+              next
             }
 
             step_counter <- step_counter + 1L
@@ -549,30 +552,16 @@ enforce_graph_adduct_consistency <- function(df_add) {
             cands_f <- cand_list[[f]]
             cand_scores <- prior_list[[f]]
 
-            if (length(s_i) > 0L) {
-              active_s <- e_s2[s_i] == assign_state_id[e_f2[s_i]]
-              if (any(active_s)) {
-                s_i_act <- s_i[active_s]
-                s1_act <- e_s1[s_i_act]
-                sc_act <- e_sc[s_i_act]
-                for (k in seq_along(cands_f)) {
-                  cand_scores[[k]] <- cand_scores[[k]] +
-                    sum(sc_act[s1_act == cands_f[[k]]])
-                }
-              }
-            }
-
-            if (length(d_i) > 0L) {
-              active_d <- e_s1[d_i] == assign_state_id[e_f1[d_i]]
-              if (any(active_d)) {
-                d_i_act <- d_i[active_d]
-                s2_act <- e_s2[d_i_act]
-                sc_act <- e_sc[d_i_act]
-                for (k in seq_along(cands_f)) {
-                  cand_scores[[k]] <- cand_scores[[k]] +
-                    sum(sc_act[s2_act == cands_f[[k]]])
-                }
-              }
+            active <- inc_nbs_list[[mi]] == assign_state_id[inc_nb] &
+              inc_ck_list[[mi]] > 0L
+            if (any(active)) {
+              rs <- rowsum.default(
+                inc_sc_list[[mi]][active],
+                inc_ck_list[[mi]][active],
+                reorder = FALSE
+              )
+              cand_scores[as.integer(rownames(rs))] <-
+                cand_scores[as.integer(rownames(rs))] + as.numeric(rs[, 1L])
             }
 
             best_idx <- which(cand_scores == max(cand_scores))

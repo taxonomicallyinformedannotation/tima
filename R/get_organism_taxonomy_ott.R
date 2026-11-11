@@ -537,28 +537,28 @@ get_organism_taxonomy_ott <- function(
   )
 
   n_out <- length(cn_vec)
-  out_list <- vector("list", 12L)
-  names(out_list) <- c(
-    "organism_name",
-    "organism_taxonomy_ottid",
-    names(target_ranks)
-  )
-  out_list[["organism_name"]] <- cn_vec
-  out_list[["organism_taxonomy_ottid"]] <- ott_vec
-
-  for (col_nm in names(target_ranks)) {
-    rk <- target_ranks[[col_nm]]
-    rk_idx <- which(otl_sub_rank == rk)
-    if (length(rk_idx) == 0L) {
-      out_list[[col_nm]] <- rep.int(NA_character_, n_out)
-    } else {
-      rk_ids <- otl_sub_id[rk_idx]
-      rk_names <- otl_sub_name[rk_idx]
-      first_rk <- !duplicated(rk_ids)
-      m_id <- fastmatch::fmatch(ott_vec, rk_ids[first_rk])
-      out_list[[col_nm]] <- rk_names[first_rk][m_id]
-    }
+  n_rk <- length(target_ranks)
+  u_otts <- unique(ott_vec)
+  n_uo <- length(u_otts)
+  rk_mat <- matrix(NA_character_, nrow = n_uo, ncol = n_rk)
+  rk_id <- fastmatch::fmatch(otl_sub_rank, unname(target_ranks))
+  o_id <- fastmatch::fmatch(otl_sub_id, u_otts)
+  ok_ro <- which(!is.na(rk_id) & !is.na(o_id))
+  if (length(ok_ro) > 0L) {
+    lin_ro <- (rk_id[ok_ro] - 1L) * n_uo + o_id[ok_ro]
+    first_ro <- !duplicated(lin_ro)
+    rk_mat[lin_ro[first_ro]] <- otl_sub_name[ok_ro[first_ro]]
   }
+  ott_u_id <- if (n_uo > 0L) fastmatch::fmatch(ott_vec, u_otts) else integer(0L)
+  rk_cols <- lapply(seq_len(n_rk), function(j) rk_mat[ott_u_id, j])
+  names(rk_cols) <- names(target_ranks)
+  out_list <- c(
+    list(
+      organism_name = cn_vec,
+      organism_taxonomy_ottid = ott_vec
+    ),
+    rk_cols
+  )
   biological_metadata <- tidytable::as_tidytable(out_list)
 
   log_info("Got OTTaxonomy!")

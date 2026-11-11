@@ -127,9 +127,9 @@ create_edges <- function(
 
   sanitized_indices <- logical(nspecs)
   if (!isTRUE(assume_sanitized) && nspecs >= 2L) {
-    for (idx in seq_len(nspecs)) {
-      sp <- frags[[idx]]
-      if (
+    needs_san <- vapply(
+      frags,
+      function(sp) {
         is.matrix(sp) &&
           nrow(sp) >= 2L &&
           !is_spectrum_sanitized(
@@ -137,14 +137,17 @@ create_edges <- function(
             tolerance = ms2_tolerance,
             ppm = ppm_tolerance
           )
-      ) {
-        frags[[idx]] <- sanitize_spectrum_matrix(
-          sp,
-          tolerance = ms2_tolerance,
-          ppm = ppm_tolerance
-        )
-        sanitized_indices[[idx]] <- TRUE
-      }
+      },
+      logical(1L)
+    )
+    if (any(needs_san)) {
+      frags[needs_san] <- lapply(
+        frags[needs_san],
+        sanitize_spectrum_matrix,
+        tolerance = ms2_tolerance,
+        ppm = ppm_tolerance
+      )
+      sanitized_indices[needs_san] <- TRUE
     }
   }
 
@@ -210,29 +213,29 @@ create_edges <- function(
         }
       }
     } else {
-      sc_vec <- numeric(length(targets))
-      mp_vec <- integer(length(targets))
-
-      for (k in seq_along(targets)) {
-        j <- targets[k]
-        res <- calculate_similarity(
-          method = method,
-          query_spectrum = q_sp,
-          target_spectrum = frags[[j]],
-          query_precursor = q_pre,
-          target_precursor = precs[j],
-          dalton = ms2_tolerance,
-          ppm = ppm_tolerance,
-          return_matched_peaks = TRUE
-        )
-        if (is.numeric(res) && length(res) >= 2L) {
-          sc_vec[k] <- res[1L]
-          mp_vec[k] <- as.integer(res[2L])
-        } else {
-          sc_vec[k] <- as.numeric(res)
-          mp_vec[k] <- 0L
-        }
-      }
+      pair_mat <- vapply(
+        targets,
+        function(j) {
+          res <- calculate_similarity(
+            method = method,
+            query_spectrum = q_sp,
+            target_spectrum = frags[[j]],
+            query_precursor = q_pre,
+            target_precursor = precs[j],
+            dalton = ms2_tolerance,
+            ppm = ppm_tolerance,
+            return_matched_peaks = TRUE
+          )
+          if (is.numeric(res) && length(res) >= 2L) {
+            c(as.numeric(res[1L]), as.numeric(as.integer(res[2L])))
+          } else {
+            c(as.numeric(res), 0)
+          }
+        },
+        numeric(2L)
+      )
+      sc_vec <- pair_mat[1L, ]
+      mp_vec <- as.integer(pair_mat[2L, ])
 
       finite_sc <- is.finite(sc_vec)
       if (any(finite_sc)) {

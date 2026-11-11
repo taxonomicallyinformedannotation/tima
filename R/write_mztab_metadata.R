@@ -124,13 +124,17 @@
 
   # ── Controlled vocabulary registry ───────────────────────────────────────
   cv_registry <- catalog$terms$cv_registry
-  for (i in seq_along(cv_registry)) {
-    entry <- cv_registry[[i]]
-    meta <- add_default(meta, paste0("cv[", i, "]-label"), entry$label)
-    meta <- add_default(meta, paste0("cv[", i, "]-full_name"), entry$full_name)
-    meta <- add_default(meta, paste0("cv[", i, "]-version"), entry$version)
-    meta <- add_default(meta, paste0("cv[", i, "]-uri"), entry$uri)
-  }
+  meta <- Reduce(
+    function(acc, i) {
+      entry <- cv_registry[[i]]
+      acc <- add_default(acc, paste0("cv[", i, "]-label"), entry$label)
+      acc <- add_default(acc, paste0("cv[", i, "]-full_name"), entry$full_name)
+      acc <- add_default(acc, paste0("cv[", i, "]-version"), entry$version)
+      add_default(acc, paste0("cv[", i, "]-uri"), entry$uri)
+    },
+    seq_along(cv_registry),
+    init = meta
+  )
 
   if (!is.null(publication) && nzchar(publication) && publication != "null") {
     meta <- add_default(meta, "publication[1]", .mztab_escape(publication))
@@ -324,30 +328,34 @@
     } else {
       2L
     }
-    for (i in seq_along(db_prefix_info)) {
-      db_n <- next_db_n + i - 1L
-      info <- db_prefix_info[[i]]
-      meta <- add_default(
-        meta,
-        paste0("database[", db_n, "]"),
-        paste0("[, , ", info$name, ", ]")
-      )
-      meta <- add_default(
-        meta,
-        paste0("database[", db_n, "]-prefix"),
-        info$prefix
-      )
-      meta <- add_default(
-        meta,
-        paste0("database[", db_n, "]-version"),
-        "Unknown"
-      )
-      meta <- add_default(
-        meta,
-        paste0("database[", db_n, "]-uri"),
-        info$uri
-      )
-    }
+    meta <- Reduce(
+      function(acc, i) {
+        db_n <- next_db_n + i - 1L
+        info <- db_prefix_info[[i]]
+        acc <- add_default(
+          acc,
+          paste0("database[", db_n, "]"),
+          paste0("[, , ", info$name, ", ]")
+        )
+        acc <- add_default(
+          acc,
+          paste0("database[", db_n, "]-prefix"),
+          info$prefix
+        )
+        acc <- add_default(
+          acc,
+          paste0("database[", db_n, "]-version"),
+          "Unknown"
+        )
+        add_default(
+          acc,
+          paste0("database[", db_n, "]-uri"),
+          info$uri
+        )
+      },
+      seq_along(db_prefix_info),
+      init = meta
+    )
   }
 
   # ── id_confidence_measure declarations (TIMA user-CV namespace) ───────────

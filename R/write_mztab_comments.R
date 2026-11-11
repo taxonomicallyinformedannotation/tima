@@ -720,18 +720,28 @@
   uri_lookup <- rep("null", length(unique_keys))
   db_lookup <- rep("null", length(unique_keys))
 
-  for (i in which(!is.na(idx_match))) {
-    rows <- xrefs_index[[idx_match[[i]]]]
-    if (is.null(rows) || nrow(rows) == 0L) {
-      next
-    }
-    row_idx <- first_key_idx[[i]]
-    fallback_val <- if (!is.na(row_idx)) fallback[[row_idx]] else "null"
-    uri_lookup[[i]] <- .mztab_pick_best_uri(rows)
-    db_lookup[[i]] <- .mztab_pick_best_database_identifier(
-      rows,
-      fallback = fallback_val
+  hit_i <- which(!is.na(idx_match))
+  if (length(hit_i) > 0L) {
+    rows_list <- xrefs_index[idx_match[hit_i]]
+    non_empty <- vapply(
+      rows_list,
+      function(r) !is.null(r) && nrow(r) > 0L,
+      logical(1L)
     )
+    ok_i <- hit_i[non_empty]
+    if (length(ok_i) > 0L) {
+      ok_rows <- rows_list[non_empty]
+      row_idx <- first_key_idx[ok_i]
+      fb_vals <- ifelse(!is.na(row_idx), fallback[row_idx], "null")
+      uri_lookup[ok_i] <- vapply(ok_rows, .mztab_pick_best_uri, character(1L))
+      db_lookup[ok_i] <- mapply(
+        .mztab_pick_best_database_identifier,
+        ok_rows,
+        fb_vals,
+        SIMPLIFY = TRUE,
+        USE.NAMES = FALSE
+      )
+    }
   }
 
   key_match <- fastmatch::fmatch(keys[valid_idx], unique_keys)
