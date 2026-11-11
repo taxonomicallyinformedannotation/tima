@@ -5,6 +5,31 @@ library(testthat)
 # Use a temporary ~/.tima, never the user's real one
 local_test_home()
 
+make_small_cache_dir <- function() {
+  tmpdir <- tempfile()
+  dir.create(file.path(tmpdir, "params"), recursive = TRUE)
+  dir.create(file.path(tmpdir, "data/source"), recursive = TRUE)
+  minimal_params <- list(
+    ms = list(polarity = "pos"),
+    files = list(
+      pattern = "test",
+      features = list(raw = "features.csv"),
+      metadata = list(raw = "metadata.tsv"),
+      annotations = list(raw = list(sirius = "sirius.zip")),
+      spectral = list(raw = "spectra.mgf")
+    )
+  )
+  yaml::write_yaml(
+    minimal_params,
+    file.path(tmpdir, "params/prepare_params.yaml")
+  )
+  yaml::write_yaml(
+    minimal_params,
+    file.path(tmpdir, "params/prepare_params_advanced.yaml")
+  )
+  tmpdir
+}
+
 
 ## Input Validation Tests ----
 
@@ -26,51 +51,71 @@ test_that("change_params_small validates ms_pol parameter", {
 })
 
 test_that("change_params_small handles NULL ms_pol", {
-  skip_on_ci()
-  # Should not error with NULL
+  tmpdir <- make_small_cache_dir()
+  on.exit(unlink(tmpdir, recursive = TRUE))
   expect_no_error(
-    change_params_small(ms_pol = NULL)
+    change_params_small(ms_pol = NULL, cache_dir = tmpdir)
   )
 })
 
 ## File Validation Tests ----
 
 test_that("change_params_small errors on missing features file", {
-  skip_on_ci()
+  tmpdir <- make_small_cache_dir()
+  on.exit(unlink(tmpdir, recursive = TRUE))
   expect_error(
-    change_params_small(fil_fea_raw = "nonexistent_features.csv"),
+    change_params_small(
+      fil_fea_raw = "nonexistent_features.csv",
+      cache_dir = tmpdir
+    ),
     "Features file does not exist"
   )
 })
 
 test_that("change_params_small errors on missing metadata file", {
-  skip_on_ci()
+  tmpdir <- make_small_cache_dir()
+  on.exit(unlink(tmpdir, recursive = TRUE))
   expect_error(
-    change_params_small(fil_met_raw = "nonexistent_metadata.tsv"),
+    change_params_small(
+      fil_met_raw = "nonexistent_metadata.tsv",
+      cache_dir = tmpdir
+    ),
     "Metadata file does not exist"
   )
 })
 
 test_that("change_params_small errors on missing SIRIUS file", {
-  skip_on_ci()
+  tmpdir <- make_small_cache_dir()
+  on.exit(unlink(tmpdir, recursive = TRUE))
   expect_error(
-    change_params_small(fil_sir_raw = "nonexistent_sirius.zip"),
+    change_params_small(
+      fil_sir_raw = "nonexistent_sirius.zip",
+      cache_dir = tmpdir
+    ),
     "SIRIUS annotations file does not exist"
   )
 })
 
 test_that("change_params_small errors on missing spectra file", {
-  skip_on_ci()
+  tmpdir <- make_small_cache_dir()
+  on.exit(unlink(tmpdir, recursive = TRUE))
   expect_error(
-    change_params_small(fil_spe_raw = "nonexistent_spectra.mgf"),
+    change_params_small(
+      fil_spe_raw = "nonexistent_spectra.mgf",
+      cache_dir = tmpdir
+    ),
     "Spectra file does not exist"
   )
 })
 
 test_that("change_params_small errors on missing mzTab file", {
-  skip_on_ci()
+  tmpdir <- make_small_cache_dir()
+  on.exit(unlink(tmpdir, recursive = TRUE))
   expect_error(
-    change_params_small(fil_mzt_raw = "nonexistent_annotations.mztab"),
+    change_params_small(
+      fil_mzt_raw = "nonexistent_annotations.mztab",
+      cache_dir = tmpdir
+    ),
     "mzTab file does not exist"
   )
 })
@@ -78,7 +123,6 @@ test_that("change_params_small errors on missing mzTab file", {
 ## Successful Update Tests ----
 
 test_that("change_params_small runs with valid polarity", {
-  skip_on_ci()
   # Create minimal environment
   tmpdir <- tempfile()
   dir.create(tmpdir, recursive = TRUE)
@@ -137,8 +181,6 @@ test_that("change_params_small runs with valid polarity", {
 })
 
 test_that("change_params_small updates all file parameters", {
-  skip_on_ci()
-
   tmpdir <- tempfile()
   dir.create(tmpdir, recursive = TRUE)
   dir.create(file.path(tmpdir, "params"), recursive = TRUE)
@@ -211,8 +253,6 @@ test_that("change_params_small updates all file parameters", {
 })
 
 test_that("change_params_small supports mzTab-only update while keeping existing core files", {
-  skip_on_ci()
-
   tmpdir <- tempfile()
   dir.create(tmpdir, recursive = TRUE)
   dir.create(file.path(tmpdir, "params"), recursive = TRUE)
@@ -259,8 +299,6 @@ test_that("change_params_small supports mzTab-only update while keeping existing
 })
 
 test_that("change_params_small accepts mzTab with explicit overlays for features/metadata/spectra", {
-  skip_on_ci()
-
   tmpdir <- tempfile()
   dir.create(tmpdir, recursive = TRUE)
   dir.create(file.path(tmpdir, "params"), recursive = TRUE)
@@ -428,8 +466,6 @@ test_that("create_yaml_null_handler creates proper function", {
 })
 
 test_that("change_params_small handles NULL parameters gracefully", {
-  skip_on_ci()
-
   tmpdir <- tempfile()
   dir.create(tmpdir, recursive = TRUE)
   dir.create(file.path(tmpdir, "params"), recursive = TRUE)
@@ -487,8 +523,6 @@ test_that("change_params_small handles NULL parameters gracefully", {
 })
 
 test_that("change_params_small handles partial updates", {
-  skip_on_ci()
-
   tmpdir <- tempfile()
   dir.create(tmpdir, recursive = TRUE)
   dir.create(file.path(tmpdir, "params"), recursive = TRUE)
@@ -539,8 +573,6 @@ test_that("change_params_small handles partial updates", {
 })
 
 test_that("change_params_small updates both yaml files", {
-  skip_on_ci()
-
   tmpdir <- tempfile()
   dir.create(tmpdir, recursive = TRUE)
   dir.create(file.path(tmpdir, "params"), recursive = TRUE)
