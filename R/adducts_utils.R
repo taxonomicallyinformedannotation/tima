@@ -498,22 +498,19 @@ calculate_formula_mass <- function(x) {
   u_x <- unique(x_sub)
   u_mass <- numeric(length(u_x))
   u_valid <- logical(length(u_x))
-  need_parse <- integer(0L)
-
-  for (i in seq_along(u_x)) {
-    ux <- u_x[[i]]
-    if (nzchar(ux)) {
-      cached <- .FORMULA_MASS_CACHE[[ux]]
-      if (!is.null(cached)) {
-        u_mass[[i]] <- cached
-        u_valid[[i]] <- TRUE
-      } else {
-        need_parse <- c(need_parse, i)
-      }
-    } else {
-      need_parse <- c(need_parse, i)
-    }
-  }
+  nz_idx <- which(nzchar(u_x))
+  cached_list <- mget(
+    u_x[nz_idx],
+    envir = .FORMULA_MASS_CACHE,
+    ifnotfound = list(NULL)
+  )
+  hit_cache <- !vapply(cached_list, is.null, logical(1L))
+  hit_idx <- nz_idx[hit_cache]
+  u_mass[hit_idx] <- as.numeric(
+    unlist(cached_list[hit_cache], use.names = FALSE)
+  )
+  u_valid[hit_idx] <- TRUE
+  need_parse <- which(!u_valid)
 
   if (length(need_parse) > 0L) {
     u_to_parse <- u_x[need_parse]

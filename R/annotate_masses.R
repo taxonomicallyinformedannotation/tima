@@ -2123,13 +2123,17 @@ score_modifier_relation_from_hypotheses <- function(
   }
   w_s <- src_hypotheses$.row_weight[valid_s]
   w_d <- dest_hypotheses$.row_weight[valid_d]
-  total_score <- 0L
-  for (ck in common_keys) {
-    total_score <- total_score +
-      as.integer(max(w_s[sk_s == ck])) +
-      as.integer(max(w_d[sk_d == ck]))
-  }
-  as.integer(total_score)
+  ord_s <- order(-w_s)
+  sk_s_u <- sk_s[ord_s]
+  keep_s <- !duplicated(sk_s_u)
+  max_w_s <- w_s[ord_s[keep_s]][fastmatch::fmatch(common_keys, sk_s_u[keep_s])]
+
+  ord_d <- order(-w_d)
+  sk_d_u <- sk_d[ord_d]
+  keep_d <- !duplicated(sk_d_u)
+  max_w_d <- w_d[ord_d[keep_d]][fastmatch::fmatch(common_keys, sk_d_u[keep_d])]
+
+  as.integer(sum(as.integer(max_w_s) + as.integer(max_w_d)))
 }
 
 #' Resolve competing cluster/loss interpretations using node hypotheses

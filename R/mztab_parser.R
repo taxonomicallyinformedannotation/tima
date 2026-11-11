@@ -235,14 +235,11 @@ NULL
     return(tidytable::as_tidytable(out_list))
   }
 
-  row_matrix <- matrix(NA_character_, nrow = n_rows, ncol = n_cols)
-  for (row_idx in seq_len(n_rows)) {
-    vals <- raw_splits[[row_idx]]
-    if (length(vals) >= 2L) {
-      take_len <- min(length(vals) - 1L, n_cols)
-      row_matrix[row_idx, seq_len(take_len)] <- vals[seq.int(2L, take_len + 1L)]
-    }
-  }
+  row_matrix <- t(vapply(
+    raw_splits,
+    function(vals) vals[seq.int(2L, n_cols + 1L)],
+    character(n_cols)
+  ))
 
   out <- as.data.frame(
     row_matrix,
@@ -251,7 +248,7 @@ NULL
   )
   names(out) <- col_names
   out[] <- lapply(out, .normalize_mztab_value)
-  rm(row_matrix, row_idx, vals, take_len, empty_idx, col_names, n_cols)
+  rm(row_matrix, empty_idx, col_names, n_cols)
   tidytable::as_tidytable(out)
 }
 

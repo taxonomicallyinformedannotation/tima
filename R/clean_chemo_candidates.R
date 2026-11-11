@@ -1833,9 +1833,7 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
   cost <- matrix(big_cost, nrow = k, ncol = n_cols)
   fin <- is.finite(weight_mat)
   cost[, seq_len(m)][fin] <- -weight_mat[fin]
-  for (i in seq_len(k)) {
-    cost[i, m + i] <- 0
-  }
+  cost[cbind(seq_len(k), m + seq_len(k))] <- 0
 
   u <- numeric(k + 1L)
   v <- numeric(n_cols + 1L)
@@ -1880,12 +1878,13 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
   }
 
   match_col <- rep.int(NA_integer_, k)
-  for (j in 2L:(m + 1L)) {
-    r_idx <- p[j]
-    if (r_idx > 0L && is.finite(weight_mat[r_idx, j - 1L])) {
-      match_col[r_idx] <- j - 1L
-    }
-  }
+  j_real <- seq_len(m)
+  r_idx <- p[j_real + 1L]
+  valid_m <- r_idx > 0L
+  j_v <- j_real[valid_m]
+  r_v <- r_idx[valid_m]
+  fin_m <- is.finite(weight_mat[cbind(r_v, j_v)])
+  match_col[r_v[fin_m]] <- j_v[fin_m]
   rc_mat <- cost[, seq_len(m), drop = FALSE] -
     outer(u[-1L], v[2L:(m + 1L)], "+")
   rc_dummy <- -u[-1L] - v[(m + 2L):(m + k + 1L)]
@@ -1897,14 +1896,8 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
 #' Compute total weight of a bipartite matching vector
 #' @keywords internal
 .bipartite_matching_weight <- function(w_mat, match_vec) {
-  total <- 0
-  for (ii in seq_along(match_vec)) {
-    mj <- match_vec[[ii]]
-    if (!is.na(mj)) {
-      total <- total + w_mat[ii, mj]
-    }
-  }
-  total
+  ok <- which(!is.na(match_vec))
+  sum(w_mat[cbind(ok, match_vec[ok])])
 }
 
 #' Compute globally optimal RT-cluster to InChIKey assignment for conflicting clusters
@@ -1971,44 +1964,13 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
   # unrelated mass families that happen to co-eluting at the same RT never merge.
   edge_key <- (af_pos - 1L) * m_all + ik_pos
   u_edge <- !duplicated(edge_key)
-  iks_by_af <- split(
-    ik_pos[u_edge],
-    factor(af_pos[u_edge], levels = seq_len(n_af))
+  g_bip <- igraph::make_graph(
+    edges = rbind(af_pos[u_edge], n_af + ik_pos[u_edge]),
+    n = n_af + m_all,
+    directed = FALSE
   )
-  afs_by_ik <- split(
-    af_pos[u_edge],
-    factor(ik_pos[u_edge], levels = seq_len(m_all))
-  )
-
-  comp_of_af <- integer(n_af)
-  comp_of_ik <- integer(m_all)
-  comp_id <- 0L
-  for (start_af in seq_len(n_af)) {
-    if (comp_of_af[[start_af]] != 0L) {
-      next
-    }
-    comp_id <- comp_id + 1L
-    comp_of_af[[start_af]] <- comp_id
-    q_af <- start_af
-    head_af <- 1L
-    while (head_af <= length(q_af)) {
-      cur_af <- q_af[[head_af]]
-      head_af <- head_af + 1L
-      nbr_iks <- iks_by_af[[cur_af]]
-      new_iks <- nbr_iks[comp_of_ik[nbr_iks] == 0L]
-      if (length(new_iks) > 0L) {
-        comp_of_ik[new_iks] <- comp_id
-        for (ik_idx in new_iks) {
-          nbr_afs <- afs_by_ik[[ik_idx]]
-          new_afs <- nbr_afs[comp_of_af[nbr_afs] == 0L]
-          if (length(new_afs) > 0L) {
-            comp_of_af[new_afs] <- comp_id
-            q_af <- c(q_af, new_afs)
-          }
-        }
-      }
-    }
-  }
+  comp_of_af <- as.integer(igraph::components(g_bip)$membership[seq_len(n_af)])
+  comp_id <- max(comp_of_af)
 
   # Refine rt_cid by candidate component so co-eluting features of different
   # mass families receive distinct cluster IDs.
@@ -2032,8 +1994,14 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
     vector("list", k_all),
     as.character(active_cids)
   )
-  optimal_cids_by_ik <- stats::setNames(vector("list", m_all), act_iks)
-  holder_fids_by_ik <- stats::setNames(vector("list", m_all), act_iks)
+  optimal_cids_by_ik <- stats::setNames(
+    replicate(m_all, integer(0L), simplify = FALSE),
+    act_iks
+  )
+  holder_fids_by_ik <- stats::setNames(
+    replicate(m_all, character(0L), simplify = FALSE),
+    act_iks
+  )
 
   rows_by_comp <- split(
     seq_along(act_rows),
@@ -2051,24 +2019,20 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
     sub_cid_pos <- fastmatch::fmatch(rt_cid[c_rows], sub_cids)
     sub_ik_pos <- fastmatch::fmatch(ik_pos[c_idx], sub_js)
 
+    ord_c <- order(
+      -row_weights[c_rows],
+      row_prio_rank[c_rows],
+      method = "radix"
+    )
+    c_rows_s <- c_rows[ord_c]
+    cell_idx <- (sub_ik_pos[ord_c] - 1L) * k_sub + sub_cid_pos[ord_c]
+    best_keep <- !duplicated(cell_idx)
+    best_cells <- cell_idx[best_keep]
+    best_rows <- c_rows_s[best_keep]
     sub_w <- matrix(-Inf, nrow = k_sub, ncol = m_sub)
     sub_best_row <- matrix(NA_integer_, nrow = k_sub, ncol = m_sub)
-    for (idx in seq_along(c_rows)) {
-      r <- c_rows[[idx]]
-      ci <- sub_cid_pos[[idx]]
-      jj <- sub_ik_pos[[idx]]
-      w <- row_weights[[r]]
-      prev_r <- sub_best_row[ci, jj]
-      if (
-        w > sub_w[ci, jj] ||
-          (w == sub_w[ci, jj] &&
-            !is.na(prev_r) &&
-            row_prio_rank[[r]] < row_prio_rank[[prev_r]])
-      ) {
-        sub_w[ci, jj] <- w
-        sub_best_row[ci, jj] <- r
-      }
-    }
+    sub_w[best_cells] <- row_weights[best_rows]
+    sub_best_row[best_cells] <- best_rows
 
     # By the pigeonhole principle, row ii can never be matched in an optimal
     # assignment to a column strictly below row ii's k_sub-th largest weight.
@@ -2107,17 +2071,14 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
     tight_red <- is.finite(red_w) & (rc_red <= 1e-9)
     repeat {
       deg1_rows <- which(rowSums(tight_red) == 1L & !tight_dummy)
-      changed <- FALSE
-      for (r in deg1_rows) {
-        c_idx <- which(tight_red[r, ])
-        others <- which(tight_red[, c_idx])
-        others <- others[others != r]
-        if (length(others) > 0L) {
-          tight_red[others, c_idx] <- FALSE
-          changed <- TRUE
-        }
-      }
-      if (!changed) {
+      c_idx_d1 <- max.col(
+        tight_red[deg1_rows, , drop = FALSE],
+        ties.method = "first"
+      )
+      n_before <- sum(tight_red[, c_idx_d1])
+      tight_red[, c_idx_d1] <- FALSE
+      tight_red[cbind(deg1_rows, c_idx_d1)] <- TRUE
+      if (sum(tight_red[, c_idx_d1]) == n_before) {
         break
       }
     }
@@ -2125,27 +2086,25 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
     tol <- 1e-13 * max(1, abs(w_star))
 
     opt_grp <- matrix(FALSE, nrow = k_sub, ncol = n_grp)
-    for (ii in seq_len(k_sub)) {
-      mj <- red_match[[ii]]
-      if (!is.na(mj)) {
-        opt_grp[ii, red_grp[[mj]]] <- TRUE
+    ok_m <- which(!is.na(red_match))
+    opt_grp[cbind(ok_m, red_grp[red_match[ok_m]])] <- TRUE
+    cand_pairs <- which(
+      !opt_grp & tight_red[, first_rep, drop = FALSE],
+      arr.ind = TRUE
+    )
+    for (p_idx in seq_len(nrow(cand_pairs))) {
+      ii <- cand_pairs[p_idx, 1L]
+      g <- cand_pairs[p_idx, 2L]
+      r_col <- first_rep[[g]]
+      w_rem <- if (ncol(red_w) == 1L) {
+        0
+      } else {
+        sub_w_rem <- red_w[-ii, -r_col, drop = FALSE]
+        rem_match <- .solve_bipartite_max_weight(sub_w_rem)
+        .bipartite_matching_weight(sub_w_rem, rem_match)
       }
-    }
-    for (ii in seq_len(k_sub)) {
-      for (g in seq_len(n_grp)) {
-        r_col <- first_rep[[g]]
-        if (!opt_grp[ii, g] && tight_red[ii, r_col]) {
-          w_rem <- if (ncol(red_w) == 1L) {
-            0
-          } else {
-            sub_w_rem <- red_w[-ii, -r_col, drop = FALSE]
-            rem_match <- .solve_bipartite_max_weight(sub_w_rem)
-            .bipartite_matching_weight(sub_w_rem, rem_match)
-          }
-          if ((w_star - (red_w[ii, r_col] + w_rem)) <= tol) {
-            opt_grp[ii, g] <- TRUE
-          }
-        }
+      if ((w_star - (red_w[ii, r_col] + w_rem)) <= tol) {
+        opt_grp[ii, g] <- TRUE
       }
     }
     opt_edge <- opt_grp[, col_grp, drop = FALSE]
@@ -2154,25 +2113,14 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
       opt_jj <- which(opt_edge[ii, ])
       target_iks_by_cid[[sub_ci_global[[ii]]]] <- act_iks[sub_js[opt_jj]]
     }
-    for (jj in seq_len(m_sub)) {
+    for (jj in which(colSums(opt_edge) > 0L)) {
       ij <- sub_js[[jj]]
       opt_ii <- which(opt_edge[, jj])
-      if (length(opt_ii) > 0L) {
-        cids_opt <- sub_cids[opt_ii]
-        optimal_cids_by_ik[[ij]] <- cids_opt
-        holders <- vapply(
-          opt_ii,
-          function(ii_idx) {
-            fids[[sub_best_row[ii_idx, jj]]]
-          },
-          character(1L)
-        )
-        names(holders) <- as.character(cids_opt)
-        holder_fids_by_ik[[ij]] <- holders
-      } else {
-        optimal_cids_by_ik[[ij]] <- integer(0L)
-        holder_fids_by_ik[[ij]] <- character(0L)
-      }
+      cids_opt <- sub_cids[opt_ii]
+      optimal_cids_by_ik[[ij]] <- cids_opt
+      holders <- fids[sub_best_row[cbind(opt_ii, jj)]]
+      names(holders) <- as.character(cids_opt)
+      holder_fids_by_ik[[ij]] <- holders
     }
   }
 
@@ -2324,7 +2272,6 @@ resolve_cross_rt_duplicate_candidates <- function(
 
   rows_by_fid <- split(seq_len(n), fids)
   row_fid_names <- names(rows_by_fid)
-  reordered_fids <- character(0L)
 
   rt_cid <- opt$rt_cid
   active_cids <- opt$active_cids
@@ -2336,8 +2283,8 @@ resolve_cross_rt_duplicate_candidates <- function(
 
   act_fids <- unique(fids[!is.na(rt_cid) & rt_cid %in% active_cids])
   act_fid_pos <- fastmatch::fmatch(act_fids, row_fid_names)
+  reordered_mask <- logical(length(act_fids))
   for (f_idx in seq_along(act_fids)) {
-    lfid <- act_fids[[f_idx]]
     f_rows <- rows_by_fid[[act_fid_pos[[f_idx]]]]
     cid <- rt_cid[f_rows[[1L]]]
     cid_chr <- as.character(cid)
@@ -2413,7 +2360,7 @@ resolve_cross_rt_duplicate_candidates <- function(
         " assigned to feature ",
         holder_fid
       )
-      reordered_fids <- c(reordered_fids, lfid)
+      reordered_mask[[f_idx]] <- TRUE
     } else {
       tied_ik <- orig_iks[[1L]]
       holders <- holder_fids_by_ik[[fastmatch::fmatch(
@@ -2432,12 +2379,13 @@ resolve_cross_rt_duplicate_candidates <- function(
           " tied with feature ",
           tied_fid
         )
-        reordered_fids <- c(reordered_fids, lfid)
+        reordered_mask[[f_idx]] <- TRUE
       }
     }
   }
 
-  if (length(reordered_fids) == 0L) {
+  n_reordered <- sum(reordered_mask)
+  if (n_reordered == 0L) {
     return(df_ranked)
   }
 
@@ -2455,7 +2403,7 @@ resolve_cross_rt_duplicate_candidates <- function(
 
   log_info(
     "Disambiguated cross-RT duplicate rank-1 candidates across %d feature(s)",
-    length(unique(reordered_fids))
+    n_reordered
   )
 
   if (is.unsorted(final_ord)) {
@@ -2550,26 +2498,27 @@ drop_cross_rt_duplicate_final_candidates <- function(
   }
   added_note <- FALSE
 
-  keep_row <- !vapply(
-    seq_len(n),
-    function(r) {
-      if (!valid_ik[[r]] || is.na(rt_cid[[r]])) {
-        return(FALSE)
-      }
-      cids_opt <- optimal_cids_by_ik[[iks[[r]]]]
-      length(cids_opt) > 0L && !(rt_cid[[r]] %in% cids_opt)
-    },
-    logical(1L)
+  assigned_iks <- names(optimal_cids_by_ik)[lengths(optimal_cids_by_ik) > 0L]
+  opt_pairs <- paste(
+    rep.int(names(target_iks_by_cid), lengths(target_iks_by_cid)),
+    unlist(target_iks_by_cid, use.names = FALSE),
+    sep = "\r"
   )
+  row_pairs <- paste(rt_cid, iks, sep = "\r")
+  keep_row <- !(valid_ik &
+    !is.na(rt_cid) &
+    (iks %in% assigned_iks) &
+    !(row_pairs %in% opt_pairs))
 
+  rows_by_fid <- split(seq_len(n), fids)
   act_fids <- unique(
     fids[keep_row & !is.na(rt_cid) & rt_cid %in% opt$active_cids]
   )
   for (lfid in act_fids) {
-    f_all <- which(fids == lfid)
+    f_all <- rows_by_fid[[lfid]]
     r1_orig <- f_all[col_rk[f_all] == 1L & valid_ik[f_all]]
     orig_iks <- unique(iks[r1_orig])
-    rem_f <- which(keep_row & fids == lfid)
+    rem_f <- f_all[keep_row[f_all]]
     cid_chr <- as.character(rt_cid[rem_f[[1L]]])
     target_iks <- target_iks_by_cid[[cid_chr]]
     is_target_rem <- valid_ik[rem_f] & (iks[rem_f] %in% target_iks)

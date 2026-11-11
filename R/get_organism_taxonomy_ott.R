@@ -84,21 +84,23 @@
     uname_parts <- vector("list", n_taxa * 2L)
     ott_parts <- vector("list", n_taxa * 2L)
 
-    for (idx in seq_len(n_taxa)) {
-      ti <- taxon_info[[idx]]
-      tl <- taxon_lineage[[idx]]
-      p1 <- 2L * idx - 1L
-      p2 <- 2L * idx
-      rank_parts[[p1]] <- as.character(ti$rank)
-      name_parts[[p1]] <- as.character(ti$name)
-      uname_parts[[p1]] <- as.character(ti$unique_name)
-      ott_parts[[p1]] <- as.integer(ti$ott_id)
+    p1 <- 2L * seq_len(n_taxa) - 1L
+    p2 <- 2L * seq_len(n_taxa)
+    rank_parts[p1] <- lapply(taxon_info, function(ti) as.character(ti$rank))
+    name_parts[p1] <- lapply(taxon_info, function(ti) as.character(ti$name))
+    uname_parts[p1] <- lapply(
+      taxon_info,
+      function(ti) as.character(ti$unique_name)
+    )
+    ott_parts[p1] <- lapply(taxon_info, function(ti) as.integer(ti$ott_id))
 
-      rank_parts[[p2]] <- as.character(tl$rank)
-      name_parts[[p2]] <- as.character(tl$name)
-      uname_parts[[p2]] <- as.character(tl$unique_name)
-      ott_parts[[p2]] <- as.integer(tl$ott_id)
-    }
+    rank_parts[p2] <- lapply(taxon_lineage, function(tl) as.character(tl$rank))
+    name_parts[p2] <- lapply(taxon_lineage, function(tl) as.character(tl$name))
+    uname_parts[p2] <- lapply(
+      taxon_lineage,
+      function(tl) as.character(tl$unique_name)
+    )
+    ott_parts[p2] <- lapply(taxon_lineage, function(tl) as.integer(tl$ott_id))
 
     rev_idx <- total_rows:1L
     return(tidytable::tidytable(

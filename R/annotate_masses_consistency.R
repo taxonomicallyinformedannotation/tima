@@ -76,21 +76,15 @@ build_feature_pairs_within_rt <- function(
   }
 
   u_smp <- unique(src_smp[src_ord])
+  src_by_smp <- split(src_ord, factor(src_smp[src_ord], levels = u_smp))
+  dest_by_smp <- split(dest_ord, factor(dest_smp[dest_ord], levels = u_smp))
   s_hits_list <- vector("list", length(u_smp))
   d_hits_list <- vector("list", length(u_smp))
   n_hit_groups <- 0L
 
-  for (smp_val in u_smp) {
-    s_idx <- if (length(u_smp) == 1L) {
-      src_ord
-    } else {
-      src_ord[src_smp[src_ord] == smp_val]
-    }
-    d_idx <- if (length(u_smp) == 1L && all(dest_smp[dest_ord] == smp_val)) {
-      dest_ord
-    } else {
-      dest_ord[dest_smp[dest_ord] == smp_val]
-    }
+  for (smp_i in seq_along(u_smp)) {
+    s_idx <- src_by_smp[[smp_i]]
+    d_idx <- dest_by_smp[[smp_i]]
     n_d <- length(d_idx)
     if (length(s_idx) == 0L || n_d == 0L) {
       next

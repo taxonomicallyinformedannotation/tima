@@ -261,16 +261,12 @@ subtract_atomic_formula <- function(formula, sub_formula = "H3N") {
   if (is.null(formula_atoms) || is.null(sub_atoms)) {
     return(NULL)
   }
-  for (el in names(sub_atoms)) {
-    if (
-      !el %in% names(formula_atoms) || formula_atoms[[el]] < sub_atoms[[el]]
-    ) {
-      return(NULL)
-    }
-    formula_atoms[[el]] <- as.integer(formula_atoms[[el]] - sub_atoms[[el]])
+  m_el <- match(names(sub_atoms), names(formula_atoms), nomatch = 0L)
+  if (any(m_el == 0L) || any(formula_atoms[m_el] < sub_atoms)) {
+    return(NULL)
   }
-  formula_atoms <- Filter(function(x) x > 0L, formula_atoms)
-  rebuild_hill_formula(unlist(formula_atoms))
+  formula_atoms[m_el] <- as.integer(formula_atoms[m_el] - sub_atoms)
+  rebuild_hill_formula(formula_atoms[formula_atoms > 0L])
 }
 
 #' Reduce (+H3N, +H) -> +H4N and (+H4N, -loss-containing-H3N) pairs
@@ -434,11 +430,12 @@ canonicalize_adduct_notation <- local({
       net_n <- signed_ns
     } else {
       net_form <- u_form
-      net_n <- integer(length(u_form))
-      for (k in seq_along(formulas)) {
-        idx_f <- match(formulas[[k]], u_form)
-        net_n[[idx_f]] <- net_n[[idx_f]] + signed_ns[[k]]
-      }
+      net_n <- as.integer(vapply(
+        split(signed_ns, factor(formulas, levels = u_form)),
+        sum,
+        integer(1L),
+        USE.NAMES = FALSE
+      ))
     }
     keep_nz <- net_n != 0L
     net <- data.frame(
