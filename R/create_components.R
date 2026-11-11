@@ -142,25 +142,30 @@ EDGE_MATCHED_PEAKS_COLUMNS <- c(
   } else {
     keep_edge <- logical(nrow(intra_edges))
     comm_groups <- split(seq_along(intra_comm), intra_comm)
-    for (idx_c in comm_groups) {
-      w_c <- edge_weights[idx_c]
-      if (!any(is.finite(w_c)) || all(w_c <= 1e-6)) {
-        keep_edge[idx_c[seq_len(min(2L, length(idx_c)))]] <- TRUE
-      } else {
-        qs_c <- stats::quantile(
-          w_c,
-          probs = c(0.5, 0.75),
-          na.rm = TRUE,
-          names = FALSE
-        )
-        thresh_c <- max(0.05, qs_c[[1L]], qs_c[[2L]])
-        keep_c <- !is.na(w_c) & w_c >= thresh_c
-        if (!any(keep_c)) {
-          keep_c[which.max(w_c)] <- TRUE
+    kept_idx_list <- lapply(
+      comm_groups,
+      function(idx_c) {
+        w_c <- edge_weights[idx_c]
+        if (!any(is.finite(w_c)) || all(w_c <= 1e-6)) {
+          idx_c[seq_len(min(2L, length(idx_c)))]
+        } else {
+          qs_c <- stats::quantile(
+            w_c,
+            probs = c(0.5, 0.75),
+            na.rm = TRUE,
+            names = FALSE
+          )
+          thresh_c <- max(0.05, qs_c[[1L]], qs_c[[2L]])
+          keep_c <- !is.na(w_c) & w_c >= thresh_c
+          if (!any(keep_c)) {
+            idx_c[which.max(w_c)]
+          } else {
+            idx_c[keep_c]
+          }
         }
-        keep_edge[idx_c[keep_c]] <- TRUE
       }
-    }
+    )
+    keep_edge[unlist(kept_idx_list, use.names = FALSE)] <- TRUE
   }
 
   intra_edges[keep_edge, , drop = FALSE]

@@ -688,4 +688,21 @@ test_that("build_mini_taxonomy_table prefers structure label on score equality a
     candidate_score_pseudo_initial = 0.8
   ))
   expect_identical(rk1$rank_initial, 1L)
+  expect_identical(
+    nrow(apply_percentile_filter(tidytable::tidytable(), 0.9)),
+    0L
+  )
+  expect_identical(
+    nrow(count_candidates(tidytable::tidytable(), tidytable::tidytable())),
+    0L
+  )
+  expect_identical(compute_candidate_M(100, "bad-adduct"), NA_real_)
+  expect_error(
+    .validate_features_dataframe("not_a_df"),
+    class = "tima_validation_error"
+  )
+  expect_error(
+    .validate_features_dataframe(tidytable::tidytable(x = 1)),
+    class = "tima_validation_error"
+  )
 })

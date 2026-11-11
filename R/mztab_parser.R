@@ -254,12 +254,8 @@ NULL
 
 #' @keywords internal
 .mztab_json_pick <- function(x, keys) {
-  for (k in keys) {
-    if (!is.null(x[[k]])) {
-      return(x[[k]])
-    }
-  }
-  NULL
+  vals <- Filter(Negate(is.null), x[intersect(keys, names(x))])
+  if (length(vals) > 0L) vals[[1L]] else NULL
 }
 
 #' @keywords internal
@@ -456,17 +452,11 @@ read_mztab_tables <- function(input, include_raw_lines = FALSE) {
   )
   lines <- .normalize_mztab_prefix_sep(lines)
 
-  first_nonblank <- ""
-  if (length(lines) > 0L) {
-    for (line in lines) {
-      if (!is.na(line) && nzchar(line)) {
-        tr <- trimws(line)
-        if (nzchar(tr)) {
-          first_nonblank <- tr
-          break
-        }
-      }
-    }
+  nonblank_idx <- grep("\\S", lines, perl = TRUE)
+  first_nonblank <- if (length(nonblank_idx) > 0L) {
+    trimws(lines[[nonblank_idx[[1L]]]])
+  } else {
+    ""
   }
   is_json <- grepl("\\.json$", tolower(input)) ||
     startsWith(first_nonblank, "{")

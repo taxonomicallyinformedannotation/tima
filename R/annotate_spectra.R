@@ -1220,15 +1220,15 @@ update_ms1_zero_tracker <- function(tracker, lib_sp) {
       rem_tol <- tracker$pair_tol[rem_unm]
       dup_lib_pos <- which(!is.na(fastmatch::fmatch(lib_sm_sub, dup_sm)))
       pos_by_sm <- split(dup_lib_pos, lib_sm_sub[dup_lib_pos])
-      extra_pos <- integer(length(rem_unm))
-      for (i in seq_along(rem_unm)) {
-        g_pos <- pos_by_sm[[as.character(rem_sm[[i]])]]
-        diffs <- abs(lib_prec[g_pos] - rem_qmz[[i]])
-        ok <- which(diffs <= rem_tol[[i]])
-        if (length(ok) > 0L) {
-          extra_pos[[i]] <- g_pos[[ok[[1L]]]]
-        }
-      }
+      extra_pos <- vapply(
+        seq_along(rem_unm),
+        function(i) {
+          g_pos <- pos_by_sm[[as.character(rem_sm[[i]])]]
+          ok <- which(abs(lib_prec[g_pos] - rem_qmz[[i]]) <= rem_tol[[i]])
+          if (length(ok) > 0L) g_pos[[ok[[1L]]]] else 0L
+        },
+        integer(1L)
+      )
       hit_extra <- extra_pos > 0L
       if (any(hit_extra)) {
         matched_unm <- c(matched_unm, rem_unm[hit_extra])
@@ -1382,40 +1382,51 @@ convert_precursor_for_matching <- function(precursors, adducts) {
   # spectra.
   out <- precursors_num
   usable_idx <- which(usable)
+  add_sub <- adducts[usable_idx]
+  u_add <- unique(add_sub)
+  add_id <- fastmatch::fmatch(add_sub, u_add)
 
-  idx_groups <- split(usable_idx, adducts[usable_idx])
+  p_mat <- vapply(
+    u_add,
+    function(add) {
+      p <- tryCatch(
+        suppressWarnings(parse_adduct(add)),
+        error = function(...) NULL
+      )
+      if (
+        is.null(p) ||
+          all(p == 0) ||
+          p[["n_mer"]] == 0L ||
+          p[["n_charges"]] == 0L
+      ) {
+        c(NA_real_, NA_real_, NA_real_, NA_real_, NA_real_)
+      } else {
+        c(
+          as.numeric(p[["n_charges"]]),
+          as.numeric(p[["n_mer"]]),
+          as.numeric(p[["n_iso"]]) * ISOTOPE_MASS_SHIFT_DALTONS,
+          as.numeric(p[["los_add_clu"]]),
+          as.numeric(p[["n_charges"]] * (p[["charge"]] %||% 0)) *
+            ELECTRON_MASS_DALTONS
+        )
+      }
+    },
+    numeric(5L)
+  )
 
-  for (add in names(idx_groups)) {
-    parsed <- tryCatch(
-      suppressWarnings(parse_adduct(add)),
-      error = function(...) NULL
-    )
-    if (is.null(parsed) || all(parsed == 0)) {
-      next
-    }
-    n_charges <- parsed[["n_charges"]]
-    n_mer <- parsed[["n_mer"]]
-    n_iso <- parsed[["n_iso"]]
-    mass_mods <- parsed[["los_add_clu"]]
-    charge_sign <- parsed[["charge"]]
-    if (n_mer == 0L || n_charges == 0L) {
-      next
-    }
-
-    idx <- idx_groups[[add]]
-    mz_vec <- precursors_num[idx]
-    iso_shift <- n_iso * ISOTOPE_MASS_SHIFT_DALTONS
-    # Same formula as calculate_mass_of_m(), including the electron term
-    z_signed <- n_charges * charge_sign
-    m_vec <- (n_charges *
-      mz_vec -
-      iso_shift -
-      mass_mods +
-      z_signed * ELECTRON_MASS_DALTONS) /
-      n_mer
-    m_vec[!is.finite(m_vec) | m_vec <= 0] <- NA_real_
-    valid <- !is.na(m_vec)
-    out[idx[valid]] <- m_vec[valid]
+  nc_u <- p_mat[1L, ]
+  valid_a <- !is.na(nc_u[add_id])
+  if (any(valid_a)) {
+    v_idx <- usable_idx[valid_a]
+    v_aid <- add_id[valid_a]
+    m_vec <- (nc_u[v_aid] *
+      precursors_num[v_idx] -
+      p_mat[3L, v_aid] -
+      p_mat[4L, v_aid] +
+      p_mat[5L, v_aid]) /
+      p_mat[2L, v_aid]
+    ok_m <- is.finite(m_vec) & m_vec > 0
+    out[v_idx[ok_m]] <- m_vec[ok_m]
   }
 
   out

@@ -340,19 +340,12 @@ parse_hmdb_like_sdf_lines <- function(sdf_lines) {
     findInterval(header_idx, record_end_idx) + 1L
   }
 
-  for (fid in seq_along(out)) {
-    field_pos <- which(field_ids == fid)
-    if (length(field_pos) > 0L) {
-      field_records <- record_ids[field_pos]
-      if (anyDuplicated(field_records) > 0L) {
-        first_occurrence <- !duplicated(field_records)
-        out[[fid]][field_records[first_occurrence]] <-
-          values[field_pos[first_occurrence]]
-      } else {
-        out[[fid]][field_records] <- values[field_pos]
-      }
-    }
-  }
+  flat_out <- rep.int(NA_character_, n_records * length(out))
+  lin_idx <- (field_ids - 1L) * n_records + record_ids
+  keep_first <- !duplicated(lin_idx)
+  flat_out[lin_idx[keep_first]] <- values[keep_first]
+  dim(flat_out) <- c(n_records, length(out))
+  colnames(flat_out) <- names(out)
 
-  tidytable::as_tidytable(out)
+  tidytable::as_tidytable(as.data.frame(flat_out, stringsAsFactors = FALSE))
 }

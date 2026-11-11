@@ -622,41 +622,39 @@ compute_candidate_M <- function(mz, adduct_string) {
   u_add <- unique(add_sub)
   add_id <- fastmatch::fmatch(add_sub, u_add)
 
-  n_u <- length(u_add)
-  u_n_charges <- rep(NA_real_, n_u)
-  u_n_mer <- rep(NA_real_, n_u)
-  u_iso_shift <- rep(NA_real_, n_u)
-  u_mass_mods <- rep(NA_real_, n_u)
-  u_z_elec <- rep(NA_real_, n_u)
+  p_mat <- vapply(
+    u_add,
+    function(add) {
+      p <- suppressWarnings(parse_adduct(add))
+      if (is.null(p) || all(p == 0)) {
+        c(NA_real_, NA_real_, NA_real_, NA_real_, NA_real_)
+      } else {
+        c(
+          as.numeric(p[["n_charges"]]),
+          as.numeric(p[["n_mer"]]),
+          as.numeric(p[["n_iso"]]) * ISOTOPE_MASS_SHIFT_DALTONS,
+          as.numeric(p[["los_add_clu"]]),
+          as.numeric(p[["n_charges"]] * p[["charge"]]) * ELECTRON_MASS_DALTONS
+        )
+      }
+    },
+    numeric(5L)
+  )
 
-  for (ui in seq_len(n_u)) {
-    parsed <- suppressWarnings(parse_adduct(u_add[[ui]]))
-    if (is.null(parsed) || all(parsed == 0)) {
-      next
-    }
-    n_charges <- parsed[["n_charges"]]
-    n_mer <- parsed[["n_mer"]]
-    u_n_charges[[ui]] <- n_charges
-    u_n_mer[[ui]] <- n_mer
-    u_iso_shift[[ui]] <- parsed[["n_iso"]] * ISOTOPE_MASS_SHIFT_DALTONS
-    u_mass_mods[[ui]] <- parsed[["los_add_clu"]]
-    u_z_elec[[ui]] <- (n_charges * parsed[["charge"]]) * ELECTRON_MASS_DALTONS
-  }
-
-  nc <- u_n_charges[add_id]
-  valid_add <- !is.na(nc)
+  nc_u <- p_mat[1L, ]
+  valid_add <- !is.na(nc_u[add_id])
   if (!any(valid_add)) {
     return(out)
   }
 
   v_idx <- usable_idx[valid_add]
   v_aid <- add_id[valid_add]
-  m_vec <- (u_n_charges[v_aid] *
+  m_vec <- (nc_u[v_aid] *
     mz_num[v_idx] -
-    u_iso_shift[v_aid] -
-    u_mass_mods[v_aid] +
-    u_z_elec[v_aid]) /
-    u_n_mer[v_aid]
+    p_mat[3L, v_aid] -
+    p_mat[4L, v_aid] +
+    p_mat[5L, v_aid]) /
+    p_mat[2L, v_aid]
   m_vec[!is.finite(m_vec) | m_vec == 0] <- NA_real_
   out[v_idx] <- m_vec
   out

@@ -244,36 +244,40 @@ calculate_mass_of_m_batch <- function(
   # Pre-compute a compact index mapping once and then use grouped indexing.
   # This avoids repeatedly scanning the whole vector for each adduct.
   if (length(unique_adducts) > 0L) {
-    adduct_idx_map <- match(adducts, unique_adducts)
-    valid_idx <- which(!is.na(adducts))
-    idx_groups <- split(valid_idx, adduct_idx_map[valid_idx])
-
-    for (i in seq_along(unique_adducts)) {
-      a <- unique_adducts[[i]]
-      parsed <- tryCatch(parse_adduct(a), error = function(...) NULL)
-      if (is.null(parsed) || all(parsed == 0L)) {
-        next
-      }
-      n_charges <- parsed[["n_charges"]]
-      charge_sign <- parsed[["charge"]]
-      n_mer <- parsed[["n_mer"]]
-      n_iso <- parsed[["n_iso"]]
-      mass_mods <- parsed[["los_add_clu"]]
-      if (n_mer == 0L || n_charges == 0L) {
-        next
-      }
-
-      idx <- idx_groups[[i]]
-      mz_sub <- mzs[idx]
-      iso_shift <- n_iso * ISOTOPE_MASS_SHIFT_DALTONS
-      z_signed <- n_charges * charge_sign
-      masses <- (n_charges *
-        mz_sub -
-        iso_shift -
-        mass_mods +
-        z_signed * electron_mass) /
-        n_mer
-      out[idx] <- masses
+    adduct_idx_map <- fastmatch::fmatch(adducts, unique_adducts)
+    p_mat <- vapply(
+      unique_adducts,
+      function(a) {
+        p <- tryCatch(parse_adduct(a), error = function(...) NULL)
+        if (
+          is.null(p) ||
+            all(p == 0L) ||
+            p[["n_mer"]] == 0L ||
+            p[["n_charges"]] == 0L
+        ) {
+          c(NA_real_, NA_real_, NA_real_, NA_real_, NA_real_)
+        } else {
+          c(
+            as.numeric(p[["n_charges"]]),
+            as.numeric(p[["n_mer"]]),
+            as.numeric(p[["n_iso"]]) * ISOTOPE_MASS_SHIFT_DALTONS,
+            as.numeric(p[["los_add_clu"]]),
+            as.numeric(p[["n_charges"]] * p[["charge"]]) * electron_mass
+          )
+        }
+      },
+      numeric(5L)
+    )
+    nc_u <- p_mat[1L, ]
+    valid_a <- which(!is.na(adduct_idx_map) & !is.na(nc_u[adduct_idx_map]))
+    if (length(valid_a) > 0L) {
+      aid <- adduct_idx_map[valid_a]
+      out[valid_a] <- (nc_u[aid] *
+        mzs[valid_a] -
+        p_mat[3L, aid] -
+        p_mat[4L, aid] +
+        p_mat[5L, aid]) /
+        p_mat[2L, aid]
     }
   }
   out
@@ -319,33 +323,36 @@ calculate_mz_from_mass_batch <- function(
     !is.na(adduct_vals) & nzchar(adduct_vals)
   ])
   if (length(unique_adducts) > 0L) {
-    adduct_idx_map <- match(adduct_vals, unique_adducts)
-    idx_groups <- split(seq_along(adduct_idx_map), adduct_idx_map)
-
-    for (i in seq_along(unique_adducts)) {
-      a <- unique_adducts[[i]]
-      parsed <- tryCatch(parse_adduct(a), error = function(...) NULL)
-      if (is.null(parsed) || all(parsed == 0L)) {
-        next
-      }
-      n_charges <- parsed[["n_charges"]]
-      charge_sign <- parsed[["charge"]]
-      n_mer <- parsed[["n_mer"]]
-      n_iso <- parsed[["n_iso"]]
-      mass_mods <- parsed[["los_add_clu"]]
-      if (n_charges == 0L) {
-        next
-      }
-
-      idx <- idx_groups[[i]]
-      mz_sub <- (neutral_vals[idx] *
-        n_mer +
-        mass_mods +
-        n_iso * ISOTOPE_MASS_SHIFT_DALTONS -
-        (n_charges * charge_sign) * electron_mass) /
-        n_charges
-      out_valid <- out[valid_idx]
-      out_valid[idx] <- mz_sub
+    adduct_idx_map <- fastmatch::fmatch(adduct_vals, unique_adducts)
+    p_mat <- vapply(
+      unique_adducts,
+      function(a) {
+        p <- tryCatch(parse_adduct(a), error = function(...) NULL)
+        if (is.null(p) || all(p == 0L) || p[["n_charges"]] == 0L) {
+          c(NA_real_, NA_real_, NA_real_, NA_real_, NA_real_)
+        } else {
+          c(
+            as.numeric(p[["n_charges"]]),
+            as.numeric(p[["n_mer"]]),
+            as.numeric(p[["n_iso"]]) * ISOTOPE_MASS_SHIFT_DALTONS,
+            as.numeric(p[["los_add_clu"]]),
+            as.numeric(p[["n_charges"]] * p[["charge"]]) * electron_mass
+          )
+        }
+      },
+      numeric(5L)
+    )
+    nc_u <- p_mat[1L, ]
+    valid_a <- which(!is.na(adduct_idx_map) & !is.na(nc_u[adduct_idx_map]))
+    if (length(valid_a) > 0L) {
+      aid <- adduct_idx_map[valid_a]
+      out_valid <- rep(NA_real_, length(neutral_vals))
+      out_valid[valid_a] <- (neutral_vals[valid_a] *
+        p_mat[2L, aid] +
+        p_mat[4L, aid] +
+        p_mat[3L, aid] -
+        p_mat[5L, aid]) /
+        nc_u[aid]
       out[valid_idx] <- out_valid
     }
   }
