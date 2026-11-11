@@ -610,32 +610,38 @@ prepare_taxa <- function(
           nrow(metadata_table_joined) > 0L &&
           ".int_w" %in% names(metadata_table_joined)
       ) {
-        fo_dt <- data.table::as.data.table(metadata_table_joined)
-        fo_agg <- fo_dt[
-          !is.na(organismOriginal),
-          list(org_int = sum(.int_w, na.rm = TRUE)),
-          by = c("feature_id", "organismOriginal")
-        ]
-        if (nrow(fo_agg) > 0L) {
-          fo_agg[, feat_tot := sum(org_int), by = "feature_id"]
-          fo_agg[, feat_max := max(org_int), by = "feature_id"]
-          keep_fo <- fo_agg[
+        valid_org <- !is.na(metadata_table_joined$organismOriginal)
+        if (any(valid_org)) {
+          fo_keys <- paste(
+            metadata_table_joined$feature_id[valid_org],
+            metadata_table_joined$organismOriginal[valid_org],
+            sep = "\r"
+          )
+          u_fo <- unique(fo_keys)
+          fo_idx <- fastmatch::fmatch(fo_keys, u_fo)
+          org_int <- as.numeric(
+            rowsum(
+              metadata_table_joined$.int_w[valid_org],
+              fo_idx,
+              reorder = FALSE,
+              na.rm = TRUE
+            )
+          )
+          u_feat <- sub("\r.*$", "", u_fo)
+          feat_tot <- stats::ave(org_int, u_feat, FUN = sum)
+          feat_max <- stats::ave(org_int, u_feat, FUN = max)
+          keep_fo <- u_fo[
             feat_tot <= 0 |
               org_int >= feat_max |
               (org_int / feat_tot) >= min_rel_intensity
           ]
-          keep_keys <- paste(
-            keep_fo$feature_id,
-            keep_fo$organismOriginal,
-            sep = "\r"
-          )
           row_keys <- paste(
             metadata_table_joined$feature_id,
             metadata_table_joined$organismOriginal,
             sep = "\r"
           )
-          keep_mask <- is.na(metadata_table_joined$organismOriginal) |
-            !is.na(fastmatch::fmatch(row_keys, keep_keys))
+          keep_mask <- !valid_org |
+            !is.na(fastmatch::fmatch(row_keys, keep_fo))
           metadata_table_joined <- metadata_table_joined[which(keep_mask), ]
         }
         data.table::set(metadata_table_joined, j = ".int_w", value = NULL)

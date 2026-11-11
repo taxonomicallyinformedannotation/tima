@@ -254,6 +254,7 @@ igraph
 inbo
 inborutils
 inchikey
+infraorder
 interpretability
 intra
 io
@@ -292,6 +293,7 @@ multicharged
 multimer
 multimers
 multisets
+multivalent
 mz
 mzML
 mzMine
@@ -321,6 +323,7 @@ prefilter
 progenesis
 protonate
 protonated
+quantized
 rds
 renv
 reranked
@@ -344,8 +347,10 @@ stereochemistry
 stereoisomers
 stoichiometric
 subcomponents
+subgenus
 subgraphs
 subscores
+subtribe
 summarization
 superdomain
 taxo
@@ -363,6 +368,7 @@ tsv
 unmanaged
 unmapped
 unparseable
+unshifted
 untargeted
 uri
 usedist
