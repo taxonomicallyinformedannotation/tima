@@ -201,97 +201,35 @@
  * @param msg Short description of what failed.
  * @param n   Size in bytes that was requested (for diagnostics only).
  */
-static int gnps_safe_to_call_r_error(void) {
-#if GNPS_HAS_R_API
-#ifdef _OPENMP
-    return !omp_in_parallel();
+#if GNPS_HAS_R_API && defined(_OPENMP)
+#  define GNPS_SAFE_R_ERROR() (!omp_in_parallel())
+#elif GNPS_HAS_R_API
+#  define GNPS_SAFE_R_ERROR() 1
 #else
-    return 1;
+#  define GNPS_SAFE_R_ERROR() 0
 #endif
-#else
-    return 0;
-#endif
-}
 
-/* malloc()/calloc() that report failure via R's error() when that's safe
- * (see above) and return NULL otherwise, for the caller to handle. */
-
-/**
- * @brief `malloc()` wrapper that reports failure via R's `error()` when
- *        that is safe (see gnps_safe_to_call_r_error()) and returns NULL
- *        otherwise, for the caller to handle.
- * @param n Bytes to allocate.
- * @return Newly allocated, uninitialized memory of size `n`, or NULL on
- *         failure when R's `error()` cannot be called from this thread.
- */
 static void *xmalloc(size_t n) {
     void *p = malloc(n);
-    if (p) return p;
-#if GNPS_HAS_R_API
-    if (gnps_safe_to_call_r_error())
-        error("gnps: memory allocation failed (%zu bytes)", n);
-#endif
-    return NULL;
+    if (!p && GNPS_SAFE_R_ERROR()) error("gnps: memory allocation failed (%zu bytes)", n);
+    return p;
 }
 
-/**
- * @brief `calloc()` wrapper that reports failure via R's `error()` when
- *        that is safe (see gnps_safe_to_call_r_error()) and returns NULL
- *        otherwise, for the caller to handle.
- * @param n Number of elements.
- * @param s Size of each element in bytes.
- * @return Newly allocated, zero-initialized memory of size `n * s`, or
- *         NULL on failure when R's `error()` cannot be called from this
- *         thread.
- */
 static void *xcalloc(size_t n, size_t s) {
     void *p = calloc(n, s);
-    if (p) return p;
-#if GNPS_HAS_R_API
-    if (gnps_safe_to_call_r_error())
-        error("gnps: memory allocation failed (%zu bytes)", n * s);
-#endif
-    return NULL;
+    if (!p && GNPS_SAFE_R_ERROR()) error("gnps: memory allocation failed (%zu bytes)", n * s);
+    return p;
 }
 
-/* Grow *ptr to at least need_bytes via realloc, ~1.5x amortized so we're
- * not reallocating every call as spectrum sizes creep up. No-op (instant
- * success) once the buffer's already big enough - that's the
- * steady-state, zero-allocation path this whole rewrite exists for.
- *
- * On failure: reports via R's error() when safe to do so, and always
- * returns 0 - the existing buffer/capacity are left untouched, so the
- * caller must check the return value and bail rather than assume it grew. */
-
-/**
- * @brief Grow a scratch buffer in place, reusing it across calls.
- *
- * Grows `*ptr` to at least `need_bytes` via `realloc()`, using ~1.5x
- * amortized growth so repeated calls with slowly increasing sizes don't
- * reallocate on every single call. A no-op (instant return) once the
- * buffer is already big enough - that's the steady-state, zero-allocation
- * path this whole rewrite exists to reach.
- *
- * @param ptr        Address of the pointer to grow (in/out).
- * @param cap_bytes  Address of the tracked capacity of `*ptr`, in bytes
- *                   (in/out).
- * @param need_bytes Minimum capacity required after this call.
- */
 static int scratch_ensure(void **ptr, size_t *cap_bytes, size_t need_bytes) {
     if (need_bytes <= *cap_bytes) return 1;
     size_t new_cap = *cap_bytes ? *cap_bytes : (size_t) 256;
     while (new_cap < need_bytes) new_cap = new_cap + new_cap / 2 + 256;
     void *newp = realloc(*ptr, new_cap);
-    if (newp) {
-        *ptr = newp;
-        *cap_bytes = new_cap;
-        return 1;
-    }
-#if GNPS_HAS_R_API
-    if (gnps_safe_to_call_r_error())
-        error("gnps: scratch allocation failed (%zu bytes)", new_cap);
-#endif
-    return 0;
+    if (!newp) { if (GNPS_SAFE_R_ERROR()) error("gnps: scratch allocation failed (%zu bytes)", new_cap); return 0; }
+    *ptr = newp;
+    *cap_bytes = new_cap;
+    return 1;
 }
 
 #define BS_SET(b, i)                                                           \
@@ -401,38 +339,6 @@ typedef struct {
 
 /** @brief The scratch instance itself - one per thread, see GNPS_TLS. */
 static GNPS_TLS GnpsScratch g_scratch = {0};
-
-/* Optional: call from a package unload hook if you want the scratch
- * memory released before process exit. Not calling it is harmless - the
- * OS reclaims everything anyway - but if you do call it, remember it only
- * frees the calling thread's copy. */
-
-/**
- * @brief Release all scratch memory held by the calling thread.
- *
- * Optional. Call this from a package unload hook if you want the memory
- * released before process exit; not calling it is harmless, since the OS
- * reclaims everything at exit anyway. Only frees the calling thread's
- * copy - each thread that has run scoring code owns its own scratch and
- * would need to call this itself.
- */
-void gnps_scratch_free_all(void) {
-    free(g_scratch.idx_buf);
-    free(g_scratch.x_tol);
-    free(g_scratch.x_shift_val);
-    free(g_scratch.x_shift_tol);
-    free(g_scratch.scaled_x);
-    free(g_scratch.scaled_y);
-    free(g_scratch.x_dirty);
-    free(g_scratch.y_dirty);
-    free(g_scratch.xi_map);
-    free(g_scratch.xi_rmap);
-    free(g_scratch.yi_map);
-    free(g_scratch.yi_rmap);
-    free(g_scratch.smat);
-    free(g_scratch.hbuf);
-    memset(&g_scratch, 0, sizeof(g_scratch));
-}
 
 /* ══════════════════════════════════════════════════════════════════════
  * score_matched - the actual matching + scoring work. Same result as the
@@ -624,8 +530,6 @@ static double score_matched(
                 BS_SET(y_dirty, (unsigned)sj);
                 if (dm_arr[i] >= 0) BS_SET(y_dirty, (unsigned)dm_arr[i]);
                 if (sm_arr[k] >= 0) BS_SET(y_dirty, (unsigned)sm_arr[k]);
-                if (dm_arr[k] >= 0) BS_SET(y_dirty, (unsigned)dm_arr[k]);
-                if (sm_arr[i] >= 0 && sm_arr[i] != sj) BS_SET(y_dirty, (unsigned)sm_arr[i]);
             }
         }
 
@@ -633,8 +537,6 @@ static double score_matched(
         for (int i = 0; i < nx; i++) {
             if (BS_TEST(x_dirty, (unsigned)i)) continue;
             int dm = dm_arr[i], sm = sm_arr[i];
-            if (dm >= 0 && BS_TEST(y_dirty, (unsigned)dm)) dm = -1;
-            if (sm >= 0 && BS_TEST(y_dirty, (unsigned)sm)) sm = -1;
             if (dm < 0 && sm < 0) continue;
             double ds = (dm >= 0) ? scaled_x[i] * scaled_y[dm] : 0.0;
             double ss = (sm >= 0) ? scaled_x[i] * scaled_y[sm] : 0.0;
@@ -670,109 +572,105 @@ static double score_matched(
 
         for (int i = 0; i < nx; i++) {
             if (!BS_TEST(x_dirty, (unsigned)i)) continue;
-            if (dm_arr[i] >= 0 && BS_TEST(y_dirty, (unsigned)dm_arr[i]) &&
-                yi_map[dm_arr[i]] < 0) {
+            if (dm_arr[i] >= 0 && yi_map[dm_arr[i]] < 0) {
                 yi_rmap[n_ym] = dm_arr[i];
                 yi_map[dm_arr[i]] = n_ym++;
             }
-            if (sm_arr[i] >= 0 && BS_TEST(y_dirty, (unsigned)sm_arr[i]) &&
-                yi_map[sm_arr[i]] < 0) {
+            if (sm_arr[i] >= 0 && yi_map[sm_arr[i]] < 0) {
                 yi_rmap[n_ym] = sm_arr[i];
                 yi_map[sm_arr[i]] = n_ym++;
             }
         }
 
         int N = (n_xm > n_ym) ? n_xm : n_ym;
-        if (N > 0) {
-            scratch_ensure((void **) &sc->smat, &sc->smat_cap,
-                           (size_t) N * (size_t) N * sizeof(double));
-            double *smat = sc->smat;
-            memset(smat, 0, (size_t) N * (size_t) N * sizeof(double));
+        scratch_ensure((void **) &sc->smat, &sc->smat_cap,
+                       (size_t) N * (size_t) N * sizeof(double));
+        double *smat = sc->smat;
+        memset(smat, 0, (size_t) N * (size_t) N * sizeof(double));
 
-            for (int i = 0; i < nx; i++) {
-                int r = xi_map[i];
-                if (r < 0) continue;
-                if (dm_arr[i] >= 0 && yi_map[dm_arr[i]] >= 0) {
-                    int c = yi_map[dm_arr[i]];
-                    double sc_val = scaled_x[i] * scaled_y[dm_arr[i]];
-                    if (sc_val > smat[(size_t) r * (size_t) N + (size_t) c])
-                        smat[(size_t) r * (size_t) N + (size_t) c] = sc_val;
-                }
-                if (sm_arr[i] >= 0 && yi_map[sm_arr[i]] >= 0) {
-                    int c = yi_map[sm_arr[i]];
-                    double sc_val = scaled_x[i] * scaled_y[sm_arr[i]];
-                    if (sc_val > smat[(size_t) r * (size_t) N + (size_t) c])
-                        smat[(size_t) r * (size_t) N + (size_t) c] = sc_val;
-                }
+        for (int i = 0; i < nx; i++) {
+            int r = xi_map[i];
+            if (r < 0) continue;
+            if (dm_arr[i] >= 0 && yi_map[dm_arr[i]] >= 0) {
+                int c = yi_map[dm_arr[i]];
+                double sc_val = scaled_x[i] * scaled_y[dm_arr[i]];
+                if (sc_val > smat[(size_t) r * (size_t) N + (size_t) c])
+                    smat[(size_t) r * (size_t) N + (size_t) c] = sc_val;
             }
+            if (sm_arr[i] >= 0 && yi_map[sm_arr[i]] >= 0) {
+                int c = yi_map[sm_arr[i]];
+                double sc_val = scaled_x[i] * scaled_y[sm_arr[i]];
+                if (sc_val > smat[(size_t) r * (size_t) N + (size_t) c])
+                    smat[(size_t) r * (size_t) N + (size_t) c] = sc_val;
+            }
+        }
 
-            /* exact shortest-augmenting-path Hungarian, 1-indexed,
-             * workspace reused across calls the same way as everything
-             * else above */
-            size_t N1 = (size_t) (N + 1);
-            size_t hneed = N1 * 2 * sizeof(double) + N1 * 2 * sizeof(int) +
-                           N1 * sizeof(double) + N1 * sizeof(int);
-            scratch_ensure((void **) &sc->hbuf, &sc->hbuf_cap, hneed);
-            char *hbuf = sc->hbuf;
+        /* exact shortest-augmenting-path Hungarian, 1-indexed,
+         * workspace reused across calls the same way as everything
+         * else above */
+        size_t N1 = (size_t) (N + 1);
+        size_t hneed = N1 * 2 * sizeof(double) + N1 * 2 * sizeof(int) +
+                       N1 * sizeof(double) + N1 * sizeof(int);
+        scratch_ensure((void **) &sc->hbuf, &sc->hbuf_cap, hneed);
+        char *hbuf = sc->hbuf;
 
-            double *hu = (double *) hbuf;
-            double *hv = hu + N1;
-            int *hp = (int *) (hv + N1);
-            int *hway = hp + (int) N1;
-            double *hmin = (double *) (hway + (int) N1);
-            int *hused = (int *) (hmin + N1);
+        double *hu = (double *) hbuf;
+        double *hv = hu + N1;
+        int *hp = (int *) (hv + N1);
+        int *hway = hp + (int) N1;
+        double *hmin = (double *) (hway + (int) N1);
+        int *hused = (int *) (hmin + N1);
 
-            memset(hu, 0, N1 * sizeof(double));
-            memset(hv, 0, N1 * sizeof(double));
-            memset(hp, 0, N1 * sizeof(int));
+        memset(hu, 0, N1 * sizeof(double));
+        memset(hv, 0, N1 * sizeof(double));
+        memset(hp, 0, N1 * sizeof(int));
 
-            for (int i = 1; i <= N; i++) {
-                hp[0] = i;
-                int j0 = 0;
+        for (int i = 1; i <= N; i++) {
+            hp[0] = i;
+            int j0 = 0;
+            for (int j = 0; j <= N; j++) {
+                hmin[j] = DBL_MAX;
+                hused[j] = 0;
+            }
+            do {
+                hused[j0] = 1;
+                int i0 = hp[j0], j1 = 0;
+                double delta = DBL_MAX;
+                for (int j = 1; j <= N; j++) {
+                    if (hused[j]) continue;
+                    double cur = -smat[(size_t) (i0 - 1) * (size_t) N + (size_t) (j - 1)]
+                                 - hu[i0] - hv[j];
+                    if (cur < hmin[j]) {
+                        hmin[j] = cur;
+                        hway[j] = j0;
+                    }
+                    if (hmin[j] < delta) {
+                        delta = hmin[j];
+                        j1 = j;
+                    }
+                }
                 for (int j = 0; j <= N; j++) {
-                    hmin[j] = DBL_MAX;
-                    hused[j] = 0;
+                    if (hused[j]) {
+                        hu[hp[j]] += delta;
+                        hv[j] -= delta;
+                    } else { hmin[j] -= delta; }
                 }
-                do {
-                    hused[j0] = 1;
-                    int i0 = hp[j0], j1 = 0;
-                    double delta = DBL_MAX;
-                    for (int j = 1; j <= N; j++) {
-                        if (hused[j]) continue;
-                        double cur = -smat[(size_t) (i0 - 1) * (size_t) N + (size_t) (j - 1)]
-                                     - hu[i0] - hv[j];
-                        if (cur < hmin[j]) {
-                            hmin[j] = cur;
-                            hway[j] = j0;
-                        }
-                        if (hmin[j] < delta) {
-                            delta = hmin[j];
-                            j1 = j;
-                        }
-                    }
-                    for (int j = 0; j <= N; j++) {
-                        if (hused[j]) {
-                            hu[hp[j]] += delta;
-                            hv[j] -= delta;
-                        } else { hmin[j] -= delta; }
-                    }
-                    j0 = j1;
-                } while (hp[j0] != 0);
-                do {
-                    int j1 = hway[j0];
-                    hp[j0] = hp[j1];
-                    j0 = j1;
-                } while (j0);
-            }
+                j0 = j1;
+            } while (hp[j0] != 0);
+            do {
+                int j1 = hway[j0];
+                hp[j0] = hp[j1];
+                j0 = j1;
+            } while (j0);
+        }
 
-            for (int j = 1; j <= N; j++) {
-                double sc_val = smat[(size_t) (hp[j] - 1) * (size_t) N + (size_t) (j - 1)];
-                if (sc_val > 0.0) {
-                    total += sc_val;
-                    matched++;
-                    if (hp[j] - 1 < n_xm) matched_xsum += x_int[xi_rmap[hp[j] - 1]];
-                    if (j - 1 < n_ym) matched_ysum += y_int[yi_rmap[j - 1]];
-                }
+        for (int j = 1; j <= N; j++) {
+            double sc_val = smat[(size_t) (hp[j] - 1) * (size_t) N + (size_t) (j - 1)];
+            if (sc_val > 0.0) {
+                total += sc_val;
+                matched++;
+                if (hp[j] - 1 < n_xm) matched_xsum += x_int[xi_rmap[hp[j] - 1]];
+                if (j - 1 < n_ym) matched_ysum += y_int[yi_rmap[j - 1]];
             }
         }
     }
@@ -810,8 +708,7 @@ int gnps_chain_dp_core_api(
     double x_pre, double y_pre,
     double tol, double ppm_val,
     GnpsCoreResult *out) {
-    if (!x_mz || !x_int || !y_mz || !y_int || !out || nx < 0 || ny < 0)
-        return -1;
+    if (!x_mz || !x_int || !y_mz || !y_int || !out || nx < 0 || ny < 0) return -1;
 
     out->score = 0.0;
     out->matches = 0;
@@ -908,8 +805,7 @@ int gnps_chain_dp_batch_core_api(
     const double *y_pre_arr, int n_lib,
     double tol, double ppm_val,
     GnpsCoreResult *out) {
-    if (!x_mz || !x_int || !y_mz_arr || !y_int_arr || !ny_arr || !y_pre_arr || !out || n_lib < 0)
-        return -1;
+    if (!x_mz || !x_int || !y_mz_arr || !y_int_arr || !ny_arr || !y_pre_arr || !out || n_lib < 0) return -1;
 
     int failures = 0;
     #ifdef _OPENMP
@@ -1077,16 +973,6 @@ int gnps_aligned_core_api(
     }
 
     int N = (n_xg > n_yg) ? n_xg : n_yg;
-    if (N == 0) {
-        free(x_fac);
-        free(y_fac);
-        free(keep_xmz);
-        free(keep_ymz);
-        free(keep_xin);
-        free(keep_yin);
-        return 0;
-    }
-
     double inv_sxs = 1.0 / sqrt(xs_sum), inv_sys = 1.0 / sqrt(ys_sum);
     double *sm = (double *) xcalloc((size_t) N * (size_t) N, sizeof(double));
     for (int i = 0; i < l; i++) {
@@ -1488,10 +1374,7 @@ SEXP C_gnps_chain_dp_batch(SEXP x, SEXP xPrecursorMz,
     free(y_int_arr);
     free(ny_arr);
 
-    if (rc != 0) {
-        free(results);
-        error("gnps_chain_dp_batch_core_api failed");
-    }
+    if (rc != 0) { free(results); error("gnps_chain_dp_batch_core_api failed"); }
 
     SEXP out = PROTECT(allocMatrix(REALSXP, n_lib, 4));
     double *o = REAL(out);
@@ -1525,187 +1408,10 @@ SEXP C_gnps(SEXP x, SEXP y) {
     const double *xmz = REAL(x), *xin = xmz + n;
     const double *ymz = REAL(y), *yin = ymz + n;
 
-    KP *buf = (KP *) xmalloc((size_t) n * sizeof(KP));
-    int m = 0;
-    for (int i = 0; i < n; i++)
-        if (!ISNA(xmz[i])) {
-            buf[m].key = xmz[i];
-            buf[m].pos = i;
-            m++;
-        }
-    qsort(buf, (size_t) m, sizeof(KP), kp_cmp);
-    double xs_sum = 0.0;
-    for (int i = 0; i < m; i++)
-        if (i == 0 || buf[i].key != buf[i - 1].key) xs_sum += xin[buf[i].pos];
-
-    m = 0;
-    for (int i = 0; i < n; i++)
-        if (!ISNA(ymz[i])) {
-            buf[m].key = ymz[i];
-            buf[m].pos = i;
-            m++;
-        }
-    qsort(buf, (size_t) m, sizeof(KP), kp_cmp);
-    double ys_sum = 0.0;
-    for (int i = 0; i < m; i++)
-        if (i == 0 || buf[i].key != buf[i - 1].key) ys_sum += yin[buf[i].pos];
-    free(buf);
-
-    if (xs_sum == 0.0 || ys_sum == 0.0) return make_result(0.0, 0, 0.0, 0.0);
-
-    int l = 0;
-    for (int i = 0; i < n; i++)
-        if (!ISNA(xmz[i]) && !ISNA(ymz[i])) l++;
-    if (!l) return make_result(0.0, 0, 0.0, 0.0);
-
-    double *keep_xmz = (double *) xmalloc((size_t) l * sizeof(double));
-    double *keep_ymz = (double *) xmalloc((size_t) l * sizeof(double));
-    double *keep_xin = (double *) xmalloc((size_t) l * sizeof(double));
-    double *keep_yin = (double *) xmalloc((size_t) l * sizeof(double));
-    {
-        int k = 0;
-        for (int i = 0; i < n; i++) {
-            if (!ISNA(xmz[i]) && !ISNA(ymz[i])) {
-                keep_xmz[k] = xmz[i];
-                keep_ymz[k] = ymz[i];
-                keep_xin[k] = xin[i];
-                keep_yin[k] = yin[i];
-                k++;
-            }
-        }
-    }
-
-    int *x_fac = (int *) xmalloc((size_t) l * sizeof(int));
-    int *y_fac = (int *) xmalloc((size_t) l * sizeof(int));
-    {
-        KP *kpb = (KP *) xmalloc((size_t) l * sizeof(KP));
-        for (int i = 0; i < l; i++) {
-            kpb[i].key = keep_xmz[i];
-            kpb[i].pos = i;
-        }
-        qsort(kpb, (size_t) l, sizeof(KP), kp_cmp);
-        int rank = 0;
-        for (int i = 0; i < l; i++) {
-            if (i == 0 || kpb[i].key != kpb[i - 1].key) rank++;
-            x_fac[kpb[i].pos] = rank;
-        }
-        for (int i = 0; i < l; i++) {
-            kpb[i].key = keep_ymz[i];
-            kpb[i].pos = i;
-        }
-        qsort(kpb, (size_t) l, sizeof(KP), kp_cmp);
-        rank = 0;
-        for (int i = 0; i < l; i++) {
-            if (i == 0 || kpb[i].key != kpb[i - 1].key) rank++;
-            y_fac[kpb[i].pos] = rank;
-        }
-        free(kpb);
-    }
-
-    int n_xg = 0, n_yg = 0;
-    for (int i = 0; i < l; i++) {
-        if (x_fac[i] > n_xg) n_xg = x_fac[i];
-        if (y_fac[i] > n_yg) n_yg = y_fac[i];
-    }
-
-    double inv_sxs = 1.0 / sqrt(xs_sum), inv_sys = 1.0 / sqrt(ys_sum);
-
-    int N = (n_xg > n_yg) ? n_xg : n_yg;
-    if (N == 0) {
-        free(x_fac);
-        free(y_fac);
-        free(keep_xmz);
-        free(keep_ymz);
-        free(keep_xin);
-        free(keep_yin);
-        return make_result(0.0, 0, 0.0, 0.0);
-    }
-
-    double *sm = (double *) xcalloc((size_t) N * (size_t) N, sizeof(double));
-    for (int i = 0; i < l; i++) {
-        size_t r = (size_t) (x_fac[i] - 1), c = (size_t) (y_fac[i] - 1);
-        sm[r * (size_t) N + c] = sqrt(keep_xin[i]) * inv_sxs
-                                 * sqrt(keep_yin[i]) * inv_sys;
-    }
-    free(x_fac);
-    free(y_fac);
-    free(keep_xmz);
-    free(keep_ymz);
-    free(keep_xin);
-    free(keep_yin);
-
-    {
-        size_t N1 = (size_t) (N + 1);
-        size_t buf_sz = N1 * 2 * sizeof(double)
-                        + N1 * 2 * sizeof(int)
-                        + N1 * sizeof(double)
-                        + N1 * sizeof(int);
-        char *hbuf = (char *) xmalloc(buf_sz);
-
-        double *u = (double *) hbuf;
-        double *v = u + N1;
-        int *p = (int *) (v + N1);
-        int *way = p + (int) N1;
-        double *minv = (double *) (way + (int) N1);
-        int *used = (int *) (minv + N1);
-
-        memset(u, 0, N1 * sizeof(double));
-        memset(v, 0, N1 * sizeof(double));
-        memset(p, 0, N1 * sizeof(int));
-
-        for (int i = 1; i <= N; i++) {
-            p[0] = i;
-            int j0 = 0;
-            for (int j = 0; j <= N; j++) {
-                minv[j] = DBL_MAX;
-                used[j] = 0;
-            }
-            do {
-                used[j0] = 1;
-                int i0 = p[j0], j1 = 0;
-                double delta = DBL_MAX;
-                for (int j = 1; j <= N; j++) {
-                    if (used[j]) continue;
-                    double cur = -sm[(size_t) (i0 - 1) * (size_t) N + (size_t) (j - 1)]
-                                 - u[i0] - v[j];
-                    if (cur < minv[j]) {
-                        minv[j] = cur;
-                        way[j] = j0;
-                    }
-                    if (minv[j] < delta) {
-                        delta = minv[j];
-                        j1 = j;
-                    }
-                }
-                for (int j = 0; j <= N; j++) {
-                    if (used[j]) {
-                        u[p[j]] += delta;
-                        v[j] -= delta;
-                    } else { minv[j] -= delta; }
-                }
-                j0 = j1;
-            } while (p[j0] != 0);
-            do {
-                int j1 = way[j0];
-                p[j0] = p[j1];
-                j0 = j1;
-            } while (j0);
-        }
-
-        double total = 0.0;
-        int matched = 0;
-        for (int j = 1; j <= N; j++) {
-            double sc = sm[(size_t) (p[j] - 1) * (size_t) N + (size_t) (j - 1)];
-            if (sc > 0.0) {
-                total += sc;
-                matched++;
-            }
-        }
-
-        free(hbuf);
-        free(sm);
-        return make_result(total, matched, total, total);
-    }
+    GnpsCoreResult out;
+    int rc = gnps_aligned_core_api(xmz, xin, ymz, yin, n, &out);
+    if (rc != 0) error("gnps_aligned_core_api failed");
+    return make_result(out.score, out.matches, out.score_forward, out.score_reverse);
 }
 
 /**
@@ -1727,169 +1433,20 @@ SEXP C_join_gnps(SEXP x, SEXP y,
     const double x_pre = asReal(xPrecursorMz), y_pre = asReal(yPrecursorMz);
     const double tol = asReal(tolerance), ppm_val = asReal(ppm);
     const int nx = (int) xlength(x), ny = (int) xlength(y);
-    const double pdiff = y_pre - x_pre;
-    const double max_pre = (x_pre > y_pre) ? x_pre : y_pre;
-    const double pdiff_tol = tol + ppm_val * fabs(max_pre) * 1e-6;
-    const int do_pdiff = (!ISNA(x_pre) && !ISNA(y_pre) && fabs(pdiff) > pdiff_tol);
-    const double eps_tol = sqrt(DBL_EPSILON);
 
-    MI *xs_arr = (MI *) xmalloc((size_t) nx * sizeof(MI));
-    MI *ys_arr = (MI *) xmalloc((size_t) ny * sizeof(MI));
-    int vx = 0, vy = 0;
-    for (int i = 0; i < nx; i++)
-        if (!ISNA(xp[i])) {
-            xs_arr[vx].mass = xp[i];
-            xs_arr[vx].idx = i;
-            vx++;
-        }
-    for (int i = 0; i < ny; i++)
-        if (!ISNA(yp[i])) {
-            ys_arr[vy].mass = yp[i];
-            ys_arr[vy].idx = i;
-            vy++;
-        }
-    qsort(xs_arr, (size_t) vx, sizeof(MI), mi_cmp);
-    qsort(ys_arr, (size_t) vy, sizeof(MI), mi_cmp);
+    GnpsJoinResult joined;
+    int rc = gnps_join_core_api(xp, nx, yp, ny, x_pre, y_pre, tol, ppm_val, &joined);
+    if (rc != 0) error("gnps_join_core_api failed");
 
-    int *dm_x = (int *) xmalloc((size_t) vx * sizeof(int));
-    int *dm_y = (int *) xmalloc((size_t) vy * sizeof(int));
-    memset(dm_x, 0xFF, (size_t)vx * sizeof(int));
-    memset(dm_y, 0xFF, (size_t)vy * sizeof(int));
-
-    {
-        int ilo = 0;
-        for (int j = 0; j < vy; j++) {
-            double ym = ys_arr[j].mass;
-            while (ilo < vx) {
-                double xm = xs_arr[ilo].mass;
-                if (xm + tol + ppm_val * xm * 1e-6 + eps_tol >= ym) break;
-                ilo++;
-            }
-            int best_i = -1;
-            double best_d = DBL_MAX;
-            for (int i = ilo; i < vx; i++) {
-                double xm = xs_arr[i].mass;
-                if (xm - tol - ppm_val * xm * 1e-6 - eps_tol > ym) break;
-                double ai = tol + ppm_val * xm * 1e-6 + eps_tol;
-                double dij = fabs(xm - ym);
-                if (dij <= ai && dij < best_d) {
-                    best_d = dij;
-                    best_i = i;
-                }
-            }
-            if (best_i >= 0 && dm_x[best_i] < 0) {
-                dm_x[best_i] = j;
-                dm_y[j] = best_i;
-            } else if (best_i >= 0) {
-                int prev_j = dm_x[best_i];
-                double prev_d = fabs(xs_arr[best_i].mass - ys_arr[prev_j].mass);
-                if (best_d < prev_d) {
-                    dm_y[prev_j] = -1;
-                    dm_x[best_i] = j;
-                    dm_y[j] = best_i;
-                }
-            }
-        }
+    SEXP rx = PROTECT(allocVector(INTSXP, joined.n_rows));
+    SEXP ry = PROTECT(allocVector(INTSXP, joined.n_rows));
+    int *ox = INTEGER(rx), *oy = INTEGER(ry);
+    for (int i = 0; i < joined.n_rows; i++) {
+        ox[i] = (joined.x_idx[i] >= 0) ? (joined.x_idx[i] + 1) : NA_INTEGER;
+        oy[i] = (joined.y_idx[i] >= 0) ? (joined.y_idx[i] + 1) : NA_INTEGER;
     }
-
-    int *sm_x = (int *) xmalloc((size_t) vx * sizeof(int));
-    memset(sm_x, 0xFF, (size_t)vx * sizeof(int));
-
-    if (do_pdiff) {
-        int ilo = 0;
-        for (int j = 0; j < vy; j++) {
-            double ym = ys_arr[j].mass;
-            while (ilo < vx) {
-                double shifted = xs_arr[ilo].mass + pdiff;
-                double ai = tol + ppm_val * fabs(shifted) * 1e-6 + eps_tol;
-                if (shifted + ai >= ym) break;
-                ilo++;
-            }
-            int best_i = -1;
-            double best_d = DBL_MAX;
-            for (int i = ilo; i < vx; i++) {
-                double shifted = xs_arr[i].mass + pdiff;
-                double ai = tol + ppm_val * fabs(shifted) * 1e-6 + eps_tol;
-                if (shifted - ai > ym) break;
-                double dij = fabs(shifted - ym);
-                if (dij <= ai && dij < best_d) {
-                    best_d = dij;
-                    best_i = i;
-                }
-            }
-            if (best_i >= 0 && sm_x[best_i] < 0) {
-                sm_x[best_i] = j;
-            } else if (best_i >= 0) {
-                int prev_j = sm_x[best_i];
-                double prev_d = fabs(xs_arr[best_i].mass + pdiff - ys_arr[prev_j].mass);
-                if (best_d < prev_d) sm_x[best_i] = j;
-            }
-        }
-    }
-
-    const size_t bsz = ((size_t) ny + 7u) >> 3;
-    unsigned char *y_used = (unsigned char *) xcalloc(bsz, 1);
-
-    int cnt = 0;
-    for (int i = 0; i < nx; i++) if (ISNA(xp[i])) cnt++;
-    for (int i = 0; i < vx; i++) {
-        if (dm_x[i] >= 0) {
-            BS_SET(y_used, (unsigned)ys_arr[dm_x[i]].idx);
-            cnt++;
-        } else {
-            cnt++;
-        }
-    }
-    for (int i = 0; i < vx; i++) {
-        if (sm_x[i] >= 0) cnt++;
-    }
-    for (int i = 0; i < ny; i++)
-        if (!ISNA(yp[i]) && !BS_TEST(y_used, (unsigned)i)) cnt++;
-
-    SEXP rx = PROTECT(allocVector(INTSXP, cnt));
-    SEXP ry = PROTECT(allocVector(INTSXP, cnt));
-    int *ox = INTEGER(rx), *oy = INTEGER(ry), pos = 0;
-
-    for (int i = 0; i < nx; i++)
-        if (ISNA(xp[i])) {
-            ox[pos] = i + 1;
-            oy[pos] = NA_INTEGER;
-            pos++;
-        }
-
-    for (int i = 0; i < vx; i++) {
-        if (dm_x[i] >= 0) {
-            ox[pos] = xs_arr[i].idx + 1;
-            oy[pos] = ys_arr[dm_x[i]].idx + 1;
-            pos++;
-        } else {
-            ox[pos] = xs_arr[i].idx + 1;
-            oy[pos] = NA_INTEGER;
-            pos++;
-        }
-    }
-
-    for (int i = 0; i < vx; i++) {
-        if (sm_x[i] >= 0) {
-            ox[pos] = xs_arr[i].idx + 1;
-            oy[pos] = ys_arr[sm_x[i]].idx + 1;
-            pos++;
-        }
-    }
-
-    for (int i = 0; i < ny; i++)
-        if (!ISNA(yp[i]) && !BS_TEST(y_used, (unsigned)i)) {
-            ox[pos] = NA_INTEGER;
-            oy[pos] = i + 1;
-            pos++;
-        }
-
-    free(xs_arr);
-    free(ys_arr);
-    free(y_used);
-    free(dm_x);
-    free(dm_y);
-    free(sm_x);
+    gnps_free_ptr(joined.x_idx);
+    gnps_free_ptr(joined.y_idx);
 
     SEXP result = PROTECT(allocVector(VECSXP, 2));
     SET_VECTOR_ELT(result, 0, rx);

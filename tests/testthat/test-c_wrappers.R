@@ -288,3 +288,89 @@ test_that("chain DP score is symmetric and swaps forward with reverse", {
     expect_equal(xy[[4L]], yx[[3L]], tolerance = 1e-12)
   }
 })
+
+test_that("gnps_chain_dp_wrapper resolves direct/shifted conflict clusters and closer-peak ties", {
+  # Conflict cluster + clean peaks (both direct-winning and shifted-winning clean peaks):
+  # pdiff = 210 - 200 = +10
+  # x[1]=50  (clean, direct match to y[1]=50)
+  # x[2]=70  (clean, shifted match to y[2]=80)
+  # x[3]=85  (clean, unmatched)
+  # x[4]=100 (dirty: direct match y[3]=100, shifted match y[4]=110)
+  # x[5]=110 (dirty: direct match y[4]=110, shifted match y[5]=120)
+  x <- cbind(
+    mz = c(50.0, 70.0, 85.0, 100.0, 110.0),
+    intensity = c(10.0, 20.0, 5.0, 100.0, 80.0)
+  )
+  y <- cbind(
+    mz = c(50.0, 80.0, 100.0, 110.0, 120.0),
+    intensity = c(10.0, 20.0, 60.0, 100.0, 90.0)
+  )
+  res_conflict <- gnps_chain_dp_wrapper(
+    x = x,
+    y = y,
+    xPrecursorMz = 200.0,
+    yPrecursorMz = 210.0,
+    tolerance = 0.05,
+    ppm = 0,
+    matchedPeaksCount = TRUE
+  )
+  expect_equal(res_conflict[[2L]], 4)
+  expect_true(res_conflict[[1L]] > 0)
+
+  # Closer-peak replacement in Step 1 (direct) and Step 2 (shifted):
+  # Two y peaks within tolerance of x[1]=100 (direct) and x[1]+10=110 (shifted),
+  # where the second y peak is closer than the first.
+  x_close <- cbind(mz = c(100.0), intensity = c(100.0))
+  y_close <- cbind(
+    mz = c(99.96, 99.99, 109.96, 109.99),
+    intensity = c(10.0, 50.0, 20.0, 80.0)
+  )
+  res_close <- gnps_chain_dp_wrapper(
+    x = x_close,
+    y = y_close,
+    xPrecursorMz = 200.0,
+    yPrecursorMz = 210.0,
+    tolerance = 0.05,
+    ppm = 0,
+    matchedPeaksCount = TRUE
+  )
+  expect_equal(res_close[[2L]], 1)
+  expect_true(res_close[[1L]] > 0)
+})
+
+test_that("join_gnps_wrapper and gnps_wrapper cover shifted matches, NAs, and tie comparators", {
+  # join_gnps_wrapper with NAs, duplicate m/z ties, closer-peak replacement, and shifted matches
+  jx <- c(NA_real_, 100.0, 100.0, 150.0)
+  jy <- c(99.96, 99.99, 109.96, 109.99, 160.0, 250.0, NA_real_)
+  jres <- join_gnps_wrapper(
+    x = jx,
+    y = jy,
+    xPrecursorMz = 200.0,
+    yPrecursorMz = 210.0,
+    tolerance = 0.05,
+    ppm = 0
+  )
+  expect_true(is.list(jres))
+  expect_true(anyNA(jres$y))
+  expect_true(anyNA(jres$x))
+
+  # gnps_wrapper with duplicate m/z keys (exercises kp_cmp tie-breaker)
+  ax <- cbind(mz = c(100.0, 100.0, 120.0), intensity = c(50.0, 50.0, 100.0))
+  ay <- cbind(mz = c(100.0, 110.0, 120.0), intensity = c(40.0, 60.0, 100.0))
+  ares <- gnps_wrapper(ax, ay)
+  expect_true(ares[[1L]] > 0)
+
+  # C_gnps_chain_dp_batch mismatched yPrecursorMz length
+  expect_error(
+    .Call(
+      C_gnps_chain_dp_batch,
+      ax,
+      200.0,
+      list(ay, ay),
+      c(200.0),
+      0.01,
+      0.0
+    ),
+    "yPrecursorMz must have one entry per y_list element"
+  )
+})
