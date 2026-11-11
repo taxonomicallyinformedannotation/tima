@@ -138,40 +138,6 @@ sanitize_spectra <- function(
     )
   }
 
-  has_nan <- vapply(
-    X = spectra@backend@peaksData,
-    FUN = .has_nan_values,
-    logical(1L),
-    USE.NAMES = FALSE
-  )
-  n_nan <- sum(has_nan)
-  if (n_nan > 0L) {
-    spectra <- spectra[!has_nan]
-    pct_nan <- round(100 * n_nan / n_before, 1)
-    log_debug(
-      "Removed %d spectra containing NaN values (%s%%)",
-      n_nan,
-      pct_nan
-    )
-  }
-
-  has_null <- vapply(
-    X = spectra@backend@peaksData,
-    FUN = is.null,
-    logical(1L),
-    USE.NAMES = FALSE
-  )
-  n_null <- sum(has_null)
-  if (n_null > 0L) {
-    spectra <- spectra[!has_null]
-    pct_null <- round(100 * n_null / n_before, 1)
-    log_debug(
-      "Removed %d NULL spectra (%s%%)",
-      n_null,
-      pct_null
-    )
-  }
-
   n_final <- length(spectra)
   n_total_removed <- n_initial - n_final
   pct_retained <- round(100 * n_final / n_initial, 1)
@@ -327,14 +293,8 @@ sanitize_spectra <- function(
   n_affected <- sum(vapply(
     seq_along(peaks_data),
     function(i) {
-      old_n <- nrow(peaks_data[[i]])
-      new_n <- nrow(cleaned_peaks[[i]])
-      if (is.null(old_n)) {
-        old_n <- 0L
-      }
-      if (is.null(new_n)) {
-        new_n <- 0L
-      }
+      old_n <- if (is.null(peaks_data[[i]])) 0L else nrow(peaks_data[[i]])
+      new_n <- if (is.null(cleaned_peaks[[i]])) 0L else nrow(cleaned_peaks[[i]])
       old_n != new_n
     },
     logical(1L)

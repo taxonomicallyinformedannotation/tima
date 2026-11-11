@@ -330,4 +330,39 @@ test_that("test-select_sirius_columns_spectral maps analog hits", {
     round(as.numeric(result$candidate_structure_error_mz[[1L]]), 4),
     round(300.1500 - 283.1184, 4)
   )
+
+  # Edge cases: .fast_strip_whitespace (empty and >256 elements), select_sirius_columns_formulas with molecularFormula & ZodiacScore & no massErrorPrecursor, and select_sirius_columns_spectral with empty df, whitespace analogHit, and NA feature_id
+  expect_identical(.fast_strip_whitespace(character(0)), character(0))
+  big_adducts <- rep(c("[M + H]+", "[M + Na]+"), each = 150L)
+  expect_identical(
+    unique(.fast_strip_whitespace(big_adducts)),
+    c("[M+H]+", "[M+Na]+")
+  )
+
+  df_form_full <- tidytable::tidytable(
+    mappingFeatureId = "F1",
+    ionMass = "180.0634",
+    adduct = "[M + H]+",
+    molecularFormula = "C6H12O6",
+    ZodiacScore = "0.99",
+    SiriusScore = "12.3"
+  )
+  res_form_full <- select_sirius_columns_formulas(df_form_full, "6")
+  expect_equal(res_form_full$candidate_structure_molecular_formula, "C6H12O6")
+  expect_equal(res_form_full$candidate_score_sirius_zodiac, "0.99")
+  expect_true(is.na(res_form_full$candidate_structure_error_mz))
+
+  expect_equal(
+    nrow(select_sirius_columns_spectral(tidytable::tidytable(), "6")),
+    0L
+  )
+  df_spec_edge <- tidytable::tidytable(
+    mappingFeatureId = c("F1", NA_character_),
+    analogHit = c(" true ", "false"),
+    ionMass = c("100.0", "200.0"),
+    referencePrecursorMz = c("100.0", "200.0")
+  )
+  res_spec_edge <- select_sirius_columns_spectral(df_spec_edge, "6")
+  expect_equal(nrow(res_spec_edge), 1L)
+  expect_equal(res_spec_edge$candidate_library, "SIRIUS spectral (analog)")
 })

@@ -426,4 +426,61 @@ test_that("split_tables_sop drops NA reference_doi only when non-NA reference ex
   expect_equal(org1_rows$reference_doi[[1L]], "10.1000/valid")
   expect_equal(nrow(org2_rows), 1L)
   expect_true(is.na(org2_rows$reference_doi[[1L]]))
+
+  # Interleaved multi-source groups with whitespace-only, all-NA, and NA organism rank
+  sop_interleaved <- tidytable::tidytable(
+    structure_smiles = c("CCO", "CCC", "CCO", "CCC"),
+    structure_smiles_no_stereo = c("CCO", "CCC", "CCO", "CCC"),
+    structure_name = c("   ", "   ", "", ""),
+    structure_tag = c(
+      NA_character_,
+      NA_character_,
+      NA_character_,
+      NA_character_
+    ),
+    structure_tax_npc_01pat = c("P1", "P2", "P1_alt", "P2_alt"),
+    structure_tax_npc_02sup = c("S1", "S2", "S1", "S2"),
+    structure_tax_npc_03cla = c("C1", "C2", "C1", "C2"),
+    structure_tax_cla_chemontid = c("0001", "0002", "0001", "0002"),
+    structure_tax_cla_01kin = c("K1", "K2", "K1_alt", "K2_alt"),
+    structure_tax_cla_02sup = c("S1", "S2", "S1", "S2"),
+    structure_tax_cla_03cla = c("C1", "C2", "C1", "C2"),
+    structure_tax_cla_04dirpar = c("D1", "D2", "D1", "D2"),
+    organism_name = c("Org1", "Org2", "Org1", "Org2"),
+    organism_taxonomy_ottid = c("1", "2", "1", "2"),
+    organism_taxonomy_01domain = c(
+      "Eukaryota",
+      NA_character_,
+      "Eukaryota",
+      NA_character_
+    ),
+    reference_doi = c("10.1/a", "10.1/b", "10.1/c", "10.1/d")
+  )
+  with_mocked_bindings(
+    process_smiles = function(table, cache) {
+      tidytable::tidytable(
+        structure_smiles_initial = c("CCO", "CCC"),
+        structure_inchikey = c(
+          "LFQSCWFLJHTTHZ-UHFFFAOYSA-N",
+          "ATUOYWHBWRKTHZ-UHFFFAOYSA-N"
+        ),
+        structure_inchikey_connectivity_layer = c(
+          "LFQSCWFLJHTTHZ",
+          "ATUOYWHBWRKTHZ"
+        ),
+        structure_smiles = c("CCO", "CCC"),
+        structure_smiles_no_stereo = c("CCO", "CCC"),
+        structure_molecular_formula = c("C2H6O", "C3H8"),
+        structure_exact_mass = c(46.0419, 44.0626)
+      )
+    },
+    {
+      res_il <- split_tables_sop(table = sop_interleaved, cache = NULL)
+    }
+  )
+  expect_true(all(is.na(res_il$str_stereo$structure_name)))
+  expect_true(all(is.na(res_il$str_stereo$structure_tag)))
+  expect_true(
+    "notClassified" %in% res_il$org_tax_ott$organism_taxonomy_01domain
+  )
 })

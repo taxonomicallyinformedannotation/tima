@@ -172,4 +172,5 @@ test_that("benchmark evaluate predictions computes top-k and threshold metrics",
   expect_equal(sum(metrics$metric_family == "score_threshold"), 3)
   expect_true(all(metrics$prediction == "predA"))
   expect_true(any(is.finite(metrics$mcc) | is.na(metrics$mcc)))
+  expect_identical(.benchmark_split_multivalue(character(0)), NA_character_)
 })

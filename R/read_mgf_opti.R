@@ -153,10 +153,6 @@ read_mgf_opti <- function(
   e_idx <- ends[seq_len(n_blocks)] - 1L
   lens <- pmax(0L, e_idx - s_idx + 1L)
 
-  if (sum(lens) == 0L) {
-    return(make_empty_mgf_df())
-  }
-
   line_idx <- sequence(lens, from = s_idx)
   block_id <- rep.int(seq_len(n_blocks), lens)
   inner_lines <- lines[line_idx]
@@ -182,60 +178,30 @@ read_mgf_opti <- function(
     return(make_empty_mgf_df())
   }
 
-  sp_pos <- regexpr(" ", pk_lines, fixed = TRUE)
-  tab_pos <- if (all(sp_pos > 1L)) {
-    integer(length(pk_lines))
-  } else {
-    regexpr("\t", pk_lines, fixed = TRUE)
+  sep1 <- regexpr("[ \t]+", pk_lines, perl = TRUE)
+  sep1_len <- attr(sep1, "match.length")
+  valid_pk_line <- sep1 > 1L & (sep1 + sep1_len) <= nchar(pk_lines)
+  if (!all(valid_pk_line)) {
+    pk_lines <- pk_lines[valid_pk_line]
+    pk_blocks <- pk_blocks[valid_pk_line]
+    sep1_len <- sep1_len[valid_pk_line]
+    sep1 <- sep1[valid_pk_line]
   }
-  has_tab <- tab_pos > 0L
-  if (!any(has_tab) && all(sp_pos > 1L)) {
-    mz_str <- substr(pk_lines, 1L, sp_pos - 1L)
-    rest_str <- substring(pk_lines, sp_pos + 1L)
-    if (any(startsWith(rest_str, " "))) {
-      rest_str <- trimws(rest_str, which = "left")
-    }
-    valid_pk_line <- nzchar(rest_str)
-    if (!all(valid_pk_line)) {
-      mz_str <- mz_str[valid_pk_line]
-      rest_str <- rest_str[valid_pk_line]
-      pk_blocks <- pk_blocks[valid_pk_line]
-    }
-    if (length(mz_str) == 0L) {
-      return(make_empty_mgf_df())
-    }
-    sp2 <- regexpr(" ", rest_str, fixed = TRUE)
-    has_sp2 <- sp2 > 0L
-    if (any(has_sp2)) {
-      rest_str[has_sp2] <- substr(rest_str[has_sp2], 1L, sp2[has_sp2] - 1L)
-    }
-    rm(pk_lines, sp_pos, tab_pos, has_tab, sp2, has_sp2)
-  } else {
-    sep1 <- regexpr("[ \t]+", pk_lines, perl = TRUE)
-    sep1_len <- attr(sep1, "match.length")
-    valid_pk_line <- sep1 > 1L & (sep1 + sep1_len) <= nchar(pk_lines)
-    if (!all(valid_pk_line)) {
-      pk_lines <- pk_lines[valid_pk_line]
-      pk_blocks <- pk_blocks[valid_pk_line]
-      sep1_len <- sep1_len[valid_pk_line]
-      sep1 <- sep1[valid_pk_line]
-    }
 
-    if (length(pk_lines) == 0L) {
-      return(make_empty_mgf_df())
-    }
-
-    mz_str <- substr(pk_lines, 1L, sep1 - 1L)
-    rest_str <- substring(pk_lines, sep1 + sep1_len)
-    rm(pk_lines, sep1, sep1_len, sp_pos, tab_pos, has_tab)
-
-    sep2 <- regexpr("[ \t]", rest_str, perl = TRUE)
-    has_sep2 <- sep2 > 0L
-    if (any(has_sep2)) {
-      rest_str[has_sep2] <- substr(rest_str[has_sep2], 1L, sep2[has_sep2] - 1L)
-    }
-    rm(sep2, has_sep2)
+  if (length(pk_lines) == 0L) {
+    return(make_empty_mgf_df())
   }
+
+  mz_str <- substr(pk_lines, 1L, sep1 - 1L)
+  rest_str <- substring(pk_lines, sep1 + sep1_len)
+  rm(pk_lines, sep1, sep1_len)
+
+  sep2 <- regexpr("[ \t]", rest_str, perl = TRUE)
+  has_sep2 <- sep2 > 0L
+  if (any(has_sep2)) {
+    rest_str[has_sep2] <- substr(rest_str[has_sep2], 1L, sep2[has_sep2] - 1L)
+  }
+  rm(sep2, has_sep2)
 
   valid_blocks <- unique(pk_blocks)
   n_sp <- length(valid_blocks)

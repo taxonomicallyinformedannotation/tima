@@ -1935,4 +1935,10 @@ test_that("taxonomy cache internal helpers cover all compression, headerless, no
     ),
     clean_df
   )
+
+  # fake_pubchemlite validation and placeholder generation
+  expect_error(fake_pubchemlite(123), class = "tima_validation_error")
+  fake_pcl <- withr::local_tempfile(fileext = ".csv")
+  expect_identical(fake_pubchemlite(fake_pcl), fake_pcl)
+  expect_true(file.exists(fake_pcl))
 })

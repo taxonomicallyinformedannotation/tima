@@ -157,7 +157,7 @@ build_annotate_masses_coverage_report <- function(
   u_f <- unique(f_col)
   all_features <- length(u_f)
   all_annotations <- n_rows
-  f_id <- if (anyNA(u_f)) match(f_col, u_f) else fastmatch::fmatch(f_col, u_f)
+  f_id <- fastmatch::fmatch(f_col, u_f)
   feat_n_ann <- tabulate(f_id, nbins = all_features)
 
   tier_classes <- c(
@@ -221,19 +221,11 @@ build_annotate_masses_coverage_report <- function(
 
   coverage_report$Pct_features <- sprintf(
     "%.2f%%",
-    if (all_features == 0L) {
-      rep(0, nrow(coverage_report))
-    } else {
-      100 * coverage_report$N_features / all_features
-    }
+    100 * coverage_report$N_features / max(1L, all_features)
   )
   coverage_report$Pct_annotations <- sprintf(
     "%.2f%%",
-    if (all_annotations == 0L) {
-      rep(0, nrow(coverage_report))
-    } else {
-      100 * coverage_report$N_annotations / all_annotations
-    }
+    100 * coverage_report$N_annotations / all_annotations
   )
 
   coverage_report <- coverage_report |>

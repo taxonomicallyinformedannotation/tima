@@ -241,4 +241,23 @@ test_that("prepare_libraries_spectra creates empty templates when input is missi
     is.data.frame(sop) || tidytable::is_tidytable(sop)
   )
   expect_true(all(names(create_empty_sop_library()) %in% names(sop)))
+  expect_null(harmonize_spectra_polarity(
+    spectra_extracted = list(),
+    mode = "pos",
+    metad = "LIB",
+    col_ad = "adduct",
+    col_ce = "ce",
+    col_ci = "id",
+    col_in = "inchi",
+    col_io = "inchi_no_stereo",
+    col_ik = "inchikey",
+    col_il = "inchikey_no_stereo",
+    col_na = "name",
+    col_po = "polarity",
+    col_sm = "smiles",
+    col_sn = "smiles_no_stereo",
+    col_si = "spectrum_id",
+    col_sp = "splash",
+    col_sy = "synonyms"
+  ))
 })

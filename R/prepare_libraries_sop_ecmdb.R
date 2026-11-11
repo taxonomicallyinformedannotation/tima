@@ -138,8 +138,6 @@ prepare_libraries_sop_ecmdb <- function(
     )
     export_output(x = ecmdb_prepared, file = output)
     rm(ecmdb_prepared)
-  } else {
-    return(output)
   }
 
   output

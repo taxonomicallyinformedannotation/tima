@@ -106,21 +106,13 @@ select_annotations_columns <- function(
   # Normalize adduct spacing (e.g., "[M + H]+" -> "[M+H]+")
   if ("candidate_adduct" %in% names(df)) {
     adducts_vec <- df[["candidate_adduct"]]
-    if (length(adducts_vec) > 1024L) {
-      u_add <- unique(adducts_vec)
-      u_add_clean <- gsub("\\s+", "", u_add)
-      data.table::set(
-        df,
-        j = "candidate_adduct",
-        value = u_add_clean[fastmatch::fmatch(adducts_vec, u_add)]
-      )
-    } else {
-      data.table::set(
-        df,
-        j = "candidate_adduct",
-        value = gsub("\\s+", "", adducts_vec)
-      )
-    }
+    u_add <- unique(adducts_vec)
+    u_add_clean <- gsub("\\s+", "", u_add)
+    data.table::set(
+      df,
+      j = "candidate_adduct",
+      value = u_add_clean[fastmatch::fmatch(adducts_vec, u_add)]
+    )
   }
 
   # Clean NULL/NA sentinels in-place while preserving output semantics.
@@ -145,14 +137,8 @@ select_annotations_columns <- function(
   }
 
   .num_to_char_fast <- function(x) {
-    if (length(x) > 1024L) {
-      ux <- unique(x)
-      if (length(ux) * 2L < length(x)) {
-        cux <- as.character(ux)
-        return(cux[fastmatch::fmatch(x, ux)])
-      }
-    }
-    as.character(x)
+    ux <- unique(x)
+    as.character(ux)[fastmatch::fmatch(x, ux)]
   }
 
   # Round numeric values in-place
@@ -199,17 +185,12 @@ select_annotations_columns <- function(
   if (length(x) == 0L) {
     return(x)
   }
-  if (length(x) > 1024L) {
-    ux <- unique(x)
-    if (length(ux) * 2L < length(x)) {
-      vals <- .fast_trim_and_na(ux)
-      if (identical(vals, ux)) {
-        return(x)
-      }
-      return(vals[fastmatch::fmatch(x, ux)])
-    }
+  ux <- unique(x)
+  vals <- .fast_trim_and_na(ux)
+  if (identical(vals, ux)) {
+    return(x)
   }
-  .fast_trim_and_na(x)
+  vals[fastmatch::fmatch(x, ux)]
 }
 
 .annotation_projection_columns <- function(model) {
@@ -268,15 +249,8 @@ recompute_structure_fields_from_smiles <- function(df, cache = NULL) {
 
   smiles_vec <- as.character(df[[smiles_col]])
   unique_smiles <- unique(smiles_vec)
-  unique_smiles <- unique_smiles[!is.na(unique_smiles)]
-  ws_sm <- grep("^[ \t\r\n]|[ \t\r\n]$", unique_smiles)
-  if (length(ws_sm) > 0L) {
-    trimmed_sm <- unique_smiles
-    trimmed_sm[ws_sm] <- trimws(unique_smiles[ws_sm])
-    unique_smiles <- unique_smiles[nzchar(trimmed_sm)]
-  } else {
-    unique_smiles <- unique_smiles[nzchar(unique_smiles)]
-  }
+  unique_smiles <- trimws(unique_smiles[!is.na(unique_smiles)])
+  unique_smiles <- unique_smiles[nzchar(unique_smiles)]
   if (length(unique_smiles) == 0L) {
     return(df)
   }

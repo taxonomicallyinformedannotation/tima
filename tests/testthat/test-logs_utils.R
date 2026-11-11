@@ -715,4 +715,41 @@ test_that("log_operation records start time", {
 test_that("log_operation returns tima_log_context class", {
   ctx <- log_operation("op")
   expect_s3_class(ctx, "tima_log_context")
+
+  # setup_logger character threshold, invalid threshold, and console appender
+  tf_log <- withr::local_tempfile(fileext = ".log")
+  withr::with_envvar(
+    c(TIMA_LOG_CONSOLE = "true"),
+    expect_no_error(setup_logger(filename = tf_log, threshold = "INFO"))
+  )
+  expect_error(
+    setup_logger(filename = tf_log, threshold = list(bad = 1)),
+    "threshold must be numeric or character"
+  )
+
+  # is_logging_initialized and ensure_logging_initialized when appenders empty
+  old_apps <- lgr::lgr$appenders
+  on.exit(lgr::lgr$set_appenders(old_apps), add = TRUE)
+  lgr::lgr$set_appenders(list())
+  expect_false(is_logging_initialized())
+  expect_invisible(ensure_logging_initialized())
+  expect_true(is_logging_initialized())
+
+  # log_fatal, add_percentage_column, log_failed with fatal error, with_logging df/list
+  expect_invisible(log_fatal("fatal %s", "test"))
+  expect_identical(add_percentage_column("not_df", "n"), "not_df")
+  expect_identical(
+    add_percentage_column(data.frame(a = 1), "missing_col"),
+    data.frame(a = 1)
+  )
+  fatal_err <- structure(
+    list(message = "critical boom"),
+    class = c("tima_fatal_error", "error", "condition")
+  )
+  expect_invisible(log_failed(ctx, fatal_err))
+
+  df_res <- with_logging("df_op", data.frame(x = 1:2))
+  expect_equal(nrow(df_res), 2L)
+  lst_res <- with_logging("list_op", list(a = 1, b = 2))
+  expect_equal(length(lst_res), 2L)
 })

@@ -48,11 +48,9 @@ decorate_masses <- function(annotation_table_ms1) {
   ]]
   valid_idx <- which(!is.na(ik_col) & ik_col != "notAnnotated")
   n_unique_structures <- length(unique(ik_col[valid_idx]))
-  n_unique_features <- if ("feature_id" %in% colnames(annotation_table_ms1)) {
-    length(unique(annotation_table_ms1[["feature_id"]][valid_idx]))
-  } else {
-    0L
-  }
+  n_unique_features <- length(
+    unique(annotation_table_ms1[["feature_id"]][valid_idx])
+  )
 
   log_info(
     "MS1 annotations: %d unique structures across %d features",

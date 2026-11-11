@@ -740,4 +740,64 @@ test_that("get_last_version_from_zenodo skips download when local file is curren
     },
     .package = "tima"
   )
+
+  # Option clamping and retry on error in fetch_zenodo_record
+  withr::local_options(
+    tima.zenodo.max_attempts = 0L,
+    tima.zenodo.req_retry_max_tries = 0L,
+    tima.zenodo.backoff_cap_s = -1
+  )
+  expect_error(
+    testthat::with_mocked_bindings(
+      req_perform = function(req) stop("network failure"),
+      .package = "httr2",
+      fetch_zenodo_record("123456", "10.5281/zenodo.123456", timeout_s = 1)
+    ),
+    "network failure"
+  )
+
+  state <- new.env(parent = emptyenv())
+  state$attempts_seen <- 0L
+  withr::local_options(
+    tima.zenodo.max_attempts = 2L,
+    tima.zenodo.req_retry_max_tries = 1L,
+    tima.zenodo.backoff_cap_s = 0
+  )
+  resp_retry <- testthat::with_mocked_bindings(
+    req_perform = function(req) {
+      state$attempts_seen <- state$attempts_seen + 1L
+      if (state$attempts_seen == 1L) {
+        stop("transient error")
+      }
+      make_zenodo_response('{"recid":"123"}')
+    },
+    .package = "httr2",
+    fetch_zenodo_record("123456", "10.5281/zenodo.123456", timeout_s = 1)
+  )
+  expect_identical(state$attempts_seen, 2L)
+
+  # Self link fallback when download link is absent and missing recid/id
+  resp_self_link <- make_zenodo_response(
+    paste0(
+      '{"files":[{"key":"target.txt","size":11,',
+      '"links":{"self":"https://example/self/target.txt"}}]}'
+    )
+  )
+  out_self <- temp_test_path("zenodo-self.txt")
+  testthat::with_mocked_bindings(
+    fetch_zenodo_record = function(record, doi, timeout_s) resp_self_link,
+    is_download_needed = function(path, zenodo_size) FALSE,
+    {
+      expect_identical(
+        get_last_version_from_zenodo(
+          doi = "10.5281/zenodo.999999",
+          pattern = "target.txt",
+          path = out_self,
+          timeout_s = 1
+        ),
+        out_self
+      )
+    },
+    .package = "tima"
+  )
 })

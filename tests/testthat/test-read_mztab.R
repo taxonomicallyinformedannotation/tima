@@ -779,3 +779,174 @@ test_that("mztab_before_after_batch emits JSON artifacts for JSON fixtures", {
   expect_true(all(file.exists(manifest$before_tables_json)))
   expect_true(all(file.exists(manifest$after_tables_json)))
 })
+
+test_that("mztab_parser and read_mztab helper edge cases are covered", {
+  # Unit coverage for mztab_parser.R and read_mztab.R helper edge cases
+  expect_identical(.normalize_mztab_value(1:2), 1:2)
+  expect_identical(.mztab_split_tsv(NULL), character(0))
+  expect_identical(.mztab_split_tsv(""), character(0))
+  expect_identical(.mztab_split_tsv("\t"), character(0))
+  expect_identical(.mztab_split_param_fields(""), character(0))
+  expect_identical(.normalize_mztab_prefix_sep(character(0)), character(0))
+  expect_identical(
+    .normalize_mztab_prefix_sep(c("\ufeffMTD\tkey\tval", "   ")),
+    c("MTD\tkey\tval", "   ")
+  )
+  expect_equal(nrow(.parse_mztab_metadata("MTD")), 0L)
+  expect_equal(nrow(.parse_mztab_metadata("MTD\t   \tval")), 0L)
+  expect_equal(
+    .parse_mztab_metadata("MTD\tkey\tv1\tv2")$value,
+    "v1\tv2"
+  )
+  expect_equal(
+    nrow(.parse_mztab_section_table(c("SMH", "SML\t1"), "SMH", "SML")),
+    0L
+  )
+  ragged_sec <- .parse_mztab_section_table(
+    c("SMH\tSML_ID\tcol2", "SML\t1", "SML\t2\ta\textra"),
+    "SMH",
+    "SML"
+  )
+  expect_equal(nrow(ragged_sec), 2L)
+  expect_true("opt_global_extra_col_1" %in% colnames(ragged_sec))
+  expect_true(is.na(.mztab_json_param_to_string(list())))
+  expect_true(is.na(.mztab_json_scalar(NA_character_)))
+  expect_identical(.mztab_json_scalar(c("a", "b")), "a|b")
+  expect_true(is.na(.mztab_json_scalar(list(NA_character_, ""))))
+  expect_equal(nrow(.mztab_json_rows_to_table(list("not_list", list()))), 0L)
+  expect_equal(nrow(.mztab_json_metadata_to_table(NULL)), 0L)
+  expect_equal(nrow(.mztab_json_metadata_to_table(list(k = ""))), 0L)
+
+  tf_bad_json <- withr::local_tempfile(fileext = ".json")
+  writeLines("{invalid_json", tf_bad_json)
+  bad_j_res <- .read_mztab_json_tables(tf_bad_json)
+  expect_equal(nrow(bad_j_res$metadata), 0L)
+
+  tf_scalar_json <- withr::local_tempfile(fileext = ".json")
+  writeLines('"just_a_string"', tf_scalar_json)
+  expect_equal(nrow(.read_mztab_json_tables(tf_scalar_json)$metadata), 0L)
+
+  tf_bom <- withr::local_tempfile(fileext = ".mztab")
+  writeLines("\ufeffMTD\tmzTab-version\t2.0.0-M", tf_bom)
+  bom_res <- read_mztab_tables(tf_bom)
+  expect_equal(nrow(bom_res$metadata), 1L)
+
+  testthat::with_mocked_bindings(
+    readLines = function(...) stop("io error"),
+    .package = "base",
+    expect_equal(nrow(read_mztab_tables(tf_bom)$metadata), 0L)
+  )
+
+  # read_mztab helper branches
+  expect_length(.mztab_assay_sample_map(tidytable::tidytable()), 0L)
+  expect_length(
+    .mztab_assay_sample_map(tidytable::tidytable(
+      key = "sample[1]",
+      value = "S1"
+    )),
+    0L
+  )
+
+  tabs_edge <- list(
+    sml = tidytable::tidytable(
+      SML_ID = "1",
+      theoretical_mass_to_charge = "200.1",
+      retention_time_in_seconds = "120",
+      retention_time_in_minutes = "2",
+      adduct = "[M+H]+"
+    ),
+    smf = tidytable::tidytable(
+      SMF_ID = "1",
+      exp_mass_to_charge = "200.1",
+      retention_time_in_minutes = "2"
+    ),
+    metadata = tidytable::tidytable()
+  )
+  feat_edge <- .mztab_to_features(tabs_edge, "feature_id", "rt", "mz", "adduct")
+  expect_equal(feat_edge$mz, 200.1)
+  expect_equal(feat_edge$adduct, "[M+H]+")
+
+  tabs_exp_mz <- list(
+    sml = tidytable::tidytable(SML_ID = "1", exp_mass_to_charge = "150.5"),
+    smf = tidytable::tidytable(),
+    metadata = tidytable::tidytable()
+  )
+  expect_equal(
+    .mztab_to_features(tabs_exp_mz, "id", "rt", "mz", "adduct")$mz,
+    150.5
+  )
+
+  expect_length(
+    .mztab_sample_species_map(tidytable::tidytable(
+      key = "sample[1]-species[1]",
+      value = "[NCBITaxon, NCBITaxon:9606, , ]"
+    )),
+    0L
+  )
+  expect_equal(nrow(.mztab_metadata_table(tidytable::tidytable())), 0L)
+  expect_equal(
+    nrow(.mztab_metadata_table(tidytable::tidytable(other = "x"))),
+    0L
+  )
+  raw_meta <- .mztab_metadata_table(
+    tidytable::tidytable(key = "title", value = "Study")
+  )
+  expect_equal(raw_meta$filename, "title")
+
+  tf_proxy <- withr::local_tempfile(fileext = ".mgf")
+  .write_proxy_mgf(
+    data.frame(feature_id = "1", mz = NA_real_),
+    tf_proxy,
+    "feature_id",
+    "mz"
+  )
+  expect_true(file.exists(tf_proxy))
+
+  # .extract_embedded_mgf edge cases
+  tf_no_com <- withr::local_tempfile(fileext = ".mztab")
+  writeLines("\ufeffMTD\ttitle\tT", tf_no_com)
+  expect_null(.extract_embedded_mgf(
+    tf_no_com,
+    data.frame(feature_id = "1"),
+    "feature_id",
+    lines = NULL
+  ))
+  expect_null(.extract_embedded_mgf(
+    tf_no_com,
+    data.frame(feature_id = "1"),
+    "feature_id",
+    lines = "COM\tMGH"
+  ))
+  expect_null(.extract_embedded_mgf(
+    tf_no_com,
+    data.frame(feature_id = "1"),
+    "feature_id",
+    lines = "COM\tMGH\t"
+  ))
+  expect_null(.extract_embedded_mgf(
+    tf_no_com,
+    data.frame(feature_id = "1"),
+    "feature_id",
+    lines = "COM\tMGH\tprec_mz"
+  ))
+  expect_null(.extract_embedded_mgf(
+    tf_no_com,
+    data.frame(feature_id = "1"),
+    "feature_id",
+    lines = c("COM\tMGH\tprec_mz", "COM\tMGF\t0")
+  ))
+
+  # Non-uniform MGF lines, missing columns, scientific notation, mismatched/invalid peaks
+  mgf_lines_ragged <- c(
+    "COM\tMGH\tprec_mz\tspec_mz\tspec_int",
+    "COM\tMGF\t1e-5\t100.0|bad|200.0\t50.0|10.0\textra_col",
+    "COM\tMGF\t200.0\t150.0"
+  )
+  emb <- .extract_embedded_mgf(
+    tf_no_com,
+    data.frame(other_col = "1"),
+    "feature_id",
+    lines = mgf_lines_ragged
+  )
+  expect_true(any(grepl("PEPMASS=0.00001", emb, fixed = TRUE)))
+})

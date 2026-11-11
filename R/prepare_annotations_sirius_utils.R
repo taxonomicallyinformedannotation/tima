@@ -333,11 +333,7 @@ create_empty_sirius_annotations <- function() {
       ck_id <- id1
     } else {
       u_ck <- comp_key[first_idx]
-      ck_id <- if (anyNA(u_ck)) {
-        match(comp_key, u_ck)
-      } else {
-        fastmatch::fmatch(comp_key, u_ck)
-      }
+      ck_id <- fastmatch::fmatch(comp_key, u_ck)
     }
     ref_idx <- first_idx[ck_id]
     non_keys <- setdiff(names(df), present_keys)

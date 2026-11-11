@@ -149,4 +149,23 @@ test_that("decorate_chemo cascades ClassyFire and NPClassifier filters independe
   # Class (>=0.5, valid): FT1, FT2 -> 2 candidates (2 unique)
   expect_true(grepl("Pathway level:\\s+4 candidates \\(3 unique\\)", logged))
   expect_true(grepl("Class level:\\s+2 candidates \\(2 unique\\)", logged))
+
+  # Missing hierarchy column triggers early return in filter_cascade_idx
+  df_no_sub <- test_df[,
+    setdiff(names(test_df), "feature_pred_tax_cla_02sup_val"),
+    with = FALSE
+  ]
+  expect_identical(
+    decorate_chemo(
+      annot_table_wei_chemo = df_no_sub,
+      score_chemical_cla_kingdom = 0.5,
+      score_chemical_cla_superclass = 0.8,
+      score_chemical_cla_class = 0.8,
+      score_chemical_cla_parent = 0.8,
+      score_chemical_npc_pathway = 0.5,
+      score_chemical_npc_superclass = 0.5,
+      score_chemical_npc_class = 0.5
+    ),
+    df_no_sub
+  )
 })

@@ -319,9 +319,6 @@ prepare_annotations_sirius <-
       data.table = TRUE,
       showProgress = FALSE
     )
-    if (ncol(dt) == 0L) {
-      stop("first five rows are empty", call. = FALSE)
-    }
     data.table::setnames(dt, make.names(names(dt), unique = TRUE))
     return(tidytable::as_tidytable(dt))
   }

@@ -44,10 +44,6 @@ NULL
 }
 
 .benchmark_split_multivalue <- function(x) {
-  if (length(x) == 0L) {
-    return(NA_character_)
-  }
-
   split_vals <- .benchmark_split_values(x)
   if (length(split_vals) == 1L) {
     return(split_vals[[1L]])
@@ -113,8 +109,7 @@ NULL
         parts[[i]] <- .benchmark_pad_to(parts[[i]], target_lens[[i]])
       }
     }
-    res <- unlist(parts, use.names = FALSE)
-    if (is.null(res)) character(0) else as.character(res)
+    as.character(unlist(parts, use.names = FALSE))
   }
 
   total_rows <- sum(n_per_row)

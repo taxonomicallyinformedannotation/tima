@@ -196,14 +196,10 @@ prepare_libraries_rt <- function(
 
   polish_df <- function(df, type = "experimental", unit = unit_rt) {
     df_tmp <- tidytable::as_tidytable(df)
-    if (!"inchikey" %in% colnames(df_tmp)) {
-      data.table::set(df_tmp, j = "inchikey", value = NA_character_)
-    }
-    if (!"smiles" %in% colnames(df_tmp)) {
-      data.table::set(df_tmp, j = "smiles", value = NA_character_)
-    }
-    if (!"structure_name" %in% colnames(df_tmp)) {
-      data.table::set(df_tmp, j = "structure_name", value = NA_character_)
+    for (col in c("inchikey", "smiles", "structure_name")) {
+      if (!col %in% colnames(df_tmp)) {
+        data.table::set(df_tmp, j = col, value = NA_character_)
+      }
     }
     if (!"rt" %in% colnames(df_tmp)) {
       data.table::set(df_tmp, j = "rt", value = NA_real_)
@@ -259,19 +255,15 @@ prepare_libraries_rt <- function(
       )
       processed <- process_smiles(smiles_df, cache = NULL)
 
-      if (nrow(processed) > 0 && "structure_inchikey" %in% names(processed)) {
-        m_idx <- fastmatch::fmatch(
-          df_missing$smiles,
-          processed$structure_smiles_initial
-        )
-        data.table::set(
-          df_missing,
-          j = "inchikey",
-          value = processed$structure_inchikey[m_idx]
-        )
-      } else {
-        data.table::set(df_missing, j = "inchikey", value = NA_character_)
-      }
+      m_idx <- fastmatch::fmatch(
+        df_missing$smiles,
+        processed$structure_smiles_initial
+      )
+      data.table::set(
+        df_missing,
+        j = "inchikey",
+        value = as.character(processed$structure_inchikey)[m_idx]
+      )
       df_completed <- tidytable::bind_rows(df_full, df_missing)
     } else {
       df_completed <- df_full
@@ -280,10 +272,8 @@ prepare_libraries_rt <- function(
     char_cols <- c("smiles", "inchikey", "structure_name", "type")
     for (col in intersect(char_cols, names(df_completed))) {
       v <- df_completed[[col]]
-      if (any(!is.na(v) & v == "NA")) {
-        v[!is.na(v) & v == "NA"] <- NA_character_
-        data.table::set(df_completed, j = col, value = v)
-      }
+      v[!is.na(v) & v == "NA"] <- NA_character_
+      data.table::set(df_completed, j = col, value = v)
     }
 
     df_completed <- tidytable::tidytable(

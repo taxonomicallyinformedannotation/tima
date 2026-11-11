@@ -180,4 +180,27 @@ test_that("decorate_bio ignores below-minimum rows when counting unique structur
   expect_true(grepl("Kingdom\\s+level:\\s+3 candidates \\(2 unique\\)", logged))
   expect_true(grepl("Species\\s+level:\\s+2 candidates \\(2 unique\\)", logged))
   expect_true(grepl("Variety\\s+level:\\s+0 candidates \\(0 unique\\)", logged))
+
+  # All scores below minimum threshold (length(valid_sc) == 0L)
+  na_df <- tidytable::tidytable(
+    feature_id = "FT1",
+    score_biological = NA_real_,
+    candidate_structure_inchikey_connectivity_layer = "IK_NA"
+  )
+  expect_identical(
+    decorate_bio(
+      annot_table_wei_bio = na_df,
+      score_biological_kingdom = 0.1,
+      score_biological_phylum = 0.2,
+      score_biological_class = 0.3,
+      score_biological_order = 0.4,
+      score_biological_family = 0.5,
+      score_biological_tribe = 0.6,
+      score_biological_genus = 0.7,
+      score_biological_species = 0.8,
+      score_biological_variety = 0.9,
+      score_biological_biota = 1.0
+    ),
+    na_df
+  )
 })

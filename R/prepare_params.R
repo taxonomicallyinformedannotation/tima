@@ -254,13 +254,7 @@ prepare_params <- function(
   fil_fea_raw <- params_small$files$features$raw
   fil_met_raw <- params_small$files$metadata$raw
   fil_spe_raw <- params_small$files$spectral$raw
-  fil_mzt_raw <- tryCatch(
-    params_small$files$mztab$raw,
-    error = function(e) {
-      force(e)
-      NULL
-    }
-  )
+  fil_mzt_raw <- params_small$files$mztab$raw
   fil_ann_raw_mzm <- params_small$files$annotations$raw$spectral$mzmine
   # The small YAML overrides the advanced value for every step, not only the
   # advanced copy

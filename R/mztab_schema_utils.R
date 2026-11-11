@@ -216,12 +216,12 @@ MZTAB_TERM_FALLBACKS <- list(
   rendered <- .mztab_render_templates(terms, values)
   catalog$metadata <- utils::modifyList(
     catalog$metadata,
-    rendered$metadata,
+    rendered$metadata %||% list(),
     keep.null = TRUE
   )
   catalog$params <- utils::modifyList(
     catalog$params,
-    rendered$params,
+    rendered$params %||% list(),
     keep.null = TRUE
   )
   catalog$cv_registry <- if (

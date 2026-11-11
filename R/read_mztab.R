@@ -492,7 +492,9 @@ read_mztab <- function(
 
 #' @keywords internal
 .mztab_metadata_table <- function(metadata_df) {
-  if (nrow(metadata_df) == 0L) {
+  if (
+    nrow(metadata_df) == 0L || !all(c("key", "value") %in% names(metadata_df))
+  ) {
     return(tidytable::tidytable())
   }
 
@@ -556,12 +558,6 @@ read_mztab <- function(
     "mzTab metadata has no sample or assay linkage; exporting raw key/value pairs"
   )
   metadata_df <- as.data.frame(metadata_df, stringsAsFactors = FALSE)
-  if (!"key" %in% names(metadata_df) || !"value" %in% names(metadata_df)) {
-    return(tidytable::tidytable(
-      filename = character(0),
-      ATTRIBUTE_species = character(0)
-    ))
-  }
   tidytable::tidytable(
     filename = as.character(metadata_df$key),
     ATTRIBUTE_species = as.character(metadata_df$value)
@@ -683,8 +679,6 @@ read_mztab <- function(
     return(NULL)
   }
 
-  col_idx <- stats::setNames(seq_along(col_names), col_names)
-
   # Split all MGF lines at once
   all_parts <- strsplit(mgf_data_lines, "\t", fixed = TRUE)
   part_lens <- lengths(all_parts)
@@ -701,24 +695,20 @@ read_mztab <- function(
   }
 
   extract_col_vec <- function(name) {
-    idx <- col_idx[[name]]
-    if (is.null(idx)) {
+    idx <- match(name, col_names)
+    if (is.na(idx)) {
       return(rep.int(NA_character_, n_spec))
     }
     pos <- idx + 2L
     if (uniform_len && pos <= target_len) {
       return(mat_parts[pos, ])
     }
-    if (all(part_lens >= pos)) {
-      vapply(all_parts, `[[`, character(1L), pos)
-    } else {
-      out <- rep.int(NA_character_, n_spec)
-      ok <- which(part_lens >= pos)
-      if (length(ok) > 0L) {
-        out[ok] <- vapply(all_parts[ok], `[[`, character(1L), pos)
-      }
-      out
+    out <- rep.int(NA_character_, n_spec)
+    ok <- which(part_lens >= pos)
+    if (length(ok) > 0L) {
+      out[ok] <- vapply(all_parts[ok], `[[`, character(1L), pos)
     }
+    out
   }
 
   prec_mz_raw <- extract_col_vec("prec_mz")
@@ -897,16 +887,8 @@ read_mztab <- function(
     if (length(mismatch_len) > 0L) {
       for (idx_m in mismatch_len) {
         np <- n_peaks_vec[[idx_m]]
-        mz_sp[[idx_m]] <- if (np > 0L) {
-          mz_sp[[idx_m]][seq_len(np)]
-        } else {
-          character(0)
-        }
-        int_sp[[idx_m]] <- if (np > 0L) {
-          int_sp[[idx_m]][seq_len(np)]
-        } else {
-          character(0)
-        }
+        mz_sp[[idx_m]] <- mz_sp[[idx_m]][seq_len(np)]
+        int_sp[[idx_m]] <- int_sp[[idx_m]][seq_len(np)]
       }
     }
     has_peaks <- n_peaks_vec > 0L
@@ -968,6 +950,5 @@ read_mztab <- function(
     )
   }
 
-  out_lines <- unlist(out_entries, use.names = FALSE)
-  if (length(out_lines) == 0L) NULL else out_lines
+  unlist(out_entries, use.names = FALSE)
 }

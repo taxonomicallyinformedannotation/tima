@@ -159,11 +159,7 @@ decorate_bio <- function(
     biota = score_biological_biota
   )
   level_vals <- unlist(levels, use.names = FALSE)
-  min_level <- if (all(is.na(level_vals))) {
-    Inf
-  } else {
-    min(level_vals, na.rm = TRUE)
-  }
+  min_level <- min(level_vals, na.rm = TRUE)
 
   ik <- annot_table_wei_bio$candidate_structure_inchikey_connectivity_layer
   raw_sc <- annot_table_wei_bio$score_biological
@@ -178,11 +174,7 @@ decorate_bio <- function(
     sc_v <- score[valid_sc]
     ik_v <- ik[valid_sc]
     u_ik <- unique(ik_v)
-    ik_id <- if (anyNA(u_ik)) {
-      match(ik_v, u_ik)
-    } else {
-      fastmatch::fmatch(ik_v, u_ik)
-    }
+    ik_id <- fastmatch::fmatch(ik_v, u_ik)
     u_sc <- sort(unique(sc_v))
 
     if (length(u_sc) <= 64L) {
@@ -197,9 +189,6 @@ decorate_bio <- function(
       u_ik_counts_by_sc_id <- tabulate(max_sc_id_ik, nbins = length(u_sc))
 
       count_stats_at_level <- function(min_score, df) {
-        if (nrow(df) == 0L || is.na(min_score)) {
-          return(c(n_candidates = 0L, n_unique_structures = 0L))
-        }
         keep_sc <- u_sc >= min_score
         c(
           n_candidates = as.integer(sum(sc_counts[keep_sc])),
@@ -213,9 +202,6 @@ decorate_bio <- function(
       cum_unique <- cumsum(first_occurrence)
 
       count_stats_at_level <- function(min_score, df) {
-        if (nrow(df) == 0L || is.na(min_score)) {
-          return(c(n_candidates = 0L, n_unique_structures = 0L))
-        }
         n_candidates <- sum(score_sorted >= min_score)
         n_unique <- if (n_candidates == 0L) 0L else cum_unique[n_candidates]
         c(n_candidates = n_candidates, n_unique_structures = n_unique)

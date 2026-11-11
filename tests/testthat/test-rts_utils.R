@@ -69,4 +69,6 @@ test_that("normalize_rt_to_minutes: max > 180 triggers seconds detection", {
   x <- c(50, 100, 200)
   out <- normalize_rt_to_minutes(x, unit = "auto", quiet = TRUE)
   expect_equal(out, x / 60)
+  out_loud <- normalize_rt_to_minutes(x, unit = "seconds", quiet = FALSE)
+  expect_equal(out_loud, x / 60)
 })

@@ -123,4 +123,18 @@ test_that("run_app aborts when app file is missing", {
       )
     }
   )
+
+  # Direct helper coverage for build_shiny_app_dir and run_shiny_app
+  testthat::with_mocked_bindings(
+    shinyAppFile = function(appFile) paste0("built:", appFile),
+    runApp = function(appDir, port, host, launch.browser) {
+      list(appDir = appDir, port = port, host = host, lb = launch.browser)
+    },
+    .package = "shiny",
+    {
+      expect_identical(build_shiny_app_dir("app.R"), "built:app.R")
+      res_run <- run_shiny_app("app.R", 3838L, "127.0.0.1", TRUE)
+      expect_identical(res_run$port, 3838L)
+    }
+  )
 })

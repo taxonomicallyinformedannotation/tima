@@ -42,9 +42,6 @@ is_spectrum_sanitized <- function(spectrum, tolerance = 0.01, ppm = 10) {
       if (anyNA(mz) || anyNA(int)) {
         return(FALSE)
       }
-      if (any(is.nan(mz)) || any(is.nan(int))) {
-        return(FALSE)
-      }
 
       # Check sorted
       if (is.unsorted(mz, na.rm = FALSE)) {
@@ -116,22 +113,19 @@ sanitize_spectrum_matrix <- function(spectrum, tolerance = 0.01, ppm = 10) {
   mz <- mz[ord]
   int <- int[ord]
 
+  res <- cbind(mz = mz, intensity = int)
   if (
     is_spectrum_sanitized(
-      cbind(mz = mz, intensity = int),
+      res,
       tolerance = tolerance,
       ppm = ppm
     )
   ) {
-    return(cbind(mz = mz, intensity = int))
+    return(res)
   }
 
   # 3. Merge peaks within tolerance (greedy: merge consecutive close peaks)
   n <- length(mz)
-  if (n <= 1L) {
-    return(cbind(mz = mz, intensity = int))
-  }
-
   merged_mz <- numeric(n)
   merged_int <- numeric(n)
   k <- 1L

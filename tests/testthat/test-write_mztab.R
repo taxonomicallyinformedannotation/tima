@@ -2078,4 +2078,409 @@ test_that(".mztab_expand_summarized and .mztab_refresh_smf_sml_refs handle mixed
   )
   smf_out <- .mztab_refresh_smf_sml_refs(smf, sml)
   expect_identical(smf_out$SML_ID_REFS, c("10|11", "10", "12"))
+
+  # Edge cases in write_mztab, write_mztab_metadata, and mztab_schema_utils
+  td_edge <- withr::local_tempdir()
+  empty_res_path <- file.path(td_edge, "empty_res.tsv")
+  writeLines("feature_id\tfeature_mz\tfeature_rt", empty_res_path)
+  out_empty_mztab <- file.path(td_edge, "empty_out.mztab")
+  expect_no_error(
+    write_mztab(
+      input = empty_res_path,
+      output = out_empty_mztab,
+      polarity = "unrecognized_polarity",
+      publication = character(0),
+      software_version = ""
+    )
+  )
+  expect_true(file.exists(out_empty_mztab))
+
+  # Metadata builder with non-key/value existing_metadata, empty software_version,
+  # NULL catalog default, and xrefs_index when no existing database[n] is present
+  cat_orig <- .mztab_schema_catalog("")
+  cat_null_uri <- cat_orig
+  cat_null_uri$terms$metadata_defaults["uri[1]"] <- list(NULL)
+  cat_null_uri$terms$params$default_database <- NULL
+  meta_edge <- testthat::with_mocked_bindings(
+    .mztab_schema_catalog = function(...) cat_null_uri,
+    .mztab_build_metadata_table(
+      mztab_id = "id1",
+      title = "t1",
+      description = "d1",
+      software_version = "",
+      ms_run_location = "null",
+      ms_run_format = "null",
+      ms_run_id_format = "null",
+      polarity = NULL,
+      publication = NULL,
+      instrument = NULL,
+      sample_name = NULL,
+      contact = NULL,
+      xrefs_index = list(
+        ABCDEFGHIJKLMN = data.frame(
+          prefix = "chebi",
+          id = "123",
+          stringsAsFactors = FALSE
+        )
+      ),
+      sme_table = tidytable::tidytable(),
+      existing_metadata = tidytable::tidytable(other = "x")
+    )
+  )
+  expect_true(any(meta_edge$key == "database[2]-prefix"))
+
+  # .mztab_write_section with only feature_id (write_cols empty) and with numeric NA
+  con_sec <- rawConnection(raw(0), "r+")
+  on.exit(close(con_sec), add = TRUE)
+  .mztab_write_section(
+    con_sec,
+    "SFH",
+    "SMF",
+    tidytable::tidytable(feature_id = c("F1", "F2"))
+  )
+  .mztab_write_section(
+    con_sec,
+    "SFH",
+    "SMF",
+    tidytable::tidytable(feature_id = "F1", val_num = c(1.5, NA_real_))
+  )
+  sec_txt <- rawToChar(rawConnectionValue(con_sec))
+  expect_match(sec_txt, "null")
+
+  # mztab_schema_utils helper branches
+  expect_identical(.mztab_normalize_column_name(character(0)), character(0))
+  expect_null(.mztab_render_templates(NULL, list()))
+  expect_identical(
+    .mztab_render_templates("v={{missing_key}}", list()),
+    "v={{missing_key}}"
+  )
+  expect_identical(.mztab_render_templates(42L, list()), 42L)
+  expect_identical(
+    .mztab_default_cv_registry("")[[4L]]$version,
+    "unknown"
+  )
+  testthat::with_mocked_bindings(
+    .get_mztab_terms_path = function() "",
+    expect_true(is.list(.mztab_read_term_catalog("")))
+  )
+  tf_bad_yml <- withr::local_tempfile(fileext = ".yml")
+  writeLines("scalar_string_only", tf_bad_yml)
+  testthat::with_mocked_bindings(
+    .get_mztab_terms_path = function() tf_bad_yml,
+    expect_true(is.list(.mztab_read_term_catalog("")))
+  )
+  testthat::with_mocked_bindings(
+    read_yaml = function(...) stop("yaml parse error"),
+    .package = "yaml",
+    expect_true(is.list(.mztab_read_term_catalog("")))
+  )
+  tf_no_tima_cv <- withr::local_tempfile(fileext = ".yml")
+  yaml::write_yaml(
+    list(
+      cv_registry = list(
+        list(label = "MS", full_name = "Mass Spec", version = "1", uri = "u")
+      )
+    ),
+    tf_no_tima_cv
+  )
+  cat_no_tima <- testthat::with_mocked_bindings(
+    .get_mztab_terms_path = function() tf_no_tima_cv,
+    .mztab_read_term_catalog("")
+  )
+  expect_true(any(vapply(
+    cat_no_tima$cv_registry,
+    function(e) identical(e$label, "TIMA"),
+    logical(1)
+  )))
+
+  tf_empty_cv <- withr::local_tempfile(fileext = ".yml")
+  yaml::write_yaml(list(metadata = list(title = "T")), tf_empty_cv)
+  cat_empty_cv <- testthat::with_mocked_bindings(
+    .get_mztab_terms_path = function() tf_empty_cv,
+    .mztab_read_term_catalog("1.0")
+  )
+  expect_true(length(cat_empty_cv$cv_registry) >= 1L)
+
+  # write_mztab_merge edge cases
+  expect_equal(
+    nrow(.mztab_refresh_smf_sml_refs(
+      tidytable::tidytable(),
+      tidytable::tidytable(SML_ID = "1")
+    )),
+    0L
+  )
+  expect_equal(
+    nrow(.mztab_refresh_smf_sme_refs(
+      tidytable::tidytable(),
+      tidytable::tidytable(SME_ID = "1")
+    )),
+    0L
+  )
+  smf_no_match <- tidytable::tidytable(
+    SMF_ID = "1",
+    feature_id = "F_OTHER",
+    SME_ID_REFS = "null",
+    SME_ID_REF_ambiguity_code = "null"
+  )
+  sme_other <- tidytable::tidytable(
+    SME_ID = c("10", "11", "10"),
+    feature_id = c("F2", "F1", "F2"),
+    database_identifier = c("DB1", "DB2", "DB1"),
+    identification_method = c("M1", "M2", "M1")
+  )
+  expect_equal(
+    .mztab_refresh_smf_sme_refs(smf_no_match, sme_other)$SME_ID_REFS,
+    "null"
+  )
+  smf_unsorted_sme <- tidytable::tidytable(
+    SMF_ID = c("1", "2"),
+    feature_id = c("F1", "F2"),
+    SME_ID_REFS = c("null", "null"),
+    SME_ID_REF_ambiguity_code = c("null", "null")
+  )
+  sme_unsorted <- tidytable::tidytable(
+    SME_ID = c("10", "20", "10", "21"),
+    feature_id = c("F2", "F1", "F2", "F1"),
+    database_identifier = c("DB1", "DB2", "DB1", "DB3"),
+    identification_method = c("M1", "M2", "M1", "M2")
+  )
+  ref_unsorted <- .mztab_refresh_smf_sme_refs(smf_unsorted_sme, sme_unsorted)
+  expect_identical(ref_unsorted$SME_ID_REFS, c("20|21", "10"))
+  expect_identical(.mztab_remap_ref_ids(character(0), NULL), character(0))
+  expect_identical(
+    .mztab_remap_ref_ids(c("1|2", "null|null"), NULL),
+    c("1|2", "null")
+  )
+  expect_identical(
+    .mztab_score_to_reliability(numeric(0), character(0)),
+    integer(0)
+  )
+  expect_identical(
+    .mztab_score_to_reliability(c(0.85, 0.5), "gnps"),
+    c(1L, 2L)
+  )
+
+  # write_mztab_comments.R and write_mztab_tables.R edge cases
+  amb_min <- .mztab_build_ambiguity_comments(data.frame(feature_id = "F1"))
+  expect_length(amb_min, 2L)
+
+  tf_edges_many <- withr::local_tempfile(fileext = ".tsv")
+  writeLines(c("source\ttarget", "F1\tF2", "F2\tF3"), tf_edges_many)
+  com_edges <- .mztab_build_edges_comments(tf_edges_many, chunk_size = 0L)
+  expect_true(length(com_edges) >= 3L)
+
+  expect_equal(.mztab_metadata_to_json(tidytable::tidytable()), list())
+  json_only_fid <- .mztab_table_to_json_rows(
+    data.frame(feature_id = c("F1", "F2")),
+    drop_feature_id = TRUE
+  )
+  expect_length(json_only_fid, 2L)
+
+  tf_edges_empty <- withr::local_tempfile(fileext = ".tsv")
+  writeLines("source\ttarget", tf_edges_empty)
+  expect_equal(.mztab_edges_json_rows(tf_edges_empty), list())
+
+  expect_identical(
+    .mztab_library_to_identification_method(character(0)),
+    character(0)
+  )
+  expect_identical(.mztab_charge_from_adduct(character(0)), character(0))
+  chg_named <- .mztab_charge_from_adduct(c(x = "neutral_form"))
+  expect_identical(chg_named, c(x = "null"))
+
+  tf_xref <- withr::local_tempfile(fileext = ".tsv")
+  writeLines("inchikey\tprefix\tid", tf_xref)
+  expect_null(.mztab_build_xrefs_index(tf_xref))
+  testthat::with_mocked_bindings(
+    safe_fread = function(...) stop("xref read error"),
+    expect_null(.mztab_build_xrefs_index(tf_xref))
+  )
+  writeLines(c("colA\tcolB", "1\t2"), tf_xref)
+  expect_null(.mztab_build_xrefs_index(tf_xref))
+
+  expect_equal(
+    .mztab_resolve_xref_fields(character(0), list()),
+    list(uri = character(0), database_identifier = character(0))
+  )
+  expect_equal(
+    .mztab_resolve_xref_fields("LFQSCWFLJHTTHZ", NULL, fallback = NULL),
+    list(uri = "null", database_identifier = "null")
+  )
+  expect_equal(
+    .mztab_resolve_xref_fields(
+      c("null", ""),
+      list(LFQSCWFLJHTTHZ = data.frame(prefix = "chebi", id = "1")),
+      fallback = "fb"
+    ),
+    list(uri = c("null", "null"), database_identifier = c("null", "null"))
+  )
+  expect_equal(
+    .mztab_resolve_xref_fields(
+      "LFQSCWFLJHTTHZ",
+      list(
+        LFQSCWFLJHTTHZ = data.frame(
+          prefix = character(0),
+          id = character(0)
+        )
+      )
+    ),
+    list(uri = "null", database_identifier = "null")
+  )
+  expect_identical(
+    .mztab_pick_best_database_identifier(
+      data.frame(prefix = "unknown_pfx", id = "1", stringsAsFactors = FALSE),
+      fallback = ""
+    ),
+    "null"
+  )
+
+  # .mztab_expand_summarized with numeric, factor, single-row factor with pipe level, and mismatched lengths
+  df_sum_f <- data.frame(
+    feature_id = "F1",
+    score_num = 1.5,
+    candidate_f_plain = factor("a"),
+    candidate_f_pipe = factor("a", levels = c("a", "b|c")),
+    candidate_empty = "",
+    stringsAsFactors = FALSE
+  )
+  exp_1 <- .mztab_expand_summarized(df_sum_f)
+  expect_equal(nrow(exp_1), 1L)
+
+  df_sum_mis <- data.frame(
+    feature_id = "F1",
+    candidate_a = "1|2|3",
+    candidate_b = "x|y",
+    stringsAsFactors = FALSE
+  )
+  exp_mis <- .mztab_expand_summarized(df_sum_mis)
+  expect_equal(nrow(exp_mis), 3L)
+
+  # .mztab_build_smf edge cases
+  expect_equal(nrow(.mztab_build_smf(data.frame(feature_id = "null"))), 0L)
+  smf_dup_opt <- .mztab_build_smf(data.frame(
+    feature_id = "F1",
+    `feature_extra!` = "v1",
+    `feature_extra?` = "v2",
+    check.names = FALSE,
+    stringsAsFactors = FALSE
+  ))
+  expect_equal(smf_dup_opt$exp_mass_to_charge, "null")
+  expect_equal(smf_dup_opt$retention_time_in_seconds, "null")
+  expect_true("opt_global_feature_extra_2" %in% colnames(smf_dup_opt))
+
+  # .mztab_build_sme edge cases
+  sme_partial <- .mztab_build_sme(
+    data.frame(
+      feature_id = c("F1", "F2"),
+      score_final = c(0.8, NA_real_),
+      extra_col = c("", "val"),
+      stringsAsFactors = FALSE
+    ),
+    smf_dup_opt
+  )
+  expect_equal(nrow(sme_partial), 1L)
+
+  # .mztab_build_sml edge cases
+  expect_equal(
+    nrow(.mztab_build_sml(
+      data.frame(feature_id = "F1"),
+      smf_dup_opt,
+      tidytable::tidytable(feature_id = "null", SME_ID = "1")
+    )),
+    0L
+  )
+  sml_dup_sme <- .mztab_build_sml(
+    data.frame(
+      feature_id = "F1",
+      candidate_structure_exact_mass = "100.1",
+      stringsAsFactors = FALSE
+    ),
+    smf_dup_opt,
+    tidytable::tidytable(
+      SME_ID = c("1", "1", "2", "3"),
+      feature_id = c("F1", "F1", "F1", "null"),
+      database_identifier = c("D1", "D2", "D3", "D4"),
+      chemical_formula = c("C1", "C2", "C3", "C4"),
+      smiles = c("S1", "S2", "S3", "S4"),
+      inchi = c("", "I2", "I3", "I4"),
+      chemical_name = c("N1", "N2", "N3", "N4"),
+      uri = c("U1", "U2", "U3", "U4"),
+      adduct_ion = c("[M+H]+", "[M+H]+", "[M+Na]+", "[M+H]+"),
+      identification_method = rep("[, , GNPS, ]", 4L),
+      rank = c("1", "1", "2", "1"),
+      `id_confidence_measure[1]` = c("0.9", "0.8", "0.7", "0.5")
+    )
+  )
+  expect_equal(sml_dup_sme$SME_ID_REFS, "1|2")
+
+  # Remaining micro-helpers and schema/merge/comment edge cases
+  expect_identical(.mztab_opt_colname("!!!"), "opt_global_extra")
+
+  testthat::with_mocked_bindings(
+    .get_mztab_schema_path = function() "",
+    {
+      req_fb <- get_mztab_required_columns()
+      expect_true(length(req_fb$SML) > 0L)
+    }
+  )
+  tf_bad_schema <- withr::local_tempfile(fileext = ".yml")
+  writeLines("ok: 1", tf_bad_schema)
+  testthat::with_mocked_bindings(
+    .get_mztab_schema_path = function() tf_bad_schema,
+    .mztab_read_yaml = function(...) stop("yaml schema error"),
+    expect_null(.load_mztab_schema())
+  )
+  expect_identical(
+    .extract_schema_required(
+      list(components = list(schemas = list(S = list()))),
+      "S"
+    ),
+    character(0)
+  )
+
+  expect_identical(.mztab_union_ref_ids("null", ""), "null")
+  expect_identical(.mztab_remap_ref_ids("null", list()), "null")
+
+  expect_identical(.mztab_build_export_comments(data.frame()), character(0))
+  expect_identical(
+    .mztab_build_ambiguity_comments(data.frame(feature_id = "null")),
+    character(0)
+  )
+  df_amb_mv <- data.frame(
+    feature_id = "F1",
+    database_identifier = "D1|D2",
+    chemical_formula = "C1|C2",
+    smiles = "S1|S2",
+    inchi = "|I2",
+    chemical_name = "N1|N2",
+    uri = "U1|U2",
+    adduct_ions = "[M+H]+|[M+Na]+",
+    stringsAsFactors = FALSE
+  )
+  expect_length(.mztab_build_ambiguity_comments(df_amb_mv), 2L)
+  expect_identical(
+    .mztab_build_ambiguity_comments(df_amb_mv[, -1L, drop = FALSE]),
+    character(0)
+  )
+
+  expect_match(
+    .mztab_build_edges_comments(tf_edges_empty),
+    "edges_file present but empty"
+  )
+  tf_edges_quote <- withr::local_tempfile(fileext = ".tsv")
+  writeLines(c("source\tlabel", "F1\ta\"b"), tf_edges_quote)
+  expect_true(length(.mztab_build_edges_comments(tf_edges_quote)) >= 2L)
+
+  expect_identical(
+    .mztab_pick_best_uri(data.frame(prefix = "unknown_pfx", id = "1")),
+    "null"
+  )
+  expect_identical(
+    .mztab_pick_best_database_identifier(NULL, fallback = ""),
+    "null"
+  )
+  expect_identical(
+    .mztab_pick_best_database_identifier(NULL, fallback = "CHEMBL1"),
+    "CHEMBL1"
+  )
 })

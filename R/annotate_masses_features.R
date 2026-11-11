@@ -165,34 +165,13 @@ load_structural_library <- function(
       for (col in new_cols) {
         data.table::set(joined, j = col, value = st[[col]][m_idx])
       }
-    } else if (
-      length(by_cols) == 2L &&
-        anyDuplicated(st[[by_cols[[1L]]]]) == 0L &&
-        !anyNA(st[[by_cols[[1L]]]])
-    ) {
-      k1 <- by_cols[[1L]]
-      k2 <- by_cols[[2L]]
-      m_idx <- fastmatch::fmatch(joined[[k1]], st[[k1]])
-      v1 <- joined[[k2]]
-      v2 <- st[[k2]][m_idx]
-      ok_k2 <- !is.na(m_idx) &
-        ((is.na(v1) & is.na(v2)) | (!is.na(v1) & !is.na(v2) & v1 == v2))
-      m_idx[!ok_k2] <- NA_integer_
-      new_cols <- setdiff(names(st), by_cols)
-      for (col in new_cols) {
-        data.table::set(joined, j = col, value = st[[col]][m_idx])
-      }
     } else if (length(by_cols) > 0L) {
       joined <- tidytable::left_join(joined, st, by = by_cols)
     }
   }
   rm(library_table, supp_tables)
 
-  if (anyNA(joined$structure_exact_mass)) {
-    structures <- joined[!is.na(joined$structure_exact_mass), ]
-  } else {
-    structures <- joined
-  }
+  structures <- joined[!is.na(joined$structure_exact_mass), ]
   rm(joined)
   em_col <- structures$structure_exact_mass
   if (!is.numeric(em_col)) {
@@ -268,14 +247,10 @@ log_adduct_breakdown <- function(annotations) {
     u_a <- unique(a_m)
     u_f <- unique(f_m)
     a_id <- fastmatch::fmatch(a_m, u_a)
-    f_id <- if (anyNA(u_f)) match(f_m, u_f) else fastmatch::fmatch(f_m, u_f)
+    f_id <- fastmatch::fmatch(f_m, u_f)
     n_a <- length(u_a)
     n_ann_v <- tabulate(a_id, nbins = n_a)
-    fa_key <- if (as.double(length(u_f)) * n_a < .Machine$integer.max) {
-      (f_id - 1L) * n_a + a_id
-    } else {
-      as.double(f_id - 1L) * n_a + a_id
-    }
+    fa_key <- as.double(f_id - 1L) * n_a + a_id
     n_feat_v <- tabulate(a_id[!duplicated(fa_key)], nbins = n_a)
     adduct_bd <- tidytable::tidytable(
       adduct = u_a,

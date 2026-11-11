@@ -544,13 +544,9 @@ calculate_formula_mass <- function(x) {
         els <- sbstr[sl]
         cnts <- as.integer(sbstr[n + sl])
         masses <- ISOTOPE_MONOISOTOPIC_MASS[els]
-        if (anyNA(masses)) {
-          u_mass[[idx_u]] <- NA_real_
-        } else {
-          val <- sum(cnts * masses)
-          u_mass[[idx_u]] <- val
-          .FORMULA_MASS_CACHE[[xx]] <- val
-        }
+        val <- sum(cnts * masses)
+        u_mass[[idx_u]] <- val
+        .FORMULA_MASS_CACHE[[xx]] <- val
         u_valid[[idx_u]] <- TRUE
       }
     }

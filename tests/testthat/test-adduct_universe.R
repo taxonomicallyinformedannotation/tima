@@ -337,4 +337,14 @@ test_that("formula token validation and legacy universe edge cases return expect
   expect_identical(NULL %||% "fallback", "fallback")
   expect_identical(character(0) %||% "fallback", "fallback")
   expect_identical("present" %||% "fallback", "present")
+
+  # Formula and carrier helper edge cases
+  expect_identical(parse_atomic_formula(""), integer())
+  expect_identical(formula_mass(integer()), 0)
+  expect_null(parse_carrier_token(NULL))
+  expect_null(parse_carrier_token(""))
+  expect_null(parse_carrier_token("UnknownCarrier"))
+  expect_true(is.na(carrier_token_mass(NULL)))
+  expect_true(is.na(carrier_token_mass(list(symbols = c(UnknownEl = 1L)))))
+  expect_identical(.format_neutrals(c(H2O = 0L), "+"), "")
 })

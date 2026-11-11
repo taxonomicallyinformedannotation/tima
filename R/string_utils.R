@@ -44,24 +44,12 @@ stri_detect_token <- function(str, pattern, separator = " $ ") {
   s_id <- fastmatch::fmatch(sv_rem, u_s)
   p_id <- fastmatch::fmatch(pv_rem, u_p)
   can_match <- which(s_has_sep[s_id] | p_has_sep[p_id])
-  if (length(can_match) == 0L) {
-    return(out)
-  }
 
   s_sub <- s_id[can_match]
   p_sub <- p_id[can_match]
   n_up <- length(u_p)
-  use_int <- as.double(length(u_s)) * n_up < .Machine$integer.max
-  sp_key <- if (use_int) {
-    (s_sub - 1L) * n_up + p_sub
-  } else {
-    as.double(s_sub - 1L) * n_up + p_sub
-  }
-  u_sp_idx <- if (use_int) {
-    which(!duplicated(sp_key))
-  } else {
-    which(fastmatch::fmatch(sp_key, sp_key) == seq_along(sp_key))
-  }
+  sp_key <- as.double(s_sub - 1L) * n_up + p_sub
+  u_sp_idx <- which(!duplicated(sp_key))
   sp_grp <- fastmatch::fmatch(sp_key, sp_key[u_sp_idx])
 
   u_s_used <- unique(s_sub[u_sp_idx])

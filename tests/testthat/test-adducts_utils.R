@@ -70,4 +70,13 @@ test_that("calculate_formula_mass memoizes repeated formulas and warns per inval
   expect_equal(w_env$cnt, 2L)
   expect_true(!is.na(bad_res[[1L]]))
   expect_true(all(is.na(bad_res[2:3])))
+
+  expect_identical(canonicalize_adducts_vectorized(character(0)), character(0))
+  expect_identical(
+    canonicalize_adducts_vectorized(c(NA_character_, NA_character_)),
+    c(NA_character_, NA_character_)
+  )
+  expect_identical(canonicalize_adducts_vectorized(""), "")
+  expect_true(is.na(calculate_formula_mass(NA_character_)))
+  expect_warning(expect_true(is.na(calculate_formula_mass(""))))
 })

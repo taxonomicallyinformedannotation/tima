@@ -79,13 +79,7 @@ complement_metadata_structures <- function(
   sf <- refs$stereo_full
   rows_cl <- .query_csr_index(refs$cl_csr, keys$inchikey)
   rows_sm <- .query_csr_index(refs$sm_csr, keys$smiles)
-  idx_keep <- if (length(rows_cl) == 0L) {
-    if (length(rows_sm) > 1L) sort(unique(rows_sm)) else rows_sm
-  } else if (length(rows_sm) == 0L) {
-    if (length(rows_cl) > 1L) sort(unique(rows_cl)) else rows_cl
-  } else {
-    sort(unique(c(rows_cl, rows_sm)))
-  }
+  idx_keep <- sort(unique(c(rows_cl, rows_sm)))
   log_debug("Stereo loaded: %d rows after filtering", length(idx_keep))
 
   ik_keep <- sf$structure_inchikey[idx_keep]
@@ -571,93 +565,6 @@ complement_metadata_structures <- function(
   has_s <- "candidate_structure_smiles_no_stereo" %in%
     names(df) &&
     nrow(stereo_s) > 0L
-
-  if (has_ic && has_s) {
-    ic_to_s <- fastmatch::fmatch(
-      stereo_i_conn$candidate_structure_smiles_no_stereo_ic,
-      stereo_s$candidate_structure_smiles_no_stereo
-    )
-    ic_conn_final <- stereo_s$candidate_structure_inchikey_connectivity_layer_s[
-      ic_to_s
-    ]
-    na_ic_conn <- is.na(ic_conn_final)
-    if (any(na_ic_conn)) {
-      ic_conn_final[na_ic_conn] <-
-        stereo_i_conn$candidate_structure_inchikey_connectivity_layer[
-          na_ic_conn
-        ]
-    }
-    ic_ns_final <- stereo_s$candidate_structure_inchikey_no_stereo_s[ic_to_s]
-    na_ic_ns <- is.na(ic_ns_final)
-    if (any(na_ic_ns)) {
-      ic_ns_final[na_ic_ns] <-
-        stereo_i_conn$candidate_structure_inchikey_no_stereo_ic[na_ic_ns]
-    }
-
-    idx <- fastmatch::fmatch(
-      df$candidate_structure_inchikey_connectivity_layer,
-      stereo_i_conn$candidate_structure_inchikey_connectivity_layer
-    )
-    mapped_smiles <- stereo_i_conn$candidate_structure_smiles_no_stereo_ic[idx]
-    mapped_conn <- ic_conn_final[idx]
-    mapped_inchikey <- ic_ns_final[idx]
-
-    miss_smiles <- is.na(mapped_smiles)
-    if (any(miss_smiles)) {
-      miss_pos <- which(miss_smiles)
-      orig_sm <- df$candidate_structure_smiles_no_stereo[miss_pos]
-      mapped_smiles[miss_pos] <- orig_sm
-
-      s_idx <- fastmatch::fmatch(
-        orig_sm,
-        stereo_s$candidate_structure_smiles_no_stereo
-      )
-      s_conn <- stereo_s$candidate_structure_inchikey_connectivity_layer_s[
-        s_idx
-      ]
-      s_ns <- stereo_s$candidate_structure_inchikey_no_stereo_s[s_idx]
-
-      na_sc <- is.na(s_conn)
-      if (any(na_sc)) {
-        s_conn[na_sc] <- df$candidate_structure_inchikey_connectivity_layer[
-          miss_pos[na_sc]
-        ]
-      }
-      ic_ns_fallback <- stereo_i_conn$candidate_structure_inchikey_no_stereo_ic[
-        idx[miss_pos]
-      ]
-      na_ic_fb <- is.na(ic_ns_fallback)
-      if (any(na_ic_fb)) {
-        ic_ns_fallback[na_ic_fb] <- df$candidate_structure_inchikey_no_stereo[
-          miss_pos[na_ic_fb]
-        ]
-      }
-      na_sns <- is.na(s_ns)
-      if (any(na_sns)) {
-        s_ns[na_sns] <- ic_ns_fallback[na_sns]
-      }
-      mapped_conn[miss_pos] <- s_conn
-      mapped_inchikey[miss_pos] <- s_ns
-    }
-
-    miss_conn <- is.na(mapped_conn)
-    if (any(miss_conn)) {
-      mapped_conn[
-        miss_conn
-      ] <- df$candidate_structure_inchikey_connectivity_layer[miss_conn]
-    }
-    miss_inchikey <- is.na(mapped_inchikey)
-    if (any(miss_inchikey)) {
-      mapped_inchikey[
-        miss_inchikey
-      ] <- df$candidate_structure_inchikey_no_stereo[miss_inchikey]
-    }
-
-    df$candidate_structure_smiles_no_stereo <- mapped_smiles
-    df$candidate_structure_inchikey_connectivity_layer <- mapped_conn
-    df$candidate_structure_inchikey_no_stereo <- mapped_inchikey
-    return(df)
-  }
 
   if (has_ic) {
     idx <- fastmatch::fmatch(
@@ -1259,17 +1166,8 @@ complement_metadata_structures <- function(
   u_dv <- unique(dedup_val)
   dv_id <- fastmatch::fmatch(dedup_val, u_dv)
   n_dv <- length(u_dv)
-  use_int_gv <- as.double(n_grp) * n_dv < .Machine$integer.max
-  gv_key <- if (use_int_gv) {
-    (g_ok - 1L) * n_dv + dv_id
-  } else {
-    as.double(g_ok - 1L) * n_dv + dv_id
-  }
-  keep <- if (use_int_gv) {
-    !duplicated(gv_key)
-  } else {
-    fastmatch::fmatch(gv_key, gv_key) == seq_along(gv_key)
-  }
+  gv_key <- as.double(g_ok - 1L) * n_dv + dv_id
+  keep <- !duplicated(gv_key)
   g_ok <- g_ok[keep]
   v_trim <- v_trim[keep]
 

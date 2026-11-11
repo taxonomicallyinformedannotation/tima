@@ -677,4 +677,38 @@ test_that("read_mgf_metadata reads every block's fields", {
   meta <- read_mgf_metadata(mgf)
   expect_equal(meta$TITLE, c("a", "b"))
   expect_equal(meta$RTINSECONDS, c("1", NA))
+
+  # Predicted MGF as list, missing rt/smiles columns, and unparseable SMILES without InChIKey
+  mgf_is_file <- file.path(tempdir(), "is_rt.mgf")
+  writeLines(
+    c(
+      "BEGIN IONS",
+      "RTINSECONDS=120",
+      "SMILES=invalid_smiles_xyz",
+      "END IONS"
+    ),
+    mgf_is_file
+  )
+  csv_no_rt <- file.path(tempdir(), "no_rt_col.csv")
+  writeLines("other_col\n1", csv_no_rt)
+  out_rt_edge <- file.path(tempdir(), "rt_edge.tsv")
+  out_sop_edge <- file.path(tempdir(), "sop_edge.tsv")
+  res_edge <- prepare_libraries_rt(
+    mgf_exp = NULL,
+    mgf_is = list(mgf_is_file),
+    temp_exp = list(csv_no_rt),
+    temp_is = NULL,
+    col_ik = "INCHIKEY",
+    col_na = "NAME",
+    col_rt = "rtime",
+    col_sm = "smiles",
+    unit_rt = "minutes",
+    name_rt = "rt",
+    name_inchikey = "inchikey",
+    name_smiles = "smiles",
+    name_name = "structure_name",
+    output_rt = out_rt_edge,
+    output_sop = out_sop_edge
+  )
+  expect_true(file.exists(res_edge["rt"]))
 })

@@ -49,11 +49,6 @@ export_output <- function(x, file) {
     "none"
   }
 
-  # Warn for large datasets
-  if (nrows > 100000L) {
-    log_debug("Large dataset - export may take time")
-  }
-
   ctx <- log_operation("export_output", file = file, n_rows = nrows)
 
   tryCatch(

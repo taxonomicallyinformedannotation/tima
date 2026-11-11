@@ -285,4 +285,15 @@ test_that("expand_combined_scores_for_filtering does not mutate wide_bio_table i
   expanded <- expand_combined_scores_for_filtering(comb, bio, chemo)
   expect_identical(names(bio), orig_bio_names)
   expect_equal(expanded$score_weighted_chemo, comb$score_final)
+
+  # .has_unique_feature_ik with pre-tagged attribute and NA keys, plus extract_bio_scores attribute propagation
+  tagged_bio <- bio
+  attr(tagged_bio, ".unique_feature_ik") <- TRUE
+  expect_true(.has_unique_feature_ik(tagged_bio))
+  ext_tagged <- extract_bio_scores(tagged_bio)
+  expect_true(isTRUE(attr(ext_tagged, ".unique_feature_ik")))
+
+  na_bio <- bio
+  na_bio$feature_id[[1L]] <- NA_character_
+  expect_false(.has_unique_feature_ik(na_bio))
 })

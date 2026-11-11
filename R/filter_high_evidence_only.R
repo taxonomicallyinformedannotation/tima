@@ -298,9 +298,11 @@ filter_high_evidence_only <- function(
 
   # SIRIUS confidence and spectral similarity filtering
   # ALWAYS filter out spectral similarity = 0 (invalid MS2 data) if column exists
-  csim <- .num_col("candidate_similarity")
-  if (!is.null(csim)) {
-    keep <- keep & (is.na(csim) | csim > 0)
+  for (sim_col in c("candidate_score_similarity", "candidate_similarity")) {
+    csim <- .num_col(sim_col)
+    if (!is.null(csim)) {
+      keep <- keep & (is.na(csim) | csim > 0)
+    }
   }
 
   # Apply threshold filters with OR logic if set
@@ -354,11 +356,7 @@ filter_high_evidence_only <- function(
         rk_col == 1L &
         df_src$feature_id == df_src$cluster_consensus_anchor_feature_id
     )
-    passing_groups <- if (length(anchor_all_idx) > 0L) {
-      unique(grp_col[anchor_all_idx[keep[anchor_all_idx]]])
-    } else {
-      character(0L)
-    }
+    passing_groups <- unique(grp_col[anchor_all_idx[keep[anchor_all_idx]]])
     prom_pass <- !is.na(fastmatch::fmatch(grp_col[prom_idx], passing_groups))
     keep_child_row_ids <- prom_idx[prom_pass]
     drop_child_row_ids <- prom_idx[!prom_pass]

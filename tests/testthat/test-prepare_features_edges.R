@@ -471,4 +471,48 @@ test_that("prepare_features_edges merges shared (source, target) edges and retai
     output_data$feature_source == "FT004" &
       output_data$feature_target == "FT004"
   ))
+
+  # Edge cases: read error, no entropy columns in spectral edges, and duplicate edges_ms2 rows triggering full_join fallback
+  expect_error(
+    testthat::with_mocked_bindings(
+      safe_fread = function(...) stop("simulated edge read error"),
+      prepare_features_edges(
+        input = list("ms1" = temp_ms1, "spectral" = temp_spectral),
+        output = temp_output,
+        name_source = "ID1",
+        name_target = "ID2"
+      )
+    ),
+    regexp = "failed to read edge files",
+    class = "tima_runtime_error"
+  )
+
+  # Spectral edges without ID1/entropy columns -> features_entropy is empty -> full_join fallback
+  temp_spec_no_ent <- withr::local_tempfile(fileext = ".tsv")
+  writeLines("OtherCol\tID2\nX1\tFT002", temp_spec_no_ent)
+  out_no_ent <- withr::local_tempfile(fileext = ".tsv")
+  expect_no_error(
+    prepare_features_edges(
+      input = list("ms1" = temp_ms1, "spectral" = temp_spec_no_ent),
+      output = out_no_ent,
+      name_source = "ID1",
+      name_target = "ID2"
+    )
+  )
+
+  # Duplicate (ID1, ID2) with differing and identical entropy in spectral edges -> triggers full_join fallbacks
+  temp_spec_dup <- withr::local_tempfile(fileext = ".tsv")
+  writeLines(
+    "ID1\tID2\tfeature_spectrum_entropy\tCosine\nFT001\tFT002\t0.5\t0.9\nFT001\tFT002\t0.6\t0.8\nFT001\tFT002\t0.6\t0.7",
+    temp_spec_dup
+  )
+  out_dup <- withr::local_tempfile(fileext = ".tsv")
+  expect_no_error(
+    prepare_features_edges(
+      input = list("ms1" = temp_ms1, "spectral" = temp_spec_dup),
+      output = out_dup,
+      name_source = "ID1",
+      name_target = "ID2"
+    )
+  )
 })

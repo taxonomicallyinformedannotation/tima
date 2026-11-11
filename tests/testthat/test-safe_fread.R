@@ -130,4 +130,10 @@ test_that("safe_fread reads .gz files and nrows=0 headers without R.utils", {
   expect_equal(nrow(full), 2L)
   expect_equal(names(full), c("col1", "col2"))
   expect_equal(as.character(full$col2), c("a", "b"))
+
+  tf_empty <- tempfile(fileext = ".tsv.gz")
+  on.exit(unlink(tf_empty), add = TRUE)
+  con_e <- gzfile(tf_empty, open = "wt")
+  close(con_e)
+  expect_equal(nrow(safe_fread(file = tf_empty, nrows = 0L)), 0L)
 })

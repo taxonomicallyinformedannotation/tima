@@ -474,4 +474,58 @@ test_that("create_edges_spectra uses precursor_mz metadata when present", {
 
   expect_identical(out, output_file)
   expect_true(file.exists(output_file))
+
+  # Parameter validations and empty-name / community-cut edge cases
+  expect_error(
+    create_edges_spectra(
+      input = spec_rds,
+      output = output_file,
+      resolution = 0
+    ),
+    class = "tima_validation_error"
+  )
+  expect_error(
+    create_edges_spectra(
+      input = spec_rds,
+      output = output_file,
+      n_iterations = 0L
+    ),
+    class = "tima_validation_error"
+  )
+  expect_error(
+    create_edges_spectra(
+      input = spec_rds,
+      output = output_file,
+      seed = NA_real_
+    ),
+    class = "tima_validation_error"
+  )
+
+  out_empty_cut <- withr::local_tempfile(fileext = ".tsv")
+  testthat::with_mocked_bindings(
+    .prune_intra_community_edges = function(edges, ...) edges[0L, ],
+    create_edges_spectra(
+      input = spec_rds,
+      output = out_empty_cut,
+      name_source = "",
+      name_target = "",
+      method = "cosine",
+      ppm = 10,
+      dalton = 0.01,
+      cutoff = 0,
+      min_fragments = 1L
+    )
+  )
+  cut_df <- tidytable::fread(out_empty_cut)
+  expect_true(all(c("source", "target") %in% names(cut_df)))
+  expect_equal(nrow(cut_df), 2L)
+
+  out_ms1_skip <- withr::local_tempfile(fileext = ".tsv")
+  testthat::with_mocked_bindings(
+    import_spectra = function(...) structure(list(), tima_ms1_skipped = 2L),
+    expect_warning(
+      create_edges_spectra(input = spec_rds, output = out_ms1_skip),
+      class = "tima_ms1_skipped_warning"
+    )
+  )
 })

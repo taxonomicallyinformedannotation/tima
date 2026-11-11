@@ -336,4 +336,76 @@ test_that("mztab reference integrity validates single-ref SMF ambiguity code and
     regexp = "SME_ID_REF_ambiguity_code",
     class = "tima_validation_error"
   )
+
+  # Additional edge cases in mztab_validate.R
+  tbl_or_empty <- get(".mztab_table_or_empty", envir = asNamespace("tima"))
+  expect_equal(nrow(tbl_or_empty(NULL)), 0L)
+  expect_equal(nrow(tbl_or_empty(list(a = 1:2))), 2L)
+  expect_equal(nrow(tbl_or_empty(123)), 0L)
+
+  get_meta <- get(".mztab_get_metadata_value", envir = asNamespace("tima"))
+  expect_true(is.na(get_meta(tidytable::tidytable(), "mzTab-version")))
+
+  val_sem <- get(
+    ".mztab_validate_metadata_semantics",
+    envir = asNamespace("tima")
+  )
+  expect_error(
+    val_sem(
+      tidytable::tidytable(key = "mzTab-version", value = "1.0.0-M"),
+      strict = TRUE
+    ),
+    regexp = "Unsupported mzTab-version",
+    class = "tima_validation_error"
+  )
+
+  val_cv <- get(".mztab_validate_cv_registry", envir = asNamespace("tima"))
+  expect_invisible(val_cv(tidytable::tidytable(other = "x"), strict = TRUE))
+
+  expect_identical(miss(character(0), "1"), character(0))
+  expect_identical(miss(c("|", ","), "1"), character(0))
+
+  # Strict errors on SML unknown SME_ID_REFS and SMF unknown SME_ID_REFS, and non-strict SML pipe mismatch warning
+  expect_error(
+    fn(
+      list(
+        sml = tidytable::tidytable(SME_ID_REFS = "999"),
+        smf = tidytable::tidytable(),
+        sme = tidytable::tidytable(SME_ID = "1")
+      ),
+      strict = TRUE
+    ),
+    regexp = "SML references unknown SME_ID",
+    class = "tima_validation_error"
+  )
+  expect_error(
+    fn(
+      list(
+        sml = tidytable::tidytable(),
+        smf = tidytable::tidytable(SME_ID_REFS = "999"),
+        sme = tidytable::tidytable(SME_ID = "1")
+      ),
+      strict = TRUE
+    ),
+    regexp = "SMF references unknown SME_ID",
+    class = "tima_validation_error"
+  )
+  expect_no_error(
+    fn(
+      list(
+        sml = tidytable::tidytable(
+          database_identifier = "A|B",
+          chemical_formula = "C1",
+          smiles = "C|CC",
+          inchi = "null|null",
+          chemical_name = "a|b",
+          uri = "u1|u2",
+          adduct_ions = "[M+H]+|[M+Na]+"
+        ),
+        smf = tidytable::tidytable(),
+        sme = tidytable::tidytable()
+      ),
+      strict = FALSE
+    )
+  )
 })

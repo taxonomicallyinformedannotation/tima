@@ -429,4 +429,28 @@ test_that(".fast_median_no_na, .compute_dynamic_thresholds, and .has_nan_values 
     intensity = c(1, 2)
   )))
   expect_true(.has_nan_values(pm_mixed))
+  expect_equal(
+    nrow(.strip_nan_peak_rows(cbind(
+      mz = c(100, NA_real_),
+      intensity = c(1, 2)
+    ))),
+    2L
+  )
+
+  # sanitize_spectra triggers low-noise removal log when >= 10 peaks have duplicated baseline intensity
+  sp_df_noise <- S4Vectors::DataFrame(
+    msLevel = 2L,
+    precursorMz = 200.0
+  )
+  sp_df_noise$mz <- IRanges::NumericList(seq(50, 140, by = 10))
+  sp_df_noise$intensity <- IRanges::NumericList(c(rep(1, 8), 50, 100))
+  sp_noise_obj <- Spectra::Spectra(sp_df_noise)
+  res_noise <- sanitize_spectra(
+    sp_noise_obj,
+    cutoff = 0,
+    dalton = 0.01,
+    ppm = 10,
+    min_fragments = 1L
+  )
+  expect_equal(length(res_noise), 1L)
 })

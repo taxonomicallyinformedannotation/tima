@@ -75,12 +75,7 @@
   }
 
   # Compute number of output rows per input row (elementwise max across cols)
-  n_vals_per_row <- if (length(lengths_list) == 1L) {
-    pmax(lengths_list[[1L]], 1L)
-  } else {
-    do.call(pmax, c(lengths_list, list(1L)))
-  }
-  n_vals_per_row[n_vals_per_row < 1L] <- 1L
+  n_vals_per_row <- do.call(pmax, c(lengths_list, list(1L)))
 
   row_idx <- rep.int(seq_len(n_rows), n_vals_per_row)
   first_in_row <- if (length(row_idx) > 1L) {
@@ -191,14 +186,10 @@
   )
 
   for (col in extra_feat_cols) {
-    if (col %in% colnames(first_rows)) {
-      val <- as.character(first_rows[[col]])
-      val[
-        is.na(val) | !nzchar(val) | val == "NA" | val == "null" | val == "NULL"
-      ] <- "null"
-    } else {
-      val <- rep("null", length(feature_ids))
-    }
+    val <- as.character(first_rows[[col]])
+    val[
+      is.na(val) | !nzchar(val) | val == "NA" | val == "null" | val == "NULL"
+    ] <- "null"
 
     base_name <- .mztab_opt_colname(col)
     out_name <- base_name
@@ -324,9 +315,6 @@
     }
 
     x <- if (is.character(x)) x else as.character(x)
-    if (length(x) != n) {
-      x <- rep(x, length.out = n)
-    }
     bad <- is.na(x) | !nzchar(x)
     if (any(bad)) {
       x[bad] <- "null"
@@ -353,19 +341,8 @@
     em_id <- fastmatch::fmatch(em_v, u_em)
     ad_id <- fastmatch::fmatch(ad_v, u_ad)
     n_u_ad <- length(u_ad)
-    use_int_pair <- as.double(length(u_em)) * n_u_ad < .Machine$integer.max
-    pair_key <- if (use_int_pair) {
-      (em_id - 1L) * n_u_ad + ad_id
-    } else {
-      as.double(em_id - 1L) * n_u_ad + ad_id
-    }
-    first_p <- which(
-      if (use_int_pair) {
-        !duplicated(pair_key)
-      } else {
-        fastmatch::fmatch(pair_key, pair_key) == seq_along(pair_key)
-      }
-    )
+    pair_key <- as.double(em_id - 1L) * n_u_ad + ad_id
+    first_p <- which(!duplicated(pair_key))
     u_keys <- pair_key[first_p]
     u_theo <- calculate_mz_from_mass_batch(
       neutral_masses = em_v[first_p],
@@ -820,17 +797,8 @@
         u_sv <- unique(s_val)
         sv_id <- fastmatch::fmatch(s_val, u_sv)
         n_u_sv <- length(u_sv)
-        use_int_sv <- as.double(n_fids) * n_u_sv < .Machine$integer.max
-        sv_key <- if (use_int_sv) {
-          (s_fid - 1L) * n_u_sv + sv_id
-        } else {
-          as.double(s_fid - 1L) * n_u_sv + sv_id
-        }
-        keep_s <- if (use_int_sv) {
-          !duplicated(sv_key)
-        } else {
-          fastmatch::fmatch(sv_key, sv_key) == seq_along(sv_key)
-        }
+        sv_key <- as.double(s_fid - 1L) * n_u_sv + sv_id
+        keep_s <- !duplicated(sv_key)
         s_fid <- s_fid[keep_s]
         s_val <- s_val[keep_s]
         n_s <- length(s_fid)

@@ -147,23 +147,19 @@
     "adduct_ions"
   )
 
-  if (!all(aligned_cols %in% colnames(results))) {
-    candidate_counts <- counts
-  } else {
-    norm <- function(x) {
-      x <- as.character(x)
-      x[is.na(x) | !nzchar(x)] <- "null"
-      x
-    }
-    cols_norm <- lapply(
-      aligned_cols,
-      function(col) norm(results[[col]][valid_fid_mask])
-    )
-    tuple_key <- do.call(paste, c(cols_norm, list(sep = "||")))
-    comb_key <- paste(fid_idx, tuple_key, sep = "\r")
-    keep_unique <- !duplicated(comb_key)
-    candidate_counts <- tabulate(fid_idx[keep_unique], nbins = length(u_fids))
+  norm <- function(x) {
+    x <- as.character(x)
+    x[is.na(x) | !nzchar(x)] <- "null"
+    x
   }
+  cols_norm <- lapply(
+    aligned_cols,
+    function(col) norm(results[[col]][valid_fid_mask])
+  )
+  tuple_key <- do.call(paste, c(cols_norm, list(sep = "||")))
+  comb_key <- paste(fid_idx, tuple_key, sep = "\r")
+  keep_unique <- !duplicated(comb_key)
+  candidate_counts <- tabulate(fid_idx[keep_unique], nbins = length(u_fids))
 
   bins <- c(
     `1` = sum(counts == 1L),
@@ -184,21 +180,13 @@
       "; 3+-candidate=",
       unname(bins[["3+"]]),
       "; max-candidate=",
-      if (length(candidate_counts) > 0L) {
-        max(candidate_counts, na.rm = TRUE)
-      } else {
-        0L
-      }
+      max(candidate_counts, na.rm = TRUE)
     ),
     paste0(
       "COM\tTIMA ambiguity\taligned_fields=",
       paste(aligned_cols, collapse = "|"),
       "; cardinality_verified=",
-      if (length(candidate_counts) > 0L) {
-        all(candidate_counts %in% c(1L, 2L, 3L, 4L, 5L, 6L, 7L))
-      } else {
-        TRUE
-      }
+      all(candidate_counts %in% c(1L, 2L, 3L, 4L, 5L, 6L, 7L))
     )
   )
 }
@@ -498,9 +486,6 @@
         return("null")
       }
       mag <- if (nzchar(reg[[2L]])) as.integer(reg[[2L]]) else 1L
-      if (is.na(mag)) {
-        mag <- 1L
-      }
       sign <- if (identical(reg[[3L]], "-")) -1L else 1L
       as.character(sign * mag)
     },
@@ -776,16 +761,6 @@
     }
   }
 
-  # Fallback: any available prefix
-  if (nrow(rows) > 0L) {
-    pfx <- rows$prefix[[1L]]
-    id <- rows$id[[1L]]
-    info <- .XREF_KNOWN_PREFIXES[[pfx]]
-    if (!is.null(info)) {
-      return(paste0(info$uri, id))
-    }
-  }
-
   "null"
 }
 
@@ -799,10 +774,7 @@
 #' @return Single database_identifier string.
 #' @keywords internal
 .mztab_pick_best_database_identifier <- function(rows, fallback = "null") {
-  if (is.null(rows) || nrow(rows) == 0L) {
-    fb <- as.character(fallback)[[1L]]
-    if (is.na(fb) || !nzchar(fb)) "null" else fb
-  } else {
+  if (!is.null(rows) && nrow(rows) > 0L) {
     # wikidata reserved for URIs; used only as a last resort for the
     # database_identifier field (matches original ordering: last).
     priority_prefixes <- c(
@@ -823,32 +795,10 @@
         }
       }
     }
-
-    # Fallback to first available mapped prefix:id.
-    # Find first valid entry instead of looping
-    pfx_vec <- as.character(rows$prefix)
-    id_vec <- as.character(rows$id)
-
-    # Find indices of valid entries
-    valid_idx <- which(
-      !is.na(id_vec) &
-        nzchar(id_vec) &
-        !vapply(
-          pfx_vec,
-          function(p) is.null(.XREF_KNOWN_PREFIXES[[p]]),
-          logical(1L)
-        )
-    )
-
-    if (length(valid_idx) > 0L) {
-      i <- valid_idx[[1L]]
-      info <- .XREF_KNOWN_PREFIXES[[pfx_vec[[i]]]]
-      return(paste0(info$prefix, ":", id_vec[[i]]))
-    }
-
-    fb <- as.character(fallback)[[1L]]
-    if (is.na(fb) || !nzchar(fb)) "null" else fb
   }
+
+  fb <- as.character(fallback)[[1L]]
+  if (is.na(fb) || !nzchar(fb)) "null" else fb
 }
 
 #' Derive additional database[n] metadata blocks from xrefs index.
@@ -875,19 +825,14 @@
   ordered_prefixes <- .MZTAB_XREF_PRIORITY_PREFIXES
   selected <- intersect(ordered_prefixes, all_prefixes)
 
-  out <- lapply(selected, function(pfx) {
+  lapply(selected, function(pfx) {
     info <- .XREF_KNOWN_PREFIXES[[pfx]]
-    if (is.null(info)) {
-      return(NULL)
-    }
     list(
       name = info$name,
       prefix = info$prefix,
       uri = gsub("/$", "", sub(":[^/]*$", "", info$uri))
     )
   })
-
-  Filter(Negate(is.null), out)
 }
 
 #' Normalize an InChIKey value to its connectivity-layer fragment.

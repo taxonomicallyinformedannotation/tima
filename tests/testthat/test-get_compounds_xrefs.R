@@ -302,4 +302,70 @@ test_that("get_compounds_xrefs writes a complete QLever response", {
   out <- tidytable::fread(output_file)
   expect_setequal(out$prefix, c("CHEBI", "wikidata"))
   expect_true(all(out$inchikey == "BSYNRYMUTXBXSQ"))
+
+  # Offline edge cases: Bioregistry load failure with no cached file, empty matched props, and .fetch_banana HTTP failure
+  out_no_cache <- temp_test_path("xrefs_no_cache_fail.tsv.gz")
+  testthat::with_mocked_bindings(
+    fromJSON = function(...) stop("network error"),
+    .package = "jsonlite",
+    {
+      res_fb <- get_compounds_xrefs(
+        props = "P683",
+        output = out_no_cache,
+        max_age_hours = 0
+      )
+      expect_equal(res_fb, out_no_cache)
+      expect_equal(nrow(tidytable::fread(out_no_cache)), 0L)
+    }
+  )
+
+  testthat::with_mocked_bindings(
+    fromJSON = function(...) {
+      list(chebi = list(wikidata.property = list(prefix = "P683")))
+    },
+    .package = "jsonlite",
+    {
+      expect_error(
+        get_compounds_xrefs(
+          props = "P_NOT_FOUND",
+          output = temp_test_path("xrefs_unmatched.tsv.gz"),
+          max_age_hours = 0
+        ),
+        regexp = "none of the supplied props were found",
+        class = "tima_validation_error"
+      )
+    }
+  )
+
+  # .fetch_banana fallback when Bioregistry API returns non-200 status
+  out_banana_fb <- temp_test_path("xrefs_banana_fb.tsv.gz")
+  testthat::with_mocked_bindings(
+    fromJSON = function(...) {
+      list(chebi = list(wikidata.property = list(prefix = "P683")))
+    },
+    .package = "jsonlite",
+    {
+      testthat::with_mocked_bindings(
+        req_perform = function(req, ...) {
+          structure(list(url = req$url), class = "mock_resp")
+        },
+        resp_status = function(resp) {
+          if (grepl("bioregistry", resp$url, fixed = TRUE)) 500L else 200L
+        },
+        resp_body_string = function(resp, ...) {
+          paste(.qlever_header, .qlever_row, sep = "\n")
+        },
+        .package = "httr2",
+        {
+          get_compounds_xrefs(
+            props = "P683",
+            output = out_banana_fb,
+            max_age_hours = 0
+          )
+          out_b <- tidytable::fread(out_banana_fb)
+          expect_true("chebi" %in% out_b$prefix)
+        }
+      )
+    }
+  )
 })

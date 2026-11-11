@@ -280,4 +280,41 @@ test_that("harmonize_spectra populates defaults and preserves list columns for m
   )
   expect_equal(nrow(res_all_cols), 2L)
   expect_setequal(res_all_cols$compound_id, c("Caffeine", "Aspirin"))
+
+  # Partial NA precursorCharge, rtime column, partial NA spectrum_id and compound_id
+  spec_partial <- tidytable::tidytable(
+    polarity = c("Positive", "Positive"),
+    name_col = c("Caffeine", "Aspirin"),
+    smiles_col = c("CN1C=NC2=C1C(=O)N(C(=O)N2C)C", "CC(=O)OC1=CC=CC=C1C(=O)O"),
+    precursorMz = c(195.088, 181.05),
+    precursorCharge = c(1L, NA_integer_),
+    rtime = c(12.5, 25.0),
+    spectrum_id = c("SPEC_A", NA_character_),
+    compound_id = c("CMPD_A", NA_character_),
+    mz = list(c(100, 195), c(120, 181)),
+    intensity = list(c(50, 100), c(40, 90))
+  )
+  res_partial <- harmonize_spectra(
+    spectra = spec_partial,
+    metad = "TestLib",
+    mode = "pos",
+    col_ad = "adduct",
+    col_ce = "collision_energy",
+    col_ci = "compound_id",
+    col_in = "inchi",
+    col_io = "inchi_no_stereo",
+    col_ik = "inchikey",
+    col_il = "inchikey_connectivity_layer",
+    col_na = "name_col",
+    col_po = "polarity",
+    col_sm = "smiles_col",
+    col_sn = "smiles_no_stereo",
+    col_si = "spectrum_id",
+    col_sp = "splash",
+    col_sy = "synonyms"
+  )
+  expect_equal(res_partial$precursorCharge, c(1L, 1L))
+  expect_equal(res_partial$rtime, c(12.5, 25.0))
+  expect_setequal(res_partial$spectrum_id, c("SPEC_A", "2"))
+  expect_setequal(res_partial$compound_id, c("CMPD_A", "Aspirin"))
 })

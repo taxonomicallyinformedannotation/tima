@@ -347,6 +347,53 @@ test_that("run_tima reports cache navigation errors", {
       )
     }
   )
+
+  expect_error(
+    .parse_run_tima_log_level(c(100, 200)),
+    class = "tima_validation_error"
+  )
+
+  # archive_log_file error fallback
+  tf_src <- withr::local_tempfile(lines = "log line")
+  testthat::with_mocked_bindings(
+    file.copy = function(...) stop("disk full"),
+    .package = "base",
+    expect_false(archive_log_file(tf_src, "20260101_000000"))
+  )
+
+  # execute_targets_pipeline success, warning, and error paths
+  td_pipe <- withr::local_tempdir()
+  withr::local_dir(td_pipe)
+  writeLines("# dummy targets script", "_targets.R")
+
+  testthat::with_mocked_bindings(
+    tar_make = function(...) invisible(NULL),
+    .package = "targets",
+    expect_invisible(execute_targets_pipeline("^ann_"))
+  )
+
+  testthat::with_mocked_bindings(
+    tar_make = function(...) {
+      warning("pipeline minor warning")
+      invisible(NULL)
+    },
+    .package = "targets",
+    expect_invisible(execute_targets_pipeline("^ann_"))
+  )
+
+  testthat::with_mocked_bindings(
+    tar_make = function(...) stop("tar_make boom"),
+    .package = "targets",
+    expect_error(
+      execute_targets_pipeline("^ann_"),
+      class = "tima_runtime_error"
+    )
+  )
+
+  withr::local_options(list(tima.tima_full_runner = function(...) {
+    invisible(NULL)
+  }))
+  expect_warning(tima_full(), "deprecated")
 })
 
 # Error Recovery Tests ----

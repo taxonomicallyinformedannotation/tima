@@ -414,9 +414,6 @@ prepare_features_tables <- function(
   )
 
   max_keep <- min(candidates, length(intensity_cols))
-  if (max_keep < 1L) {
-    return(tidytable::tidytable())
-  }
 
   n_feat <- nrow(tbl)
   if (n_feat > 0L && anyDuplicated(feature_ids) == 0L) {
@@ -444,9 +441,6 @@ prepare_features_tables <- function(
 
       for (k in seq_len(max_keep)) {
         n_act <- length(active_rows)
-        if (n_act == 0L) {
-          break
-        }
         sub_m <- if (n_act == n_feat) {
           work_mat
         } else {
@@ -480,14 +474,8 @@ prepare_features_tables <- function(
           stringsAsFactors = FALSE,
           check.names = FALSE
         )
-        if ("rt" %in% extra_cols) {
-          empty_tbl$rt <- vector("list", 0L)
-        }
-        if ("mz" %in% extra_cols) {
-          empty_tbl$mz <- vector("list", 0L)
-        }
-        if ("adduct" %in% extra_cols) {
-          empty_tbl$adduct <- vector("list", 0L)
+        for (ec in extra_cols) {
+          empty_tbl[[ec]] <- vector("list", 0L)
         }
         return(empty_tbl)
       }

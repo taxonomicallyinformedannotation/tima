@@ -47,21 +47,6 @@ rank_candidates <- function(df) {
   }
 
   .clean_rank_score <- function(raw_s, n_rows) {
-    if (length(raw_s) > 1000L) {
-      u <- unique(raw_s)
-      u_num <- if (is.numeric(u)) {
-        as.double(u)
-      } else {
-        suppressWarnings(as.numeric(u))
-      }
-      u_num[!is.finite(u_num)] <- NA_real_
-      neg <- !is.na(u_num) & u_num < 0
-      if (any(neg)) {
-        u_num[neg] <- 0
-      }
-      idx <- if (anyNA(u)) match(raw_s, u) else fastmatch::fmatch(raw_s, u)
-      return(u_num[idx])
-    }
     s <- if (is.numeric(raw_s)) {
       as.double(raw_s)
     } else {
@@ -86,26 +71,11 @@ rank_candidates <- function(df) {
   iks <- df$candidate_structure_inchikey_connectivity_layer
   u_fids <- unique(fids)
   u_iks <- unique(iks)
-  fid_id <- if (anyNA(u_fids)) {
-    match(fids, u_fids)
-  } else {
-    fastmatch::fmatch(fids, u_fids)
-  }
-  ik_id <- if (anyNA(u_iks)) {
-    match(iks, u_iks)
-  } else {
-    fastmatch::fmatch(iks, u_iks)
-  }
+  fid_id <- fastmatch::fmatch(fids, u_fids)
+  ik_id <- fastmatch::fmatch(iks, u_iks)
 
   n_iks <- length(u_iks)
-  pair_key_raw <- if (
-    as.double(length(u_fids)) * n_iks < .Machine$integer.max
-  ) {
-    (fid_id - 1L) * n_iks + ik_id
-  } else {
-    n_iks_stride <- if (bitwAnd(n_iks, 1023L) == 0L) n_iks + 1L else n_iks
-    as.double(fid_id - 1L) * n_iks_stride + ik_id
-  }
+  pair_key_raw <- as.double(fid_id - 1L) * n_iks + ik_id
 
   if (anyDuplicated(pair_key_raw) == 0L) {
     fid_keep <- fid_id
@@ -136,10 +106,6 @@ rank_candidates <- function(df) {
     g_o <- g[ord]
     v_o <- v[ord]
     m <- length(ord)
-    if (m == 1L) {
-      out[v_idx[ord]] <- 1L
-      return(out)
-    }
     seq_m <- seq_len(m)
     new_g <- c(TRUE, g_o[-1L] != g_o[-m])
     g_idx <- integer(m)

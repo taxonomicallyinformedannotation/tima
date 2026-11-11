@@ -245,4 +245,20 @@ test_that("copy_backbone surfaces package copy failures", {
     ),
     class = "tima_runtime_error"
   )
+
+  # Direct helper error paths when dir.create or file.copy fails
+  tf_blocker <- withr::local_tempfile()
+  writeLines("x", tf_blocker)
+  expect_error(
+    .copy_backbone_dir_create(file.path(tf_blocker, "sub")),
+    "Failed to create directory"
+  )
+  src_dir <- withr::local_tempdir()
+  dst_dir <- withr::local_tempdir()
+  writeLines("a", file.path(src_dir, "item.txt"))
+  writeLines("b", file.path(dst_dir, "item.txt"))
+  expect_error(
+    .copy_backbone_dir_copy(src_dir, dst_dir, overwrite = FALSE),
+    "Failed to copy directory"
+  )
 })

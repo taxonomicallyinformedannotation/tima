@@ -561,4 +561,23 @@ test_that(".filter_top_intensity_samples handles zero intensity columns, >16 all
     names(res_dup_zero),
     c("feature_id", "sample", "rt", "mz", "adduct")
   )
+
+  # 5. Multi-candidate matrix subsetting when some features have 0 positive samples
+  tbl_partial <- data.frame(
+    feature_id = c("f1", "f2"),
+    rt = c(1.0, 2.0),
+    mz = c(100.0, 200.0),
+    s1 = c(0, 10),
+    s2 = c(0, 20),
+    stringsAsFactors = FALSE
+  )
+  res_partial <- .filter_top_intensity_samples(
+    tbl_partial,
+    candidates = 2L,
+    name_features = "feature_id",
+    name_rt = "rt",
+    name_mz = "mz",
+    name_adduct = "adduct"
+  )
+  expect_identical(res_partial$feature_id, c("f2", "f2"))
 })

@@ -543,4 +543,28 @@ test_that("prepare_libraries_sop_bigg writes a placeholder if a model fails", {
   expect_equal(nrow(lib), 1L)
   expect_true(all(is.na(unlist(lib))))
   expect_length(fake$calls$pubchem, 0L)
+
+  # Batch where all InChIKeys return NotFound from PubChem
+  unknown_only_model <- list(
+    list(
+      id = "unk_model",
+      metabolites = list(
+        list(
+          id = "unk_c",
+          name = "Unknown compound",
+          annotation = list(inchi_key = list(.ik$unknown))
+        )
+      )
+    )
+  )
+  fake_unk <- local_fake_bigg(models = unknown_only_model)
+  out_unk <- file.path(withr::local_tempdir(), "bigg_unk.tsv")
+  prepare_libraries_sop_bigg(
+    bigg_models = list(
+      "Escherichia coli" = c(model_id = "unk_model", doi = "10.1/u")
+    ),
+    bigg_url = fake_unk$url,
+    output = out_unk
+  )
+  expect_true(file.exists(out_unk))
 })

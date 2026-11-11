@@ -119,6 +119,21 @@ test_that("prepare_features_components handles single valid file", {
 
   unlink(temp_input)
   unlink(temp_output)
+
+  # Runtime error when reading component files fails inside tryCatch
+  tf_err <- withr::local_tempfile(fileext = ".tsv")
+  writeLines("cluster index\tcomponentindex\n1\t1", tf_err)
+  expect_error(
+    testthat::with_mocked_bindings(
+      safe_fread = function(...) stop("simulated read error"),
+      prepare_features_components(
+        input = tf_err,
+        output = withr::local_tempfile(fileext = ".tsv")
+      )
+    ),
+    regexp = "failed to read component files",
+    class = "tima_runtime_error"
+  )
 })
 
 test_that("prepare_features_components handles multiple input files", {
@@ -206,6 +221,21 @@ test_that("prepare_features_components handles empty input file", {
 
   unlink(temp_input)
   unlink(temp_output)
+
+  # Runtime error when reading component files fails inside tryCatch
+  tf_err <- withr::local_tempfile(fileext = ".tsv")
+  writeLines("cluster index\tcomponentindex\n1\t1", tf_err)
+  expect_error(
+    testthat::with_mocked_bindings(
+      safe_fread = function(...) stop("simulated read error"),
+      prepare_features_components(
+        input = tf_err,
+        output = withr::local_tempfile(fileext = ".tsv")
+      )
+    ),
+    regexp = "failed to read component files",
+    class = "tima_runtime_error"
+  )
 })
 
 test_that("prepare_features_components removes duplicates", {
@@ -237,6 +267,21 @@ test_that("prepare_features_components removes duplicates", {
 
   unlink(temp_input)
   unlink(temp_output)
+
+  # Runtime error when reading component files fails inside tryCatch
+  tf_err <- withr::local_tempfile(fileext = ".tsv")
+  writeLines("cluster index\tcomponentindex\n1\t1", tf_err)
+  expect_error(
+    testthat::with_mocked_bindings(
+      safe_fread = function(...) stop("simulated read error"),
+      prepare_features_components(
+        input = tf_err,
+        output = withr::local_tempfile(fileext = ".tsv")
+      )
+    ),
+    regexp = "failed to read component files",
+    class = "tima_runtime_error"
+  )
 })
 
 test_that("prepare_features_components handles NA values correctly", {
@@ -259,6 +304,21 @@ test_that("prepare_features_components handles NA values correctly", {
 
   unlink(temp_input)
   unlink(temp_output)
+
+  # Runtime error when reading component files fails inside tryCatch
+  tf_err <- withr::local_tempfile(fileext = ".tsv")
+  writeLines("cluster index\tcomponentindex\n1\t1", tf_err)
+  expect_error(
+    testthat::with_mocked_bindings(
+      safe_fread = function(...) stop("simulated read error"),
+      prepare_features_components(
+        input = tf_err,
+        output = withr::local_tempfile(fileext = ".tsv")
+      )
+    ),
+    regexp = "failed to read component files",
+    class = "tima_runtime_error"
+  )
 })
 
 test_that("prepare_features_components standardizes column names", {
@@ -293,4 +353,19 @@ test_that("prepare_features_components standardizes column names", {
 
   unlink(temp_input)
   unlink(temp_output)
+
+  # Runtime error when reading component files fails inside tryCatch
+  tf_err <- withr::local_tempfile(fileext = ".tsv")
+  writeLines("cluster index\tcomponentindex\n1\t1", tf_err)
+  expect_error(
+    testthat::with_mocked_bindings(
+      safe_fread = function(...) stop("simulated read error"),
+      prepare_features_components(
+        input = tf_err,
+        output = withr::local_tempfile(fileext = ".tsv")
+      )
+    ),
+    regexp = "failed to read component files",
+    class = "tima_runtime_error"
+  )
 })

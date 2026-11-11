@@ -104,10 +104,7 @@ prepare_libraries_sop_hmdb_like <- function(
             } else {
               clean_empty <- function(x) {
                 v <- x[keep]
-                empty_mask <- !is.na(v) & !nzchar(v)
-                if (any(empty_mask)) {
-                  v[empty_mask] <- NA_character_
-                }
+                v[!is.na(v) & !nzchar(v)] <- NA_character_
                 v
               }
               core <- tidytable::tidytable(
@@ -121,38 +118,34 @@ prepare_libraries_sop_hmdb_like <- function(
                 round_reals() |>
                 tidytable::distinct()
 
-              if (nrow(core) == 0L) {
-                hmdb_like_prepared <- fake_sop_columns()[0, ]
-              } else {
-                n_c <- nrow(core)
-                na_chr <- rep.int(NA_character_, n_c)
-                out_list <- c(
-                  list(
-                    structure_name = core$structure_name,
-                    structure_inchikey = core$structure_inchikey,
-                    structure_smiles = core$structure_smiles,
-                    structure_inchikey_2D = na_chr,
-                    structure_smiles_2D = na_chr,
-                    structure_molecular_formula = core$structure_molecular_formula,
-                    structure_exact_mass = core$structure_exact_mass,
-                    structure_xlogp = core$structure_xlogp,
-                    structure_taxonomy_npclassifier_01pathway = na_chr,
-                    structure_taxonomy_npclassifier_02superclass = na_chr,
-                    structure_taxonomy_npclassifier_03class = na_chr,
-                    structure_taxonomy_classyfire_chemontid = na_chr,
-                    structure_taxonomy_classyfire_01kingdom = na_chr,
-                    structure_taxonomy_classyfire_02superclass = na_chr,
-                    structure_taxonomy_classyfire_03class = na_chr,
-                    structure_taxonomy_classyfire_04directparent = na_chr,
-                    structure_tag = rep.int(tag, n_c),
-                    organism_name = rep.int(organism_name, n_c),
-                    reference_doi = na_chr
-                  ),
-                  lapply(organism_taxonomy, rep.int, times = n_c)
-                )
-                hmdb_like_prepared <- tidytable::as_tidytable(out_list) |>
-                  select_sop_columns()
-              }
+              n_c <- nrow(core)
+              na_chr <- rep.int(NA_character_, n_c)
+              out_list <- c(
+                list(
+                  structure_name = core$structure_name,
+                  structure_inchikey = core$structure_inchikey,
+                  structure_smiles = core$structure_smiles,
+                  structure_inchikey_2D = na_chr,
+                  structure_smiles_2D = na_chr,
+                  structure_molecular_formula = core$structure_molecular_formula,
+                  structure_exact_mass = core$structure_exact_mass,
+                  structure_xlogp = core$structure_xlogp,
+                  structure_taxonomy_npclassifier_01pathway = na_chr,
+                  structure_taxonomy_npclassifier_02superclass = na_chr,
+                  structure_taxonomy_npclassifier_03class = na_chr,
+                  structure_taxonomy_classyfire_chemontid = na_chr,
+                  structure_taxonomy_classyfire_01kingdom = na_chr,
+                  structure_taxonomy_classyfire_02superclass = na_chr,
+                  structure_taxonomy_classyfire_03class = na_chr,
+                  structure_taxonomy_classyfire_04directparent = na_chr,
+                  structure_tag = rep.int(tag, n_c),
+                  organism_name = rep.int(organism_name, n_c),
+                  reference_doi = na_chr
+                ),
+                lapply(organism_taxonomy, rep.int, times = n_c)
+              )
+              hmdb_like_prepared <- tidytable::as_tidytable(out_list) |>
+                select_sop_columns()
             }
           }
 
@@ -323,10 +316,6 @@ parse_hmdb_like_sdf_lines <- function(sdf_lines) {
 
   cand_field_id <- u_field_id[fastmatch::fmatch(cand_lines, u_cand)]
   keep_idx <- which(!is.na(cand_field_id))
-
-  if (length(keep_idx) == 0L) {
-    return(tidytable::as_tidytable(out))
-  }
 
   header_idx <- cand_idx[keep_idx]
   field_ids <- cand_field_id[keep_idx]

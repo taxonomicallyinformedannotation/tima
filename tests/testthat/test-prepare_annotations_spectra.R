@@ -232,4 +232,42 @@ test_that(".ensure_expected_annotation_cols adds missing columns and enforces co
 
   expect_identical(names(out), expected_cols)
   expect_identical(out$annotation_note, NA_character_)
+
+  # Validation error for invalid output, 0-row input chunk, NA feature_id filtering, and setcolorder when all cols present
+  s <- stage_structure_fixtures()
+  ann_empty <- temp_test_path("ann_empty_chunk.tsv")
+  writeLines("feature_id\tcandidate_adduct\n\t[M+H]+", ann_empty)
+  expect_error(
+    prepare_annotations_spectra(
+      input = ann_empty,
+      output = c("a.tsv", "b.tsv"),
+      str_stereo = s$stereo,
+      str_met = s$met,
+      str_tax_cla = s$cla,
+      str_tax_npc = s$npc
+    ),
+    regexp = "output must be a single character string",
+    class = "tima_validation_error"
+  )
+
+  out_empty <- temp_test_path("spectra_empty_out.tsv")
+  res_empty <- prepare_annotations_spectra(
+    input = ann_empty,
+    output = out_empty,
+    str_stereo = s$stereo,
+    str_met = s$met,
+    str_tax_cla = s$cla,
+    str_tax_npc = s$npc
+  )
+  expect_equal(res_empty, out_empty)
+
+  df_all_present <- tidytable::tidytable(
+    b = "2",
+    a = "1"
+  )
+  reordered <- .ensure_expected_annotation_cols(
+    data.table::copy(df_all_present),
+    c("a", "b")
+  )
+  expect_identical(names(reordered), c("a", "b"))
 })

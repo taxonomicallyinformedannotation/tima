@@ -179,4 +179,7 @@ test_that("validate_all_with_predicate rejects unnamed inputs", {
     "must be a named list",
     class = "tima_validation_error"
   )
+  expect_true(is_numeric_in_range(5, 0, 10))
+  expect_false(is_numeric_in_range(-1, 0, 10))
+  expect_false(is_numeric_in_range(NA_real_, 0, 10))
 })

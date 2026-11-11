@@ -261,4 +261,36 @@ test_that("read_mgf_metadata parses fields without peaks and keeps first duplica
   expect_equal(meta$PEPMASS, c("100.0", NA_character_))
   expect_equal(meta$EMPTY_KEY, c("", NA_character_))
   expect_equal(meta$RTINSECONDS, c(NA_character_, "42.5"))
+
+  # Edge cases for read_mgf_opti and read_mgf_metadata
+  expect_error(read_mgf_opti(tf, msLevel = 0L), "positive integer")
+  expect_error(
+    read_mgf_metadata(tempfile(fileext = ".mgf")),
+    "MGF file not found"
+  )
+
+  tf_comment_only <- write_mgf(list(c("BEGIN IONS", "# comment", "END IONS")))
+  on.exit(unlink(tf_comment_only), add = TRUE)
+  expect_equal(nrow(read_mgf_opti(tf_comment_only)), 0L)
+  expect_equal(nrow(read_mgf_metadata(tf_comment_only)), 0L)
+
+  tf_bad_peaks <- write_mgf(list(c("BEGIN IONS", "100.0", "END IONS")))
+  on.exit(unlink(tf_bad_peaks), add = TRUE)
+  expect_equal(nrow(read_mgf_opti(tf_bad_peaks)), 0L)
+
+  tf_no_desc <- write_mgf(list(
+    c("BEGIN IONS", "bad_peak_line", "100.0 50.0", "END IONS")
+  ))
+  on.exit(unlink(tf_no_desc), add = TRUE)
+  res_no_desc <- read_mgf_opti(tf_no_desc)
+  expect_equal(nrow(res_no_desc), 1L)
+  expect_true(is.na(res_no_desc$precursorMz[[1L]]))
+
+  tf_pm_extra <- write_mgf(list(
+    c("BEGIN IONS", "PEPMASS=150.0 200.0 2", "100.0 50.0", "END IONS")
+  ))
+  on.exit(unlink(tf_pm_extra), add = TRUE)
+  res_pm_extra <- read_mgf_opti(tf_pm_extra)
+  expect_equal(res_pm_extra$precursorMz[[1L]], 150.0)
+  expect_equal(res_pm_extra$precursorIntensity[[1L]], 200.0)
 })

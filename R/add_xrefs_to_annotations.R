@@ -113,11 +113,7 @@ add_xrefs_to_annotations <- function(results_list, xrefs_file) {
     return(df)
   }
 
-  xref_row_u <- if (anyNA(u_xref_raw)) {
-    match(xref_raw_ik, u_xref_raw)
-  } else {
-    fastmatch::fmatch(xref_raw_ik, u_xref_raw)
-  }
+  xref_row_u <- fastmatch::fmatch(xref_raw_ik, u_xref_raw)
   keep_xref <- !is.na(u_xref_match[xref_row_u])
   f_ik <- u_xref_key[xref_row_u[keep_xref]]
   f_prefix <- as.character(xrefs$prefix[keep_xref])

@@ -739,7 +739,7 @@ with_logging <- function(operation_name, expr, ...) {
         result_meta$n_elements <- length(result)
       }
 
-      log_complete(ctx, !!!result_meta)
+      do.call(log_complete, c(list(ctx), result_meta))
       result
     },
     error = function(e) {

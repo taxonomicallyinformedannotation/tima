@@ -77,15 +77,6 @@
     lin_n <- vapply(taxon_lineage, nrow, integer(1L))
     tot_per_taxon <- 1L + lin_n
     total_rows <- sum(tot_per_taxon)
-    if (total_rows == 0L) {
-      return(tidytable::tidytable(
-        id = integer(),
-        rank = character(),
-        name = character(),
-        unique_name = character(),
-        ott_id = integer()
-      ))
-    }
 
     id_col <- rep.int(ott_ids[seq_len(n_taxa)], tot_per_taxon)
     rank_parts <- vector("list", n_taxa * 2L)
@@ -269,27 +260,25 @@ get_organism_taxonomy_ott <- function(
   # Clean and prepare organism names on unique values
   u_org <- unique(df$organism)
   u_org <- u_org[!is.na(u_org)]
-  if (length(u_org) > 0L) {
-    u_org <- trimws(as.character(u_org))
-    # Remove hybrid indicators (x and ×)
-    u_org <- stri_replace_all_fixed(
-      str = u_org,
-      pattern = " x ",
-      replacement = " ",
-      vectorize_all = FALSE
-    )
-    u_org <- stri_replace_all_fixed(
-      str = u_org,
-      pattern = "\u00D7 ",
-      replacement = "",
-      vectorize_all = FALSE
-    )
-    u_org <- unique(u_org)
-    search_str <- tolower(u_org)
-  } else {
-    u_org <- character(0)
-    search_str <- character(0)
+  if (length(u_org) == 0L) {
+    return(.empty_organism_taxonomy_table())
   }
+  u_org <- trimws(as.character(u_org))
+  # Remove hybrid indicators (x and ×)
+  u_org <- stri_replace_all_fixed(
+    str = u_org,
+    pattern = " x ",
+    replacement = " ",
+    vectorize_all = FALSE
+  )
+  u_org <- stri_replace_all_fixed(
+    str = u_org,
+    pattern = "\u00D7 ",
+    replacement = "",
+    vectorize_all = FALSE
+  )
+  u_org <- unique(u_org)
+  search_str <- tolower(u_org)
   organism_table <- tidytable::tidytable(
     canonical_name = u_org,
     search_string = search_str
@@ -503,33 +492,19 @@ get_organism_taxonomy_ott <- function(
       nomatch = 0L
     ) >
       0L
-  if (!any(keep_m)) {
-    return(.empty_organism_taxonomy_table())
-  }
   m_ss <- new_matched_otl_exact$search_string[keep_m]
   m_ott <- new_matched_otl_exact$ott_id[keep_m]
 
-  if (anyDuplicated(m_ss) == 0L) {
-    m_org <- fastmatch::fmatch(organism_table$search_string, m_ss)
-    keep_org <- which(!is.na(m_org))
-    if (length(keep_org) == 0L) {
-      return(.empty_organism_taxonomy_table())
-    }
-    cn_vec <- organism_table$canonical_name[keep_org]
-    ott_vec <- m_ott[m_org[keep_org]]
-  } else {
-    joined_orgs <- tidytable::left_join(
-      organism_table,
-      tidytable::tidytable(search_string = m_ss, ott_id = m_ott),
-      by = "search_string"
-    )
-    ok_j <- !is.na(joined_orgs$ott_id)
-    if (!any(ok_j)) {
-      return(.empty_organism_taxonomy_table())
-    }
-    cn_vec <- joined_orgs$canonical_name[ok_j]
-    ott_vec <- joined_orgs$ott_id[ok_j]
+  joined_orgs <- tidytable::inner_join(
+    organism_table,
+    tidytable::tidytable(search_string = m_ss, ott_id = m_ott),
+    by = "search_string"
+  )
+  if (nrow(joined_orgs) == 0L) {
+    return(.empty_organism_taxonomy_table())
   }
+  cn_vec <- joined_orgs$canonical_name
+  ott_vec <- joined_orgs$ott_id
 
   ord_org <- order(cn_vec, ott_vec)
   cn_vec <- cn_vec[ord_org]

@@ -233,9 +233,6 @@ prepare_libraries_sop_bigg <- function(
           taxonomy_template,
           doi
         ) {
-          if (is.null(doi)) {
-            return(NULL)
-          }
           tidytable::tidytable(
             organism_name = organism_name,
             organism_taxonomy_ottid = taxonomy_template$ottid,
@@ -262,7 +259,7 @@ prepare_libraries_sop_bigg <- function(
               FUN = function(org_name) {
                 doi <- bigg_models[[org_name]]["doi"]
                 taxonomy <- taxonomy_templates[[org_name]]
-                if (is.null(taxonomy)) {
+                if (is.null(taxonomy) || is.null(doi) || is.na(doi)) {
                   return(NULL)
                 }
                 create_organism_table(org_name, taxonomy, doi)

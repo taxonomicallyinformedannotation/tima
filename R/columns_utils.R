@@ -414,17 +414,8 @@ clean_collapse <- function(grouped_df, cols = NULL, separator = " $ ") {
     u_v <- unique(v_ok)
     v_id <- fastmatch::fmatch(v_ok, u_v)
     n_v <- length(u_v)
-    use_int <- as.double(n_g) * n_v < .Machine$integer.max
-    gv_key <- if (use_int) {
-      (g_ok - 1L) * n_v + v_id
-    } else {
-      as.double(g_ok - 1L) * n_v + v_id
-    }
-    keep <- if (use_int) {
-      !duplicated(gv_key)
-    } else {
-      fastmatch::fmatch(gv_key, gv_key) == seq_along(gv_key)
-    }
+    gv_key <- as.double(g_ok - 1L) * n_v + v_id
+    keep <- !duplicated(gv_key)
     g_ok <- g_ok[keep]
     v_ok <- v_ok[keep]
 

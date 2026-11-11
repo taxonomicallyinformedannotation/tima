@@ -588,4 +588,51 @@ test_that("install emits lifecycle deprecation warning and delegates to install_
       )
     }
   )
+
+  # Thin wrapper coverage and Windows python.exe branch in check_or_install_python
+  testthat::with_mocked_bindings(
+    miniconda_path = function() "/mock/mini",
+    install_miniconda = function() "installed_mini",
+    virtualenv_exists = function(envname) paste0("exists:", envname),
+    virtualenv_create = function(envname, python) {
+      paste0("create:", envname, ":", python)
+    },
+    virtualenv_install = function(envname, packages) {
+      paste0("inst:", envname, ":", paste(packages, collapse = ","))
+    },
+    py_install = function(packages) {
+      paste0("py:", paste(packages, collapse = ","))
+    },
+    .package = "reticulate",
+    {
+      expect_identical(.miniconda_path(), "/mock/mini")
+      expect_identical(.install_miniconda(), "installed_mini")
+      expect_identical(.virtualenv_exists("e"), "exists:e")
+      expect_identical(.virtualenv_create("e", "py"), "create:e:py")
+      expect_identical(.virtualenv_install("e", "p"), "inst:e:p")
+      expect_identical(.py_install("p"), "py:p")
+    }
+  )
+  testthat::with_mocked_bindings(
+    tar_destroy = function(ask) paste0("destroyed:", ask),
+    .package = "targets",
+    {
+      expect_identical(.tar_destroy(), "destroyed:FALSE")
+    }
+  )
+  win_py <- testthat::with_mocked_bindings(
+    .sys_which = function(cmd) "",
+    .miniconda_path = function() "C:/miniconda",
+    .path_exists = function(p) TRUE,
+    log_warn = function(...) invisible(NULL),
+    log_info = function(...) invisible(NULL),
+    {
+      testthat::with_mocked_bindings(
+        Sys.info = function() c(sysname = "Windows"),
+        .package = "base",
+        check_or_install_python()
+      )
+    }
+  )
+  expect_identical(win_py, file.path("C:/miniconda", "python.exe"))
 })

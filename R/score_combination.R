@@ -1,9 +1,5 @@
 .has_unique_feature_ik <- function(df) {
-  if (isTRUE(attr(df, ".unique_feature_ik"))) {
-    return(TRUE)
-  }
-  n <- nrow(df)
-  if (n <= 1L) {
+  if (isTRUE(attr(df, ".unique_feature_ik")) || nrow(df) <= 1L) {
     return(TRUE)
   }
   f <- df$feature_id
@@ -16,12 +12,8 @@
   f_id <- fastmatch::fmatch(f, u_f)
   k_id <- fastmatch::fmatch(k, u_k)
   n_k <- length(u_k)
-  if (as.double(length(u_f)) * n_k < .Machine$integer.max) {
-    anyDuplicated((f_id - 1L) * n_k + k_id) == 0L
-  } else {
-    pk <- as.double(f_id - 1L) * n_k + k_id
-    all(fastmatch::fmatch(pk, pk) == seq_along(pk))
-  }
+  pk <- as.double(f_id - 1L) * n_k + k_id
+  anyDuplicated(pk) == 0L
 }
 
 #' @title Extract narrow biological score table
@@ -66,18 +58,7 @@ extract_bio_scores <- function(weight_bio_result) {
     "candidate_score_pseudo_initial",
     "score_weighted_bio"
   )
-  out <- if (all(need_cols %in% names(weight_bio_result))) {
-    tidytable::as_tidytable(as.list(weight_bio_result)[need_cols])
-  } else {
-    weight_bio_result |>
-      tidytable::select(
-        feature_id,
-        candidate_structure_inchikey_connectivity_layer,
-        score_biological,
-        candidate_score_pseudo_initial,
-        score_weighted_bio
-      )
-  }
+  out <- tidytable::as_tidytable(as.list(weight_bio_result)[need_cols])
   if (isTRUE(attr(weight_bio_result, ".unique_feature_ik"))) {
     attr(out, ".unique_feature_ik") <- TRUE
   }

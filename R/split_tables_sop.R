@@ -70,41 +70,22 @@ split_tables_sop <- function(table, cache) {
   rm(org_cols, keep_org)
 
   log_debug("Joining structural data with computed properties")
-  has_valid_smi <- !all(is.na(table$structure_smiles_initial))
   struct_all_cols <- grep("structure", names(table), fixed = TRUE, value = TRUE)
   keep_struct_cols <- unique(c(
     "structure_smiles_initial",
     intersect("structure_name", struct_all_cols),
     grep("_tag|_tax", struct_all_cols, value = TRUE)
   ))
-  if (has_valid_smi) {
-    table_structural_initial <- unique(
-      tidytable::as_tidytable(as.list(table)[struct_all_cols]),
-      by = keep_struct_cols
-    )
-    table_structural_standardized <- table_structural_initial |>
-      process_smiles(cache = cache) |>
-      tidytable::distinct(structure_smiles_initial, .keep_all = TRUE)
-    table_structural <- tidytable::as_tidytable(
-      as.list(table_structural_initial)[keep_struct_cols]
-    )
-    rm(table_structural_initial)
-  } else {
-    table_structural_initial <- table |>
-      tidytable::select(
-        tidyselect::contains(match = "structure")
-      ) |>
-      tidytable::distinct()
-
-    table_structural_standardized <- table_structural_initial |>
-      process_smiles(cache = cache) |>
-      tidytable::distinct(structure_smiles_initial, .keep_all = TRUE)
-
-    table_structural <- table_structural_initial |>
-      tidytable::select(tidyselect::all_of(keep_struct_cols)) |>
-      tidytable::distinct()
-    rm(table_structural_initial)
-  }
+  table_structural_initial <- tidytable::distinct(
+    tidytable::as_tidytable(as.list(table)[struct_all_cols])
+  )
+  table_structural_standardized <- table_structural_initial |>
+    process_smiles(cache = cache) |>
+    tidytable::distinct(structure_smiles_initial, .keep_all = TRUE)
+  table_structural <- tidytable::distinct(
+    tidytable::as_tidytable(as.list(table_structural_initial)[keep_struct_cols])
+  )
+  rm(table_structural_initial)
 
   if ("structure_inchikey" %in% names(table_structural_standardized)) {
     ik_std <- table_structural_standardized$structure_inchikey
@@ -137,9 +118,7 @@ split_tables_sop <- function(table, cache) {
       )
     }
   }
-  if (!has_valid_smi) {
-    table_structural <- tidytable::distinct(table_structural)
-  }
+  table_structural <- tidytable::distinct(table_structural)
   log_debug(
     "table_structural: %s rows x %d cols",
     format_count(nrow(table_structural)),
@@ -155,16 +134,8 @@ split_tables_sop <- function(table, cache) {
   sm2d_vec <- table_structural_standardized$structure_smiles_no_stereo[t_idx]
   rm(table_structural_standardized)
 
-  org_vec <- if ("organism_name" %in% names(table)) {
-    table$organism_name
-  } else {
-    rep(NA_character_, nrow(table))
-  }
-  doi_vec <- if ("reference_doi" %in% names(table)) {
-    table$reference_doi
-  } else {
-    rep(NA_character_, nrow(table))
-  }
+  org_vec <- table$organism_name %||% rep(NA_character_, nrow(table))
+  doi_vec <- table$reference_doi %||% rep(NA_character_, nrow(table))
   rm(table)
 
   keep_key <- !is.na(ik_vec) & !is.na(sm2d_vec) & !is.na(org_vec)
@@ -184,17 +155,8 @@ split_tables_sop <- function(table, cache) {
     ik_id_k <- fastmatch::fmatch(table_keys$structure_inchikey, u_ik_k)
     org_id_k <- fastmatch::fmatch(table_keys$organism_name, u_org_k)
     n_org_k <- length(u_org_k)
-    use_int_io <- as.double(length(u_ik_k)) * n_org_k < .Machine$integer.max
-    io_key <- if (use_int_io) {
-      (ik_id_k - 1L) * n_org_k + org_id_k
-    } else {
-      as.double(ik_id_k - 1L) * n_org_k + org_id_k
-    }
-    is_dup_io <- if (use_int_io) {
-      duplicated(io_key)
-    } else {
-      fastmatch::fmatch(io_key, io_key) != seq_along(io_key)
-    }
+    io_key <- as.double(ik_id_k - 1L) * n_org_k + org_id_k
+    is_dup_io <- duplicated(io_key)
     dup_io <- unique(io_key[is_dup_io])
     if (length(dup_io) > 0L) {
       drop_na <- na_doi & !is.na(fastmatch::fmatch(io_key, dup_io))
@@ -219,20 +181,6 @@ split_tables_sop <- function(table, cache) {
     structure_smiles_initial = table_structural$structure_smiles_initial[u_can],
     structure_smiles = table_structural$structure_smiles[u_can]
   )
-
-  if (!"structure_inchikey_no_stereo" %in% names(table_structural)) {
-    ik_all <- table_structural$structure_inchikey
-    valid_ik_all <- !is.na(ik_all) & nchar(ik_all) >= 27L
-    ik_ns_all <- rep(NA_character_, length(ik_all))
-    if (any(valid_ik_all)) {
-      ik_ns_all[valid_ik_all] <- paste0(
-        stri_sub(str = ik_all[valid_ik_all], from = 1L, to = 14L),
-        "-",
-        stri_sub(str = ik_all[valid_ik_all], from = -1L, to = -1L)
-      )
-    }
-    table_structural$structure_inchikey_no_stereo <- ik_ns_all
-  }
 
   # str_stereo: keyed by full inchikey, includes name, tag, xlogp
   keep_st <- which(
@@ -329,17 +277,8 @@ split_tables_sop <- function(table, cache) {
     u_dv <- unique(dedup_val)
     dv_id <- fastmatch::fmatch(dedup_val, u_dv)
     n_dv <- length(u_dv)
-    use_int_gv <- as.double(n_grp) * n_dv < .Machine$integer.max
-    gv_key <- if (use_int_gv) {
-      (g_ok - 1L) * n_dv + dv_id
-    } else {
-      as.double(g_ok - 1L) * n_dv + dv_id
-    }
-    keep <- if (use_int_gv) {
-      !duplicated(gv_key)
-    } else {
-      fastmatch::fmatch(gv_key, gv_key) == seq_along(gv_key)
-    }
+    gv_key <- as.double(g_ok - 1L) * n_dv + dv_id
+    keep <- !duplicated(gv_key)
     g_ok <- g_ok[keep]
     v_trim <- v_trim[keep]
 

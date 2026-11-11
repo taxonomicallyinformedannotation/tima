@@ -327,3 +327,52 @@ test_that(".normalize_annotation_text handles large (>1024) clean and dirty vect
 #   )
 #   expect_equal(nrow(result), 2)
 # })
+
+test_that("select_annotations_columns helpers cover cache resolution and process_smiles fallbacks", {
+  expect_identical(.normalize_annotation_text(character(0)), character(0))
+
+  td <- withr::local_tempdir()
+  stereo_path <- file.path(td, "str_stereo.tsv")
+  cache_path <- file.path(td, "processed.csv.gz")
+  file.create(cache_path)
+  expect_identical(
+    .resolve_smiles_cache_path(stereo_path, "explicit.csv.gz"),
+    "explicit.csv.gz"
+  )
+  expect_identical(.resolve_smiles_cache_path(stereo_path, NULL), cache_path)
+
+  df_smi <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_structure_smiles_no_stereo = "CCO"
+  )
+  testthat::with_mocked_bindings(
+    process_smiles = function(...) stop("simulated RDKit error"),
+    expect_identical(recompute_structure_fields_from_smiles(df_smi), df_smi)
+  )
+  testthat::with_mocked_bindings(
+    process_smiles = function(...) {
+      tidytable::tidytable(
+        structure_smiles_initial = c("CCO", "CCO"),
+        structure_smiles_no_stereo = c("CCO", "CCO"),
+        structure_inchikey_connectivity_layer = c(
+          "LFQSCWFLJHTTHZ",
+          "LFQSCWFLJHTTHZ"
+        ),
+        structure_inchikey_no_stereo = c(
+          "LFQSCWFLJHTTHZ-UHFFFAOYSA-N",
+          "LFQSCWFLJHTTHZ-UHFFFAOYSA-N"
+        ),
+        structure_molecular_formula = c("C2H6O", "C2H6O"),
+        structure_exact_mass = c(46.04186, 46.04186),
+        structure_xlogp = c(-0.3, -0.3)
+      )
+    },
+    {
+      res_dup <- recompute_structure_fields_from_smiles(df_smi)
+      expect_identical(
+        res_dup$candidate_structure_inchikey_connectivity_layer,
+        "LFQSCWFLJHTTHZ"
+      )
+    }
+  )
+})

@@ -162,27 +162,19 @@ create_edges <- function(
   res_m <- vector("list", n_queries)
 
   for (i in seq_len(n_queries)) {
-    if (i %% 500L == 0L) {
-      log_info("Processed %d / %d queries", i, n_queries)
-    }
-
     q_sp <- frags[[i]]
     q_pre <- precs[i]
     targets <- (i + 1L):nspecs
 
     if (use_gnps) {
-      if (length(targets) > 0L) {
-        res_mat <- gnps_chain_dp_batch_wrapper(
-          x = q_sp,
-          xPrecursorMz = q_pre,
-          y_list = frags[targets],
-          yPrecursorMz = precs_num[targets],
-          tolerance = ms2_tolerance,
-          ppm = ppm_tolerance
-        )
-      } else {
-        res_mat <- matrix(nrow = 0L, ncol = 4)
-      }
+      res_mat <- gnps_chain_dp_batch_wrapper(
+        x = q_sp,
+        xPrecursorMz = q_pre,
+        y_list = frags[targets],
+        yPrecursorMz = precs_num[targets],
+        tolerance = ms2_tolerance,
+        ppm = ppm_tolerance
+      )
 
       sc_vec <- res_mat[, 1L]
       if (!anyNA(sc_vec) && !any(is.infinite(sc_vec))) {

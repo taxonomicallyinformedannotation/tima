@@ -414,4 +414,51 @@ test_that("add_xrefs_to_annotations deduplicates identical IDs and distinguishes
     result$full$candidate_structure_id_wikidata,
     c("", "Q999", NA_character_, NA_character_)
   )
+
+  # Edge cases: empty df, all-NA inchikeys, mixed single + multi counts for same prefix, and all-NA id values
+  xrefs_edge <- tidytable::tidytable(
+    inchikey = c(
+      "ABCDEFGHIJKLMN-1",
+      "ABCDEFGHIJKLMN-2",
+      "OPQRSTUVWXYZAB-1"
+    ),
+    prefix = c("chebi", "chebi", "chebi"),
+    id = c("10", "20", "30")
+  )
+  expect_identical(
+    nrow(.add_xrefs_to_df(tidytable::tidytable(), xrefs_edge)),
+    0L
+  )
+  df_na_ik <- tidytable::tidytable(
+    feature_id = "F1",
+    candidate_structure_inchikey_connectivity_layer = NA_character_
+  )
+  expect_identical(.add_xrefs_to_df(df_na_ik, xrefs_edge), df_na_ik)
+
+  df_mixed <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "ABCDEFGHIJKLMN",
+      "OPQRSTUVWXYZAB"
+    )
+  )
+  res_mixed <- .add_xrefs_to_df(df_mixed, xrefs_edge)
+  expect_identical(
+    res_mixed$candidate_structure_id_chebi,
+    c("10 $ 20", "30")
+  )
+
+  xrefs_na_id <- tidytable::tidytable(
+    inchikey = "ABCDEFGHIJKLMN",
+    prefix = "chebi",
+    id = NA_character_
+  )
+  expect_identical(.add_xrefs_to_df(df_mixed, xrefs_na_id), df_mixed)
+
+  xrefs_disjoint <- tidytable::tidytable(
+    inchikey = "ZZZZZZZZZZZZZZ-UHFFFAOYSA-N",
+    prefix = "chebi",
+    id = "999"
+  )
+  expect_identical(.add_xrefs_to_df(df_mixed, xrefs_disjoint), df_mixed)
 })

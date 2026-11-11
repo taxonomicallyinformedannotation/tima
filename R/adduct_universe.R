@@ -220,11 +220,7 @@ build_adduct_universe_from_legacy <- function(
     cl_mass <- cluster_masses[[ci]]
     cl_named <- stats::setNames(1L, cl)
     new_strings <- apply_modifier_to_adducts(base_adducts, cl, "+")
-    ok <- !is.na(new_strings) & nzchar(new_strings)
-    if (!any(ok)) {
-      next
-    }
-    base_idx <- which(ok)
+    base_idx <- which(!is.na(new_strings) & nzchar(new_strings))
     for (ri in seq_along(base_idx)) {
       br_idx <- base_idx[[ri]]
       all_rows[[row_idx]] <- list(
@@ -246,11 +242,7 @@ build_adduct_universe_from_legacy <- function(
     lo_mass <- loss_masses[[li]]
     lo_named <- stats::setNames(1L, lo)
     new_strings <- apply_modifier_to_adducts(base_adducts, lo, "-")
-    ok <- !is.na(new_strings) & nzchar(new_strings)
-    if (!any(ok)) {
-      next
-    }
-    base_idx <- which(ok)
+    base_idx <- which(!is.na(new_strings) & nzchar(new_strings))
     for (ri in seq_along(base_idx)) {
       br_idx <- base_idx[[ri]]
       all_rows[[row_idx]] <- list(
@@ -278,11 +270,7 @@ build_adduct_universe_from_legacy <- function(
         cl_mass <- cluster_masses[[ci]]
         cl_named <- stats::setNames(1L, cl)
         new_strings <- apply_modifier_to_adducts(loss_strings, cl, "+")
-        ok <- !is.na(new_strings) & nzchar(new_strings)
-        if (!any(ok)) {
-          next
-        }
-        base_idx <- which(ok)
+        base_idx <- which(!is.na(new_strings) & nzchar(new_strings))
         for (ri in seq_along(base_idx)) {
           br_idx <- base_idx[[ri]]
           all_rows[[row_idx]] <- list(
@@ -385,16 +373,7 @@ calculate_mz_from_neutral_mass <- function(
   if (token == "H") {
     return("-H")
   }
-  if (z0 == 1L) {
-    return(paste0(token, "-2H"))
-  }
-  if (z0 == 2L) {
-    return(paste0(token, "-3H"))
-  }
-  if (z0 == 3L) {
-    return(paste0(token, "-4H"))
-  }
-  token
+  paste0(token, "-", z0 + 1L, "H")
 }
 
 # Tiny default helper for NULL or zero-length fallback.

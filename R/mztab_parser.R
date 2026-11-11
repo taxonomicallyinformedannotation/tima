@@ -69,9 +69,9 @@ NULL
   }
 
   out <- as.character(lines)
-  has_escaped_bom <- !is.na(out) & grepl("^\\ufeff", out)
-  if (any(has_escaped_bom)) {
-    out[has_escaped_bom] <- sub("^\\ufeff", "", out[has_escaped_bom])
+  has_bom <- !is.na(out) & startsWith(out, "\ufeff")
+  if (any(has_bom)) {
+    out[has_bom] <- sub("^\ufeff", "", out[has_bom])
   }
 
   already_ok <- !is.na(out) &
@@ -219,14 +219,6 @@ NULL
 
   n_cols <- length(col_names)
   n_rows <- length(raw_splits)
-  if (n_cols == 0L) {
-    out <- as.data.frame(
-      matrix(NA_character_, nrow = n_rows, ncol = 0L),
-      stringsAsFactors = FALSE,
-      check.names = FALSE
-    )
-    return(tidytable::as_tidytable(out))
-  }
 
   target_raw_len <- n_cols + 1L
   if (all(raw_lens == target_raw_len)) {
@@ -324,16 +316,12 @@ NULL
     return(paste(as.character(x), collapse = "|"))
   }
 
-  if (is.list(x)) {
-    vals <- vapply(x, .mztab_json_scalar, FUN.VALUE = character(1L))
-    vals <- vals[!is.na(vals) & nzchar(vals)]
-    if (length(vals) == 0L) {
-      return(NA_character_)
-    }
-    return(paste(unique(vals), collapse = "|"))
+  vals <- vapply(x, .mztab_json_scalar, FUN.VALUE = character(1L))
+  vals <- vals[!is.na(vals) & nzchar(vals)]
+  if (length(vals) == 0L) {
+    return(NA_character_)
   }
-
-  as.character(x)
+  paste(unique(vals), collapse = "|")
 }
 
 #' @keywords internal
@@ -469,12 +457,7 @@ read_mztab_tables <- function(input, include_raw_lines = FALSE) {
       character(0)
     }
   )
-  if (length(lines) > 0L) {
-    has_bom <- !is.na(lines) & startsWith(lines, "\ufeff")
-    if (any(has_bom)) {
-      lines[has_bom] <- sub("^\ufeff", "", lines[has_bom])
-    }
-  }
+  lines <- .normalize_mztab_prefix_sep(lines)
 
   first_nonblank <- ""
   if (length(lines) > 0L) {
@@ -493,8 +476,6 @@ read_mztab_tables <- function(input, include_raw_lines = FALSE) {
   if (is_json) {
     return(.read_mztab_json_tables(input))
   }
-
-  lines <- .normalize_mztab_prefix_sep(lines)
 
   out <- list(
     metadata = .parse_mztab_metadata(lines),

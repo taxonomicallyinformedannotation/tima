@@ -856,4 +856,72 @@ test_that(".normalize_enrichment_text handles sentinels and preserves valid n/e 
       "epicatechin"
     )
   )
+
+  # Helper edge cases in complement_metadata_structures.R
+  expect_equal(nrow(.build_structure_keys(tidytable::tidytable())), 0L)
+  expect_equal(
+    nrow(.build_structure_key_lookup_fast(
+      tidytable::tidytable(),
+      tidytable::tidytable(),
+      tidytable::tidytable(),
+      tidytable::tidytable(),
+      tidytable::tidytable(),
+      tidytable::tidytable()
+    )),
+    0L
+  )
+
+  sk_1 <- .build_structure_keys(tidytable::tidytable(
+    candidate_structure_inchikey_no_stereo = "IK1-N",
+    candidate_structure_inchikey_connectivity_layer = "IK1"
+  ))
+  lk_1 <- .build_structure_key_lookup_fast(
+    structure_keys = sk_1,
+    met_lookup = tidytable::tidytable(
+      candidate_structure_inchikey_no_stereo = "IK1-N",
+      .lk_molecular_formula = "C2H6O"
+    ),
+    nam_lookup = tidytable::tidytable(),
+    stereo_bridge = tidytable::tidytable(),
+    tax_cla = tidytable::tidytable(),
+    tax_npc = tidytable::tidytable(),
+    allowed_inchikey_no_stereo = NULL
+  )
+  expect_true(is.na(lk_1$.enr_candidate_structure_exact_mass[[1L]]))
+
+  expect_equal(
+    nrow(.apply_structure_enrichment_fast(tidytable::tidytable(), lk_1)),
+    0L
+  )
+  enr_df <- .apply_structure_enrichment_fast(
+    data.frame(
+      candidate_structure_inchikey_no_stereo = "IK1-N",
+      candidate_structure_inchikey_connectivity_layer = "IK1",
+      stringsAsFactors = FALSE
+    ),
+    lk_1,
+    row_to_sk = NULL
+  )
+  expect_equal(enr_df$candidate_structure_molecular_formula, "C2H6O")
+
+  df_plain <- data.frame(x = "1", stringsAsFactors = FALSE)
+  df_ens <- .ensure_structure_placeholders(df_plain)
+  expect_identical(.ensure_structure_placeholders(df_ens), df_ens)
+
+  tf_sel <- withr::local_tempfile(fileext = ".tsv")
+  writeLines("col_a\tcol_b\n1\t2", tf_sel)
+  expect_equal(nrow(.safe_fread_selected(tf_sel, "test", "nonexistent")), 0L)
+
+  expect_true(all(is.na(.collapse_delimited_lookup(1L, 1L, NA_character_))))
+  expect_true(all(is.na(.collapse_delimited_lookup(1L, 1L, "   "))))
+  expect_equal(
+    .collapse_delimited_lookup(
+      c(2L, 1L, 2L, 1L),
+      2L,
+      c("b1", "a1", "b2", "a2")
+    ),
+    c("a1 $ a2", "b1 $ b2")
+  )
+  expect_true(all(is.na(.resolve_numeric_lookup(1L, 1L, NA_character_))))
+  expect_true(all(is.na(.resolve_numeric_lookup(1L, 1L, "not_num"))))
 })

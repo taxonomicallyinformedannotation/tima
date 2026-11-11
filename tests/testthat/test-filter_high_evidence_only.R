@@ -594,4 +594,28 @@ test_that("filter_high_evidence_only retains promoted MS1 candidates only when a
   )
 
   expect_setequal(res$feature_id, c("ANCHOR_PASS", "MS1_GOOD_ANCHOR"))
+
+  # Character score columns + matched_peaks_min = NULL + promoted child add-back
+  df_addback <- tidytable::tidytable(
+    feature_id = c("ANCHOR_PASS", "CHILD_PROM"),
+    candidate_structure_inchikey_connectivity_layer = c("IK_A", "IK_A"),
+    score_biological = c("0.95", "0.95"),
+    candidate_score_pseudo_initial = c("0.95", "0.95"),
+    score_weighted_chemo = c("0.95", "0.95"),
+    candidate_similarity = c(0.8, 0.8),
+    candidate_count_similarity_peaks_matched = c(5L, 0L),
+    rank_final = c(1L, 1L),
+    cluster_consensus_group_id = c("G1", "G1"),
+    cluster_consensus_promoted_from_anchor = c(FALSE, TRUE),
+    cluster_consensus_anchor_feature_id = c("ANCHOR_PASS", "ANCHOR_PASS")
+  )
+  # Anchor has NA matched peaks so child keeps its own 0 matched peaks (fails filter)
+  # and is added back because its anchor passed!
+  df_addback$candidate_count_similarity_peaks_matched <- c(NA_integer_, 0L)
+  res_ab <- filter_high_evidence_only(
+    df_addback,
+    matched_peaks_min = NULL,
+    context = "test"
+  )
+  expect_setequal(res_ab$feature_id, c("ANCHOR_PASS", "CHILD_PROM"))
 })

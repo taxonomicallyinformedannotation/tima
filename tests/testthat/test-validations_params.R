@@ -159,6 +159,11 @@ test_that("validate_weights accepts valid non-negative weights", {
 
 test_that("validate_weights errors on negative weights", {
   expect_error(validate_weights(c(1, -1, 1)), class = "tima_error")
+  expect_error(
+    validate_weights(c(bio = 0.5, chemo = -0.2)),
+    regexp = "chemo",
+    class = "tima_error"
+  )
 })
 
 test_that("validate_weights errors on all-zero weights", {
@@ -283,6 +288,11 @@ test_that("validate_list_or_vector errors on non-list/vector", {
   expect_error(
     validate_list_or_vector(NULL, param_name = "x", allow_null = FALSE),
     class = "tima_error"
+  )
+  expect_error(
+    validate_list_or_vector(new.env(), param_name = "x"),
+    regexp = "must be a list or vector",
+    class = "tima_validation_error"
   )
 })
 

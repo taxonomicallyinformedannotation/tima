@@ -474,4 +474,133 @@ test_that("sanitize_sirius keeps validation status when structure count read fai
     },
     .package = "tima"
   )
+
+  # Additional edge cases across sanitize_mgf, sanitize_csv, sanitize_metadata, and sanitize_sirius
+  tf_mgf_ms1only <- withr::local_tempfile(fileext = ".mgf")
+  writeLines(
+    c("BEGIN IONS", "PEPMASS=100.0", "MSLEVEL=1", "END IONS"),
+    tf_mgf_ms1only
+  )
+  expect_false(sanitize_mgf(tf_mgf_ms1only)$valid)
+
+  tf_mgf_nopeaks <- withr::local_tempfile(fileext = ".mgf")
+  writeLines(
+    c("BEGIN IONS", "PEPMASS=100.0", "MSLEVEL=2", "END IONS"),
+    tf_mgf_nopeaks
+  )
+  res_np <- sanitize_mgf(tf_mgf_nopeaks)
+  expect_true(res_np$valid)
+
+  testthat::with_mocked_bindings(
+    readLines = function(...) stop("mgf read boom"),
+    .package = "base",
+    {
+      res_err_mgf <- sanitize_mgf(tf_mgf_nopeaks)
+      expect_false(res_err_mgf$valid)
+    }
+  )
+
+  tf_csv_0col <- withr::local_tempfile(fileext = ".tsv")
+  writeLines("", tf_csv_0col)
+  testthat::with_mocked_bindings(
+    safe_fread = function(...) tidytable::tidytable(),
+    {
+      res_0col <- sanitize_csv(tf_csv_0col)
+      expect_false(res_0col$valid)
+      expect_match(res_0col$issues[[1L]], "no columns")
+    }
+  )
+
+  tf_meta <- withr::local_tempfile(fileext = ".tsv")
+  writeLines(
+    c(
+      "filename\torganism",
+      "s1.mzML\tHomo sapiens",
+      "s2.mzML\t",
+      "s3.mzML\tHomo sapiens",
+      "s4.mzML\tHomo sapiens",
+      "s5.mzML\tHomo sapiens",
+      "s6.mzML\tHomo sapiens",
+      "s7.mzML\tHomo sapiens"
+    ),
+    tf_meta
+  )
+  tf_feat <- withr::local_tempfile(fileext = ".tsv")
+  writeLines("feature_id\ts1.mzML Peak area", tf_feat)
+  res_meta_6miss <- sanitize_metadata(tf_meta, features_file = tf_feat)
+  expect_true(res_meta_6miss$valid)
+  expect_equal(res_meta_6miss$n_unmatched, 6L)
+
+  testthat::with_mocked_bindings(
+    safe_fread = function(file, ...) {
+      if (identical(file, tf_meta)) {
+        stop("meta read error")
+      }
+      tidytable::tidytable()
+    },
+    {
+      res_meta_err <- sanitize_metadata(tf_meta)
+      expect_false(res_meta_err$valid)
+    }
+  )
+
+  testthat::with_mocked_bindings(
+    safe_fread = function(file, ...) {
+      if (identical(file, tf_feat)) {
+        stop("feat read error")
+      }
+      tidytable::tidytable(filename = "s1.mzML", organism = "Homo sapiens")
+    },
+    {
+      res_feat_err <- sanitize_metadata(tf_meta, features_file = tf_feat)
+      expect_false(res_feat_err$valid)
+    }
+  )
+
+  # ZIP SIRIUS v5 and unknown version edge cases
+  td_zip <- withr::local_tempdir()
+  f_v5 <- file.path(td_zip, "formula_identifications.tsv")
+  s_v5 <- file.path(td_zip, "compound_identifications.tsv")
+  writeLines("id\n1", f_v5)
+  writeLines("id\n1", s_v5)
+  zip_v5 <- file.path(td_zip, "sirius_v5.zip")
+  utils::zip(zip_v5, files = c(f_v5, s_v5), flags = "-q")
+  testthat::with_mocked_bindings(
+    safe_fread = function(...) stop("zip struct error"),
+    {
+      res_zv5 <- sanitize_sirius(zip_v5)
+      expect_false(res_zv5$valid)
+      expect_equal(res_zv5$sirius_version, "5")
+    }
+  )
+
+  dummy_txt <- file.path(td_zip, "readme.txt")
+  writeLines("hi", dummy_txt)
+  zip_unk <- file.path(td_zip, "sirius_unk.zip")
+  utils::zip(zip_unk, files = dummy_txt, flags = "-q")
+  res_zunk <- sanitize_sirius(zip_unk)
+  expect_false(res_zunk$valid)
+  expect_equal(res_zunk$sirius_version, "unknown")
+
+  # Metadata without organism column + metadata with all filenames matched
+  tf_meta_noorg <- withr::local_tempfile(fileext = ".tsv")
+  writeLines(c("filename", "s1.mzML"), tf_meta_noorg)
+  res_all_match <- sanitize_metadata(tf_meta_noorg, features_file = tf_feat)
+  expect_true(res_all_match$valid)
+  expect_true(res_all_match$filenames_match)
+
+  # ZIP SIRIUS v6 with valid structure_identifications_all.tsv
+  td_z6 <- withr::local_tempdir()
+  f_v6 <- file.path(td_z6, "formula_identifications_all.tsv")
+  c_v6 <- file.path(td_z6, "canopus_formula_summary_all.tsv")
+  s_v6 <- file.path(td_z6, "structure_identifications_all.tsv")
+  writeLines("id\n1", f_v6)
+  writeLines("id\n1", c_v6)
+  writeLines("id\n1\n2", s_v6)
+  zip_v6 <- file.path(td_z6, "sirius_v6.zip")
+  utils::zip(zip_v6, files = c(f_v6, c_v6, s_v6), flags = "-q")
+  res_zv6 <- sanitize_sirius(zip_v6)
+  expect_true(res_zv6$valid)
+  expect_equal(res_zv6$sirius_version, "6")
+  expect_equal(res_zv6$n_features, 2L)
 })

@@ -262,12 +262,10 @@ sanitize_csv <- function(
   columns <- read_result$columns
 
   # Check for empty file
-  if (n_rows == 0L && length(issues) == 0L) {
-    issues <- c(issues, paste0(file_type, " is empty (0 rows)"))
-  }
-
   if (n_cols == 0L && length(issues) == 0L) {
     issues <- c(issues, paste0(file_type, " has no columns)"))
+  } else if (n_rows == 0L && length(issues) == 0L) {
+    issues <- c(issues, paste0(file_type, " is empty (0 rows)"))
   }
 
   # Check for required columns
@@ -766,19 +764,6 @@ sanitize_sirius <- function(sirius_dir) {
         )
       ))
     }
-  }
-
-  # Now check directory
-  if (!dir.exists(sirius_dir)) {
-    return(list(
-      valid = FALSE,
-      has_formula = FALSE,
-      has_canopus = FALSE,
-      has_structure = FALSE,
-      n_features = 0L,
-      is_zip = is_zip,
-      issues = c(issues, "Could not access SIRIUS directory")
-    ))
   }
 
   # Check for required summary files (try both SIRIUS v5 and v6 names)

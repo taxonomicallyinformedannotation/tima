@@ -182,7 +182,10 @@ local_fake_ott_api <- function(.env = parent.frame()) {
   calls$taxon_info <- list()
   local_mocked_bindings(
     req_perform = function(req, ...) structure(list(), class = "mock_resp"),
-    resp_status_desc = function(resp) "OK",
+    resp_status_desc = function(resp) {
+      force(resp)
+      "OK"
+    },
     .package = "httr2",
     .env = .env
   )
@@ -492,4 +495,105 @@ test_that("get_organism_taxonomy_ott handles sub-ranks and duplicate search_stri
     result$organism_taxonomy_09species,
     c("Gentiana lutea", "Homo sapiens")
   )
+
+  # Fallback non-standard lineage columns, all-NA organisms, network error, and unmatched search_string
+  non_std_lin <- .build_taxonomy_lineage(
+    taxon_info = list(
+      list(rank = "species", name = "A", unique_name = "A", ott_id = 1L)
+    ),
+    taxon_lineage = list(
+      data.frame(
+        rank = "genus",
+        name = "G",
+        unique_name = "G",
+        ott_id = 2L,
+        extra = "x"
+      )
+    ),
+    ott_ids = 1L
+  )
+  expect_equal(nrow(non_std_lin), 2L)
+
+  expect_equal(
+    nrow(get_organism_taxonomy_ott(data.frame(organism = NA_character_))),
+    0L
+  )
+  testthat::with_mocked_bindings(
+    req_perform = function(...) stop("connection refused"),
+    .package = "httr2",
+    expect_warning(
+      res_err <- get_organism_taxonomy_ott(data.frame(
+        organism = "Homo sapiens"
+      )),
+      class = "tima_ott_unavailable_warning"
+    )
+  )
+  expect_equal(nrow(res_err), 0L)
+
+  local_fake_ott_api()
+  local_mocked_bindings(
+    tnrs_match_names = function(names, ...) {
+      data.frame(
+        search_string = "unrelated_query",
+        ott_id = 999999L,
+        unique_name = "Unrelated",
+        stringsAsFactors = FALSE
+      )
+    },
+    taxonomy_taxon_info = function(ott_ids, ...) {
+      list(list(
+        rank = "species",
+        name = "X",
+        unique_name = "X",
+        ott_id = 576855L
+      ))
+    },
+    tax_lineage = function(...) {
+      list(data.frame(
+        rank = character(),
+        name = character(),
+        unique_name = character(),
+        ott_id = integer()
+      ))
+    },
+    .package = "rotl"
+  )
+  res_no_keep_m <- get_organism_taxonomy_ott(
+    data.frame(organism = "Homo sapiens"),
+    retry = FALSE
+  )
+  expect_equal(nrow(res_no_keep_m), 0L)
+
+  local_mocked_bindings(
+    tnrs_match_names = function(names, ...) {
+      data.frame(
+        search_string = "other_search_str",
+        ott_id = 576855L,
+        unique_name = "Other",
+        stringsAsFactors = FALSE
+      )
+    },
+    taxonomy_taxon_info = function(ott_ids, ...) {
+      list(list(
+        rank = "species",
+        name = "X",
+        unique_name = "X",
+        ott_id = 576855L
+      ))
+    },
+    tax_lineage = function(...) {
+      list(data.frame(
+        rank = character(),
+        name = character(),
+        unique_name = character(),
+        ott_id = integer()
+      ))
+    },
+    .package = "rotl"
+  )
+  res_no_join <- get_organism_taxonomy_ott(
+    data.frame(organism = "Homo sapiens"),
+    retry = FALSE
+  )
+  expect_equal(nrow(res_no_join), 0L)
 })

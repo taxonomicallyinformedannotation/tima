@@ -3100,4 +3100,189 @@ test_that("annotate_masses internal helpers cover primary/secondary, weak hypoth
     output_edges = out_edg_c
   )
   expect_true(file.exists(out_ann_c))
+
+  # Edge cases in annotate_masses_features: all-NA preassigned adducts, NA structure_exact_mass in library, and log_adduct_breakdown without error_mz
+  expect_equal(
+    nrow(
+      propagate_preassigned_over_adduct_edges(
+        tidytable::tidytable(
+          feature_id = "F1",
+          adduct = "[M+H]+",
+          feature_id_dest = "F2",
+          adduct_dest = "[M+Na]+"
+        ),
+        tidytable::tidytable(feature_id = "F1", adduct = NA_character_)
+      )
+    ),
+    0L
+  )
+
+  str_met_na <- file.path(td, "str_met_na.tsv")
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_smiles_no_stereo = c("CCO", "CCC"),
+      structure_exact_mass = c(M_eth, NA_real_),
+      structure_molecular_formula = c("C2H6O", "C3H8"),
+      structure_xlogp = c(-0.3, 1.5)
+    ),
+    str_met_na,
+    sep = "\t"
+  )
+  lib_smi_2 <- file.path(td, "lib2.tsv")
+  tidytable::fwrite(
+    tidytable::tidytable(
+      structure_smiles = "CCO",
+      structure_inchikey = "LFQSCWFLJHTTHZ-UHFFFAOYSA-N"
+    ),
+    lib_smi_2,
+    sep = "\t"
+  )
+  loaded_na <- load_structural_library(
+    library = lib_smi_2,
+    str_stereo = str_ste,
+    str_met = str_met_na,
+    str_nam = str_nam,
+    str_tax_cla = str_cla,
+    str_tax_npc = str_npc,
+    tolerance_ppm = 10
+  )
+  expect_equal(nrow(loaded_na$structures), 1L)
+
+  expect_null(log_adduct_breakdown(tidytable::tidytable()))
+  expect_null(
+    log_adduct_breakdown(
+      tidytable::tidytable(feature_id = "F1", adduct = "[M+H]+")
+    )
+  )
+
+  # annotate_masses_enforcement edge cases
+  expect_equal(
+    nrow(enrich_with_structure_metadata(
+      tidytable::tidytable(),
+      tidytable::tidytable()
+    )),
+    0L
+  )
+  enr_no_em <- enrich_with_structure_metadata(
+    combined = tidytable::tidytable(
+      feature_id = "F1",
+      structure_name = "Ethanol",
+      error_mz = 0.001
+    ),
+    structure_table = tidytable::tidytable(
+      structure_name = "Ethanol",
+      structure_xlogp = -0.3
+    )
+  )
+  expect_equal(nrow(enr_no_em), 1L)
+
+  expect_identical(loss_term_atom_requirements("2"), integer())
+  expect_identical(loss_term_atom_requirements("invalid$$$"), integer())
+  expect_identical(adduct_loss_atom_requirements(""), integer())
+  expect_identical(adduct_loss_atom_requirements("[M]+"), integer())
+  expect_identical(
+    adduct_loss_atom_requirements("H2O"),
+    c(H = 2L, O = 1L)
+  )
+  testthat::with_mocked_bindings(
+    parse_atomic_formula = function(...) stop("parse boom"),
+    {
+      expect_identical(loss_term_atom_requirements("H2O"), integer())
+      expect_true(is.na(formula_satisfies_loss_requirements(
+        "C6H12O6",
+        c(H = 2L)
+      )))
+    }
+  )
+  testthat::with_mocked_bindings(
+    normalize_adduct_string = function(...) stop("norm error"),
+    expect_identical(
+      adduct_loss_atom_requirements("[M-H2O+H]+"),
+      c(H = 2L, O = 1L)
+    )
+  )
+  expect_true(formula_satisfies_loss_requirements("C6H12O6", integer()))
+  expect_true(is.na(formula_satisfies_loss_requirements("$$$", c(H = 2L))))
+
+  expect_equal(
+    nrow(enforce_loss_formula_compatibility(tidytable::tidytable())),
+    0L
+  )
+  expect_equal(
+    nrow(enforce_loss_formula_compatibility(tidytable::tidytable(
+      feature_id = "F1",
+      adduct = "[M-H2O+H]+",
+      source = "loss",
+      candidate_structure_molecular_formula = "CH4",
+      candidate_structure_error_mz = NA_real_
+    ))),
+    1L
+  )
+
+  # Redundant loss edge dropped when adduct_edges already encode the loss on both endpoints
+  edg_red <- build_output_edges(
+    features_table = tidytable::tidytable(feature_id = c("F1", "F2")),
+    adduct_edges = tidytable::tidytable(
+      feature_id = "F1",
+      adduct = "[M-H2O+H]+",
+      feature_id_dest = "F2",
+      adduct_dest = "[M-H2O+Na]+"
+    ),
+    loss_edges = tidytable::tidytable(
+      feature_id = "F1",
+      loss = "H2O",
+      feature_id_dest = "F2"
+    ),
+    cluster_edges = tidytable::tidytable(),
+    covariance_edges = NULL,
+    name_source = "feature_source",
+    name_target = "feature_target"
+  )
+  expect_false(any(grepl("loss", edg_red$label)))
+
+  expect_null(log_consistency_audit(NULL))
+  expect_null(log_consistency_audit(list(n_kept = 3L, n_dropped = 1L)))
+  # Without loss_term column (uses adduct requirements)
+  ann_no_lt <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    adduct = c("[M-H2O+H]+", "[M+H]+"),
+    source = c("loss", "loss"),
+    candidate_structure_molecular_formula = c("CH4", "CH4"),
+    candidate_structure_error_mz = c(0.001, 0.001)
+  )
+  res_no_lt <- enforce_loss_formula_compatibility(ann_no_lt)
+  expect_true(is.na(res_no_lt$candidate_structure_error_mz[[1L]]))
+
+  # Without source column and with active_mask all FALSE
+  ann_no_src <- tidytable::tidytable(
+    feature_id = c("F1", "F2"),
+    adduct = c("[M-H2O+H]+", "[M+H]+"),
+    loss_term = c(NA_character_, ""),
+    candidate_structure_molecular_formula = c("CH4", "CH4"),
+    candidate_structure_error_mz = c(NA_real_, 0.001)
+  )
+  expect_equal(nrow(enforce_loss_formula_compatibility(ann_no_src)), 2L)
+
+  expect_equal(
+    nrow(enforce_annotation_edge_adduct_agreement(
+      tidytable::tidytable(),
+      tidytable::tidytable()
+    )),
+    0L
+  )
+  expect_equal(
+    nrow(enforce_annotation_edge_adduct_agreement(
+      tidytable::tidytable(feature_id = "F1"),
+      tidytable::tidytable()
+    )),
+    1L
+  )
+  expect_equal(
+    nrow(enforce_annotation_edge_adduct_agreement(
+      tidytable::tidytable(feature_id = "F1", adduct = "[M+H]+"),
+      tidytable::tidytable(),
+      baseline_adduct = NULL
+    )),
+    1L
+  )
 })

@@ -147,10 +147,9 @@ formula_mass <- function(formula_vec) {
 #' @keywords internal
 parse_carrier_token <- function(token) {
   token <- as.character(token)
-  if (is.null(token) || is.na(token) || !nzchar(token)) {
+  if (length(token) == 0L || is.na(token)) {
     return(NULL)
   }
-  # Split at +/- boundaries while keeping the sign
   parts <- regmatches(
     token,
     gregexpr("([+-]?)([0-9]*)([A-Za-z][A-Za-z0-9]*)", token, perl = TRUE)
@@ -173,9 +172,6 @@ parse_carrier_token <- function(token) {
       as.integer(coef_match[[1L]])
     }
     sym <- sub("^[0-9]+", "", body, perl = TRUE)
-    if (!nzchar(sym)) {
-      return(NULL)
-    }
     # Normalise NH4 → H4N (IUPAC Hill order) so charge lookup works.
     if (sym == "NH4") {
       sym <- "H4N"

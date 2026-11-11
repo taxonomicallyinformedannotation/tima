@@ -146,210 +146,97 @@ harmonize_spectra <- function(
   target_num_po <- if (is_pos) 1 else -1
 
   # Filter polarity on unique values of col_po before copying list columns
-  if (col_po %in% names(spectra)) {
-    po_vec <- spectra[[col_po]]
-    u_po <- unique(po_vec)
-    u_keep <- grepl(pattern = mode, x = u_po, ignore.case = TRUE) |
-      (suppressWarnings(as.numeric(u_po)) %in% target_num_po)
-    if (all(u_keep)) {
-      keep_idx <- seq_len(nrow(spectra))
-    } else if (!any(u_keep)) {
-      keep_idx <- integer(0L)
-    } else {
-      m_po <- if (anyNA(u_po)) {
-        match(po_vec, u_po)
-      } else {
-        fastmatch::fmatch(po_vec, u_po)
-      }
-      keep_idx <- which(u_keep[m_po])
-    }
-  } else {
-    keep_idx <- integer(0L)
-  }
+  po_vec <- spectra[[col_po]]
+  u_po <- unique(po_vec)
+  u_keep <- grepl(pattern = mode, x = u_po, ignore.case = TRUE) |
+    (suppressWarnings(as.numeric(u_po)) %in% target_num_po)
+  m_po <- fastmatch::fmatch(po_vec, u_po)
+  keep_idx <- which(u_keep[m_po])
 
   n_keep <- length(keep_idx)
-  if (n_keep == 0L && length(columns_missing) > 0L) {
-    names(columns_missing) <- columns_missing
-    spectra_missing <- columns_missing |>
-      data.frame() |>
-      tidytable::as_tidytable() |>
-      tidytable::bind_cols(tidytable::tidytable(value = NA_character_)) |>
-      tidytable::pivot_wider(names_from = columns_missing) |>
-      tidytable::mutate(join = "x")
+  target_order <- c(
+    "adduct",
+    "collision_energy",
+    "compound_id",
+    "inchi",
+    "inchi_no_stereo",
+    "inchikey",
+    "inchikey_connectivity_layer",
+    "name",
+    "precursorMz",
+    "precursorCharge",
+    "smiles",
+    "smiles_no_stereo",
+    "spectrum_id",
+    "splash",
+    "synonyms",
+    if ("rtime" %in% names(spectra)) "rtime",
+    "mz",
+    "intensity",
+    "library"
+  )
+  out_cols <- vector("list", length(target_order))
+  names(out_cols) <- target_order
 
-    if (!"precursorCharge" %in% names(spectra)) {
-      spectra$precursorCharge <- NA_integer_
-    }
-
-    spectra_filtered <- spectra |>
-      data.frame(check.names = FALSE) |>
-      tidytable::as_tidytable()
-
-    for (.col in intersect(c("mz", "intensity"), names(spectra_filtered))) {
-      if (!is.list(spectra_filtered[[.col]])) {
-        spectra_filtered[[.col]] <- as.list(spectra_filtered[[.col]])
-      }
-    }
-
-    spectra_filtered <- spectra_filtered |>
-      tidytable::filter(
-        grepl(
-          pattern = mode,
-          x = !!as.name(col_po),
-          ignore.case = TRUE
-        ) |
-          suppressWarnings(as.numeric(!!as.name(col_po))) %in% target_num_po
-      ) |>
-      tidytable::select(
-        tidyselect::any_of(x = columns_full),
-        tidyselect::any_of(x = "precursorCharge"),
-        precursorMz,
-        tidyselect::any_of(x = "rtime"),
-        mz,
-        intensity
-      ) |>
-      tidytable::mutate(
-        join = "x",
-        precursorCharge = tidytable::coalesce(precursorCharge, default_charge)
-      )
-
-    spectra_harmonized <- spectra_filtered |>
-      tidytable::full_join(y = spectra_missing) |>
-      tidytable::select(tidyselect::any_of(
-        x = c(
-          "adduct",
-          "collision_energy",
-          "compound_id",
-          "inchi",
-          "inchi_no_stereo",
-          "inchikey",
-          "inchikey_connectivity_layer",
-          "name",
-          "precursorMz",
-          "precursorCharge",
-          "smiles",
-          "smiles_no_stereo",
-          "spectrum_id",
-          "splash",
-          "synonyms",
-          "rtime",
-          "mz",
-          "intensity"
-        )
-      )) |>
-      tidytable::mutate(
-        library = metad,
-        spectrum_id = tidytable::if_else(
-          condition = is.na(spectrum_id),
-          true = tidytable::row_number() |>
-            as.character(),
-          false = as.character(spectrum_id)
-        ),
-        compound_id = tidytable::if_else(
-          condition = is.na(compound_id),
-          true = name |>
-            as.character(),
-          false = compound_id |>
-            as.character()
-        )
-      ) |>
-      data.frame(check.names = FALSE)
-
-    for (.col in intersect(c("mz", "intensity"), names(spectra_harmonized))) {
-      if (!is.list(spectra_harmonized[[.col]])) {
-        spectra_harmonized[[.col]] <- as.list(spectra_harmonized[[.col]])
-      }
-    }
-    rm(spectra_filtered)
-  } else {
-    target_order <- c(
-      "adduct",
-      "collision_energy",
-      "compound_id",
-      "inchi",
-      "inchi_no_stereo",
-      "inchikey",
-      "inchikey_connectivity_layer",
-      "name",
-      "precursorMz",
-      "precursorCharge",
-      "smiles",
-      "smiles_no_stereo",
-      "spectrum_id",
-      "splash",
-      "synonyms",
-      if ("rtime" %in% names(spectra)) "rtime",
-      "mz",
-      "intensity",
-      "library"
-    )
-    out_cols <- vector("list", length(target_order))
-    names(out_cols) <- target_order
-
-    for (std_nm in names(columns_full)) {
-      src_nm <- columns_full[[std_nm]]
-      if (src_nm %in% names(spectra)) {
-        out_cols[[std_nm]] <- spectra[[src_nm]][keep_idx]
-      } else {
-        out_cols[[std_nm]] <- rep(NA_character_, n_keep)
-      }
-    }
-    for (miss_nm in columns_missing) {
-      out_cols[[miss_nm]] <- rep(NA_character_, n_keep)
-    }
-
-    out_cols[["precursorMz"]] <- spectra[["precursorMz"]][keep_idx]
-    if ("precursorCharge" %in% names(spectra)) {
-      pc <- spectra[["precursorCharge"]][keep_idx]
-      na_pc <- is.na(pc)
-      if (any(na_pc)) {
-        pc[na_pc] <- default_charge
-      }
-      out_cols[["precursorCharge"]] <- pc
+  for (std_nm in names(columns_full)) {
+    src_nm <- columns_full[[std_nm]]
+    if (src_nm %in% names(spectra)) {
+      out_cols[[std_nm]] <- spectra[[src_nm]][keep_idx]
     } else {
-      out_cols[["precursorCharge"]] <- rep(default_charge, n_keep)
+      out_cols[[std_nm]] <- rep(NA_character_, n_keep)
     }
-
-    if ("rtime" %in% names(spectra)) {
-      out_cols[["rtime"]] <- spectra[["rtime"]][keep_idx]
-    }
-    for (.col in c("mz", "intensity")) {
-      col_val <- spectra[[.col]][keep_idx]
-      if (!is.list(col_val)) {
-        col_val <- as.list(col_val)
-      }
-      out_cols[[.col]] <- col_val
-    }
-
-    out_cols[["library"]] <- rep(metad, n_keep)
-
-    sid <- out_cols[["spectrum_id"]]
-    if (all(is.na(sid))) {
-      out_cols[["spectrum_id"]] <- as.character(seq_len(n_keep))
-    } else {
-      sid_chr <- as.character(sid)
-      na_sid <- is.na(sid_chr)
-      if (any(na_sid)) {
-        sid_chr[na_sid] <- as.character(which(na_sid))
-      }
-      out_cols[["spectrum_id"]] <- sid_chr
-    }
-
-    cid <- out_cols[["compound_id"]]
-    nm_chr <- as.character(out_cols[["name"]])
-    if (all(is.na(cid))) {
-      out_cols[["compound_id"]] <- nm_chr
-    } else {
-      cid_chr <- as.character(cid)
-      na_cid <- is.na(cid_chr)
-      if (any(na_cid)) {
-        cid_chr[na_cid] <- nm_chr[na_cid]
-      }
-      out_cols[["compound_id"]] <- cid_chr
-    }
-
-    spectra_harmonized <- tidytable::as_tidytable(out_cols)
   }
+  for (miss_nm in columns_missing) {
+    out_cols[[miss_nm]] <- rep(NA_character_, n_keep)
+  }
+
+  out_cols[["precursorMz"]] <- spectra[["precursorMz"]][keep_idx]
+  if ("precursorCharge" %in% names(spectra)) {
+    pc <- spectra[["precursorCharge"]][keep_idx]
+    na_pc <- is.na(pc)
+    if (any(na_pc)) {
+      pc[na_pc] <- default_charge
+    }
+    out_cols[["precursorCharge"]] <- pc
+  } else {
+    out_cols[["precursorCharge"]] <- rep(default_charge, n_keep)
+  }
+
+  if ("rtime" %in% names(spectra)) {
+    out_cols[["rtime"]] <- spectra[["rtime"]][keep_idx]
+  }
+  for (.col in c("mz", "intensity")) {
+    out_cols[[.col]] <- as.list(spectra[[.col]][keep_idx])
+  }
+
+  out_cols[["library"]] <- rep(metad, n_keep)
+
+  sid <- out_cols[["spectrum_id"]]
+  if (all(is.na(sid))) {
+    out_cols[["spectrum_id"]] <- as.character(seq_len(n_keep))
+  } else {
+    sid_chr <- as.character(sid)
+    na_sid <- is.na(sid_chr)
+    if (any(na_sid)) {
+      sid_chr[na_sid] <- as.character(which(na_sid))
+    }
+    out_cols[["spectrum_id"]] <- sid_chr
+  }
+
+  cid <- out_cols[["compound_id"]]
+  nm_chr <- as.character(out_cols[["name"]])
+  if (all(is.na(cid))) {
+    out_cols[["compound_id"]] <- nm_chr
+  } else {
+    cid_chr <- as.character(cid)
+    na_cid <- is.na(cid_chr)
+    if (any(na_cid)) {
+      cid_chr[na_cid] <- nm_chr[na_cid]
+    }
+    out_cols[["compound_id"]] <- cid_chr
+  }
+
+  spectra_harmonized <- tidytable::as_tidytable(out_cols)
 
   smiles_harmonized <- spectra_harmonized |>
     process_smiles(smiles_colname = "smiles")
@@ -361,43 +248,29 @@ harmonize_spectra <- function(
   smiles_harmonized <- smiles_harmonized |>
     tidytable::rename(smiles = smiles_old, smiles_new = smiles)
 
-  if (
-    n_keep > 0L &&
-      nrow(smiles_harmonized) > 0L &&
-      !anyDuplicated(smiles_harmonized$smiles)
-  ) {
-    sm_vec <- spectra_harmonized$smiles
-    u_sm <- smiles_harmonized$smiles
-    m_sm <- if (anyNA(u_sm) || anyNA(sm_vec)) {
-      match(sm_vec, u_sm)
-    } else {
-      fastmatch::fmatch(sm_vec, u_sm)
-    }
-    valid_m <- which(!is.na(m_sm))
-    ord <- order(m_sm[valid_m], method = "radix")
-    row_idx <- valid_m[ord]
-    sm_idx <- m_sm[row_idx]
-
-    drop_cols <- c(colnames(smiles_harmonized)[-1L], "smiles")
-    keep_base_cols <- setdiff(names(spectra_harmonized), drop_cols)
-    base_list <- lapply(
-      as.list(spectra_harmonized)[keep_base_cols],
-      `[`,
-      row_idx
-    )
-    sm_cols <- setdiff(colnames(smiles_harmonized), "smiles")
-    sm_list <- lapply(as.list(smiles_harmonized)[sm_cols], `[`, sm_idx)
-    names(sm_list)[names(sm_list) == "smiles_new"] <- "smiles"
-    spectra_harmonized <- tidytable::as_tidytable(c(base_list, sm_list))
+  sm_vec <- spectra_harmonized$smiles
+  u_sm <- smiles_harmonized$smiles
+  m_sm <- if (anyNA(u_sm) || anyNA(sm_vec)) {
+    match(sm_vec, u_sm)
   } else {
-    spectra_harmonized <- spectra_harmonized |>
-      tidytable::select(
-        -tidyselect::any_of(colnames(smiles_harmonized)[-1L])
-      ) |>
-      tidytable::inner_join(smiles_harmonized) |>
-      tidytable::select(-smiles) |>
-      tidytable::rename(smiles = smiles_new)
+    fastmatch::fmatch(sm_vec, u_sm)
   }
+  valid_m <- which(!is.na(m_sm))
+  ord <- order(m_sm[valid_m], method = "radix")
+  row_idx <- valid_m[ord]
+  sm_idx <- m_sm[row_idx]
+
+  drop_cols <- c(colnames(smiles_harmonized)[-1L], "smiles")
+  keep_base_cols <- setdiff(names(spectra_harmonized), drop_cols)
+  base_list <- lapply(
+    as.list(spectra_harmonized)[keep_base_cols],
+    `[`,
+    row_idx
+  )
+  sm_cols <- setdiff(colnames(smiles_harmonized), "smiles")
+  sm_list <- lapply(as.list(smiles_harmonized)[sm_cols], `[`, sm_idx)
+  names(sm_list)[names(sm_list) == "smiles_new"] <- "smiles"
+  spectra_harmonized <- tidytable::as_tidytable(c(base_list, sm_list))
   rm(smiles_harmonized)
 
   log_complete(ctx, n_harmonized = nrow(spectra_harmonized))

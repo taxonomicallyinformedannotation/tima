@@ -78,10 +78,7 @@ prepare_annotations_gnps <- function(
 
   ctx <- log_operation("prepare_annotations_gnps", n_files = length(input))
 
-  if (length(input) == 0) {
-    input <- "w1llN3v3r3v3r3x1st"
-  }
-  if (all(file.exists(unlist(input)))) {
+  if (length(input) > 0L && all(file.exists(unlist(input)))) {
     ## See https://github.com/CCMS-UCSD/GNPS_Workflows/issues/747
     table <- Map(
       function(x, y) {

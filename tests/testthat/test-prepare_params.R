@@ -68,8 +68,25 @@ test_that("prepare_params accepts explicit fixture lists", {
   withr::local_dir(new = temp_test_dir("prepare_params_manual"))
   stage_installed_params()
 
+  ps <- get_params(step = "prepare_params")
+  pa <- get_params(step = "prepare_params_advanced")
   expect_silent(prepare_params(
-    params_small = get_params(step = "prepare_params"),
-    params_advanced = get_params(step = "prepare_params_advanced")
+    params_small = ps,
+    params_advanced = pa
+  ))
+
+  ps_empty_tax <- ps
+  ps_empty_tax$organisms$taxon <- ""
+  expect_silent(prepare_params(
+    params_small = ps_empty_tax,
+    params_advanced = pa
+  ))
+
+  ps_tax <- ps
+  ps_tax$organisms$taxon <- "Homo sapiens"
+  expect_silent(prepare_params(
+    params_small = ps_tax,
+    params_advanced = pa,
+    step = "annotate_masses"
   ))
 })

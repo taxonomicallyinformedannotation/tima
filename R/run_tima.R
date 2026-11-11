@@ -73,13 +73,19 @@ execute_targets_pipeline <- function(target_pattern = "^(ann_wei|exp_mzt)$") {
   }
 
   tryCatch(
-    {
-      targets::tar_make(
-        names = tidyselect::matches(match = target_pattern),
-        script = targets_script
-      )
-      log_success("Targets pipeline completed successfully")
-    },
+    withCallingHandlers(
+      {
+        targets::tar_make(
+          names = tidyselect::matches(match = target_pattern),
+          script = targets_script
+        )
+        log_success("Targets pipeline completed successfully")
+      },
+      warning = function(w) {
+        log_warn("Pipeline warning: %s", conditionMessage(w))
+        invokeRestart("muffleWarning")
+      }
+    ),
     error = function(e) {
       log_error("Pipeline execution failed: %s", conditionMessage(e))
       cli::cli_abort(
@@ -91,10 +97,6 @@ execute_targets_pipeline <- function(target_pattern = "^(ann_wei|exp_mzt)$") {
         class = c("tima_runtime_error", "tima_error"),
         call = NULL
       )
-    },
-    warning = function(w) {
-      log_warn("Pipeline warning: %s", conditionMessage(w))
-      invokeRestart("muffleWarning")
     }
   )
 

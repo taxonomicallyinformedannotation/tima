@@ -1628,6 +1628,8 @@ test_that("SIRIUS utility helpers cover low-duplicate key guard, whitespace over
     ),
     0L
   )
+  fn_v5 <- get_sirius_filenames(version = "5")
+  expect_identical(fn_v5$canopus, "canopus_compound_summary.tsv")
   fn_v6 <- get_sirius_filenames(version = "6")
   expect_true(grepl("structure_identifications", fn_v6$structures))
   st_prep <- tidytable::tidytable(
@@ -1642,6 +1644,13 @@ test_that("SIRIUS utility helpers cover low-duplicate key guard, whitespace over
     candidate_structure_smiles_no_stereo = NA_character_,
     candidate_adduct = "[M+H]+",
     candidate_library = "GNPS"
+  )
+  expect_identical(
+    nrow(merge_sirius_structures_with_spectral(
+      tidytable::tidytable(),
+      sp_na_smi
+    )),
+    1L
   )
   res_na_smi <- merge_sirius_structures_with_spectral(st_prep, sp_na_smi)
   expect_identical(nrow(res_na_smi), 2L)
@@ -1737,4 +1746,25 @@ test_that("SIRIUS utility helpers cover low-duplicate key guard, whitespace over
     max_radix_space = 1
   )
   expect_identical(res_paste_match, c(3L, 1L, NA_integer_))
+
+  tf_empty <- withr::local_tempfile(fileext = ".tsv")
+  file.create(tf_empty)
+  expect_error(.read_sirius_tabular(tf_empty), "first five rows are empty")
+  expect_error(
+    .read_sirius_tabular(textConnection("")),
+    "first five rows are empty"
+  )
+
+  # Directory fallback when .get_sirius_zip_names errors in load_sirius_tables and load_sirius_summaries
+  dir_fb <- withr::local_tempdir()
+  testthat::with_mocked_bindings(
+    .get_sirius_zip_names = function(...) stop("not a zip"),
+    read_from_sirius_zip = function(...) tidytable::tidytable(),
+    {
+      tbls_fb <- load_sirius_tables(dir_fb, version = "6")
+      expect_true(is.list(tbls_fb))
+      sums_fb <- load_sirius_summaries(dir_fb)
+      expect_equal(nrow(sums_fb), 0L)
+    }
+  )
 })

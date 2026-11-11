@@ -52,7 +52,11 @@ test_that("parse_cli_params maps SIRIUS analog mz-error CLI argument", {
   params <- get_params(step = "prepare_params_advanced")
 
   result <- parse_cli_params(
-    arguments = list(too_sir_max_analog_abs_mz_error = 0.005),
+    arguments = list(
+      too_sir_max_analog_abs_mz_error = 0.005,
+      ms_clu = "H2O, CH3OH",
+      ms_sol = "ACN, MeOH"
+    ),
     parameters = params
   )
 
@@ -60,4 +64,6 @@ test_that("parse_cli_params maps SIRIUS analog mz-error CLI argument", {
     result$tools$sirius$max_analog_abs_mz_error,
     0.005
   )
+  expect_equal(result$ms$clusters, c("H2O", "CH3OH"))
+  expect_equal(result$ms$solvents, c("ACN", "MeOH"))
 })

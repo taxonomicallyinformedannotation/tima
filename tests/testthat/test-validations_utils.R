@@ -274,4 +274,56 @@ test_that("assert_scalar_numeric enforces type and range", {
   expect_error(assert_scalar_numeric(c(1, 2), "param"), "single numeric")
   expect_error(assert_scalar_numeric(NA_real_, "param"), "cannot be NA")
   expect_error(assert_scalar_numeric(-1, "param", min = 0), "must be between")
+
+  expect_error(
+    validate_file_exists(NULL, param_name = "p", required = TRUE),
+    "path is NULL"
+  )
+  expect_invisible(validate_file_exists(NULL, required = FALSE))
+  expect_error(
+    validate_file_exists(123, param_name = "p"),
+    "Invalid file path type"
+  )
+  expect_error(
+    validate_dataframe_structure(
+      data.frame(alpha = 1),
+      required_cols = "zzzz_unmatched_xyz"
+    ),
+    "Missing required column"
+  )
+  expect_error(validate_choice(123, c("a", "b")), "Invalid type")
+  expect_error(
+    validate_file_exists("/nonexistent_dir_tima_xyz/missing.tsv"),
+    "Directory does not exist"
+  )
+  expect_warning(
+    validate_dataframe_structure(
+      data.frame(a = 1, extra = 2),
+      required_cols = "a",
+      optional_cols = "a"
+    ),
+    "Unexpected columns"
+  )
+  expect_error(validate_numeric_range(c(1, 2)), "numeric vector of length")
+  expect_warning(
+    validate_numeric_range(
+      1,
+      min_value = 0,
+      max_value = 10,
+      recommended_min = 5
+    ),
+    "below recommended minimum"
+  )
+  td_sim <- withr::local_tempdir()
+  writeLines("x", file.path(td_sim, "features.tsv"))
+  expect_error(
+    validate_file_exists(file.path(td_sim, "feature.tsv")),
+    "Similar files in directory"
+  )
+  expect_equal(.validate_single_file_path(123, "my_file")$type, "invalid")
+  expect_error(
+    validate_choice("zzzz_unmatched_xyz", c("pos", "neg")),
+    "Invalid value"
+  )
+  expect_error(validate_tolerance_ppm("not_numeric"), "Invalid tolerance_ppm")
 })

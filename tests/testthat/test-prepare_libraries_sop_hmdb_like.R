@@ -127,4 +127,41 @@ test_that("parse_hmdb_like_sdf_lines parses repeated headers and keeps first fie
   expect_equal(out_dt$structure_smiles, "CCO")
   expect_equal(out_dt$structure_exact_mass, 46.04186, tolerance = 1e-5)
   expect_equal(out_dt$structure_tag, "endogenous")
+
+  # Edge cases: tag = NULL, empty SDF, SDF with no '>' headers, only unknown tags, empty values, no $$$$ record end, and runtime error fallback
+  expect_equal(nrow(parse_hmdb_like_sdf_lines(c("HeaderOnly", "M  END"))), 1L)
+  expect_equal(
+    nrow(parse_hmdb_like_sdf_lines(c("> <UNKNOWN_FIELD>", "val", "$$$$"))),
+    1L
+  )
+  expect_equal(
+    nrow(parse_hmdb_like_sdf_lines(c("> <SMILES>", "", "$$$$"))),
+    1L
+  )
+  no_end <- parse_hmdb_like_sdf_lines(c("> <SMILES>", "CCO"))
+  expect_equal(no_end$smiles, "CCO")
+
+  tf_empty_sdf <- withr::local_tempfile(fileext = ".sdf")
+  writeLines(character(0), tf_empty_sdf)
+  out_empty_sdf <- withr::local_tempfile(fileext = ".tsv")
+  prepare_libraries_sop_hmdb_like(
+    input = tf_empty_sdf,
+    output = out_empty_sdf,
+    source_name = "HMDB_empty",
+    tag = NULL
+  )
+  expect_equal(nrow(tidytable::fread(out_empty_sdf)), 0L)
+
+  # Error inside tryCatch falls back to fake_sop_columns()
+  out_err_sdf <- withr::local_tempfile(fileext = ".tsv")
+  testthat::with_mocked_bindings(
+    parse_hmdb_like_input = function(...) stop("corrupt SDF"),
+    prepare_libraries_sop_hmdb_like(
+      input = tf_empty_sdf,
+      output = out_err_sdf,
+      source_name = "HMDB_err",
+      tag = NULL
+    )
+  )
+  expect_true(file.exists(out_err_sdf))
 })

@@ -393,10 +393,6 @@ create_edges_spectra <- function(
     extra_ent[[target_col]] <- extra_ent[[source_col]]
     edges <- tidytable::bind_rows(edges, extra_ent)
   }
-  na_tgt <- is.na(edges[[target_col]])
-  if (any(na_tgt)) {
-    edges[[target_col]][na_tgt] <- edges[[source_col]][na_tgt]
-  }
 
   if (
     !"candidate_score_similarity" %in% names(edges) && "score" %in% names(edges)
@@ -464,29 +460,11 @@ create_edges_spectra <- function(
     }
   }
 
-  if (nrow(edges) > 0L) {
-    log_info(
-      "Found %d communities using %s",
-      length(unique(community_result$component_membership)),
-      community_result$method_used
-    )
-
-    retained_features <- unique(c(
-      unique(edges[[source_col]]),
-      unique(edges[[target_col]])
-    ))
-    dropped_features <- setdiff(pre_cut_features, retained_features)
-
-    if (length(dropped_features) > 0L) {
-      log_info(
-        "Community cut removed %d feature(s) that had no intra-community edges; %d feature(s) remain in the exported edge graph",
-        length(dropped_features),
-        length(retained_features)
-      )
-    }
-  } else {
-    log_info("No edges found for community detection")
-  }
+  log_info(
+    "Found %d communities using %s",
+    length(unique(community_result$component_membership)),
+    community_result$method_used
+  )
 
   export_output(x = edges, file = output)
 

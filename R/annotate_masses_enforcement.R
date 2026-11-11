@@ -139,14 +139,6 @@ enrich_with_structure_metadata <- function(combined, structure_table) {
     }
 
     tax_joined_early <- FALSE
-    if (!is.null(taxonomy_table) && nrow(struct_unique) > 0L) {
-      if (can_join_tax_early) {
-        struct_unique <- struct_unique |>
-          tidytable::left_join(taxonomy_table, by = tax_keys_early) |>
-          tidytable::distinct()
-        tax_joined_early <- TRUE
-      }
-    }
   }
 
   enriched <- tidytable::as_tidytable(combined)
@@ -450,71 +442,11 @@ enforce_loss_formula_compatibility <- function(annotations) {
     )
   ))
 
-  if (nrow(annotations) <= 10000L) {
-    out <- tidytable::as_tidytable(annotations)
-    for (cc in struct_cols) {
-      out[idx_drop, (cc) := NA]
-    }
-    out <- out |> tidytable::distinct()
-  } else {
-    # Determine duplicate rows among (already-unmatched rows U idx_drop) BEFORE
-    # modifying struct_cols so we never copy 3M-element vectors twice.
-    na_err_orig <- is.na(annotations$candidate_structure_error_mz)
-    na_err_mask <- na_err_orig
-    na_err_mask[idx_drop] <- TRUE
-    na_pool_idx <- which(na_err_mask)
-
-    orig_na_idx <- which(na_err_orig)
-    all_orig_struct_na <- if (length(orig_na_idx) == 0L) {
-      TRUE
-    } else {
-      all(vapply(
-        struct_cols,
-        function(cc) all(is.na(annotations[[cc]][orig_na_idx])),
-        logical(1L)
-      ))
-    }
-
-    non_struct_cols <- setdiff(colnames(annotations), struct_cols)
-    if (all_orig_struct_na && length(non_struct_cols) > 0L) {
-      sub_tbl <- tidytable::as_tidytable(
-        lapply(as.list(annotations)[non_struct_cols], `[`, na_pool_idx)
-      )
-      dup_sub <- duplicated(sub_tbl)
-    } else {
-      sub_list <- lapply(as.list(annotations), `[`, na_pool_idx)
-      is_drop_all <- logical(nrow(annotations))
-      is_drop_all[idx_drop] <- TRUE
-      in_drop_sub <- which(is_drop_all[na_pool_idx])
-      for (cc in struct_cols) {
-        sub_list[[cc]][in_drop_sub] <- NA
-      }
-      dup_sub <- duplicated(tidytable::as_tidytable(sub_list))
-    }
-
-    is_demoted <- logical(nrow(annotations))
-    is_demoted[idx_drop] <- TRUE
-
-    if (any(dup_sub)) {
-      keep_mask <- rep(TRUE, nrow(annotations))
-      keep_mask[na_pool_idx[dup_sub]] <- FALSE
-      keep_idx <- which(keep_mask)
-      out_list <- lapply(as.list(annotations), `[`, keep_idx)
-      surv_demoted <- which(is_demoted[keep_idx])
-      if (length(surv_demoted) > 0L) {
-        for (cc in struct_cols) {
-          out_list[[cc]][surv_demoted] <- NA
-        }
-      }
-      out <- tidytable::as_tidytable(out_list)
-    } else {
-      out_list <- as.list(annotations)
-      for (cc in struct_cols) {
-        out_list[[cc]][idx_drop] <- NA
-      }
-      out <- tidytable::as_tidytable(out_list)
-    }
+  out_list <- as.list(annotations)
+  for (cc in struct_cols) {
+    out_list[[cc]][idx_drop] <- NA
   }
+  out <- tidytable::distinct(tidytable::as_tidytable(out_list))
 
   log_info(
     paste0(
@@ -554,16 +486,8 @@ enforce_annotation_edge_adduct_agreement <- function(
     adduct_edges$adduct,
     adduct_edges$adduct_dest
   )))
-  sm_add <- if ("adduct" %in% colnames(adduct_key_map)) {
-    as.character(adduct_key_map$adduct)
-  } else {
-    character(nrow(adduct_key_map))
-  }
-  sm_key <- if ("state_key" %in% colnames(adduct_key_map)) {
-    as.character(adduct_key_map$state_key)
-  } else {
-    sm_add
-  }
+  sm_add <- as.character(adduct_key_map$adduct)
+  sm_key <- as.character(adduct_key_map$state_key)
 
   edge_supported_vec <- logical(n_in)
   feature_has_edge_support <- logical(n_in)
@@ -663,28 +587,10 @@ enforce_annotation_edge_adduct_agreement <- function(
     a_dr <- annotations$adduct[drop_idx]
     u_fd <- unique(f_dr)
     u_ad <- unique(a_dr)
-    n_fd <- length(u_fd)
     n_ad <- max(1L, length(u_ad))
-    if (as.numeric(n_fd) * as.numeric(n_ad) < 2e9) {
-      f_i <- if (anyNA(u_fd)) {
-        match(f_dr, u_fd)
-      } else {
-        fastmatch::fmatch(f_dr, u_fd)
-      }
-      a_i <- if (anyNA(u_ad)) {
-        match(a_dr, u_ad)
-      } else {
-        fastmatch::fmatch(a_dr, u_ad)
-      }
-      dropped_n <- sum(
-        tabulate((f_i - 1L) * n_ad + a_i, nbins = n_fd * n_ad) > 0L
-      )
-    } else {
-      dropped_n <- nrow(
-        tidytable::tidytable(feature_id = f_dr, adduct = a_dr) |>
-          tidytable::distinct()
-      )
-    }
+    f_i <- match(f_dr, u_fd)
+    a_i <- match(a_dr, u_ad)
+    dropped_n <- sum(!duplicated(as.double(f_i - 1L) * n_ad + a_i))
     log_info(
       paste0(
         "Annotation/edge adduct agreement removed %d unsupported ",

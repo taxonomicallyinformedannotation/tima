@@ -240,12 +240,7 @@ is_download_needed <- function(path, zenodo_size) {
 
   local_size <- file.size(path)
 
-  if (is.na(local_size)) {
-    log_debug("Cannot determine local file size, download needed")
-    return(TRUE)
-  }
-
-  if (local_size != zenodo_size) {
+  if (is.na(local_size) || local_size != zenodo_size) {
     log_debug(
       "File size mismatch (local: %s, remote: %s), download needed",
       local_size,
@@ -358,20 +353,6 @@ get_last_version_from_zenodo <- function(doi, pattern, path, timeout_s = 90) {
     filenames <- character(0)
     file_urls <- character(0)
     file_sizes <- numeric(0)
-  } else if (is.data.frame(files)) {
-    filenames <- files$key
-    if ("links.download" %in% names(files)) {
-      file_urls <- files$links.download
-    } else if ("links.self" %in% names(files)) {
-      file_urls <- files$links.self
-    } else {
-      file_urls <- rep(NA_character_, nrow(files))
-    }
-    file_sizes <- files$size
-  } else if (is.list(files) && !is.null(files$key)) {
-    filenames <- files$key
-    file_urls <- files$links$download %||% files$links$self
-    file_sizes <- files$size
   } else {
     filenames <- vapply(
       X = files,
@@ -383,10 +364,8 @@ get_last_version_from_zenodo <- function(doi, pattern, path, timeout_s = 90) {
     file_urls <- vapply(
       X = files,
       FUN = function(x) {
-        if (is.list(x) && is.list(x$links) && !is.null(x$links$download)) {
-          x$links$download
-        } else if (is.list(x) && is.list(x$links) && !is.null(x$links$self)) {
-          x$links$self
+        if (is.list(x) && is.list(x$links)) {
+          x$links$download %||% x$links$self %||% NA_character_
         } else {
           NA_character_
         }

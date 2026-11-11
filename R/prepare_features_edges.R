@@ -209,7 +209,9 @@ prepare_features_edges <- function(
   }
 
   extra_ent_cols <- setdiff(entropy_columns, name_source)
-  if (
+  if (length(entropy_columns) == 0L || nrow(features_entropy) == 0L) {
+    step2 <- data.table::copy(edges_ms1)
+  } else if (
     name_source %in%
       names(edges_ms1) &&
       name_source %in% names(features_entropy) &&
@@ -219,19 +221,11 @@ prepare_features_edges <- function(
     step2 <- data.table::copy(edges_ms1)
     src_ms1 <- step2[[name_source]]
     src_ent <- features_entropy[[name_source]]
-    m_ent <- if (anyNA(src_ent) || anyNA(src_ms1)) {
-      match(src_ms1, src_ent)
-    } else {
-      fastmatch::fmatch(src_ms1, src_ent)
-    }
+    m_ent <- fastmatch::fmatch(src_ms1, src_ent)
     for (col in extra_ent_cols) {
       data.table::set(step2, j = col, value = features_entropy[[col]][m_ent])
     }
-    unmatched_ent <- if (anyNA(src_ent) || anyNA(src_ms1)) {
-      is.na(match(src_ent, src_ms1))
-    } else {
-      fastmatch::fmatch(src_ent, src_ms1, nomatch = 0L) == 0L
-    }
+    unmatched_ent <- is.na(fastmatch::fmatch(src_ent, src_ms1))
     if (any(unmatched_ent)) {
       step2 <- tidytable::bind_rows(
         step2,
@@ -286,8 +280,7 @@ prepare_features_edges <- function(
       }
     }
   } else {
-    edges_table_treated <- step2 |>
-      tidytable::full_join(y = edges_ms2)
+    edges_table_treated <- tidytable::bind_rows(step2, edges_ms2)
   }
   rm(step2)
 

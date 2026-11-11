@@ -447,26 +447,15 @@
         mm_u <- v_m[multi_mask]
         mm_sml <- v_sml[multi_mask]
         u_mm <- unique(mm_u)
-        if (is.unsorted(mm_u)) {
-          ord_mm <- order(fastmatch::fmatch(mm_u, u_mm), method = "radix")
-          mm_u <- mm_u[ord_mm]
-          mm_sml <- mm_sml[ord_mm]
-        }
+        ord_mm <- order(fastmatch::fmatch(mm_u, u_mm), method = "radix")
+        mm_u <- mm_u[ord_mm]
+        mm_sml <- mm_sml[ord_mm]
         if (anyDuplicated(mm_sml) > 0L) {
           u_s <- unique(mm_sml)
           s_id <- fastmatch::fmatch(mm_sml, u_s)
           n_u_s <- length(u_s)
-          use_int_s <- as.double(n_u) * n_u_s < .Machine$integer.max
-          s_key <- if (use_int_s) {
-            (mm_u - 1L) * n_u_s + s_id
-          } else {
-            as.double(mm_u - 1L) * n_u_s + s_id
-          }
-          keep_s <- if (use_int_s) {
-            !duplicated(s_key)
-          } else {
-            fastmatch::fmatch(s_key, s_key) == seq_along(s_key)
-          }
+          s_key <- as.double(mm_u - 1L) * n_u_s + s_id
+          keep_s <- !duplicated(s_key)
           mm_u <- mm_u[keep_s]
           mm_sml <- mm_sml[keep_s]
         }
@@ -479,13 +468,9 @@
         for (L in sort(unique(grp_len_m))) {
           f_pos <- which(grp_len_m == L)
           f_ids_L <- u_fid_m[f_pos]
-          if (L == 1L) {
-            lookup_refs[f_ids_L] <- mm_sml[idx1_m[f_pos]]
-          } else {
-            starts <- idx1_m[f_pos]
-            cols_L <- lapply(0L:(L - 1L), function(off) mm_sml[starts + off])
-            lookup_refs[f_ids_L] <- do.call(paste, c(cols_L, list(sep = "|")))
-          }
+          starts <- idx1_m[f_pos]
+          cols_L <- lapply(0L:(L - 1L), function(off) mm_sml[starts + off])
+          lookup_refs[f_ids_L] <- do.call(paste, c(cols_L, list(sep = "|")))
         }
       }
     }
@@ -565,11 +550,9 @@
     multi_mask <- counts[fid_id] > 1L
     m_pos <- which(multi_mask)
     m_fid <- fid_id[m_pos]
-    if (is.unsorted(m_fid)) {
-      ord_m <- order(m_fid, method = "radix")
-      m_pos <- m_pos[ord_m]
-      m_fid <- m_fid[ord_m]
-    }
+    ord_m <- order(m_fid, method = "radix")
+    m_pos <- m_pos[ord_m]
+    m_fid <- m_fid[ord_m]
 
     db_clean <- as.character(sme_df$database_identifier[valid_sme_idx])
     db_clean[
@@ -590,17 +573,8 @@
       u_db <- unique(db_sub)
       db_id <- fastmatch::fmatch(db_sub, u_db)
       n_u_db <- length(u_db)
-      use_int_db <- as.double(n_u) * n_u_db < .Machine$integer.max
-      db_key <- if (use_int_db) {
-        (fid_db - 1L) * n_u_db + db_id
-      } else {
-        as.double(fid_db - 1L) * n_u_db + db_id
-      }
-      keep_db <- if (use_int_db) {
-        !duplicated(db_key)
-      } else {
-        fastmatch::fmatch(db_key, db_key) == seq_along(db_key)
-      }
+      db_key <- as.double(fid_db - 1L) * n_u_db + db_id
+      keep_db <- !duplicated(db_key)
       n_db_all <- tabulate(fid_db[keep_db], nbins = n_u)
     }
 
@@ -614,17 +588,8 @@
       u_mt <- unique(mt_sub)
       mt_id <- fastmatch::fmatch(mt_sub, u_mt)
       n_u_mt <- length(u_mt)
-      use_int_mt <- as.double(n_u) * n_u_mt < .Machine$integer.max
-      mt_key <- if (use_int_mt) {
-        (fid_mt - 1L) * n_u_mt + mt_id
-      } else {
-        as.double(fid_mt - 1L) * n_u_mt + mt_id
-      }
-      keep_mt <- if (use_int_mt) {
-        !duplicated(mt_key)
-      } else {
-        fastmatch::fmatch(mt_key, mt_key) == seq_along(mt_key)
-      }
+      mt_key <- as.double(fid_mt - 1L) * n_u_mt + mt_id
+      keep_mt <- !duplicated(mt_key)
       n_mt_all <- tabulate(fid_mt[keep_mt], nbins = n_u)
     }
 
@@ -638,17 +603,8 @@
         u_r <- unique(r_sub)
         r_id <- fastmatch::fmatch(r_sub, u_r)
         n_u_r <- length(u_r)
-        use_int_r <- as.double(n_u) * n_u_r < .Machine$integer.max
-        r_key <- if (use_int_r) {
-          (fid_r - 1L) * n_u_r + r_id
-        } else {
-          as.double(fid_r - 1L) * n_u_r + r_id
-        }
-        keep_r <- if (use_int_r) {
-          !duplicated(r_key)
-        } else {
-          fastmatch::fmatch(r_key, r_key) == seq_along(r_key)
-        }
+        r_key <- as.double(fid_r - 1L) * n_u_r + r_id
+        keep_r <- !duplicated(r_key)
         r_sub <- r_sub[keep_r]
         fid_r <- fid_r[keep_r]
       }
@@ -661,13 +617,9 @@
       for (L in sort(unique(grp_len_r))) {
         f_pos <- which(grp_len_r == L)
         f_ids_L <- u_fid_r[f_pos]
-        if (L == 1L) {
-          lookup_refs[f_ids_L] <- r_sub[idx1_r[f_pos]]
-        } else {
-          starts <- idx1_r[f_pos]
-          cols_L <- lapply(0L:(L - 1L), function(off) r_sub[starts + off])
-          lookup_refs[f_ids_L] <- do.call(paste, c(cols_L, list(sep = "|")))
-        }
+        starts <- idx1_r[f_pos]
+        cols_L <- lapply(0L:(L - 1L), function(off) r_sub[starts + off])
+        lookup_refs[f_ids_L] <- do.call(paste, c(cols_L, list(sep = "|")))
       }
 
       gt1_fids <- u_fid_r[grp_len_r > 1L]
@@ -726,22 +678,15 @@
 
   map_keys <- names(id_map)
   if (!is.null(map_keys) && length(id_map) > 0L) {
-    if (is.atomic(id_map)) {
-      map_vals <- as.character(id_map)
-      keep_m <- !is.na(map_vals) & nzchar(map_vals)
-      map_keys <- map_keys[keep_m]
-      map_vals <- map_vals[keep_m]
-    } else {
-      keep_m <- vapply(
-        id_map,
-        function(v) {
-          !is.null(v) && length(v) == 1L && !is.na(v) && nzchar(as.character(v))
-        },
-        logical(1L)
-      )
-      map_keys <- map_keys[keep_m]
-      map_vals <- as.character(unlist(id_map[keep_m], use.names = FALSE))
-    }
+    keep_m <- vapply(
+      id_map,
+      function(v) {
+        !is.null(v) && length(v) == 1L && !is.na(v) && nzchar(as.character(v))
+      },
+      logical(1L)
+    )
+    map_keys <- map_keys[keep_m]
+    map_vals <- as.character(unlist(id_map[keep_m], use.names = FALSE))
   } else {
     map_keys <- character(0)
     map_vals <- character(0)

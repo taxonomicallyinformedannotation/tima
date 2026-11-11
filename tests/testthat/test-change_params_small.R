@@ -923,6 +923,7 @@ test_that("change_params_small initializes missing mztab entry and updates optio
 
   expect_no_error(change_params_small(
     fil_mzt_raw = file.path(tmp, "input.mztab"),
+    fil_ann_mzm = file.path(tmp, "input.mztab"),
     hig_evi = TRUE,
     summarize = TRUE,
     org_tax = NULL,
@@ -934,7 +935,18 @@ test_that("change_params_small initializes missing mztab entry and updates optio
     captured$yaml$files$mztab$raw,
     file.path(tmp, "data", "source", "input.mztab")
   )
+  expect_identical(
+    captured$yaml$files$annotations$raw$mzmine,
+    file.path(tmp, "data", "interim", "annotations", "input.mztab")
+  )
   expect_identical(captured$yaml$organisms$taxon, NA)
   expect_identical(captured$yaml$options$high_evidence, TRUE)
   expect_identical(captured$yaml$options$summarize, TRUE)
+
+  expect_no_error(change_params_small(
+    fil_mzt_raw = file.path(tmp, "input.mztab"),
+    org_tax = "Homo sapiens",
+    cache_dir = NULL
+  ))
+  expect_identical(captured$yaml$organisms$taxon, "Homo sapiens")
 })

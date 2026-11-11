@@ -136,9 +136,6 @@ decorate_chemo <- function(
       return(integer(0L))
     }
     idx <- prev_idx[sc_col[prev_idx] >= score_threshold]
-    if (length(idx) == 0L) {
-      return(integer(0L))
-    }
     v_sub <- annot_table_wei_chemo[[col_name]][idx]
     idx[is.na(fastmatch::fmatch(v_sub, bad_vals))]
   }
@@ -193,18 +190,11 @@ decorate_chemo <- function(
     ik_act <- ik_col[active_idx]
     u_ik <- unique(ik_act)
     n_u_ik <- length(u_ik)
-    ik_id[active_idx] <- if (anyNA(u_ik)) {
-      match(ik_act, u_ik)
-    } else {
-      fastmatch::fmatch(ik_act, u_ik)
-    }
+    ik_id[active_idx] <- fastmatch::fmatch(ik_act, u_ik)
   }
 
   count_idx_stats <- function(idx) {
     n_cand <- length(idx)
-    if (n_cand == 0L) {
-      return(c(n_candidates = 0L, n_unique_structures = 0L))
-    }
     n_uniq <- sum(tabulate(ik_id[idx], nbins = n_u_ik) > 0L)
     c(n_candidates = n_cand, n_unique_structures = n_uniq)
   }
