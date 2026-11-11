@@ -293,111 +293,124 @@ calculate_entropy_and_similarity <- function(
           )
         }
 
-        # Batch call failed or returned NULL: fall back to per-pair loop
-        scores <- rep(NA_real_, n_candidates)
-        matched_counts <- integer(n_candidates)
-        scores_forward <- rep(NA_real_, n_candidates)
-        scores_reverse <- rep(NA_real_, n_candidates)
-        for (pos_idx in seq_len(n_candidates)) {
-          lib_idx <- lib_indices_sub[[pos_idx]]
-          lib_spectrum <- lib_spectra[[lib_idx]]
+        # Batch call failed or returned NULL: fall back to per-pair evaluation
+        fallback_mat <- vapply(
+          seq_len(n_candidates),
+          function(pos_idx) {
+            lib_idx <- lib_indices_sub[[pos_idx]]
+            lib_spectrum <- lib_spectra[[lib_idx]]
 
-          if (
-            !is.matrix(lib_spectrum) ||
-              nrow(lib_spectrum) == 0L ||
-              ncol(lib_spectrum) < 2L
-          ) {
-            next
-          }
-
-          target_ion_precursor <- lib_precursors[[lib_idx]]
-          res <- gnps_chain_dp_wrapper(
-            current_spectrum,
-            lib_spectrum,
-            current_ion_precursor,
-            target_ion_precursor,
-            dalton,
-            ppm,
-            matchedPeaksCount = TRUE
-          )
-          scores[[pos_idx]] <- as.numeric(res[[1L]])
-          matched_counts[[pos_idx]] <- as.integer(res[[2L]])
-          scores_forward[[pos_idx]] <- as.numeric(res[[3L]])
-          scores_reverse[[pos_idx]] <- as.numeric(res[[4L]])
-        }
-      } else {
-        # Non-GNPS path or forward/reverse not needed: use per-pair calls
-        scores <- rep(NA_real_, n_candidates)
-        matched_counts <- integer(n_candidates)
-        scores_forward <- rep(NA_real_, n_candidates)
-        scores_reverse <- rep(NA_real_, n_candidates)
-        q_mz <- current_spectrum[, 1L]
-        for (pos_idx in seq_len(n_candidates)) {
-          lib_idx <- lib_indices_sub[[pos_idx]]
-          lib_spectrum <- lib_spectra[[lib_idx]]
-
-          if (
-            !is.matrix(lib_spectrum) ||
-              nrow(lib_spectrum) == 0L ||
-              ncol(lib_spectrum) < 2L
-          ) {
-            next
-          }
-
-          target_ion_precursor <- lib_precursors[[lib_idx]]
-          scores[[pos_idx]] <- as.numeric(calculate_similarity(
-            method = method,
-            query_spectrum = current_spectrum,
-            target_spectrum = lib_spectrum,
-            query_precursor = current_ion_precursor,
-            target_precursor = target_ion_precursor,
-            dalton = dalton,
-            ppm = ppm
-          ))
-          lib_mz_sorted <- lib_mz_sorted_list[[lib_idx]]
-          if (is.null(lib_mz_sorted)) {
-            mz_col <- lib_spectrum[, 1L]
-            lib_mz_sorted <- if (is.unsorted(mz_col)) sort(mz_col) else mz_col
-          }
-          matched_counts[[pos_idx]] <- .count_matched_peaks(
-            q_mz,
-            lib_mz_sorted,
-            dalton,
-            ppm
-          )
-
-          # Compute forward/reverse only for above-threshold matches
-          if (
-            !is.na(scores[[pos_idx]]) &&
-              scores[[pos_idx]] >= threshold &&
-              compute_forward_reverse
-          ) {
-            fwd_rev_q_prec <- if (method == "cosine") {
-              NA_real_
-            } else {
-              current_ion_precursor
+            if (
+              !is.matrix(lib_spectrum) ||
+                nrow(lib_spectrum) == 0L ||
+                ncol(lib_spectrum) < 2L
+            ) {
+              return(c(NA_real_, 0, NA_real_, NA_real_))
             }
-            fwd_rev_t_prec <- if (method == "cosine") {
-              NA_real_
-            } else {
-              target_ion_precursor
-            }
-            fwd_rev <- gnps_chain_dp_wrapper(
+
+            target_ion_precursor <- lib_precursors[[lib_idx]]
+            res <- gnps_chain_dp_wrapper(
               current_spectrum,
               lib_spectrum,
-              fwd_rev_q_prec,
-              fwd_rev_t_prec,
+              current_ion_precursor,
+              target_ion_precursor,
               dalton,
               ppm,
               matchedPeaksCount = TRUE
             )
-            scores_forward[[pos_idx]] <- as.numeric(fwd_rev[[3L]])
-            scores_reverse[[pos_idx]] <- as.numeric(fwd_rev[[4L]])
-          } else {
-            scores_forward[[pos_idx]] <- NA_real_
-            scores_reverse[[pos_idx]] <- NA_real_
-          }
-        }
+            c(
+              as.numeric(res[[1L]]),
+              as.numeric(as.integer(res[[2L]])),
+              as.numeric(res[[3L]]),
+              as.numeric(res[[4L]])
+            )
+          },
+          numeric(4L)
+        )
+        scores <- fallback_mat[1L, ]
+        matched_counts <- as.integer(fallback_mat[2L, ])
+        scores_forward <- fallback_mat[3L, ]
+        scores_reverse <- fallback_mat[4L, ]
+      } else {
+        # Non-GNPS path or forward/reverse not needed: use per-pair calls
+        q_mz <- current_spectrum[, 1L]
+        pair_mat <- vapply(
+          seq_len(n_candidates),
+          function(pos_idx) {
+            lib_idx <- lib_indices_sub[[pos_idx]]
+            lib_spectrum <- lib_spectra[[lib_idx]]
+
+            if (
+              !is.matrix(lib_spectrum) ||
+                nrow(lib_spectrum) == 0L ||
+                ncol(lib_spectrum) < 2L
+            ) {
+              return(c(NA_real_, 0, NA_real_, NA_real_))
+            }
+
+            target_ion_precursor <- lib_precursors[[lib_idx]]
+            sc_val <- as.numeric(calculate_similarity(
+              method = method,
+              query_spectrum = current_spectrum,
+              target_spectrum = lib_spectrum,
+              query_precursor = current_ion_precursor,
+              target_precursor = target_ion_precursor,
+              dalton = dalton,
+              ppm = ppm
+            ))
+            lib_mz_sorted <- lib_mz_sorted_list[[lib_idx]]
+            if (is.null(lib_mz_sorted)) {
+              mz_col <- lib_spectrum[, 1L]
+              lib_mz_sorted <- if (is.unsorted(mz_col)) sort(mz_col) else mz_col
+            }
+            mc_val <- .count_matched_peaks(
+              q_mz,
+              lib_mz_sorted,
+              dalton,
+              ppm
+            )
+
+            # Compute forward/reverse only for above-threshold matches
+            if (
+              !is.na(sc_val) &&
+                sc_val >= threshold &&
+                compute_forward_reverse
+            ) {
+              fwd_rev_q_prec <- if (method == "cosine") {
+                NA_real_
+              } else {
+                current_ion_precursor
+              }
+              fwd_rev_t_prec <- if (method == "cosine") {
+                NA_real_
+              } else {
+                target_ion_precursor
+              }
+              fwd_rev <- gnps_chain_dp_wrapper(
+                current_spectrum,
+                lib_spectrum,
+                fwd_rev_q_prec,
+                fwd_rev_t_prec,
+                dalton,
+                ppm,
+                matchedPeaksCount = TRUE
+              )
+              c(
+                sc_val,
+                as.numeric(mc_val),
+                as.numeric(fwd_rev[[3L]]),
+                as.numeric(fwd_rev[[4L]])
+              )
+            } else {
+              c(sc_val, as.numeric(mc_val), NA_real_, NA_real_)
+            }
+          },
+          numeric(4L)
+        )
+        scores <- pair_mat[1L, ]
+        matched_counts <- as.integer(pair_mat[2L, ])
+        scores_forward <- pair_mat[3L, ]
+        scores_reverse <- pair_mat[4L, ]
       }
 
       valid_indices <- which(!is.na(scores) & scores >= threshold)

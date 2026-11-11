@@ -86,18 +86,19 @@ compute_weighted_components <- function(
 
   # Accumulate normalized weighted sum and evidence coverage directly
   w_norm <- weights / weight_sum
-  score <- numeric(n)
-  coverage <- if (include_coverage) numeric(n) else NULL
-  for (k in seq_along(values)) {
-    w <- w_norm[[k]]
-    if (w != 0) {
+  active_k <- which(w_norm != 0)
+  acc <- Reduce(
+    function(st, k) {
+      w <- w_norm[[k]]
       v <- values[[k]]
       if (length(v) != n) {
         v <- rep_len(v, n)
       }
       na_mask <- is.na(v)
-      if (include_coverage) {
-        coverage <- coverage + (!na_mask) * w
+      cov_next <- if (include_coverage) {
+        st$coverage + (!na_mask) * w
+      } else {
+        NULL
       }
       if (any(na_mask)) {
         v <- as.double(v)
@@ -109,11 +110,16 @@ compute_weighted_components <- function(
         v[na_mask] <- prior_k
       }
       term <- if (w == 1) as.double(v) else v * w
-      score <- score + term
-    }
-  }
+      list(score = st$score + term, coverage = cov_next)
+    },
+    active_k,
+    init = list(
+      score = numeric(n),
+      coverage = if (include_coverage) numeric(n) else NULL
+    )
+  )
 
-  list(score = score, coverage = coverage)
+  acc
 }
 
 #' Compute weighted scores from evidence components

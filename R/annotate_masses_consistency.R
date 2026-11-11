@@ -76,43 +76,12 @@ build_feature_pairs_within_rt <- function(
   }
 
   u_smp <- unique(src_smp[src_ord])
-  src_by_smp <- split(src_ord, factor(src_smp[src_ord], levels = u_smp))
-  dest_by_smp <- split(dest_ord, factor(dest_smp[dest_ord], levels = u_smp))
-  s_hits_list <- vector("list", length(u_smp))
-  d_hits_list <- vector("list", length(u_smp))
-  n_hit_groups <- 0L
-
-  for (smp_i in seq_along(u_smp)) {
-    s_idx <- src_by_smp[[smp_i]]
-    d_idx <- dest_by_smp[[smp_i]]
-    n_d <- length(d_idx)
-    if (length(s_idx) == 0L || n_d == 0L) {
-      next
-    }
-    d_rt_s <- dest_rt[d_idx]
-    lo <- findInterval(src_rt_min[s_idx], d_rt_s, left.open = TRUE) + 1L
-    hi <- findInterval(src_rt_max[s_idx], d_rt_s, left.open = FALSE)
-    lo <- pmax.int(1L, lo)
-    hi <- pmin.int(n_d, hi)
-    valid <- which(lo <= hi)
-    if (length(valid) == 0L) {
-      next
-    }
-    msz <- hi[valid] - lo[valid] + 1L
-    s_exp <- rep.int(s_idx[valid], msz)
-    d_exp <- d_idx[sequence(msz, from = lo[valid])]
-    keep <- which(
-      dest_mz[d_exp] >= src_mz[s_exp] &
-        dest_fid_int[d_exp] != src_fid_int[s_exp]
-    )
-    if (length(keep) > 0L) {
-      n_hit_groups <- n_hit_groups + 1L
-      s_hits_list[[n_hit_groups]] <- s_exp[keep]
-      d_hits_list[[n_hit_groups]] <- d_exp[keep]
-    }
-  }
-
-  if (n_hit_groups == 0L) {
+  d_smp_id <- fastmatch::fmatch(dest_smp[dest_ord], u_smp)
+  keep_d <- !is.na(d_smp_id)
+  dest_ord <- dest_ord[keep_d]
+  d_smp_id <- d_smp_id[keep_d]
+  n_d <- length(dest_ord)
+  if (n_d == 0L) {
     return(tidytable::tidytable(
       feature_id = character(),
       rt = numeric(),
@@ -125,15 +94,48 @@ build_feature_pairs_within_rt <- function(
     ))
   }
 
-  s_hit <- if (n_hit_groups == 1L) {
-    s_hits_list[[1L]]
-  } else {
-    unlist(s_hits_list[seq_len(n_hit_groups)], use.names = FALSE)
+  s_smp_id <- fastmatch::fmatch(src_smp[src_ord], u_smp)
+  d_ord_smp <- order(d_smp_id, dest_rt[dest_ord], method = "radix")
+  dest_ord <- dest_ord[d_ord_smp]
+  d_smp_id <- d_smp_id[d_ord_smp]
+
+  min_rt <- min(c(src_rt_min[src_ord], dest_rt[dest_ord]))
+  max_rt <- max(c(src_rt_max[src_ord], dest_rt[dest_ord]))
+  rt_span <- max(1, max_rt - min_rt) * 4 + 100
+
+  s_lo_key <- (s_smp_id - 1) * rt_span + (src_rt_min[src_ord] - min_rt)
+  s_hi_key <- (s_smp_id - 1) * rt_span + (src_rt_max[src_ord] - min_rt)
+  d_key <- (d_smp_id - 1) * rt_span + (dest_rt[dest_ord] - min_rt)
+
+  lo <- pmax.int(1L, findInterval(s_lo_key, d_key, left.open = TRUE) + 1L)
+  hi <- pmin.int(n_d, findInterval(s_hi_key, d_key, left.open = FALSE))
+  valid <- which(lo <= hi)
+
+  s_hit <- integer(0L)
+  d_hit <- integer(0L)
+  if (length(valid) > 0L) {
+    msz <- hi[valid] - lo[valid] + 1L
+    s_exp <- rep.int(src_ord[valid], msz)
+    d_exp <- dest_ord[sequence(msz, from = lo[valid])]
+    keep <- which(
+      dest_mz[d_exp] >= src_mz[s_exp] &
+        dest_fid_int[d_exp] != src_fid_int[s_exp]
+    )
+    s_hit <- s_exp[keep]
+    d_hit <- d_exp[keep]
   }
-  d_hit <- if (n_hit_groups == 1L) {
-    d_hits_list[[1L]]
-  } else {
-    unlist(d_hits_list[seq_len(n_hit_groups)], use.names = FALSE)
+
+  if (length(s_hit) == 0L) {
+    return(tidytable::tidytable(
+      feature_id = character(),
+      rt = numeric(),
+      mz = numeric(),
+      feature_id_dest = character(),
+      mz_dest = numeric(),
+      delta = numeric(),
+      delta_min = numeric(),
+      delta_max = numeric()
+    ))
   }
 
   mz_s <- src_mz[s_hit]
@@ -498,54 +500,57 @@ enforce_graph_adduct_consistency <- function(df_add) {
       cand_list[ambig_node_keys] <- cand_states_split
       prior_list[ambig_node_keys] <- prior_term_split
 
-      for (ci in seq_along(comp_edge_groups)) {
-        e_idx <- comp_edge_groups[[ci]]
-        e_f1 <- f1_id[e_idx]
-        e_f2 <- f2_id[e_idx]
-        e_s1 <- s1_id[e_idx]
-        e_s2 <- s2_id[e_idx]
-        e_sc <- edge_score[e_idx]
+      multi_nodes <- unlist(
+        lapply(comp_edge_groups, function(e_idx) {
+          comp_nodes <- unique(c(f1_id[e_idx], f2_id[e_idx]))
+          comp_nodes[is_ambig_f[comp_nodes]]
+        }),
+        use.names = FALSE
+      )
+      n_multi <- length(multi_nodes)
 
-        comp_nodes <- unique(c(e_f1, e_f2))
-        multi_nodes <- comp_nodes[is_ambig_f[comp_nodes]]
-        n_multi <- length(multi_nodes)
+      e_f1 <- f1_id[in_ambig_comp]
+      e_f2 <- f2_id[in_ambig_comp]
+      e_s1 <- s1_id[in_ambig_comp]
+      e_s2 <- s2_id[in_ambig_comp]
+      e_sc <- edge_score[in_ambig_comp]
 
-        inc_both_f <- c(e_f1, e_f2)
-        inc_both_nb <- c(e_f2, e_f1)
-        inc_both_nb_s <- c(e_s2, e_s1)
-        inc_both_my_s <- c(e_s1, e_s2)
-        inc_both_sc <- c(e_sc, e_sc)
-        inc_m <- fastmatch::fmatch(inc_both_f, multi_nodes)
-        keep_inc <- which(!is.na(inc_m))
-        inc_sp <- split(keep_inc, inc_m[keep_inc])
-        inc_nb_list <- lapply(inc_sp, function(idx) inc_both_nb[idx])
-        inc_nbs_list <- lapply(inc_sp, function(idx) inc_both_nb_s[idx])
-        inc_sc_list <- lapply(inc_sp, function(idx) inc_both_sc[idx])
-        inc_ck_list <- Map(
-          function(idx, f) {
-            fastmatch::fmatch(inc_both_my_s[idx], cand_list[[f]], nomatch = 0L)
-          },
-          inc_sp,
-          multi_nodes
-        )
+      inc_both_f <- c(e_f1, e_f2)
+      inc_both_nb <- c(e_f2, e_f1)
+      inc_both_nb_s <- c(e_s2, e_s1)
+      inc_both_my_s <- c(e_s1, e_s2)
+      inc_both_sc <- c(e_sc, e_sc)
+      inc_m <- fastmatch::fmatch(inc_both_f, multi_nodes)
+      keep_inc <- which(!is.na(inc_m))
+      inc_sp <- split(keep_inc, inc_m[keep_inc])
+      inc_nb_list <- lapply(inc_sp, function(idx) inc_both_nb[idx])
+      inc_nbs_list <- lapply(inc_sp, function(idx) inc_both_nb_s[idx])
+      inc_sc_list <- lapply(inc_sp, function(idx) inc_both_sc[idx])
+      inc_ck_list <- Map(
+        function(idx, f) {
+          fastmatch::fmatch(inc_both_my_s[idx], cand_list[[f]], nomatch = 0L)
+        },
+        inc_sp,
+        multi_nodes
+      )
 
-        last_eval_step <- integer(n_f)
-        last_change_step <- integer(n_f)
-        step_counter <- 0L
+      last_eval_step <- integer(n_f)
+      last_change_step <- integer(n_f)
+      step_counter <- 0L
+      iter <- 0L
 
-        for (iter in seq_len(20L)) {
-          changed <- FALSE
-          for (mi in seq_len(n_multi)) {
-            f <- multi_nodes[[mi]]
-            inc_nb <- inc_nb_list[[mi]]
+      repeat {
+        iter <- iter + 1L
+        changed <- FALSE
+        mi <- 1L
+        repeat {
+          f <- multi_nodes[[mi]]
+          inc_nb <- inc_nb_list[[mi]]
 
-            if (
-              iter > 1L &&
-                !any(last_change_step[inc_nb] >= last_eval_step[[f]])
-            ) {
-              next
-            }
-
+          if (
+            iter == 1L ||
+              any(last_change_step[inc_nb] >= last_eval_step[[f]])
+          ) {
             step_counter <- step_counter + 1L
             last_eval_step[[f]] <- step_counter
 
@@ -576,8 +581,12 @@ enforce_graph_adduct_consistency <- function(df_add) {
               changed <- TRUE
             }
           }
-          if (!changed) break
+          if (mi == n_multi) {
+            break
+          }
+          mi <- mi + 1L
         }
+        if (!changed || iter >= 20L) break
       }
     }
   }

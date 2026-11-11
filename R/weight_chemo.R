@@ -215,14 +215,14 @@ weight_chemo <- function(
     )
   )
 
-  # Evaluate stri_detect_token only on unique valid (cand, fval) pairs per level
+  # Evaluate token matching only on unique valid (cand, fval) pairs per level
   # and assign directly onto annot_table_wei_bio_clean — avoids 21-column
   # distinct() and 21-column right_join() copies across millions of rows.
   annot_table_wei_chemo <- annot_table_wei_bio_clean
   rm(annot_table_wei_bio_clean)
-  score_chem_max <- numeric(n_annotations)
+  df_names <- names(annot_table_wei_chemo)
 
-  for (lvl in chemo_levels) {
+  lvl_cols <- lapply(chemo_levels, function(lvl) {
     cand_vals <- annot_table_wei_chemo[[lvl$cand]]
     fval <- annot_table_wei_chemo[[lvl$fval]]
     col_out <- rep(NA_real_, n_annotations)
@@ -256,7 +256,7 @@ weight_chemo <- function(
               hit_idx <- valid_idx[hit]
               if (
                 isTRUE(weight_by_pred_score) &&
-                  lvl$fscore %in% names(annot_table_wei_chemo)
+                  lvl$fscore %in% df_names
               ) {
                 sc_raw <- annot_table_wei_chemo[[lvl$fscore]][hit_idx]
                 sc_num <- suppressWarnings(as.double(sc_raw))
@@ -266,34 +266,36 @@ weight_chemo <- function(
                   w_vec[ok_sc] <- w_val * pmin(pmax(sc_num[ok_sc], 0), 1)
                 }
                 col_out[hit_idx] <- w_vec
-                if (w_val > 0) {
-                  score_chem_max[hit_idx] <- pmax.int(
-                    score_chem_max[hit_idx],
-                    w_vec
-                  )
-                }
               } else {
                 col_out[hit_idx] <- w_val
-                if (w_val > 0) {
-                  score_chem_max[hit_idx] <- pmax.int(
-                    score_chem_max[hit_idx],
-                    w_val
-                  )
-                }
               }
             }
           }
         }
       }
     }
-    data.table::set(annot_table_wei_chemo, j = lvl$out, value = col_out)
-  }
+    col_out
+  })
+
+  out_names <- vapply(chemo_levels, `[[`, character(1L), "out")
+  data.table::set(annot_table_wei_chemo, j = out_names, value = lvl_cols)
+  score_chem_max <- Reduce(
+    function(acc, col_v) {
+      ok <- which(!is.na(col_v) & col_v > acc)
+      if (length(ok) > 0L) {
+        acc[ok] <- col_v[ok]
+      }
+      acc
+    },
+    lvl_cols,
+    init = numeric(n_annotations)
+  )
   data.table::set(
     annot_table_wei_chemo,
     j = "score_chemical",
     value = score_chem_max
   )
-  rm(chemo_levels, score_chem_max)
+  rm(chemo_levels, lvl_cols, out_names, score_chem_max)
 
   weighted_chemo <- compute_weighted_components(
     annot_table_wei_chemo$score_chemical,

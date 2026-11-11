@@ -186,8 +186,9 @@ compute_intensity_covariance_edges <- function(
 
   if (length(idx_cand) > 0L) {
     cand_lens <- vec_lens[idx_i[idx_cand]]
-    for (s_len in unique(cand_lens)) {
-      pair_sub <- if (length(unique(cand_lens)) == 1L) {
+    u_lens <- unique(cand_lens)
+    len_results <- lapply(u_lens, function(s_len) {
+      pair_sub <- if (length(u_lens) == 1L) {
         idx_cand
       } else {
         idx_cand[cand_lens == s_len]
@@ -205,54 +206,67 @@ compute_intensity_covariance_edges <- function(
       }
       mat[!mask] <- 0
 
-      local_i <- fastmatch::fmatch(idx_i[pair_sub], u_feats)
-      local_j <- fastmatch::fmatch(idx_j[pair_sub], u_feats)
+      ci <- fastmatch::fmatch(idx_i[pair_sub], u_feats)
+      cj <- fastmatch::fmatch(idx_j[pair_sub], u_feats)
       n_sub <- length(pair_sub)
-      chunk_size <- max(256L, min(8192L, as.integer(524288L / max(1L, s_len))))
-      n_chunks <- ceiling(n_sub / chunk_size)
-
-      for (ch in seq_len(n_chunks)) {
-        rng <- ((ch - 1L) * chunk_size + 1L):min(n_sub, ch * chunk_size)
-        ci <- local_i[rng]
-        cj <- local_j[rng]
-        n_rng <- length(ci)
-        v <- mask[ci, , drop = FALSE] & mask[cj, , drop = FALSE]
-        nv <- as.integer(.rowSums(v, n_rng, s_len))
-        insuff <- nv < 3L
-        if (any(insuff)) {
-          n_insufficient_samples <- n_insufficient_samples + sum(insuff)
-        }
-        ok <- which(!insuff)
-        n_ok <- length(ok)
-        if (n_ok > 0L) {
-          v_ok <- v[ok, , drop = FALSE]
-          nv_ok <- nv[ok]
-          x <- mat[ci[ok], , drop = FALSE] * v_ok
-          y <- mat[cj[ok], , drop = FALSE] * v_ok
-          mx <- .rowSums(x, n_ok, s_len) / nv_ok
-          my <- .rowSums(y, n_ok, s_len) / nv_ok
-          dx <- (x - mx) * v_ok
-          dy <- (y - my) * v_ok
-          ssx <- .rowSums(dx * dx, n_ok, s_len)
-          ssy <- .rowSums(dy * dy, n_ok, s_len)
-          denom <- sqrt(ssx * ssy)
-          r_val <- .rowSums(dx * dy, n_ok, s_len) / denom
-          bad_r <- is.na(r_val) |
-            !is.finite(r_val) |
-            !is.finite(denom) |
-            denom <= 0
-          if (any(bad_r)) {
-            n_correlation_failed <- n_correlation_failed + sum(bad_r)
-          }
-          good <- which(!bad_r)
-          if (length(good) > 0L) {
-            dest_idx <- pair_sub[rng[ok[good]]]
-            cor_all[dest_idx] <- pmax(-1, pmin(1, r_val[good]))
-            n_samp_all[dest_idx] <- nv_ok[good]
-            valid_test[dest_idx] <- TRUE
-          }
+      v <- mask[ci, , drop = FALSE] & mask[cj, , drop = FALSE]
+      nv <- as.integer(.rowSums(v, n_sub, s_len))
+      insuff <- nv < 3L
+      n_insuff <- sum(insuff)
+      ok <- which(!insuff)
+      n_ok <- length(ok)
+      n_bad <- 0L
+      dest_idx <- integer(0L)
+      cor_vals <- numeric(0L)
+      samp_vals <- integer(0L)
+      if (n_ok > 0L) {
+        v_ok <- v[ok, , drop = FALSE]
+        nv_ok <- nv[ok]
+        x <- mat[ci[ok], , drop = FALSE] * v_ok
+        y <- mat[cj[ok], , drop = FALSE] * v_ok
+        mx <- .rowSums(x, n_ok, s_len) / nv_ok
+        my <- .rowSums(y, n_ok, s_len) / nv_ok
+        dx <- (x - mx) * v_ok
+        dy <- (y - my) * v_ok
+        ssx <- .rowSums(dx * dx, n_ok, s_len)
+        ssy <- .rowSums(dy * dy, n_ok, s_len)
+        denom <- sqrt(ssx * ssy)
+        r_val <- .rowSums(dx * dy, n_ok, s_len) / denom
+        bad_r <- is.na(r_val) |
+          !is.finite(r_val) |
+          !is.finite(denom) |
+          denom <= 0
+        n_bad <- sum(bad_r)
+        good <- which(!bad_r)
+        if (length(good) > 0L) {
+          dest_idx <- pair_sub[ok[good]]
+          cor_vals <- pmax(-1, pmin(1, r_val[good]))
+          samp_vals <- nv_ok[good]
         }
       }
+      list(
+        n_insuff = n_insuff,
+        n_bad = n_bad,
+        dest_idx = dest_idx,
+        cor_vals = cor_vals,
+        samp_vals = samp_vals
+      )
+    })
+
+    n_insufficient_samples <- n_insufficient_samples +
+      sum(vapply(len_results, `[[`, integer(1L), "n_insuff"))
+    n_correlation_failed <- sum(vapply(len_results, `[[`, integer(1L), "n_bad"))
+    all_dest <- unlist(lapply(len_results, `[[`, "dest_idx"), use.names = FALSE)
+    if (length(all_dest) > 0L) {
+      cor_all[all_dest] <- unlist(
+        lapply(len_results, `[[`, "cor_vals"),
+        use.names = FALSE
+      )
+      n_samp_all[all_dest] <- unlist(
+        lapply(len_results, `[[`, "samp_vals"),
+        use.names = FALSE
+      )
+      valid_test[all_dest] <- TRUE
     }
   }
 

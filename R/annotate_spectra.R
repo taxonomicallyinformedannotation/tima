@@ -287,8 +287,6 @@ annotate_spectra <- function(
   }
 
   # Process one library at a time: load, compute, finalize, cleanup
-  df_chunks <- list()
-  n_lib_count <- 0L
   ms1_zero_tracker <- if (
     !is.null(ms1_annotations) && is.numeric(threshold) && threshold <= 0
   ) {
@@ -302,26 +300,8 @@ annotate_spectra <- function(
     NULL
   }
 
-  for (lib_path in libs_vec) {
-    # Reset per-iteration temporaries up front. This matters: previously
-    # lib_precursors_all / lib_adducts_all / all_target_ids / meta / df_chunk
-    # were only assigned -- and only rm()'d -- inside the
-    # `nrow(sim_chunk) > 0L` branch below. If library K produced hits (large
-    # vectors bound to these names) and library K+1 produced zero hits, that
-    # branch was skipped entirely and library K's objects stayed referenced
-    # for the rest of the loop: gc() can't collect what's still bound to a
-    # name. Over a run with many sparse libraries this ratchets peak memory
-    # up toward "largest hit-producing library" instead of "one library",
-    # defeating the point of processing them one at a time. Declaring them
-    # as NULL here means the unconditional rm() at the bottom of the loop is
-    # always valid and never carries anything across iterations.
-    lib_precursors_all <- NULL
-    lib_adducts_all <- NULL
-    all_target_ids <- NULL
-    meta <- NULL
-    df_chunk <- NULL
-
-    # Load single library
+  lib_results <- lapply(libs_vec, function(lib_path) {
+    on.exit(gc(verbose = FALSE), add = TRUE)
     spectral_library <- import_and_clean_library_collection(
       c(lib_path),
       dalton = dalton,
@@ -332,19 +312,17 @@ annotate_spectra <- function(
       query_adducts = query_meta$query_adduct
     )
 
-    if (length(spectral_library) == 0L) {
-      rm(spectral_library)
-      next
+    n_sp <- length(spectral_library)
+    if (n_sp == 0L) {
+      return(list(n_lib = 0L, chunk = NULL))
     }
 
     log_library_stats(spectral_library)
-    n_lib_count <- n_lib_count + length(spectral_library)
 
     if (!is.null(ms1_zero_tracker)) {
       update_ms1_zero_tracker(ms1_zero_tracker, spectral_library)
     }
 
-    # (calculate_entropy_and_similarity handles pre-computation outside hot loop)
     sim_chunk <- compute_similarity_safe(
       lib_sp = spectral_library,
       query_sp = query_sp,
@@ -357,10 +335,10 @@ annotate_spectra <- function(
       query_precursors = query_precursors
     )
 
+    df_chunk <- NULL
     if (nrow(sim_chunk) > 0L) {
       lib_precursors_all <- attr(sim_chunk, "lib_precursors_raw")
       lib_adducts_all <- attr(sim_chunk, "lib_adducts_raw")
-
       all_target_ids <- unique(sim_chunk$target_id)
       meta <- build_library_metadata(
         spectral_library,
@@ -368,8 +346,6 @@ annotate_spectra <- function(
         target_ids = all_target_ids,
         target_adduct_raw = lib_adducts_all[all_target_ids]
       )
-
-      # Finalize this library's results
       df_chunk <- finalize_results(
         df_sim = tidytable::as_tidytable(x = sim_chunk),
         meta = meta,
@@ -377,27 +353,17 @@ annotate_spectra <- function(
         dalton = dalton,
         ppm = ppm
       )
-
-      if (nrow(df_chunk) > 0L) {
-        df_chunks[[length(df_chunks) + 1L]] <- df_chunk
-      }
     }
 
-    # Cleanup this library. This is now unconditional (previously
-    # `sim_chunk`/`meta` were only rm()'d inside the `if (nrow(sim_chunk) >
-    # 0L)` branch above), so nothing from this iteration -- hit or miss --
-    # survives into the next one.
-    rm(
-      spectral_library,
-      sim_chunk,
-      lib_precursors_all,
-      lib_adducts_all,
-      all_target_ids,
-      meta,
-      df_chunk
-    )
-    gc(verbose = FALSE)
-  }
+    list(n_lib = n_sp, chunk = df_chunk)
+  })
+
+  n_lib_count <- sum(vapply(lib_results, `[[`, integer(1L), "n_lib"))
+  df_chunks <- Filter(
+    function(x) !is.null(x) && nrow(x) > 0L,
+    lapply(lib_results, `[[`, "chunk")
+  )
+  rm(lib_results)
 
   if (n_lib_count == 0L) {
     msg <- if (isFALSE(approx)) {
@@ -649,59 +615,53 @@ import_and_clean_library_collection <- function(
   query_precursors = NULL,
   query_adducts = NULL
 ) {
-  processed <- list()
-  for (i in seq_along(paths)) {
-    path <- paths[[i]]
-    sp <- if (tolower(tools::file_ext(path)) == "rds") {
-      readRDS(path)
-    } else {
-      import_spectra(
-        file = path,
-        cutoff = 0,
-        dalton = dalton,
-        polarity = polarity,
-        ppm = ppm,
-        sanitize = FALSE,
-        combine = FALSE
-      )
-    }
-
-    if (!methods::is(sp, "Spectra")) {
-      cli::cli_abort(
-        "library source did not produce a Spectra object",
-        class = c("tima_validation_error", "tima_error"),
-        call = NULL
-      )
-    }
-
-    if (!isTRUE(approx) && !is.null(query_precursors)) {
-      sp <- tryCatch(
-        reduce_library_by_precursor(
-          lib_sp = sp,
-          query_precursors = query_precursors,
-          query_adducts = query_adducts,
+  processed <- Filter(
+    function(x) length(x) > 0L,
+    lapply(paths, function(path) {
+      sp <- if (tolower(tools::file_ext(path)) == "rds") {
+        readRDS(path)
+      } else {
+        import_spectra(
+          file = path,
+          cutoff = 0,
           dalton = dalton,
-          ppm = ppm
-        ),
-        error = function(e) {
-          log_warn(
-            "Per-library precursor reduction failed: %s",
-            conditionMessage(e)
-          )
-          sp
-        }
-      )
-    }
+          polarity = polarity,
+          ppm = ppm,
+          sanitize = FALSE,
+          combine = FALSE
+        )
+      }
 
-    sp <- remove_empty_peak_spectra(sp)
-    if (length(sp) == 0L) {
-      rm(sp)
-      next
-    }
+      if (!methods::is(sp, "Spectra")) {
+        cli::cli_abort(
+          "library source did not produce a Spectra object",
+          class = c("tima_validation_error", "tima_error"),
+          call = NULL
+        )
+      }
 
-    processed[[length(processed) + 1L]] <- sp
-    rm(sp)
-  }
+      if (!isTRUE(approx) && !is.null(query_precursors)) {
+        sp <- tryCatch(
+          reduce_library_by_precursor(
+            lib_sp = sp,
+            query_precursors = query_precursors,
+            query_adducts = query_adducts,
+            dalton = dalton,
+            ppm = ppm
+          ),
+          error = function(e) {
+            log_warn(
+              "Per-library precursor reduction failed: %s",
+              conditionMessage(e)
+            )
+            sp
+          }
+        )
+      }
+
+      remove_empty_peak_spectra(sp)
+    })
+  )
 
   if (length(processed) == 0L) {
     return(list())

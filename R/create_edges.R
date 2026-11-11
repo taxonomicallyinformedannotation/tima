@@ -156,15 +156,10 @@ create_edges <- function(
 
   log_metadata(ctx, phase = "calculating", n_comparisons = n_comparisons)
 
-  bin_counts <- integer(10L)
   use_gnps <- (method == "gnps")
   precs_num <- as.numeric(precs)
-  res_f <- vector("list", n_queries)
-  res_t <- vector("list", n_queries)
-  res_s <- vector("list", n_queries)
-  res_m <- vector("list", n_queries)
 
-  for (i in seq_len(n_queries)) {
+  query_results <- lapply(seq_len(n_queries), function(i) {
     q_sp <- frags[[i]]
     q_pre <- precs[i]
     targets <- (i + 1L):nspecs
@@ -180,16 +175,13 @@ create_edges <- function(
       )
 
       sc_vec <- res_mat[, 1L]
-      if (!anyNA(sc_vec) && !any(is.infinite(sc_vec))) {
-        bins <- pmin(9L, pmax(0L, as.integer(sc_vec * 10)))
-        bin_counts <- bin_counts + tabulate(bins + 1L, nbins = 10L)
+      sc_fin <- if (!anyNA(sc_vec) && !any(is.infinite(sc_vec))) {
+        sc_vec
       } else {
-        finite_sc <- is.finite(sc_vec)
-        if (any(finite_sc)) {
-          bins <- pmin(9L, pmax(0L, as.integer(sc_vec[finite_sc] * 10)))
-          bin_counts <- bin_counts + tabulate(bins + 1L, nbins = 10L)
-        }
+        sc_vec[is.finite(sc_vec)]
       }
+      bins <- pmin(9L, pmax(0L, as.integer(sc_fin * 10)))
+      bc <- tabulate(bins + 1L, nbins = 10L)
 
       kept_idx <- if (!is.null(threshold)) {
         which(!is.na(sc_vec) & sc_vec >= threshold)
@@ -206,61 +198,75 @@ create_edges <- function(
         }
         if (length(kept_idx) > 0L) {
           t_kept <- targets[kept_idx]
-          res_f[[i]] <- rep.int(i, length(t_kept))
-          res_t[[i]] <- t_kept
-          res_s[[i]] <- sc_vec[kept_idx]
-          res_m[[i]] <- as.integer(mp_sub)
+          return(list(
+            bc = bc,
+            f = rep.int(i, length(t_kept)),
+            t = t_kept,
+            s = sc_vec[kept_idx],
+            m = as.integer(mp_sub)
+          ))
         }
       }
-    } else {
-      pair_mat <- vapply(
-        targets,
-        function(j) {
-          res <- calculate_similarity(
-            method = method,
-            query_spectrum = q_sp,
-            target_spectrum = frags[[j]],
-            query_precursor = q_pre,
-            target_precursor = precs[j],
-            dalton = ms2_tolerance,
-            ppm = ppm_tolerance,
-            return_matched_peaks = TRUE
-          )
-          if (is.numeric(res) && length(res) >= 2L) {
-            c(as.numeric(res[1L]), as.numeric(as.integer(res[2L])))
-          } else {
-            c(as.numeric(res), 0)
-          }
-        },
-        numeric(2L)
-      )
-      sc_vec <- pair_mat[1L, ]
-      mp_vec <- as.integer(pair_mat[2L, ])
-
-      finite_sc <- is.finite(sc_vec)
-      if (any(finite_sc)) {
-        bins <- pmin(9L, pmax(0L, as.integer(sc_vec[finite_sc] * 10)))
-        bin_counts <- bin_counts + tabulate(bins + 1L, nbins = 10L)
-      }
-
-      keep <- rep(TRUE, length(targets))
-      if (!is.null(threshold)) {
-        keep <- keep & (sc_vec >= threshold)
-      }
-      if (!is.null(matched_peaks)) {
-        keep <- keep & (mp_vec >= matched_peaks)
-      }
-      keep[is.na(keep)] <- FALSE
-
-      if (any(keep)) {
-        t_kept <- targets[keep]
-        res_f[[i]] <- rep.int(i, length(t_kept))
-        res_t[[i]] <- t_kept
-        res_s[[i]] <- sc_vec[keep]
-        res_m[[i]] <- mp_vec[keep]
-      }
+      return(list(bc = bc, f = NULL, t = NULL, s = NULL, m = NULL))
     }
-  }
+
+    pair_mat <- vapply(
+      targets,
+      function(j) {
+        res <- calculate_similarity(
+          method = method,
+          query_spectrum = q_sp,
+          target_spectrum = frags[[j]],
+          query_precursor = q_pre,
+          target_precursor = precs[j],
+          dalton = ms2_tolerance,
+          ppm = ppm_tolerance,
+          return_matched_peaks = TRUE
+        )
+        if (is.numeric(res) && length(res) >= 2L) {
+          c(as.numeric(res[1L]), as.numeric(as.integer(res[2L])))
+        } else {
+          c(as.numeric(res), 0)
+        }
+      },
+      numeric(2L)
+    )
+    sc_vec <- pair_mat[1L, ]
+    mp_vec <- as.integer(pair_mat[2L, ])
+
+    bins <- pmin(9L, pmax(0L, as.integer(sc_vec[is.finite(sc_vec)] * 10)))
+    bc <- tabulate(bins + 1L, nbins = 10L)
+
+    keep <- rep(TRUE, length(targets))
+    if (!is.null(threshold)) {
+      keep <- keep & (sc_vec >= threshold)
+    }
+    if (!is.null(matched_peaks)) {
+      keep <- keep & (mp_vec >= matched_peaks)
+    }
+    keep[is.na(keep)] <- FALSE
+
+    if (any(keep)) {
+      t_kept <- targets[keep]
+      return(list(
+        bc = bc,
+        f = rep.int(i, length(t_kept)),
+        t = t_kept,
+        s = sc_vec[keep],
+        m = mp_vec[keep]
+      ))
+    }
+    list(bc = bc, f = NULL, t = NULL, s = NULL, m = NULL)
+  })
+
+  bin_counts <- as.integer(
+    rowSums(vapply(query_results, `[[`, integer(10L), "bc"))
+  )
+  res_f <- lapply(query_results, `[[`, "f")
+  res_t <- lapply(query_results, `[[`, "t")
+  res_s <- lapply(query_results, `[[`, "s")
+  res_m <- lapply(query_results, `[[`, "m")
+  rm(query_results)
 
   if (any(sanitized_indices)) {
     log_warn(

@@ -344,32 +344,44 @@ EDGE_MATCHED_PEAKS_COLUMNS <- c(
       )
     }
 
-    best_partition <- NULL
-    best_modularity <- -Inf
-    best_resolution <- resolution
-
-    for (resolution_value in resolution_grid) {
-      community_detection <- detect_communities(resolution_value)
-      if (is.null(community_detection)) {
-        next
+    grid_results <- lapply(resolution_grid, function(resolution_value) {
+      cd <- detect_communities(resolution_value)
+      if (is.null(cd)) {
+        return(list(
+          partition = NULL,
+          modularity = -Inf,
+          res = resolution_value
+        ))
       }
-
-      membership <- igraph::membership(community_detection)
-      modularity_value <- igraph::modularity(
+      mod_val <- igraph::modularity(
         network_graph,
-        membership = membership,
+        membership = igraph::membership(cd),
         weights = igraph::E(network_graph)$weight
       )
+      list(
+        partition = cd,
+        modularity = if (is.finite(mod_val)) mod_val else -Inf,
+        res = resolution_value
+      )
+    })
 
-      if (
-        is.finite(modularity_value) &&
-          modularity_value > best_modularity + 1e-8
-      ) {
-        best_partition <- community_detection
-        best_modularity <- modularity_value
-        best_resolution <- resolution_value
-      }
-    }
+    best_st <- Reduce(
+      function(best, cur) {
+        if (
+          !is.null(cur$partition) &&
+            cur$modularity > best$modularity + 1e-8
+        ) {
+          cur
+        } else {
+          best
+        }
+      },
+      grid_results,
+      init = list(partition = NULL, modularity = -Inf, res = resolution)
+    )
+    best_partition <- best_st$partition
+    best_modularity <- best_st$modularity
+    best_resolution <- best_st$res
 
     if (!is.null(best_partition)) {
       community_detection <- best_partition

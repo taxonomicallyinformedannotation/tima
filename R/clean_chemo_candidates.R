@@ -1821,7 +1821,8 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
   p <- integer(n_cols + 1L)
   way <- integer(n_cols + 1L)
 
-  for (i in seq_len(k)) {
+  i <- 1L
+  repeat {
     p[1L] <- i
     j0 <- 1L
     minv <- rep.int(Inf, n_cols + 1L)
@@ -1856,6 +1857,10 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
         break
       }
     }
+    if (i == k) {
+      break
+    }
+    i <- i + 1L
   }
 
   match_col <- rep.int(NA_integer_, k)
@@ -2059,7 +2064,7 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
     factor(comp_cid[act_local_cid], levels = seq_len(comp_id))
   )
 
-  for (cc in seq_len(comp_id)) {
+  comp_sols <- lapply(seq_len(comp_id), function(cc) {
     c_idx <- rows_by_comp[[cc]]
     c_rows <- act_rows[c_idx]
     sub_cids <- sort(unique(rt_cid[c_rows]))
@@ -2131,43 +2136,76 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
       !opt_grp & tight_red[, first_rep, drop = FALSE],
       arr.ind = TRUE
     )
-    for (p_idx in seq_len(nrow(cand_pairs))) {
-      ii <- cand_pairs[p_idx, 1L]
-      g <- cand_pairs[p_idx, 2L]
-      r_col <- first_rep[[g]]
-      w_rem <- if (ncol(red_w) == 1L) {
-        0
-      } else {
-        sub_w_rem <- red_w[-ii, -r_col, drop = FALSE]
-        rem_match <- .solve_bipartite_max_weight(sub_w_rem)
-        .bipartite_matching_weight(sub_w_rem, rem_match)
-      }
-      if ((w_star - (red_w[ii, r_col] + w_rem)) <= tol) {
-        opt_grp[ii, g] <- TRUE
-      }
+    if (nrow(cand_pairs) > 0L) {
+      is_opt_pair <- vapply(
+        seq_len(nrow(cand_pairs)),
+        function(p_idx) {
+          ii <- cand_pairs[p_idx, 1L]
+          g <- cand_pairs[p_idx, 2L]
+          r_col <- first_rep[[g]]
+          w_rem <- if (ncol(red_w) == 1L) {
+            0
+          } else {
+            sub_w_rem <- red_w[-ii, -r_col, drop = FALSE]
+            rem_match <- .solve_bipartite_max_weight(sub_w_rem)
+            .bipartite_matching_weight(sub_w_rem, rem_match)
+          }
+          (w_star - (red_w[ii, r_col] + w_rem)) <= tol
+        },
+        logical(1L)
+      )
+      opt_grp[cand_pairs[is_opt_pair, , drop = FALSE]] <- TRUE
     }
     opt_edge <- opt_grp[, col_grp, drop = FALSE]
-
-    target_iks_by_cid[sub_ci_global] <- lapply(
-      seq_len(k_sub),
-      function(ii) act_iks[sub_js[which(opt_edge[ii, ])]]
-    )
     pos_jj <- which(colSums(opt_edge) > 0L)
-    optimal_cids_by_ik[sub_js[pos_jj]] <- lapply(
-      pos_jj,
-      function(jj) sub_cids[which(opt_edge[, jj])]
+
+    list(
+      sub_ci_global = sub_ci_global,
+      target_iks = lapply(
+        seq_len(k_sub),
+        function(ii) act_iks[sub_js[which(opt_edge[ii, ])]]
+      ),
+      ik_indices = sub_js[pos_jj],
+      opt_cids = lapply(
+        pos_jj,
+        function(jj) sub_cids[which(opt_edge[, jj])]
+      ),
+      holders = lapply(
+        pos_jj,
+        function(jj) {
+          opt_ii <- which(opt_edge[, jj])
+          stats::setNames(
+            fids[sub_best_row[cbind(opt_ii, jj)]],
+            as.character(sub_cids[opt_ii])
+          )
+        }
+      )
     )
-    holder_fids_by_ik[sub_js[pos_jj]] <- lapply(
-      pos_jj,
-      function(jj) {
-        opt_ii <- which(opt_edge[, jj])
-        stats::setNames(
-          fids[sub_best_row[cbind(opt_ii, jj)]],
-          as.character(sub_cids[opt_ii])
-        )
-      }
-    )
-  }
+  })
+
+  all_ci_global <- unlist(
+    lapply(comp_sols, `[[`, "sub_ci_global"),
+    use.names = FALSE
+  )
+  target_iks_by_cid[all_ci_global] <- unlist(
+    lapply(comp_sols, `[[`, "target_iks"),
+    recursive = FALSE,
+    use.names = FALSE
+  )
+  all_ik_idx <- unlist(
+    lapply(comp_sols, `[[`, "ik_indices"),
+    use.names = FALSE
+  )
+  optimal_cids_by_ik[all_ik_idx] <- unlist(
+    lapply(comp_sols, `[[`, "opt_cids"),
+    recursive = FALSE,
+    use.names = FALSE
+  )
+  holder_fids_by_ik[all_ik_idx] <- unlist(
+    lapply(comp_sols, `[[`, "holders"),
+    recursive = FALSE,
+    use.names = FALSE
+  )
 
   list(
     rt_cid = rt_cid,
@@ -2331,8 +2369,7 @@ resolve_cross_rt_duplicate_candidates <- function(
     unique(fids[col_rk == 1L & valid_ik])
   )
   act_fid_pos <- fastmatch::fmatch(act_fids, row_fid_names)
-  reordered_mask <- logical(length(act_fids))
-  for (f_idx in seq_along(act_fids)) {
+  feat_updates <- lapply(seq_along(act_fids), function(f_idx) {
     f_rows <- rows_by_fid[[act_fid_pos[[f_idx]]]]
     cid <- rt_cid[f_rows[[1L]]]
     cid_chr <- as.character(cid)
@@ -2353,7 +2390,7 @@ resolve_cross_rt_duplicate_candidates <- function(
       !taken_by_other
 
     if (!any(is_target_row)) {
-      next
+      return(NULL)
     }
 
     f_target_iks <- unique(f_iks[is_target_row])
@@ -2362,7 +2399,7 @@ resolve_cross_rt_duplicate_candidates <- function(
         all(orig_iks %in% f_target_iks) &&
         !any(taken_by_other)
     ) {
-      next
+      return(NULL)
     }
 
     tier <- ifelse(is_target_row, 0L, ifelse(taken_by_other, 2L, 1L))
@@ -2377,7 +2414,6 @@ resolve_cross_rt_duplicate_candidates <- function(
     rk_key_part <- ifelse(tier_s == 0L, 1L, col_rk[f_rows_s])
     old_key <- paste(tier_s, rk_key_part, sep = ":")
     new_rk_f <- match(old_key, unique(old_key))
-    col_rk[f_rows_s] <- new_rk_f
 
     r1_new <- f_rows_s[new_rk_f == 1L]
     new_top_iks <- unique(iks[r1_new])
@@ -2385,7 +2421,14 @@ resolve_cross_rt_duplicate_candidates <- function(
       length(orig_iks) == length(new_top_iks) &&
         all(orig_iks %in% new_top_iks)
     ) {
-      next
+      return(list(
+        f_rows_s = f_rows_s,
+        new_rk_f = new_rk_f,
+        reordered = FALSE,
+        f_rows = integer(0L),
+        r1_promoted = integer(0L),
+        note_str = NA_character_
+      ))
     }
 
     displaced_iks <- orig_iks[
@@ -2402,42 +2445,83 @@ resolve_cross_rt_duplicate_candidates <- function(
       other_holders <- holders[names(holders) != cid_chr]
       holder_fid <- unname(other_holders[[1L]])
       r1_promoted <- r1_new[!(iks[r1_new] %in% orig_iks)]
-      col_prom[f_rows] <- FALSE
-      col_prom[r1_promoted] <- TRUE
-      col_note[r1_promoted] <- paste0(
-        "Promoted to rank 1: cross-RT duplicate InChIKey ",
-        displaced_ik,
-        " assigned to feature ",
-        holder_fid
-      )
-      reordered_mask[[f_idx]] <- TRUE
-    } else {
-      tied_iks <- orig_iks[
-        (orig_iks %in% target_iks) & lengths(optimal_cids_by_ik[orig_iks]) > 1L
-      ]
-      tied_ik <- tied_iks[[1L]]
-      holders <- holder_fids_by_ik[[fastmatch::fmatch(
-        tied_ik,
-        holder_ik_names
-      )]]
-      other_holders <- holders[names(holders) != cid_chr]
-      tied_fid <- unname(other_holders[[1L]])
-      r1_promoted <- r1_new[!(iks[r1_new] %in% orig_iks)]
-      if (length(r1_promoted) > 0L) {
-        col_prom[f_rows] <- FALSE
-        col_prom[r1_promoted] <- TRUE
-        col_note[r1_promoted] <- paste0(
+      return(list(
+        f_rows_s = f_rows_s,
+        new_rk_f = new_rk_f,
+        reordered = TRUE,
+        f_rows = f_rows,
+        r1_promoted = r1_promoted,
+        note_str = paste0(
           "Promoted to rank 1: cross-RT duplicate InChIKey ",
-          tied_ik,
-          " tied with feature ",
-          tied_fid
+          displaced_ik,
+          " assigned to feature ",
+          holder_fid
         )
-        reordered_mask[[f_idx]] <- TRUE
-      }
+      ))
     }
-  }
 
-  n_reordered <- sum(reordered_mask)
+    tied_iks <- orig_iks[
+      (orig_iks %in% target_iks) & lengths(optimal_cids_by_ik[orig_iks]) > 1L
+    ]
+    tied_ik <- tied_iks[[1L]]
+    holders <- holder_fids_by_ik[[fastmatch::fmatch(
+      tied_ik,
+      holder_ik_names
+    )]]
+    other_holders <- holders[names(holders) != cid_chr]
+    tied_fid <- unname(other_holders[[1L]])
+    r1_promoted <- r1_new[!(iks[r1_new] %in% orig_iks)]
+    list(
+      f_rows_s = f_rows_s,
+      new_rk_f = new_rk_f,
+      reordered = TRUE,
+      f_rows = f_rows,
+      r1_promoted = r1_promoted,
+      note_str = paste0(
+        "Promoted to rank 1: cross-RT duplicate InChIKey ",
+        tied_ik,
+        " tied with feature ",
+        tied_fid
+      )
+    )
+  })
+
+  valid_up <- Filter(Negate(is.null), feat_updates)
+  if (length(valid_up) > 0L) {
+    all_f_rows_s <- unlist(
+      lapply(valid_up, `[[`, "f_rows_s"),
+      use.names = FALSE
+    )
+    all_new_rk <- unlist(lapply(valid_up, `[[`, "new_rk_f"), use.names = FALSE)
+    col_rk[all_f_rows_s] <- all_new_rk
+
+    reord_up <- Filter(function(u) isTRUE(u$reordered), valid_up)
+    n_reordered <- length(reord_up)
+    if (n_reordered > 0L) {
+      all_reset_rows <- unlist(
+        lapply(reord_up, `[[`, "f_rows"),
+        use.names = FALSE
+      )
+      all_prom_rows <- unlist(
+        lapply(reord_up, `[[`, "r1_promoted"),
+        use.names = FALSE
+      )
+      prom_lens <- vapply(
+        reord_up,
+        function(u) length(u$r1_promoted),
+        integer(1L)
+      )
+      prom_notes <- rep.int(
+        vapply(reord_up, `[[`, character(1L), "note_str"),
+        prom_lens
+      )
+      col_prom[all_reset_rows] <- FALSE
+      col_prom[all_prom_rows] <- TRUE
+      col_note[all_prom_rows] <- prom_notes
+    }
+  } else {
+    n_reordered <- 0L
+  }
   if (n_reordered == 0L) {
     return(df_ranked)
   }
@@ -2567,7 +2651,7 @@ drop_cross_rt_duplicate_final_candidates <- function(
   act_fids <- unique(
     fids[keep_row & !is.na(rt_cid) & rt_cid %in% opt$active_cids]
   )
-  for (lfid in act_fids) {
+  drop_updates <- lapply(act_fids, function(lfid) {
     f_all <- rows_by_fid[[lfid]]
     r1_orig <- f_all[col_rk[f_all] == 1L & valid_ik[f_all]]
     orig_iks <- unique(iks[r1_orig])
@@ -2587,10 +2671,11 @@ drop_cross_rt_duplicate_final_candidates <- function(
     rk_key_part <- ifelse(tier_s == 0L, 1L, col_rk[ord_rem])
     old_key <- paste(tier_s, rk_key_part, sep = ":")
     new_rk <- match(old_key, unique(old_key))
-    col_rk[ord_rem] <- new_rk
 
     r1_new <- ord_rem[new_rk == 1L]
     new_top_iks <- unique(iks[r1_new])
+    note_rows <- integer(0L)
+    note_str <- NA_character_
     if (
       length(orig_iks) > 0L &&
         !(length(orig_iks) == length(new_top_iks) &&
@@ -2607,17 +2692,16 @@ drop_cross_rt_duplicate_final_candidates <- function(
         other_holders <- holders[names(holders) != cid_chr]
         holder_fid <- unname(other_holders[[1L]])
         r1_promoted <- r1_new[!(iks[r1_new] %in% orig_iks)]
-        note_str <- paste0(
-          "Promoted to rank 1: cross-RT duplicate InChIKey ",
-          displaced_ik,
-          " assigned to feature ",
-          holder_fid
-        )
         na_note <- is.na(col_note[r1_promoted]) |
           !nzchar(trimws(col_note[r1_promoted]))
         if (any(na_note)) {
-          col_note[r1_promoted[na_note]] <- note_str
-          added_note <- TRUE
+          note_rows <- r1_promoted[na_note]
+          note_str <- paste0(
+            "Promoted to rank 1: cross-RT duplicate InChIKey ",
+            displaced_ik,
+            " assigned to feature ",
+            holder_fid
+          )
         }
       } else {
         tied_iks <- orig_iks[
@@ -2630,20 +2714,54 @@ drop_cross_rt_duplicate_final_candidates <- function(
         tied_fid <- unname(other_holders[[1L]])
         r1_promoted <- r1_new[!(iks[r1_new] %in% orig_iks)]
         if (length(r1_promoted) > 0L) {
-          note_str <- paste0(
-            "Promoted to rank 1: cross-RT duplicate InChIKey ",
-            tied_ik,
-            " tied with feature ",
-            tied_fid
-          )
           na_note <- is.na(col_note[r1_promoted]) |
             !nzchar(trimws(col_note[r1_promoted]))
           if (any(na_note)) {
-            col_note[r1_promoted[na_note]] <- note_str
-            added_note <- TRUE
+            note_rows <- r1_promoted[na_note]
+            note_str <- paste0(
+              "Promoted to rank 1: cross-RT duplicate InChIKey ",
+              tied_ik,
+              " tied with feature ",
+              tied_fid
+            )
           }
         }
       }
+    }
+    list(
+      ord_rem = ord_rem,
+      new_rk = new_rk,
+      note_rows = note_rows,
+      note_str = note_str
+    )
+  })
+
+  if (length(drop_updates) > 0L) {
+    all_ord_rem <- unlist(
+      lapply(drop_updates, `[[`, "ord_rem"),
+      use.names = FALSE
+    )
+    all_new_rk <- unlist(
+      lapply(drop_updates, `[[`, "new_rk"),
+      use.names = FALSE
+    )
+    col_rk[all_ord_rem] <- all_new_rk
+    note_up <- Filter(function(u) length(u$note_rows) > 0L, drop_updates)
+    if (length(note_up) > 0L) {
+      all_note_rows <- unlist(
+        lapply(note_up, `[[`, "note_rows"),
+        use.names = FALSE
+      )
+      note_lens <- vapply(
+        note_up,
+        function(u) length(u$note_rows),
+        integer(1L)
+      )
+      col_note[all_note_rows] <- rep.int(
+        vapply(note_up, `[[`, character(1L), "note_str"),
+        note_lens
+      )
+      added_note <- TRUE
     }
   }
 

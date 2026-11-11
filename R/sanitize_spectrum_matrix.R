@@ -132,7 +132,8 @@ sanitize_spectrum_matrix <- function(spectrum, tolerance = 0.01, ppm = 10) {
   merged_mz[1L] <- mz[1L] * int[1L]
   merged_int[1L] <- int[1L]
 
-  for (i in 2L:n) {
+  i <- 2L
+  repeat {
     # Current group representative m/z
     rep_mz <- merged_mz[k] / merged_int[k]
     allowed <- tolerance + ppm * rep_mz * 1e-6
@@ -147,6 +148,10 @@ sanitize_spectrum_matrix <- function(spectrum, tolerance = 0.01, ppm = 10) {
       merged_mz[k] <- mz[i] * int[i]
       merged_int[k] <- int[i]
     }
+    if (i == n) {
+      break
+    }
+    i <- i + 1L
   }
   # Finalize last group
   merged_mz[k] <- merged_mz[k] / merged_int[k]

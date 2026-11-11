@@ -431,99 +431,36 @@ prepare_features_tables <- function(
       ncol = n_samp
     )
 
-    work_mat <- num_mat
-    work_mat[is.na(work_mat)] <- -Inf
-    work_mat[work_mat <= 0] <- -Inf
-
-    if (max_keep <= 16L) {
-      row_idx_list <- vector("list", max_keep)
-      col_idx_list <- vector("list", max_keep)
-      val_list <- vector("list", max_keep)
-      rk_list <- vector("list", max_keep)
-      active_rows <- seq_len(n_feat)
-
-      for (k in seq_len(max_keep)) {
-        n_act <- length(active_rows)
-        sub_m <- if (n_act == n_feat) {
-          work_mat
-        } else {
-          work_mat[active_rows, , drop = FALSE]
-        }
-        best_c <- max.col(sub_m, ties.method = "first")
-        lin_idx <- (best_c - 1L) * n_act + seq_len(n_act)
-        best_v <- sub_m[lin_idx]
-        keep <- is.finite(best_v)
-        if (!any(keep)) {
-          break
-        }
-        kept_r <- active_rows[keep]
-        kept_c <- best_c[keep]
-        row_idx_list[[k]] <- kept_r
-        col_idx_list[[k]] <- kept_c
-        val_list[[k]] <- best_v[keep]
-        rk_list[[k]] <- rep.int(k, length(kept_r))
-        if (k < max_keep) {
-          work_mat[(kept_c - 1L) * n_feat + kept_r] <- -Inf
-          active_rows <- kept_r
-        }
-      }
-      rm(work_mat)
-
-      kept_r_all <- unlist(row_idx_list, use.names = FALSE)
-      if (length(kept_r_all) == 0L) {
-        empty_tbl <- data.frame(
-          feature_id = character(0),
-          sample = character(0),
-          stringsAsFactors = FALSE,
-          check.names = FALSE
-        )
-        empty_tbl[extra_cols] <- replicate(
-          length(extra_cols),
-          vector("list", 0L),
-          simplify = FALSE
-        )
-        return(empty_tbl)
-      }
-      kept_c_all <- unlist(col_idx_list, use.names = FALSE)
-      kept_v_all <- unlist(val_list, use.names = FALSE)
-      kept_rk_all <- unlist(rk_list, use.names = FALSE)
-    } else {
-      valid_pos <- which(is.finite(work_mat))
-      if (length(valid_pos) == 0L) {
-        empty_tbl <- data.frame(
-          feature_id = character(0),
-          sample = character(0),
-          stringsAsFactors = FALSE,
-          check.names = FALSE
-        )
-        if ("rt" %in% extra_cols) {
-          empty_tbl$rt <- vector("list", 0L)
-        }
-        if ("mz" %in% extra_cols) {
-          empty_tbl$mz <- vector("list", 0L)
-        }
-        if ("adduct" %in% extra_cols) {
-          empty_tbl$adduct <- vector("list", 0L)
-        }
-        return(empty_tbl)
-      }
-      r_id <- (valid_pos - 1L) %% n_feat + 1L
-      c_id <- (valid_pos - 1L) %/% n_feat + 1L
-      v_val <- work_mat[valid_pos]
-      rm(work_mat)
-      ord_v <- order(r_id, -v_val, c_id, method = "radix")
-      r_id <- r_id[ord_v]
-      c_id <- c_id[ord_v]
-      v_val <- v_val[ord_v]
-      n_v <- length(r_id)
-      new_g <- if (n_v > 1L) c(TRUE, r_id[-1L] != r_id[-n_v]) else TRUE
-      rk <- seq_len(n_v) - cummax(ifelse(new_g, seq_len(n_v), 1L)) + 1L
-      keep_rk <- which(rk <= max_keep)
-      kept_r_all <- r_id[keep_rk]
-      kept_c_all <- c_id[keep_rk]
-      kept_v_all <- v_val[keep_rk]
-      kept_rk_all <- rk[keep_rk]
+    valid_pos <- which(!is.na(num_mat) & is.finite(num_mat) & num_mat > 0)
+    if (length(valid_pos) == 0L) {
+      empty_tbl <- data.frame(
+        feature_id = character(0),
+        sample = character(0),
+        stringsAsFactors = FALSE,
+        check.names = FALSE
+      )
+      empty_tbl[extra_cols] <- replicate(
+        length(extra_cols),
+        vector("list", 0L),
+        simplify = FALSE
+      )
+      return(empty_tbl)
     }
+    r_id <- (valid_pos - 1L) %% n_feat + 1L
+    c_id <- (valid_pos - 1L) %/% n_feat + 1L
+    v_val <- num_mat[valid_pos]
+    ord_v <- order(r_id, -v_val, c_id, method = "radix")
+    r_id <- r_id[ord_v]
+    c_id <- c_id[ord_v]
+    v_val <- v_val[ord_v]
+    n_v <- length(r_id)
+    new_g <- if (n_v > 1L) c(TRUE, r_id[-1L] != r_id[-n_v]) else TRUE
+    rk <- seq_len(n_v) - cummax(ifelse(new_g, seq_len(n_v), 1L)) + 1L
+    keep_rk <- which(rk <= max_keep)
+    kept_r_all <- r_id[keep_rk]
+    kept_c_all <- c_id[keep_rk]
+    kept_v_all <- v_val[keep_rk]
+    kept_rk_all <- rk[keep_rk]
 
     if (feature_order_is_numeric) {
       ord_final <- order(
