@@ -624,7 +624,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   org_tax_ott = get_params(step =
     "prepare_taxa")\$files\$libraries\$sop\$merged\$organisms\$taxonomies\$ott,
   output = get_params(step = "prepare_taxa")\$files\$metadata\$prepared,
-  taxon = get_params(step = "prepare_taxa")\$organisms\$taxon
+  taxon = get_params(step = "prepare_taxa")\$organisms\$taxon,
+  min_rel_intensity = 0.01
 )
 </code></pre>
 </section>
@@ -693,6 +694,14 @@ character Path for output file
 </td>
 <td>
 character Organism name to enforce for all features (e.g., "Homo sapiens"). If provided, overrides metadata-based assignment.
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="min_rel_intensity">min_rel_intensity</code>
+</td>
+<td>
+numeric Minimum relative intensity fraction (default 0.01) to retain an organism attribution in aligned samples.
 </td>
 </tr>
 </tbody></table>

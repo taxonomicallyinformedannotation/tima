@@ -649,6 +649,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Intensity co-variance edges (<code>p &lt; correlation_p_threshold</code> after Benjamini-Hochberg adjustment) reinforce <code>adduct_support</code> without dropping untested single-sample pairs</li>
 <li><code>build_universe_transition_tables()</code> always orients pairs from lighter to heavier adduct and supports single-adduct universes</li>
 <li><code>adduct_support</code> no longer counts a feature as its own neighbor</li>
+<li>Applied exact <code>1 / |z|</code> isotope shift (<code>n_iso * 1.003355 / |z|</code>) in <code>calculate_mass_of_m()</code> and <code>calculate_mz_from_mass()</code>, enumerated mixed multivalent charge carriers (<code>+2</code>, <code>+3</code>) via integer charge balance, used tolerance-bounded consensus mode for component neutral mass <code>M</code>, replaced grid-quantized mass/RT bins in <code>mass_evidence</code> with bounded-diameter 1D clustering, and evaluated co-variance edges with one-sided Pearson correlation on <code>log1p(intensity)</code></li>
+<li>Required explicit modifier presence in <code>score_modifier_relation_from_hypotheses()</code> so cluster and neutral-loss interpretations are not scored identically after algebraic cancellation</li>
 </ul></li>
 <li><strong>Ranking and filtering</strong>:
 <ul>
@@ -659,10 +661,12 @@ ul.task-list li input[type="checkbox"] {
 <li>Taxon and chemical class names are matched as exact tokens rather than substrings (<code>Ara</code> no longer matches <code>Arabidopsis</code>)</li>
 <li>High-evidence filtering uses anchor scores for cluster-promoted rows and requires sufficient score coverage; <code>high_evidence</code> only toggles the <code>full</code> table (<code>filtered</code> and <code>mini</code> always filter to high evidence)</li>
 <li>Default Biota biological score is capped at <code>1.0</code> (was <code>1.007276</code>)</li>
+<li>Computed real per-row evidence <code>coverage</code> (<code>present_weight / weight_sum</code>) in <code>compute_weighted_components()</code>, added optional <code>na_prior</code> shrinkage and Cauchy RT/<code>m/z</code> error decay (<code>compute_rt_mz_penalty()</code>), supported <code>"corroborated"</code> and <code>"noisy_or"</code> spectral score fusion plus SIRIUS Zodiac modulation, scored all 15 taxonomic ranks (including <code>infraorder</code>, <code>subfamily</code>, <code>subtribe</code>, <code>subgenus</code>, <code>subspecies</code>), weighted neighbor consistency in <code>clean_bio()</code> by edge similarity, used complete-linkage 1D RT clustering in <code>resolve_cross_rt_duplicate_candidates()</code>, and filtered trace sample attributions in <code>prepare_taxa()</code> via <code>min_rel_intensity</code></li>
 </ul></li>
 <li><strong>Masses and spectra</strong>:
 <ul>
 <li>Applied signed electron-mass correction (<code>z * m_e</code>, CODATA 2018 <code>ELECTRON_MASS_DALTONS</code>) consistently across <code>calculate_mass_of_m()</code>, <code>calculate_mz_from_mass()</code>, and spectral neutral-mass calculations</li>
+<li>Separated <code>"cosine"</code> (unshifted direct cosine) from <code>"gnps"</code> (precursor-shifted modified cosine), passed actual precursor <code>m/z</code> for the GNPS neutral-loss shift during neutral-mass window matching in <code>annotate_spectra()</code>, and used adaptive per-community edge pruning and symmetric <code>min(N_source, N_target)</code> peak scaling in <code>create_components()</code></li>
 <li><code>annotate_spectra()</code> and <code>create_edges_spectra()</code> warn once and return valid empty outputs instead of aborting when an MGF has no MS2 spectra; hardened <code>get_spectra_ids()</code> on 0-row <code>Spectra</code></li>
 </ul></li>
 <li><strong>Inputs, parameters, and xrefs</strong>:

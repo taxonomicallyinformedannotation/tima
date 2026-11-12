@@ -612,7 +612,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
-<pre><code class="language-R">transform_score_sirius_csi(csi_score = NULL, K = 100, scale = 20)
+<pre><code class="language-R">transform_score_sirius_csi(
+  csi_score = NULL,
+  K = 100,
+  scale = 20,
+  zodiac_score = NULL
+)
 </code></pre>
 </section>
 <section id="arguments" class="level3">
@@ -640,6 +645,14 @@ numeric Shift parameter to adjust the sigmoid center (default: 100, midpoint at 
 </td>
 <td>
 numeric Scale parameter controlling sigmoid steepness (default: 20)
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="zodiac_score">zodiac_score</code>
+</td>
+<td>
+numeric Optional SIRIUS Zodiac molecular formula network score in <code style="white-space: pre;">[0, 1]</code>. When provided and finite, modulates the transformed CSI score by the formula confidence.
 </td>
 </tr>
 </tbody></table>
