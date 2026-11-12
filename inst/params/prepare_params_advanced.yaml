@@ -482,7 +482,7 @@ ms:
     - "CH5NO2" # (ammonium formate)             ~63.032
     - "CHNaO2" # (sodium formate)               ~67.987
     - "CHKO2" # (potassium formate)            ~83.961
-    # - "C2H4O2"       # (acetic acid)                  ~60.021
+    - "C2H4O2" # (acetic acid)                  ~60.021
     # - "C2H7NO2"      # (ammonium acetate)             ~77.046
     # - "C2H3NaO2"     # (sodium acetate)               ~82.003
     # - "C2H3KO2"      # (potassium acetate)            ~97.977

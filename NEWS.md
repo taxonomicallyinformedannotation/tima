@@ -12,6 +12,15 @@
   promotions in `annotation_note` (`full`/`filtered`) and `note` (`mini`)
 - Expanded MS1 neutral-loss defaults with PFAS-relevant losses (`HF`, `CF2`,
   `CF2O`, `CF3`, `CHF2`, `C2F2`, `C2F4`, `C3F6`, `C2F3O`) and `SO2` / `SO3`
+- MS1 neutral losses no longer need adduct-graph support on the precursor: a
+  loss edge to a precursor that only has baseline ions now gives the product ion
+  the loss from the precursor's plain baseline ions (single charge, monomer, no
+  modifier), so a lone `[M-H]-` and its co-eluting water loss give `[M-H-H2O]-`.
+  These hypotheses keep the `baseline` origin and tie with the primary baseline
+  ion in conflict resolution, so a chance loss partner never evicts it.
+  Previously such losses were detected as edges and then dropped
+- The acetic-acid cluster (`C2H4O2`) is on by default (YAML params and Shiny
+  app)
 - Added PubChem Lite as an exposomics library flagged as `xenobiotic`
   (`Q409205`)
 - Flattened `annotate_masses` modifier defaults so `clusters` and `solvents` are

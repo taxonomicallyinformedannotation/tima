@@ -749,25 +749,47 @@ collect_node_adduct_hypotheses <- function(
   } else {
     support_base <- base_hyps |>
       tidytable::filter(candidate_adduct_origin == "supported")
+    # A loss edge is pair evidence in itself: a precursor without any supported
+    # adduct state still passes the loss on from its plain baseline ions
+    # (single charge, monomer, no modifier), so a lone `[M-H]-` and its
+    # co-eluting water loss give `[M-H-H2O]-` to the product ion. Such a
+    # hypothesis is only as strong as the baseline it comes from: it keeps the
+    # "baseline" origin, so it never evicts the product's own alternatives.
+    baseline_precursors <- base_hyps |>
+      tidytable::filter(
+        candidate_adduct_origin == "baseline",
+        is_plain_monomer_ion(adduct)
+      )
     tidytable::bind_rows(
+      tidytable::bind_rows(
+        propagate_modifier_dest_to_src(
+          base_hyps = support_base,
+          edges = loss_edges,
+          mod_col = "loss",
+          mod_sign = "-",
+          strip_label = TRUE,
+          source_label = "loss"
+        ),
+        propagate_modifier_src_to_dest(
+          base_hyps = support_base,
+          edges = loss_edges,
+          mod_col = "loss",
+          mod_sign = "+",
+          strip_label = TRUE,
+          source_label = "loss"
+        )
+      ) |>
+        tidytable::mutate(candidate_adduct_origin = "supported"),
       propagate_modifier_dest_to_src(
-        base_hyps = support_base,
+        base_hyps = baseline_precursors,
         edges = loss_edges,
         mod_col = "loss",
         mod_sign = "-",
         strip_label = TRUE,
         source_label = "loss"
-      ),
-      propagate_modifier_src_to_dest(
-        base_hyps = support_base,
-        edges = loss_edges,
-        mod_col = "loss",
-        mod_sign = "+",
-        strip_label = TRUE,
-        source_label = "loss"
-      )
-    ) |>
-      tidytable::mutate(candidate_adduct_origin = "supported")
+      ) |>
+        tidytable::mutate(candidate_adduct_origin = "baseline")
+    )
   }
 
   all_hyps <- tidytable::bind_rows(
@@ -790,6 +812,14 @@ collect_node_adduct_hypotheses <- function(
   attr(result, "feature_m_map") <- feature_m_map
 
   result
+}
+
+#' Whether an adduct is a plain monomer ion: one charge-carrier term and a
+#' single charge (`[M+H]+`, `[M+Na]+`, `[M-H]-`), not a multimer, a multiply
+#' charged ion or an ion with a cluster or loss
+#' @keywords internal
+is_plain_monomer_ion <- function(adduct) {
+  grepl("^\\[M[+-][A-Z][A-Za-z0-9]*\\][+-]$", as.character(adduct))
 }
 
 #' Simplify adduct strings produced by cluster/loss expansion while preserving
