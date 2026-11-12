@@ -702,6 +702,7 @@ ui <- shiny::fluidPage(
               "CH5NO2", # (ammonium formate)             ~63.032
               "CHNaO2", # (sodium formate)               ~67.987
               "CHKO2", # (potassium formate)            ~83.961
+              "C2H4O2", # (acetic acid)                  ~60.021
               "C2HF3O2" # (trifluoroacetic acid)         ~78.014
             )
           ) |>

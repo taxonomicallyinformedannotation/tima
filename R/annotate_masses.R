@@ -2789,6 +2789,17 @@ enforce_non_conflicting_annotation_states <- function(
     }
     supp_class_rank[!is.na(src_col) & src_col == "evidence"] <- 5L
     supp_class_rank[!is.na(src_col) & src_col %in% c("cluster", "loss")] <- 4L
+    # A loss passed on from a baseline precursor (no adduct-graph support,
+    # `collect_node_adduct_hypotheses()`) is only as strong as the primary
+    # baseline ion: it ties with it instead of evicting it.
+    if ("candidate_adduct_origin" %in% colnames(annotations)) {
+      supp_class_rank[
+        !is.na(src_col) &
+          src_col == "loss" &
+          !is.na(annotations$candidate_adduct_origin) &
+          annotations$candidate_adduct_origin == "baseline"
+      ] <- 6L
+    }
     supp_class_rank[!is.na(src_col) & src_col == "multi"] <- 3L
     supp_class_rank[
       !is.na(src_col) &
