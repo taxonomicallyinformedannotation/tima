@@ -84,10 +84,12 @@ build_evidence_supported_hypotheses <- function(
   # min_support_v <- as.integer(uni_dt$min_cluster_support)
   K <- length(adduct_v)
 
-  exact_masses_sorted <- sort(as.numeric(exact_masses))
-  exact_masses_sorted <- exact_masses_sorted[
-    is.finite(exact_masses_sorted) & exact_masses_sorted > 0
+  exact_masses_num <- as.numeric(exact_masses)
+  exact_masses_num <- exact_masses_num[
+    is.finite(exact_masses_num) & exact_masses_num > 0
   ]
+  exact_masses_sorted <- sort(unique(exact_masses_num))
+  rm(exact_masses_num)
   use_library_prefilter <- length(exact_masses_sorted) > 0L
   tol_ppm_num <- as.numeric(tolerance_ppm)
 
@@ -130,34 +132,39 @@ build_evidence_supported_hypotheses <- function(
     ifelse(is.finite(cap_eff), as.character(cap_eff), "Inf")
   )
 
-  # Vectorized hypothesis generation across all (feature, adduct) pairs.
-  # Hot path uses a single matrix evaluation and one batched inclusion check.
+  # Vectorized hypothesis generation per adduct so each inclusion check
+  # preserves m/z ordering locality and avoids allocating an (n_feat x K) matrix.
   t_loop <- Sys.time()
   slope_v <- abs(z_v) / n_mer_v
   offset_v <- (niso_v * EVIDENCE_ISOTOPE_SHIFT_DA + am_v) / n_mer_v + am_pm_v
-  implied_mat <- outer(feature_mzs, slope_v) - rep(offset_v, each = n_feat)
-  ok_idx <- which(
-    is.finite(implied_mat) &
-      implied_mat >= min_neutral_mass &
-      implied_mat <= max_neutral_mass
-  )
-  if (length(ok_idx) > 0L && use_library_prefilter) {
-    hit <- .has_library_match_within_tolerance(
-      masses = implied_mat[ok_idx],
-      exact_masses_sorted = exact_masses_sorted,
-      tolerance_ppm = tol_ppm_num,
-      tolerance_dalton = tolerance_dalton
+  adduct_hits <- lapply(seq_len(K), function(k) {
+    implied_m <- feature_mzs * slope_v[[k]] - offset_v[[k]]
+    ok <- which(
+      is.finite(implied_m) &
+        implied_m >= min_neutral_mass &
+        implied_m <= max_neutral_mass
     )
-    ok_idx <- ok_idx[hit]
-  }
+    if (length(ok) > 0L && use_library_prefilter) {
+      hit <- .has_library_match_within_tolerance(
+        masses = implied_m[ok],
+        exact_masses_sorted = exact_masses_sorted,
+        tolerance_ppm = tol_ppm_num,
+        tolerance_dalton = tolerance_dalton
+      )
+      ok <- ok[hit]
+    }
+    list(f_idx = ok, m_val = implied_m[ok])
+  })
+  hit_lens <- vapply(adduct_hits, function(x) length(x$f_idx), integer(1L))
+  total_hits <- sum(hit_lens)
   log_debug(
     "Evidence pass: %d adducts in %.2fs (%d kept hypotheses)",
     K,
     as.numeric(Sys.time() - t_loop, units = "secs"),
-    length(ok_idx)
+    total_hits
   )
 
-  if (length(ok_idx) == 0L) {
+  if (total_hits == 0L) {
     return(.materialize_baseline_only(
       feature_ids = feature_ids,
       feature_rts = feature_rts,
@@ -168,10 +175,10 @@ build_evidence_supported_hypotheses <- function(
     ))
   }
 
-  f_idx_vec <- (ok_idx - 1L) %% n_feat + 1L
-  a_idx_vec <- (ok_idx - 1L) %/% n_feat + 1L
-  m_vec <- implied_mat[ok_idx]
-  rm(implied_mat, ok_idx)
+  f_idx_vec <- unlist(lapply(adduct_hits, `[[`, "f_idx"), use.names = FALSE)
+  a_idx_vec <- rep.int(seq_len(K), hit_lens)
+  m_vec <- unlist(lapply(adduct_hits, `[[`, "m_val"), use.names = FALSE)
+  rm(adduct_hits)
   log_info(
     "Evidence engine candidate materialization: %d rows",
     length(f_idx_vec)

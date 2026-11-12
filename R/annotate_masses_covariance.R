@@ -206,50 +206,75 @@ compute_intensity_covariance_edges <- function(
       }
       mat[!mask] <- 0
 
-      ci <- fastmatch::fmatch(idx_i[pair_sub], u_feats)
-      cj <- fastmatch::fmatch(idx_j[pair_sub], u_feats)
-      n_sub <- length(pair_sub)
-      v <- mask[ci, , drop = FALSE] & mask[cj, , drop = FALSE]
-      nv <- as.integer(.rowSums(v, n_sub, s_len))
-      insuff <- nv < 3L
-      n_insuff <- sum(insuff)
-      ok <- which(!insuff)
-      n_ok <- length(ok)
-      n_bad <- 0L
-      dest_idx <- integer(0L)
-      cor_vals <- numeric(0L)
-      samp_vals <- integer(0L)
-      if (n_ok > 0L) {
-        v_ok <- v[ok, , drop = FALSE]
-        nv_ok <- nv[ok]
-        x <- mat[ci[ok], , drop = FALSE] * v_ok
-        y <- mat[cj[ok], , drop = FALSE] * v_ok
-        mx <- .rowSums(x, n_ok, s_len) / nv_ok
-        my <- .rowSums(y, n_ok, s_len) / nv_ok
-        dx <- (x - mx) * v_ok
-        dy <- (y - my) * v_ok
-        ssx <- .rowSums(dx * dx, n_ok, s_len)
-        ssy <- .rowSums(dy * dy, n_ok, s_len)
-        denom <- sqrt(ssx * ssy)
-        r_val <- .rowSums(dx * dy, n_ok, s_len) / denom
-        bad_r <- is.na(r_val) |
-          !is.finite(r_val) |
-          !is.finite(denom) |
-          denom <= 0
-        n_bad <- sum(bad_r)
-        good <- which(!bad_r)
-        if (length(good) > 0L) {
-          dest_idx <- pair_sub[ok[good]]
-          cor_vals <- pmax(-1, pmin(1, r_val[good]))
-          samp_vals <- nv_ok[good]
+      ci_all <- fastmatch::fmatch(idx_i[pair_sub], u_feats)
+      cj_all <- fastmatch::fmatch(idx_j[pair_sub], u_feats)
+      n_sub_all <- length(pair_sub)
+      chunk_size <- 50000L
+      chunk_starts <- seq.int(1L, n_sub_all, by = chunk_size)
+      chunk_res <- lapply(chunk_starts, function(cs) {
+        ce <- min(cs + chunk_size - 1L, n_sub_all)
+        rng <- cs:ce
+        n_sub <- length(rng)
+        ci <- ci_all[rng]
+        cj <- cj_all[rng]
+        v <- mask[ci, , drop = FALSE] & mask[cj, , drop = FALSE]
+        nv <- as.integer(.rowSums(v, n_sub, s_len))
+        insuff <- nv < 3L
+        n_insuff <- sum(insuff)
+        ok <- which(!insuff)
+        n_ok <- length(ok)
+        n_bad <- 0L
+        dest_idx <- integer(0L)
+        cor_vals <- numeric(0L)
+        samp_vals <- integer(0L)
+        if (n_ok > 0L) {
+          v_ok <- v[ok, , drop = FALSE]
+          nv_ok <- nv[ok]
+          x <- mat[ci[ok], , drop = FALSE] * v_ok
+          y <- mat[cj[ok], , drop = FALSE] * v_ok
+          mx <- .rowSums(x, n_ok, s_len) / nv_ok
+          my <- .rowSums(y, n_ok, s_len) / nv_ok
+          dx <- (x - mx) * v_ok
+          dy <- (y - my) * v_ok
+          ssx <- .rowSums(dx * dx, n_ok, s_len)
+          ssy <- .rowSums(dy * dy, n_ok, s_len)
+          denom <- sqrt(ssx * ssy)
+          r_val <- .rowSums(dx * dy, n_ok, s_len) / denom
+          bad_r <- is.na(r_val) |
+            !is.finite(r_val) |
+            !is.finite(denom) |
+            denom <= 0
+          n_bad <- sum(bad_r)
+          good <- which(!bad_r)
+          if (length(good) > 0L) {
+            dest_idx <- pair_sub[rng[ok[good]]]
+            cor_vals <- pmax(-1, pmin(1, r_val[good]))
+            samp_vals <- nv_ok[good]
+          }
         }
-      }
+        list(
+          n_insuff = n_insuff,
+          n_bad = n_bad,
+          dest_idx = dest_idx,
+          cor_vals = cor_vals,
+          samp_vals = samp_vals
+        )
+      })
       list(
-        n_insuff = n_insuff,
-        n_bad = n_bad,
-        dest_idx = dest_idx,
-        cor_vals = cor_vals,
-        samp_vals = samp_vals
+        n_insuff = sum(vapply(chunk_res, `[[`, integer(1L), "n_insuff")),
+        n_bad = sum(vapply(chunk_res, `[[`, integer(1L), "n_bad")),
+        dest_idx = unlist(
+          lapply(chunk_res, `[[`, "dest_idx"),
+          use.names = FALSE
+        ),
+        cor_vals = unlist(
+          lapply(chunk_res, `[[`, "cor_vals"),
+          use.names = FALSE
+        ),
+        samp_vals = unlist(
+          lapply(chunk_res, `[[`, "samp_vals"),
+          use.names = FALSE
+        )
       )
     })
 

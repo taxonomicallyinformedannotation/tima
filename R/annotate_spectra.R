@@ -301,7 +301,6 @@ annotate_spectra <- function(
   }
 
   lib_results <- lapply(libs_vec, function(lib_path) {
-    on.exit(gc(verbose = FALSE), add = TRUE)
     spectral_library <- import_and_clean_library_collection(
       c(lib_path),
       dalton = dalton,

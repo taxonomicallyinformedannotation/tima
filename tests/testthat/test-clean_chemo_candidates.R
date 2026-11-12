@@ -1380,4 +1380,67 @@ test_that("clean_chemo_candidates helpers cover edge cases, complete linkage, an
     ],
     "IK_B"
   )
+
+  # Consensus-promoted rank-1 candidate with lower raw score than rank-2 MS2 row
+  # plus an unrelated feature at RT 1.98 shifting global 1D RT bin boundaries
+  df_consensus_boundary <- tidytable::tidytable(
+    feature_id = c(
+      "F_UNREL",
+      "F_ANCHOR",
+      "F_CHILD",
+      "F_CHILD",
+      "F_LATE",
+      "F_LATE"
+    ),
+    rt = c(1.98, 2.00, 2.04, 2.04, 8.00, 8.00),
+    rank_final = c(1L, 1L, 1L, 2L, 1L, 2L),
+    candidate_structure_inchikey_connectivity_layer = c(
+      "IK_UNREL",
+      "IK_ANCHOR",
+      "IK_ANCHOR",
+      "IK_CHILD_MS2",
+      "IK_ANCHOR",
+      "IK_LATE_ALT"
+    ),
+    score_weighted_chemo = c(0.90, 0.98, 0.50, 0.92, 0.80, 0.75),
+    candidate_score_similarity = c(NA, 0.95, NA, 0.85, 0.70, 0.65)
+  )
+  res_cb <- resolve_cross_rt_duplicate_candidates(
+    df_consensus_boundary,
+    rt_tolerance = 0.05
+  )
+  expect_identical(
+    res_cb$candidate_structure_inchikey_connectivity_layer[
+      res_cb$feature_id == "F_CHILD" & res_cb$rank_final == 1L
+    ],
+    "IK_ANCHOR"
+  )
+  expect_identical(
+    res_cb$candidate_structure_inchikey_connectivity_layer[
+      res_cb$feature_id == "F_LATE" & res_cb$rank_final == 1L
+    ],
+    "IK_LATE_ALT"
+  )
+  filt_cb <- drop_cross_rt_duplicate_final_candidates(
+    df_consensus_boundary,
+    rt_tolerance = 0.05
+  )
+  expect_identical(
+    filt_cb$candidate_structure_inchikey_connectivity_layer[
+      filt_cb$feature_id == "F_CHILD" & filt_cb$rank_final == 1L
+    ],
+    "IK_ANCHOR"
+  )
+
+  # Direct call to .solve_optimal_rt_cluster_assignment without row_rt (row_rt = NULL fallback)
+  opt_no_rt <- .solve_optimal_rt_cluster_assignment(
+    fids = c("F1", "F1", "F2", "F3", "F3"),
+    rt_cid = c(1L, 1L, 2L, 3L, 3L),
+    iks = c("IK_A", "IK_B", "IK_A", "IK_B", "IK_C"),
+    valid_ik = rep(TRUE, 5L),
+    col_rk = c(1L, 2L, 1L, 1L, 2L),
+    row_prio_rank = 1:5,
+    row_weights = c(100.9, 100.8, 100.85, 100.95, 100.7)
+  )
+  expect_false(is.null(opt_no_rt))
 })

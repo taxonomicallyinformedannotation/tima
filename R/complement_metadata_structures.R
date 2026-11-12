@@ -572,10 +572,13 @@ complement_metadata_structures <- function(
     nrow(stereo_s) > 0L
 
   if (has_ic) {
-    idx <- fastmatch::fmatch(
-      df$candidate_structure_inchikey_connectivity_layer,
+    ic_col <- df$candidate_structure_inchikey_connectivity_layer
+    u_ic <- unique(ic_col)
+    u_ic_idx <- fastmatch::fmatch(
+      u_ic,
       stereo_i_conn$candidate_structure_inchikey_connectivity_layer
     )
+    idx <- u_ic_idx[fastmatch::fmatch(ic_col, u_ic)]
     mapped_smiles <- stereo_i_conn$candidate_structure_smiles_no_stereo_ic[idx]
     mapped_inchikey <- stereo_i_conn$candidate_structure_inchikey_no_stereo_ic[
       idx
@@ -599,10 +602,13 @@ complement_metadata_structures <- function(
   }
 
   if (has_s) {
-    idx <- fastmatch::fmatch(
-      df$candidate_structure_smiles_no_stereo,
+    sm_col <- df$candidate_structure_smiles_no_stereo
+    u_sm <- unique(sm_col)
+    u_sm_idx <- fastmatch::fmatch(
+      u_sm,
       stereo_s$candidate_structure_smiles_no_stereo
     )
+    idx <- u_sm_idx[fastmatch::fmatch(sm_col, u_sm)]
     mapped_conn <- stereo_s$candidate_structure_inchikey_connectivity_layer_s[
       idx
     ]

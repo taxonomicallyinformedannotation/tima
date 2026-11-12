@@ -949,27 +949,31 @@ append_component_weak_hypotheses <- function(
 
   u_tpl_ads <- unique(tpl_adduct)
   n_uta <- length(u_tpl_ads)
-  all_cmass_rep <- rep(u_cmass, times = n_uta)
-  all_ads_rep <- rep(u_tpl_ads, each = n_u)
-  all_mz_exp <- as.numeric(calculate_mz_from_lookup(
-    neutral_mass = all_cmass_rep,
-    adducts = all_ads_rep,
-    adduct_lookup = adduct_lookup
-  ))
-  mz_exp_mat <- matrix(all_mz_exp, nrow = n_u, ncol = n_uta)
-
   tol_da <- tolerance_dalton %||% -1
-  mz_diff_mat <- abs(u_mz - mz_exp_mat)
-  ppm_diff_mat <- mz_diff_mat * 1e6 / pmax(u_mz, mz_exp_mat)
-  ok_mat <- (is.finite(ppm_diff_mat) & ppm_diff_mat <= tolerance_ppm) |
-    (!is.na(mz_diff_mat) & mz_diff_mat <= tol_da)
-  tpl_col_idx <- fastmatch::fmatch(tpl_adduct, u_tpl_ads)
-  hits_mat <- which(ok_mat[, tpl_col_idx, drop = FALSE], arr.ind = TRUE)
-  if (nrow(hits_mat) == 0L) {
+  tpl_groups <- split(seq_len(n_tpl), fastmatch::fmatch(tpl_adduct, u_tpl_ads))
+  hit_chunks <- lapply(seq_len(n_uta), function(a_idx) {
+    mz_exp <- as.numeric(calculate_mz_from_lookup(
+      neutral_mass = u_cmass,
+      adducts = rep.int(u_tpl_ads[[a_idx]], n_u),
+      adduct_lookup = adduct_lookup
+    ))
+    mz_diff <- abs(u_mz - mz_exp)
+    ppm_diff <- mz_diff * 1e6 / pmax(u_mz, mz_exp)
+    ok_u <- which(
+      (is.finite(ppm_diff) & ppm_diff <= tolerance_ppm) |
+        (!is.na(mz_diff) & mz_diff <= tol_da)
+    )
+    t_idxs <- tpl_groups[[a_idx]]
+    list(
+      u = rep.int(ok_u, length(t_idxs)),
+      t = rep(t_idxs, each = length(ok_u))
+    )
+  })
+  hit_u <- unlist(lapply(hit_chunks, `[[`, "u"), use.names = FALSE)
+  if (length(hit_u) == 0L) {
     return(node_hypotheses)
   }
-  hit_u <- hits_mat[, 1L]
-  hit_t <- hits_mat[, 2L]
+  hit_t <- unlist(lapply(hit_chunks, `[[`, "t"), use.names = FALSE)
 
   weak_all <- tidytable::tidytable(
     feature_id = u_fids[hit_u],

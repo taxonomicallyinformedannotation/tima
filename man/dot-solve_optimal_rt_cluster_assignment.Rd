@@ -11,7 +11,9 @@
   valid_ik,
   col_rk,
   row_prio_rank,
-  row_weights
+  row_weights,
+  row_rt = NULL,
+  rt_tolerance = DEFAULT_HE_MAX_RT_ERROR_MIN
 )
 }
 \description{
