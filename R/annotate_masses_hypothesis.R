@@ -706,22 +706,40 @@ collect_node_adduct_hypotheses <- function(
   } else {
     support_base <- base_hyps |>
       tidytable::filter(candidate_adduct_origin == "supported")
+    # As for losses below: a cluster edge is pair evidence in itself, so a base
+    # ion without any supported adduct state still passes the cluster on from
+    # its plain baseline ions (a lone `[M-H]-` and its co-eluting acetate
+    # cluster give `[M-H+C2H4O2]-`), at baseline strength.
+    cluster_base <- base_hyps |>
+      tidytable::filter(
+        candidate_adduct_origin == "baseline",
+        is_plain_monomer_ion(adduct)
+      )
     tidytable::bind_rows(
-      propagate_modifier_dest_to_src(
-        base_hyps = support_base,
-        edges = cluster_edges,
-        mod_col = "cluster",
-        mod_sign = "-",
-        source_label = "cluster"
-      ),
+      tidytable::bind_rows(
+        propagate_modifier_dest_to_src(
+          base_hyps = support_base,
+          edges = cluster_edges,
+          mod_col = "cluster",
+          mod_sign = "-",
+          source_label = "cluster"
+        ),
+        propagate_modifier_src_to_dest(
+          base_hyps = support_base,
+          edges = cluster_edges,
+          mod_col = "cluster",
+          mod_sign = "+"
+        )
+      ) |>
+        tidytable::mutate(candidate_adduct_origin = "supported"),
       propagate_modifier_src_to_dest(
-        base_hyps = support_base,
+        base_hyps = cluster_base,
         edges = cluster_edges,
         mod_col = "cluster",
         mod_sign = "+"
-      )
-    ) |>
-      tidytable::mutate(candidate_adduct_origin = "supported")
+      ) |>
+        tidytable::mutate(candidate_adduct_origin = "baseline")
+    )
   }
 
   loss_hyps <- if (all(c("adduct", "adduct_dest") %in% colnames(loss_edges))) {
