@@ -47,7 +47,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-7e52812dfc6a7b4c743579661ce18315.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-3dba021ccb97a5709654d2c27fb431b2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -626,6 +626,7 @@ ul.task-list li input[type="checkbox"] {
 <li>Cross-RT duplicate final candidate disambiguation (<code>resolve_cross_rt_duplicate_candidates()</code>, <code>drop_cross_rt_duplicate_final_candidates()</code>): peaks eluting at distinct retention times (<code>&gt; 0.05</code> min apart) no longer keep the same planar structure (<code>candidate_structure_inchikey_connectivity_layer</code>) at <code>rank_final = 1</code>. TIMA solves the global maximum-weight assignment (Hungarian algorithm) across RT clusters, preserves exact ties without random tie-breaking, and records promotions in <code>annotation_note</code> (<code>full</code>/<code>filtered</code>) and <code>note</code> (<code>mini</code>)</li>
 <li>Expanded MS1 neutral-loss defaults with PFAS-relevant losses (<code>HF</code>, <code>CF2</code>, <code>CF2O</code>, <code>CF3</code>, <code>CHF2</code>, <code>C2F2</code>, <code>C2F4</code>, <code>C3F6</code>, <code>C2F3O</code>) and <code>SO2</code> / <code>SO3</code></li>
 <li>MS1 neutral losses no longer need adduct-graph support on the precursor: a loss edge to a precursor that only has baseline ions now gives the product ion the loss from the precursor’s plain baseline ions (single charge, monomer, no modifier), so a lone <code>[M-H]-</code> and its co-eluting water loss give <code>[M-H-H2O]-</code>. These hypotheses keep the <code>baseline</code> origin and tie with the primary baseline ion in conflict resolution, so a chance loss partner never evicts it. Previously such losses were detected as edges and then dropped</li>
+<li>MS1 clusters no longer need adduct-graph support on the base ion either: a cluster edge from a base ion that only has baseline ions now gives the cluster ion the cluster from the base ion’s plain baseline ions, at baseline strength (e.g.&nbsp;a lone <code>[M-H]-</code> and its co-eluting acetate cluster give <code>[M-H+C2H4O2]-</code>). On the same labelled benchmark, acetate-cluster features had their compound among the candidates 56 % of the time instead of 16 %</li>
 <li>The acetic-acid cluster (<code>C2H4O2</code>) is on by default (YAML params and Shiny app)</li>
 <li>Added PubChem Lite as an exposomics library flagged as <code>xenobiotic</code> (<code>Q409205</code>)</li>
 <li>Flattened <code>annotate_masses</code> modifier defaults so <code>clusters</code> and <code>solvents</code> are single lists (no polarity split) across YAML params, CLI, Shiny app, and targets</li>
