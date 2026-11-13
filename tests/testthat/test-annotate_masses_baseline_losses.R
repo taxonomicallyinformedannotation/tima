@@ -145,3 +145,74 @@ test_that("a baseline-origin loss ties with the primary baseline ion", {
   # A graph-supported loss still outranks the baseline ion.
   expect_identical(kept_f1("supported"), "[M-H-H2O]-")
 })
+
+test_that("a cluster edge from an unsupported base ion gives the cluster ion", {
+  mz_base <- as.numeric(calculate_mz_from_mass(300.0, "[M-H]-"))
+  hyps <- collect_node_adduct_hypotheses(
+    adduct_edges = tidytable::tidytable(
+      feature_id = character(),
+      adduct = character(),
+      feature_id_dest = character(),
+      adduct_dest = character()
+    ),
+    # Oriented from the base ion (lighter) to the cluster ion (heavier).
+    cluster_edges = tidytable::tidytable(
+      feature_id = "B",
+      cluster = "C2H4O2",
+      feature_id_dest = "C"
+    ),
+    loss_edges = tidytable::tidytable(
+      feature_id = character(),
+      loss = character(),
+      feature_id_dest = character()
+    ),
+    evidence_hypotheses = NULL,
+    preassigned = tidytable::tidytable(
+      feature_id = character(),
+      adduct = character()
+    ),
+    baseline_adducts = c("[M-H2]2-", "[M-H]-", "[M-H+CH2O2]-"),
+    features_table = tidytable::tidytable(
+      feature_id = c("B", "C"),
+      mz = c(mz_base, mz_base + 60.021129),
+      rt = c(1.0, 1.0)
+    )
+  )
+  cluster_rows <- hyps[hyps$source == "cluster", ]
+  expect_identical(cluster_rows$feature_id, "C")
+  expect_identical(cluster_rows$adduct, "[M-H+C2H4O2]-")
+  expect_identical(cluster_rows$candidate_adduct_origin, "baseline")
+  # The cluster ion keeps its own baseline ions; the base ion gains nothing.
+  expect_true("[M-H]-" %in% hyps$adduct[hyps$feature_id == "C"])
+  expect_false(any(hyps$source[hyps$feature_id == "B"] == "cluster"))
+})
+
+test_that("a baseline-origin cluster ties with the primary baseline ion", {
+  annotations <- tidytable::tidytable(
+    feature_id = c("f1", "f1", "f2", "f3"),
+    adduct = c("[M-H]-", "[M-H+C2H4O2]-", "[M-H]-", "[M+Cl]-"),
+    source = c("baseline", "cluster", "pair", "pair"),
+    candidate_adduct_origin = c(
+      "baseline",
+      "baseline",
+      "supported",
+      "supported"
+    ),
+    adduct_support = c(0L, 0L, 1L, 1L),
+    candidate_structure_error_mz = c(0.001, 0.001, 0.001, 0.001)
+  )
+  out <- enforce_non_conflicting_annotation_states(
+    annotations = annotations,
+    adduct_edges = tidytable::tidytable(
+      feature_id = "f2",
+      adduct = "[M-H]-",
+      feature_id_dest = "f3",
+      adduct_dest = "[M+Cl]-"
+    ),
+    baseline_adduct = "[M-H]-"
+  )
+  expect_identical(
+    sort(out$adduct[out$feature_id == "f1"]),
+    c("[M-H+C2H4O2]-", "[M-H]-")
+  )
+})

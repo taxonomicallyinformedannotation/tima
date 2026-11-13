@@ -19,6 +19,12 @@
   These hypotheses keep the `baseline` origin and tie with the primary baseline
   ion in conflict resolution, so a chance loss partner never evicts it.
   Previously such losses were detected as edges and then dropped
+- MS1 clusters no longer need adduct-graph support on the base ion either: a
+  cluster edge from a base ion that only has baseline ions now gives the cluster
+  ion the cluster from the base ion's plain baseline ions, at baseline strength
+  (e.g. a lone `[M-H]-` and its co-eluting acetate cluster give
+  `[M-H+C2H4O2]-`). On the same labelled benchmark, acetate-cluster features had
+  their compound among the candidates 56 % of the time instead of 16 %
 - The acetic-acid cluster (`C2H4O2`) is on by default (YAML params and Shiny
   app)
 - Added PubChem Lite as an exposomics library flagged as `xenobiotic`
