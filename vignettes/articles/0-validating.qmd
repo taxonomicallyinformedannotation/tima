@@ -4,7 +4,7 @@ author:
   name: Adriano Rutz
   orcid: 0000-0003-0443-9902
 citation:
-  url: https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validation.html
+  url: https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validating.html
 comments:
   giscus:
     repo: taxonomicallyinformedannotation/tima
@@ -62,25 +62,26 @@ validate_inputs(
 )
 ```
 
-You can also validate a single input at a time (any omitted argument is
-skipped), and `annotate_masses()` / `annotate_spectra()` automatically run the
-relevant checks before starting.
+You can also validate a single input at a time (any `NULL` argument is skipped)
+as a standalone pre-flight check before running downstream steps.
 
 ## What is checked and why
 
-- **Features table (`features`):** Must be a non-empty CSV/TSV containing your
-  feature ID, `mz`, and `rt` columns (`feature_col` if not named `feature_id`).
-- **Spectra (`spectra`):** Must be a readable MGF with balanced `BEGIN IONS` /
-  `END IONS` blocks, a precursor `PEPMASS` per spectrum, and non-empty peak
-  lists.
-- **Metadata (`metadata`):** When provided, verifies the sample filename column
-  (`metadata_filename_col`) and checks that referenced files exist in
-  `metadata_data_dir`.
-- **SIRIUS workspace (`sirius`):** Checks that summary files
-  (`formula_identifications_all.tsv`, `canopus_formula_summary_all.tsv`, and
-  `compound_identifications_all.tsv` / `structure_identifications_all.tsv`) were
-  exported (`--full-summary` in the CLI or the summary export button in the
-  GUI).
+- **Features table (`features`):** Must be a readable, non-empty CSV/TSV
+  containing your feature ID column (`feature_col`, default `"feature_id"`),
+  `rt`, and `mz` columns.
+- **Spectra (`spectra`):** Must be a non-empty MGF file with balanced
+  `BEGIN IONS` / `END IONS` blocks, a valid precursor `PEPMASS` per spectrum,
+  and non-empty peak lists.
+- **Metadata (`metadata`):** Must be a readable CSV/TSV containing
+  `filename_col` (default `"filename"`) and `organism_col` (default
+  `"organism"`). When both `features` and `metadata` are supplied, it also
+  cross-checks sample filenames against intensity columns in the features table.
+- **SIRIUS workspace (`sirius`):** Accepts either a directory or a `.zip`
+  archive and verifies exported summary files (`formula_identifications*`,
+  `canopus_formula_summary*`, and `compound_identifications*` /
+  `structure_identifications*` via `--full-summary` in the CLI or summary export
+  in the GUI).
 
 ## Next steps
 

@@ -42,7 +42,7 @@ if (dir.exists("../../inst")) {
 }
 ```
 
-This vignette describes...
+This vignette describes:
 
 - All parameters you need
 - All inputs you need
@@ -171,7 +171,7 @@ tima::get_example_files("hmdb_is")
 
 This library is **optional**. As no standard LC method is shared (for now) among
 laboratories, this library will be heavily laboratory-dependent. It could also
-be a library of in silico predicted retention times. If you want to prepare you
+be a library of in silico predicted retention times. If you want to prepare your
 own library, have a look at `params/user/prepare_libraries_rt.yaml`.
 
 #### Structure-Organism Pairs

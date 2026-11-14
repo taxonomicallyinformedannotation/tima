@@ -131,15 +131,22 @@ set_tima_fn <- function(fn_name, fn_obj) {
 
 run_mutant <- function(id, file, line, old_code, new_code, test_files) {
   orig_lines <- readLines(file)
+  orig_env <- new.env(parent = ns)
+  sys.source(file, envir = orig_env)
+  orig_fns <- list()
+  for (nm in ls(orig_env, all.names = TRUE)) {
+    if (exists(nm, envir = ns, inherits = FALSE)) {
+      fn <- get(nm, envir = ns, inherits = FALSE)
+      if (is.function(fn)) {
+        orig_fns[[nm]] <- fn
+      }
+    }
+  }
+
   on.exit(
     {
-      writeLines(orig_lines, file)
-      env <- new.env(parent = ns)
-      sys.source(file, envir = env)
-      for (nm in ls(env, all.names = TRUE)) {
-        if (is.function(env[[nm]]) && exists(nm, envir = ns, inherits = FALSE)) {
-          set_tima_fn(nm, env[[nm]])
-        }
+      for (nm in names(orig_fns)) {
+        set_tima_fn(nm, orig_fns[[nm]])
       }
     },
     add = TRUE
@@ -148,10 +155,9 @@ run_mutant <- function(id, file, line, old_code, new_code, test_files) {
   mut_lines <- orig_lines
   mut_lines[line] <- sub(old_code, new_code, mut_lines[line], fixed = TRUE)
   stopifnot(!identical(mut_lines, orig_lines))
-  writeLines(mut_lines, file)
 
   env <- new.env(parent = ns)
-  sys.source(file, envir = env)
+  eval(parse(text = mut_lines, keep.source = TRUE), envir = env)
   for (nm in ls(env, all.names = TRUE)) {
     if (is.function(env[[nm]]) && exists(nm, envir = ns, inherits = FALSE)) {
       set_tima_fn(nm, env[[nm]])

@@ -1,32 +1,36 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: Report a bug or unexpected result in tima
 title: ""
-labels: ""
+labels: bug
 assignees: ""
 ---
 
-**Describe the bug** A clear and concise description of what the bug is.
+## Summary
 
-**To Reproduce** Steps to reproduce the behavior: 1. Go to '...' 2. Click on
-'....' 3. Scroll down to '....' 4. See error
+A clear description of the bug or unexpected behavior.
 
-**Expected behavior** A clear and concise description of what you expected to
-happen.
+## Minimal Reproducible Example
 
-**Screenshots** If applicable, add screenshots to help explain your problem.
+Steps, function call (`run_tima()`, `run_app()`, CLI script, or YAML
+parameters), and minimal input details needed to reproduce the issue.
 
-**Desktop (please complete the following information):**
+```r
+# minimal reproducible example
+```
 
-- OS: e.g. iOS
-- Browser e.g. chrome, safari
-- Version e.g. 22
+## Expected vs. Actual Behavior
 
-**Mobile phone (please complete the following information):**
+- **Expected:**
+- **Actual (including full error traceback or log lines):**
 
-- Device: e.g. iPhone6
-- OS: e.g. iOS8.1
-- Browser e.g. stock browser, safari
-- Version e.g. 22
+## Environment
 
-**Additional context** Add any other context about the problem here.
+- **Operating system:** (e.g., Linux Ubuntu 24.04, macOS 15, Windows 11)
+- **Invocation method:** (R console / Shiny app / CLI script / Docker /
+  `targets`)
+- **R and `tima` versions (`sessionInfo()`):**
+
+```r
+# paste output of utils::sessionInfo()
+```

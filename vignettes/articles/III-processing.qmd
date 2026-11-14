@@ -51,8 +51,7 @@ tima::get_example_files()
 ```
 
 This vignette describes how **T**axonomically **I**nformed **M**etabolite
-**A**nnotation is performed. If you followed all previous steps successfully,
-this should be a piece of cake, you deserve it!
+**A**nnotation is performed.
 
 ```{r}
 #| label: weight-all

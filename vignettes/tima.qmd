@@ -55,10 +55,10 @@ After some time using TIMA, you will probably wonder: "*What was the parameters
 I used to generate this file?*" ... Or a collaborator might ask you to share
 your data and parameters. Writing them down each time might be time-consuming
 and not really in line with modern computational approaches. Therefore, we chose
-to implement all parameters of all steps (almost...) as YAML files. They are
-human-readable and can be used in batches. If you do not like YAML, parameters
-of each step can also be given as command line arguments. They will then be
-saved as YAML you will be able to share.
+to implement all parameters of all steps as YAML files. They are human-readable
+and can be used in batches. If you do not like YAML, parameters of each step can
+also be given as command line arguments. They will then be saved as YAML you
+will be able to share.
 
 To ensure optimal reproducibility and avoiding re-computing endlessly steps that
 did not change, we decided to build a
@@ -134,7 +134,7 @@ We now recommend you to read the following vignettes:
 #| eval: false
 #| include: true
 
-validate_inputs(
+tima::validate_inputs(
   features = "data/source/example_features.csv",
   spectra = "data/source/example_spectra.mgf",
   metadata = "data/source/example_metadata.tsv",
@@ -145,7 +145,7 @@ validate_inputs(
 )
 ```
 
-If you do not feel like going through all the steps, then just do 🚀:
+To configure parameters and launch the pipeline from the Shiny interface:
 
 ```{r}
 #| label: run_app
@@ -155,7 +155,7 @@ If you do not feel like going through all the steps, then just do 🚀:
 tima::run_app()
 ```
 
-If you do not even need a GUI ☠️:
+To run the pipeline directly from R without the GUI:
 
 ```{r}
 #| label: run_tima

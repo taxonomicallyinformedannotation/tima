@@ -99,7 +99,7 @@ tima::get_example_files()
 debugging time:
 
 ```r
-validate_inputs(
+tima::validate_inputs(
   features = "data/source/example_features.csv",
   spectra = "data/source/example_spectra.mgf",
   metadata = "data/source/example_metadata.tsv",
@@ -135,7 +135,7 @@ are below:
 
 ```bash
 docker pull adafede/tima-r
-# docker build inst/. -t adafede/tima-r --no-cache
+# docker build -f inst/Dockerfile . -t adafede/tima-r --no-cache
 ```
 
 ```bash
@@ -146,17 +146,11 @@ docker run \
 -v "$(pwd)/.tima/data:/home/tima-user/.tima/data" \
 -p 3838:3838 \
 adafede/tima-r
-# docker run \
-# --user tima-user \
-# --memory="12g" \
-# -v "$(pwd)/.tima/_targets:/home/tima-user/.tima/_targets" \
-# -v "$(pwd)/.tima/data:/home/tima-user/.tima/data" \
-# adafede/tima-r
 ```
 
 Adapt the memory limit as needed. The app will be available at
-<http://localhost:3838/tima>. Results will be written to `.tima/data` (your
-mounted folder).
+<http://localhost:3838>. Results will be written to `.tima/data` (your mounted
+folder).
 
 ## Main Citations
 
@@ -167,22 +161,19 @@ tools/resources used.
 
 General: <https://doi.org/10.3389/fpls.2019.01329>
 
-⚠️ Do not forget to cite which version you used:
-<https://doi.org/10.5281/zenodo.5797920>
+Please cite the specific version used: <https://doi.org/10.5281/zenodo.5797920>
 
 ### LOTUS
 
 General: <https://doi.org/10.7554/eLife.70780>
 
-⚠️ Do not forget to cite which version you used:
-<https://doi.org/10.5281/zenodo.5794106>
+Please cite the specific version used: <https://doi.org/10.5281/zenodo.5794106>
 
 ### ISDB
 
 General: <https://doi.org/10.1021/acs.analchem.5b04804>
 
-⚠️ Do not forget to cite which version you used:
-<https://doi.org/10.5281/zenodo.5607185>
+Please cite the specific version used: <https://doi.org/10.5281/zenodo.5607185>
 
 ### GNPS
 
@@ -208,11 +199,9 @@ General: <https://doi.org/10.1038/s41592-019-0344-8>
   - Fecal: <https://doi.org/10.1016/j.aca.2018.05.031>
   - Saliva: <https://doi.org/10.1007/s11306-015-0840-5>
   - Serum: <https://doi.org/10.1371/journal.pone.0016957>
-  - Sweat:
   - Urine: <https://doi.org/10.1371/journal.pone.0073076>
 - MCDB: <https://doi.org/10.1021/acs.jafc.9b00204>
 - SMPDB 2.0: <https://doi.org/10.1093/nar/gkt1067>
-  <!-- -   MiMeDB 2.0: <https://doi.org/10.1093/nar/gkaf1272> -->
 - T3DB: <https://doi.org/10.1093/nar/gku1004>
 - YMDB 2.0: <https://doi.org/10.1093/nar/gkw1058>
 - Enveda-180: <https://doi.org/10.5281/zenodo.21346580>

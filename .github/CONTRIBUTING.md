@@ -1,66 +1,79 @@
 # Contributing to tima
 
-This outlines how to propose a change to tima. For a detailed discussion on
-contributing to this and other tidyverse packages, please see the [development
-contributing guide](https://rstd.io/tidy-contrib) and our [code review
-principles](https://code-review.tidyverse.org/).
+Thank you for contributing to `tima`.
 
-## Fixing typos
+## Reporting Bugs and Suggesting Changes
 
-You can fix typos, spelling mistakes, or grammatical errors in the documentation
-directly using the GitHub web interface, as long as the changes are made in the
-*source* file. This generally means you'll need to edit [roxygen2
-comments](https://roxygen2.r-lib.org/articles/roxygen2.html) in an `.R`, not a
-`.Rd` file. You can find the `.R` file that generates the `.Rd` by reading the
-comment in the first line.
+Before starting larger changes, open an issue at
+<https://github.com/taxonomicallyinformedannotation/tima/issues> describing the
+problem or proposed change. For bugs, include a minimal reproducible example
+along with your `tima` version and R `sessionInfo()`.
 
-## Bigger changes
+For typo or documentation fixes in R help pages, edit the roxygen2 comments in
+the source `R/*.R` files rather than editing generated `man/*.Rd` files
+directly.
 
-If you want to make a bigger change, it's a good idea to first file an issue and
-make sure someone from the team agrees that it's needed. If you've found a bug,
-please file an issue that illustrates the bug with a minimal
-[reprex](https://www.tidyverse.org/help/#reprex) (this will also help you write
-a unit test, if needed). See our guide on [how to create a great
-issue](https://code-review.tidyverse.org/issues/) for more advice.
+## Local Development Setup
 
-### Pull request process
+Clone the repository:
 
-- Fork the package and clone onto your computer. If you haven't done this
-  before, we recommend using
-  `usethis::create_from_github("taxonomicallyinformedannotation/tima-r", fork = TRUE)`.
+```bash
+git clone https://github.com/taxonomicallyinformedannotation/tima.git
+```
 
-- Install all development dependencies with `pak::pak()`, and then make sure the
-  package passes R CMD check by running `devtools::check()`. If R CMD check
-  doesn't pass cleanly, it's a good idea to ask for help before continuing.
+Install Bioconductor and CRAN/r-universe dependencies before running local
+checks (Bioconductor packages require `BiocManager::install()`):
 
-- Create a Git branch for your pull request (PR). We recommend using
-  `usethis::pr_init("brief-description-of-change")`.
+```r
+install.packages(c("BiocManager", "devtools", "roxygen2", "testthat", "pkgload", "lintr"))
+BiocManager::install(c("MetaboCoreUtils", "MsBackendMgf", "MsBackendMsp", "MsCoreUtils", "Spectra"))
+```
 
-- Make your changes, commit to git, and then create a PR by running
-  `usethis::pr_push()`, and following the prompts in your browser. The title of
-  your PR should briefly describe the change. The body of your PR should contain
-  `Fixes #issue-number`.
+## Pull Request Workflow
 
-- For user-facing changes, add a bullet to the top of `NEWS.md` (i.e. just below
-  the first header). Follow the style described in
-  <https://style.tidyverse.org/news.html>.
+1. Create a focused branch from `main`.
+2. Edit code and add or update unit tests under `tests/testthat/`.
+3. Run the verification checks below before pushing:
+   - Format R code with [Air](https://posit-dev.github.io/air/):
+     ```bash
+     air format .
+     air format . --check
+     ```
 
-### Code style
+   - Static checks and linting:
+     ```bash
+     jarl check .
+     Rscript --vanilla -e 'lintr::lint_dir("R")'
+     ```
 
-- New code should follow the tidyverse [style
-  guide](https://style.tidyverse.org). You can use the
-  [styler](https://CRAN.R-project.org/package=styler) package to apply these
-  styles, but please don't restyle code that has nothing to do with your PR.
+   - Run the offline test suite via `pkgload::load_all(".")` (required for
+     internal helper access):
+     ```bash
+     TIMA_TESTS_OFFLINE=true Rscript --vanilla -e 'pkgload::load_all(".", export_all = TRUE, helpers = FALSE, quiet = TRUE); testthat::test_local(".")'
+     ```
 
-- We use [roxygen2](https://cran.r-project.org/package=roxygen2), with [Markdown
-  syntax](https://cran.r-project.org/web/packages/roxygen2/vignettes/rd-formatting.html),
-  for documentation.
+   - Regenerate roxygen documentation if any `@export` or roxygen tag changed:
+     ```bash
+     Rscript --vanilla -e 'roxygen2::roxygenise(".")'
+     ```
 
-- We use [testthat](https://cran.r-project.org/package=testthat) for unit tests.
-  Contributions with test cases included are easier to accept.
+   - Check spelling and full package build:
+     ```bash
+     Rscript --vanilla -e 'spelling::spell_check_package(".")'
+     R CMD check . --no-manual --no-build-vignettes --no-vignettes
+     ```
+4. Add a concise bullet under `NEWS.md` for user-facing changes.
+
+## Code Conventions
+
+- Follow the tidyverse style guide (<https://style.tidyverse.org/>), enforced
+  via `air format .` (80-character line width).
+- Document functions with `roxygen2` using Markdown syntax.
+- Ensure tests are deterministic, offline-safe under `TIMA_TESTS_OFFLINE=true`,
+  and clean up temporary files with `withr::local_tempdir()` /
+  `withr::local_tempfile()`.
 
 ## Code of Conduct
 
-Please note that the tima project is released with a [Contributor Code of
-Conduct](CODE_OF_CONDUCT.md). By contributing to this project you agree to abide
-by its terms.
+Please note that this project adheres to the [Code of
+Conduct](CODE_OF_CONDUCT.md). By participating, you agree to abide by its terms.

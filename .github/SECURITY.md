@@ -2,10 +2,18 @@
 
 ## Supported Versions
 
-The supported versions can be found in detail in
-[releases](https://github.com/taxonomicallyinformedannotation/tima/releases).
+Supported releases are listed on the [GitHub releases
+page](https://github.com/taxonomicallyinformedannotation/tima/releases).
 
 ## Reporting a Vulnerability
 
-If you have identified a vulnerability, please open an issue without giving
-details. We will then connect offline to discuss the specifics.
+Do not open a public GitHub issue for unpatched security vulnerabilities.
+
+Instead, report vulnerabilities privately through either of these channels:
+
+1. [GitHub Private Vulnerability
+   Reporting](https://github.com/taxonomicallyinformedannotation/tima/security/advisories/new)
+2. Direct email to the maintainer: <mailto:adafede@gmail.com>
+
+Please include reproduction steps, affected versions or files, and any suggested
+fix if available.
