@@ -4,16 +4,14 @@
 DISABLE_ERRORS_LINTERS:
   - COPYPASTE_JSCPD
   - MARKDOWN_MARKDOWN_LINK_CHECK
-  - R_LINTR
   - REPOSITORY_DEVSKIM
-  - REPOSITORY_GITLEAKS
   - REPOSITORY_KICS
 DISABLE_LINTERS:
   - SPELL_CSPELL
   - SPELL_LYCHEE
-FILTER_REGEX_EXCLUDE: '(codemeta\.json|inst/app/tests/shinytest/test_app-expected/.*\.json)'
+FILTER_REGEX_EXCLUDE: '(codemeta\.json)'
 MARKDOWN_FILTER_REGEX_EXCLUDE: '(LICENSE\.md|NEWS\.md)'
 MARKDOWN_MARKDOWN_LINK_CHECK_DISABLE_ERRORS: true
 PRE_COMMANDS:
-  - command: R --slave -e 'install.packages(c("lintr"))'
+  - command: R --slave -e 'install.packages("lintr", repos = "https://cloud.r-project.org")'
     cwd: "root"

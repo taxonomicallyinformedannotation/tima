@@ -11,10 +11,10 @@
 ^TESTING\.md$
 ^[.]?air[.]toml$
 ^[.]agent-scratch
+^[.]agent-work$
 ^[.]agent[.]md$
 ^[.]agentignore$
 ^[.]cursor[.]md$
-^[.]kb/
 ^[.]mcp[.]json$
 ^[.]obsidian[.]md$
 ^\.DS_Store$
@@ -59,7 +59,6 @@
 ^renv$
 ^renv\.lock$
 ^tests/testthat/_snaps$
-^tests/testthat/_snaps/
 ^vignettes/\.quarto$
 ^vignettes/articles$
 ^vignettes/articles/*_files$

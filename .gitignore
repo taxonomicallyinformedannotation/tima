@@ -2,6 +2,10 @@
 .Rprofile
 .Rproj.user
 *.agent-scratch*
+.agent-work/
+.kb/
+.idea/
+inst/_targets/
 inst/python/__pycache__/*
 vignettes/*.html
 vignettes/articles/*_files$
@@ -36,7 +40,6 @@ vignettes/*.pdf
 # These can be explicitly added with `git add -f` to commit them
 !.claudeignore
 !.agentignore
-!.mcp.json
 
 # Knowledge base and graph outputs (not shipped)
 kb/

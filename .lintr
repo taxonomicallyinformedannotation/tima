@@ -1,0 +1,18 @@
+linters: lintr::linters_with_defaults(
+    line_length_linter = NULL,
+    indentation_linter = NULL,
+    brace_linter = NULL,
+    spaces_inside_linter = NULL,
+    spaces_left_parentheses_linter = NULL,
+    function_left_parentheses_linter = NULL,
+    paren_body_linter = NULL,
+    commas_linter = NULL,
+    infix_spaces_linter = NULL,
+    quotes_linter = NULL,
+    object_name_linter = NULL,
+    object_length_linter = NULL,
+    commented_code_linter = NULL,
+    object_usage_linter = NULL,
+    return_linter = NULL
+  )
+encoding: "UTF-8"

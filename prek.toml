@@ -10,14 +10,22 @@ rev = "0.13.0"
 hooks = [{ id = "air-format" }]
 
 [[repos]]
-repo = "https://github.com/lorenzwalthert/precommit"
-rev = "v0.4.3.9035"
-hooks = [{ id = "use-tidy-description" }, { id = "parsable-R" }, { id = "no-browser-statement" }, { id = "no-print-statement" }, { id = "no-debug-statement" }, { id = "deps-in-desc", additional_dependencies = ["taxonomicallyinformedannotation/tima"] }, { id = "readme-rmd-rendered" }]
-
-[[repos]]
 repo = "https://github.com/pre-commit/pre-commit-hooks"
 rev = "v6.0.0"
-hooks = [{ id = "check-added-large-files", args = ["--maxkb=200"] }, { id = "file-contents-sorter", files = '^\.Rbuildignore$' }, { id = "check-case-conflict" }, { id = "check-merge-conflict" }, { id = "check-shebang-scripts-are-executable" }, { id = "check-symlinks" }, { id = "check-toml" }, { id = "check-xml" }, { id = "check-yaml" }, { id = "mixed-line-ending" }, { id = "end-of-file-fixer", exclude = '\.Rd' }, { id = "trailing-whitespace" }]
+hooks = [
+  { id = "check-added-large-files", args = ["--maxkb=200"] },
+  { id = "file-contents-sorter", files = '^\.Rbuildignore$' },
+  { id = "check-case-conflict" },
+  { id = "check-merge-conflict" },
+  { id = "check-shebang-scripts-are-executable" },
+  { id = "check-symlinks" },
+  { id = "check-toml" },
+  { id = "check-xml" },
+  { id = "check-yaml" },
+  { id = "mixed-line-ending" },
+  { id = "end-of-file-fixer", exclude = '\.Rd$' },
+  { id = "trailing-whitespace" },
+]
 
 [[repos]]
 repo = "https://github.com/tombi-toml/tombi-pre-commit"
@@ -36,4 +44,11 @@ hooks = [{ id = "jarl-check" }]
 
 [[repos]]
 repo = "local"
-hooks = [{ id = "forbid-r-artifacts", name = "Don't commit R workspace files", entry = "Cannot commit .Rhistory, .RData, .Rds or .rds.", language = "fail", files = '\.(Rhistory|RData|Rds|rds)$', exclude = '^inst/extdata/.*\.rds$' }]
+hooks = [
+  { id = "parsable-r", name = "Check R files parse", entry = "Rscript", args = ["--vanilla", "-e", "for (f in commandArgs(trailingOnly = TRUE)) parse(file = f, encoding = 'UTF-8')"], language = "system", files = '\.[rR]$', pass_filenames = true },
+  { id = "no-debug-calls", name = "Forbid browser/debug/debugonce calls", entry = '^\s*(browser|debug|debugonce)\s*\(', language = "pygrep", files = '^(R|inst)/.*\.[rR]$' },
+  { id = "valid-description", name = "Check DESCRIPTION validity", entry = "Rscript", args = ["--vanilla", "-e", "d <- read.dcf('DESCRIPTION'); req <- c('Package', 'Version', 'Title', 'Description', 'License'); stopifnot(nrow(d) == 1L, all(req %in% colnames(d)), all(nzchar(trimws(d[1L, req]))))"], language = "system", files = "^DESCRIPTION$", pass_filenames = false },
+  { id = "readme-synced", name = "Check README.md is not older than README.qmd", entry = "python3", args = ["-c", "import os, sys; sys.exit(1 if os.path.getmtime('README.md') + 1 < os.path.getmtime('README.qmd') else 0)"], language = "system", files = '^README\.(qmd|md)$', pass_filenames = false },
+  { id = "ruff-check", name = "Lint Python files with ruff", entry = "ruff", args = ["check"], language = "system", files = '\.py$', pass_filenames = true },
+  { id = "forbid-r-artifacts", name = "Don't commit R workspace files", entry = "Cannot commit .Rhistory, .RData, .Rds or .rds.", language = "fail", files = '\.(Rhistory|RData|Rds|rds)$', exclude = '^inst/extdata/.*\.rds$' },
+]
