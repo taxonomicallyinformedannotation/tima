@@ -429,6 +429,49 @@ test_that("test-apply_taxonomic_filter handles NA taxonomy values", {
   expect_false("Org2" %in% result$organism_name)
 })
 
+test_that("apply_taxonomic_filter distinguishes order from infraorder and supports sub-ranks", {
+  table_keys <- data.frame(
+    structure_inchikey = c("IK1", "IK2"),
+    organism_name = c("OrgA", "OrgB")
+  )
+  table_org_tax_ott <- data.frame(
+    organism_name = c("OrgA", "OrgB"),
+    organism_taxonomy_05_1infraorder = c("Order1", "Infra2"),
+    organism_taxonomy_05order = c("OtherOrder", "Order1"),
+    organism_taxonomy_06_1subfamily = c("SubfamA", "SubfamB")
+  )
+
+  res_order <- apply_taxonomic_filter(
+    table_keys,
+    table_org_tax_ott,
+    level = "order",
+    value = "Order1"
+  )
+  expect_identical(res_order$organism_name, "OrgB")
+
+  res_subfamily <- apply_taxonomic_filter(
+    table_keys,
+    table_org_tax_ott,
+    level = "subfamily",
+    value = "SubfamA"
+  )
+  expect_identical(res_subfamily$organism_name, "OrgA")
+
+  expect_silent(validate_sop_merged_inputs(
+    files = "dummy.csv",
+    filter = TRUE,
+    level = "subfamily",
+    value = "SubfamA",
+    output_key = tempfile(),
+    output_org_tax_ott = tempfile(),
+    output_str_can = tempfile(),
+    output_str_stereo = tempfile(),
+    output_str_met = tempfile(),
+    output_str_tax_cla = tempfile(),
+    output_str_tax_npc = tempfile()
+  ))
+})
+
 test_that("test-apply_taxonomic_filter returns unique structures", {
   # Load fixtures instead of creating inline
   table_keys <- load_fixture("structure_keys_duplicate_structures")

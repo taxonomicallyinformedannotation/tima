@@ -682,3 +682,60 @@ normalize_chemontid <- function(x) {
   }
   u[idx]
 }
+
+.OTT_RANK_COL_MAP <- c(
+  domain = "organism_taxonomy_01domain",
+  kingdom = "organism_taxonomy_02kingdom",
+  phylum = "organism_taxonomy_03phylum",
+  class = "organism_taxonomy_04class",
+  order = "organism_taxonomy_05order",
+  infraorder = "organism_taxonomy_05_1infraorder",
+  family = "organism_taxonomy_06family",
+  subfamily = "organism_taxonomy_06_1subfamily",
+  tribe = "organism_taxonomy_07tribe",
+  subtribe = "organism_taxonomy_07_1subtribe",
+  genus = "organism_taxonomy_08genus",
+  subgenus = "organism_taxonomy_08_1subgenus",
+  species = "organism_taxonomy_09species",
+  subspecies = "organism_taxonomy_09_1subspecies",
+  varietas = "organism_taxonomy_10varietas"
+)
+
+.OTT_SUBRANK_COLS <- unname(
+  .OTT_RANK_COL_MAP[c(
+    "infraorder",
+    "subfamily",
+    "subtribe",
+    "subgenus",
+    "subspecies"
+  )]
+)
+
+.SAMPLE_FROM_OTT_COLS <- c(
+  sample_organism_01_domain = "organism_taxonomy_01domain",
+  sample_organism_02_kingdom = "organism_taxonomy_02kingdom",
+  sample_organism_03_phylum = "organism_taxonomy_03phylum",
+  sample_organism_04_class = "organism_taxonomy_04class",
+  sample_organism_05_order = "organism_taxonomy_05order",
+  sample_organism_05_1_infraorder = "organism_taxonomy_05_1infraorder",
+  sample_organism_06_family = "organism_taxonomy_06family",
+  sample_organism_06_1_subfamily = "organism_taxonomy_06_1subfamily",
+  sample_organism_07_tribe = "organism_taxonomy_07tribe",
+  sample_organism_07_1_subtribe = "organism_taxonomy_07_1subtribe",
+  sample_organism_08_genus = "organism_taxonomy_08genus",
+  sample_organism_08_1_subgenus = "organism_taxonomy_08_1subgenus",
+  sample_organism_09_species = "organism_taxonomy_09species",
+  sample_organism_09_1_subspecies = "organism_taxonomy_09_1subspecies",
+  sample_organism_10_varietas = "organism_taxonomy_10varietas"
+)
+
+.ensure_ott_subrank_cols <- function(df) {
+  missing <- setdiff(.OTT_SUBRANK_COLS, names(df))
+  if (length(missing) == 0L) {
+    return(df)
+  }
+  df <- tidytable::as_tidytable(df)
+  na_vals <- rep(list(rep(NA_character_, nrow(df))), length(missing))
+  data.table::set(df, j = missing, value = na_vals)
+  df
+}

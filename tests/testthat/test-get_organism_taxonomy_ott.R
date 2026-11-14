@@ -597,3 +597,86 @@ test_that("get_organism_taxonomy_ott handles sub-ranks and duplicate search_stri
   )
   expect_equal(nrow(res_no_join), 0L)
 })
+
+test_that("get_organism_taxonomy_ott extracts all 5 biological sub-ranks and empty schema has 17 columns", {
+  empty_tbl <- .empty_organism_taxonomy_table()
+  expect_equal(nrow(empty_tbl), 0L)
+  expect_equal(ncol(empty_tbl), 17L)
+  expect_true(all(
+    c(
+      "organism_taxonomy_05_1infraorder",
+      "organism_taxonomy_06_1subfamily",
+      "organism_taxonomy_07_1subtribe",
+      "organism_taxonomy_08_1subgenus",
+      "organism_taxonomy_09_1subspecies"
+    ) %in%
+      names(empty_tbl)
+  ))
+
+  local_fake_ott_api()
+  taxon_entry <- c(
+    .ott_taxon(990001L, "subspecies", "Homo sapiens neanderthalensis"),
+    list(
+      lineage = list(
+        .ott_taxon(770315L, "species", "Homo sapiens"),
+        .ott_taxon(990002L, "subgenus", "Homo (subgenus)"),
+        .ott_taxon(770309L, "genus", "Homo"),
+        .ott_taxon(990003L, "subtribe", "Hominina"),
+        .ott_taxon(990004L, "tribe", "Hominini"),
+        .ott_taxon(990005L, "subfamily", "Homininae"),
+        .ott_taxon(770311L, "family", "Hominidae"),
+        .ott_taxon(990006L, "infraorder", "Simiiformes"),
+        .ott_taxon(913935L, "order", "Primates"),
+        .ott_taxon(244265L, "class", "Mammalia"),
+        .ott_taxon(125642L, "phylum", "Chordata"),
+        .ott_taxon(691846L, "kingdom", "Metazoa"),
+        .ott_taxon(304358L, "domain", "Eukaryota")
+      )
+    )
+  )
+  local_mocked_bindings(
+    tnrs_match_names = function(names, ...) {
+      res <- data.frame(
+        search_string = "homo sapiens neanderthalensis",
+        unique_name = "Homo sapiens neanderthalensis",
+        approximate_match = FALSE,
+        ott_id = 990001L,
+        is_synonym = FALSE,
+        flags = "",
+        number_matches = 1L,
+        stringsAsFactors = FALSE
+      )
+      class(res) <- c("match_names", "data.frame")
+      res
+    },
+    taxonomy_taxon_info = function(ott_ids, ...) list(taxon_entry),
+    tax_lineage = function(info, ...) {
+      lapply(info, function(entry) {
+        rows <- lapply(entry$lineage, function(nd) {
+          data.frame(
+            rank = nd$rank,
+            name = nd$name,
+            unique_name = nd$unique_name,
+            ott_id = nd$ott_id,
+            stringsAsFactors = FALSE
+          )
+        })
+        do.call(rbind, rows)
+      })
+    },
+    .package = "rotl"
+  )
+
+  res <- get_organism_taxonomy_ott(
+    df = data.frame(organism = "Homo sapiens neanderthalensis"),
+    retry = FALSE
+  )
+  expect_identical(res$organism_taxonomy_05_1infraorder, "Simiiformes")
+  expect_identical(res$organism_taxonomy_06_1subfamily, "Homininae")
+  expect_identical(res$organism_taxonomy_07_1subtribe, "Hominina")
+  expect_identical(res$organism_taxonomy_08_1subgenus, "Homo (subgenus)")
+  expect_identical(
+    res$organism_taxonomy_09_1subspecies,
+    "Homo sapiens neanderthalensis"
+  )
+})

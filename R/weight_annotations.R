@@ -33,8 +33,8 @@
 #'     candidates within each feature (default: 0.9). Used for consistent
 #'     filtering between mini and filtered outputs.
 #' @param weight_spectral Weight for the spectral score
-#' @param weight_chemical Weight for the biological score
-#' @param weight_biological Weight for the chemical consistency score
+#' @param weight_chemical Weight for the chemical consistency score
+#' @param weight_biological Weight for the biological score
 #' @param score_biological_domain Score for a `domain` match
 #' (should be lower than `kingdom`)
 #' @param score_biological_kingdom Score for a `kingdom` match
@@ -46,11 +46,11 @@
 #' @param score_biological_order Score for a `order` match
 #' (should be lower than `infraorder`)
 #' @param score_biological_infraorder Score for a `infraorder` match
-#' (should be lower than `order`)
+#' (should be lower than `family`)
 #' @param score_biological_family Score for a `family` match
 #' (should be lower than `subfamily`)
 #' @param score_biological_subfamily Score for a `subfamily` match
-#' (should be lower than `family`)
+#' (should be lower than `tribe`)
 #' @param score_biological_tribe Score for a `tribe` match
 #' (should be lower than `subtribe`)
 #' @param score_biological_subtribe Score for a `subtribe` match
@@ -317,14 +317,6 @@ weight_annotations <- function(
   force = get_params(step = "weight_annotations")$options$force,
   xrefs_file = NULL
 ) {
-  # These sub-rank weights are accepted for YAML config completeness
-  # but not yet wired into scoring.
-  force(score_biological_infraorder)
-  force(score_biological_subfamily)
-  force(score_biological_subtribe)
-  force(score_biological_subgenus)
-  force(score_biological_subspecies)
-
   validate_weight_annotations_inputs(
     library = library,
     components = components,
@@ -554,7 +546,13 @@ weight_annotations <- function(
     score_biological_genus = score_biological_genus,
     score_biological_species = score_biological_species,
     score_biological_variety = score_biological_variety,
-    score_biological_biota = score_biological_biota
+    score_biological_biota = score_biological_biota,
+    score_biological_domain = score_biological_domain,
+    score_biological_infraorder = score_biological_infraorder,
+    score_biological_subfamily = score_biological_subfamily,
+    score_biological_subtribe = score_biological_subtribe,
+    score_biological_subgenus = score_biological_subgenus,
+    score_biological_subspecies = score_biological_subspecies
   )
 
   annot_table_wei_bio_clean <- annot_table_wei_bio_kept |>

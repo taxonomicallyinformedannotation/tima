@@ -85,20 +85,20 @@ prepare_taxa <- function(
 
   .make_nd_taxa_table <- function(feature_ids) {
     feature_ids <- unique(as.character(feature_ids))
-    tidytable::tidytable(
-      feature_id = feature_ids,
-      sample_organism_name = "ND",
-      sample_organism_01_domain = "ND",
-      sample_organism_02_kingdom = "ND",
-      sample_organism_03_phylum = "ND",
-      sample_organism_04_class = "ND",
-      sample_organism_05_order = "ND",
-      sample_organism_06_family = "ND",
-      sample_organism_07_tribe = "ND",
-      sample_organism_08_genus = "ND",
-      sample_organism_09_species = "ND",
-      sample_organism_10_varietas = "ND"
+    nd_cols <- stats::setNames(
+      rep(
+        list(rep.int("ND", length(feature_ids))),
+        length(.SAMPLE_FROM_OTT_COLS)
+      ),
+      names(.SAMPLE_FROM_OTT_COLS)
     )
+    tidytable::as_tidytable(c(
+      list(
+        feature_id = feature_ids,
+        sample_organism_name = rep.int("ND", length(feature_ids))
+      ),
+      nd_cols
+    ))
   }
 
   validate_character(input, param_name = "input", allow_empty = FALSE)
@@ -300,6 +300,8 @@ prepare_taxa <- function(
     )
   }
 
+  ott_table <- .ensure_ott_subrank_cols(ott_table)
+
   ott_match_mask <- fastmatch::fmatch(
     ott_table$organism_name,
     organism_table$organism,
@@ -332,6 +334,7 @@ prepare_taxa <- function(
       tidytable::filter(!is.na(organism_taxonomy_ottid)) |>
       tidytable::rename(organism_name = organism)
   }
+  biological_metadata <- .ensure_ott_subrank_cols(biological_metadata)
   rm(organism_table_filled, organism_table_missing)
 
   if (is.null(taxon)) {
@@ -357,31 +360,13 @@ prepare_taxa <- function(
   }
   collapse_cols <- c(
     "sample_organism_name",
-    "sample_organism_01_domain",
-    "sample_organism_02_kingdom",
-    "sample_organism_03_phylum",
-    "sample_organism_04_class",
-    "sample_organism_05_order",
-    "sample_organism_06_family",
-    "sample_organism_07_tribe",
-    "sample_organism_08_genus",
-    "sample_organism_09_species",
-    "sample_organism_10_varietas"
+    names(.SAMPLE_FROM_OTT_COLS)
   )
 
   expected_cols <- c(
     "feature_id",
     "organismOriginal",
-    "organism_taxonomy_01domain",
-    "organism_taxonomy_02kingdom",
-    "organism_taxonomy_03phylum",
-    "organism_taxonomy_04class",
-    "organism_taxonomy_05order",
-    "organism_taxonomy_06family",
-    "organism_taxonomy_07tribe",
-    "organism_taxonomy_08genus",
-    "organism_taxonomy_09species",
-    "organism_taxonomy_10varietas"
+    unname(.OTT_RANK_COL_MAP)
   )
 
   if (
@@ -397,34 +382,15 @@ prepare_taxa <- function(
     u_fid <- as.vector(unique(as.character(feature_table_0$feature_id)))
     rm(feature_table_0, metadata_table)
 
+    ott_cols <- c("organism_name", unname(.OTT_RANK_COL_MAP))
     one_row <- biological_metadata |>
-      tidytable::distinct(
-        organism_name,
-        organism_taxonomy_01domain,
-        organism_taxonomy_02kingdom,
-        organism_taxonomy_03phylum,
-        organism_taxonomy_04class,
-        organism_taxonomy_05order,
-        organism_taxonomy_06family,
-        organism_taxonomy_07tribe,
-        organism_taxonomy_08genus,
-        organism_taxonomy_09species,
-        organism_taxonomy_10varietas
-      ) |>
+      tidytable::select(tidyselect::all_of(ott_cols)) |>
+      tidytable::distinct() |>
       tidytable::mutate(feature_id = "1") |>
       tidytable::select(
         feature_id,
         sample_organism_name = organism_name,
-        sample_organism_01_domain = organism_taxonomy_01domain,
-        sample_organism_02_kingdom = organism_taxonomy_02kingdom,
-        sample_organism_03_phylum = organism_taxonomy_03phylum,
-        sample_organism_04_class = organism_taxonomy_04class,
-        sample_organism_05_order = organism_taxonomy_05order,
-        sample_organism_06_family = organism_taxonomy_06family,
-        sample_organism_07_tribe = organism_taxonomy_07tribe,
-        sample_organism_08_genus = organism_taxonomy_08genus,
-        sample_organism_09_species = organism_taxonomy_09species,
-        sample_organism_10_varietas = organism_taxonomy_10varietas
+        tidyselect::all_of(.SAMPLE_FROM_OTT_COLS)
       ) |>
       tidytable::mutate(tidytable::across(
         .cols = tidyselect::everything(),
@@ -778,16 +744,7 @@ prepare_taxa <- function(
         tidytable::select(
           feature_id,
           sample_organism_name = organismOriginal,
-          sample_organism_01_domain = organism_taxonomy_01domain,
-          sample_organism_02_kingdom = organism_taxonomy_02kingdom,
-          sample_organism_03_phylum = organism_taxonomy_03phylum,
-          sample_organism_04_class = organism_taxonomy_04class,
-          sample_organism_05_order = organism_taxonomy_05order,
-          sample_organism_06_family = organism_taxonomy_06family,
-          sample_organism_07_tribe = organism_taxonomy_07tribe,
-          sample_organism_08_genus = organism_taxonomy_08genus,
-          sample_organism_09_species = organism_taxonomy_09species,
-          sample_organism_10_varietas = organism_taxonomy_10varietas
+          tidyselect::all_of(.SAMPLE_FROM_OTT_COLS)
         ) |>
         tidytable::mutate(tidytable::across(
           .cols = tidyselect::everything(),
@@ -820,16 +777,7 @@ prepare_taxa <- function(
         tidytable::select(
           feature_id,
           sample_organism_name = organismOriginal,
-          sample_organism_01_domain = organism_taxonomy_01domain,
-          sample_organism_02_kingdom = organism_taxonomy_02kingdom,
-          sample_organism_03_phylum = organism_taxonomy_03phylum,
-          sample_organism_04_class = organism_taxonomy_04class,
-          sample_organism_05_order = organism_taxonomy_05order,
-          sample_organism_06_family = organism_taxonomy_06family,
-          sample_organism_07_tribe = organism_taxonomy_07tribe,
-          sample_organism_08_genus = organism_taxonomy_08genus,
-          sample_organism_09_species = organism_taxonomy_09species,
-          sample_organism_10_varietas = organism_taxonomy_10varietas
+          tidyselect::all_of(.SAMPLE_FROM_OTT_COLS)
         ) |>
         tidytable::mutate(tidytable::across(
           .cols = tidyselect::everything(),

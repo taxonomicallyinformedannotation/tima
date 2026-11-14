@@ -1,5 +1,6 @@
 #' Create batches from a vector
 #' @description Splits a vector into batches of specified size
+#' @include columns_utils.R
 #' @include logs_utils.R
 #' @param items [character] Vector to batch
 #' @param batch_size [integer] Size of each batch
@@ -178,16 +179,7 @@
   cols <- c(
     "organism_name",
     "organism_taxonomy_ottid",
-    "organism_taxonomy_01domain",
-    "organism_taxonomy_02kingdom",
-    "organism_taxonomy_03phylum",
-    "organism_taxonomy_04class",
-    "organism_taxonomy_05order",
-    "organism_taxonomy_06family",
-    "organism_taxonomy_07tribe",
-    "organism_taxonomy_08genus",
-    "organism_taxonomy_09species",
-    "organism_taxonomy_10varietas"
+    unname(.OTT_RANK_COL_MAP)
   )
   tidytable::as_tidytable(
     stats::setNames(rep(list(character()), length(cols)), cols)
@@ -523,20 +515,11 @@ get_organism_taxonomy_ott <- function(
     }
   }
 
-  target_ranks <- c(
-    "organism_taxonomy_01domain" = "domain",
-    "organism_taxonomy_02kingdom" = "kingdom",
-    "organism_taxonomy_03phylum" = "phylum",
-    "organism_taxonomy_04class" = "class",
-    "organism_taxonomy_05order" = "order",
-    "organism_taxonomy_06family" = "family",
-    "organism_taxonomy_07tribe" = "tribe",
-    "organism_taxonomy_08genus" = "genus",
-    "organism_taxonomy_09species" = "species",
-    "organism_taxonomy_10varietas" = "varietas"
+  target_ranks <- stats::setNames(
+    names(.OTT_RANK_COL_MAP),
+    unname(.OTT_RANK_COL_MAP)
   )
 
-  n_out <- length(cn_vec)
   n_rk <- length(target_ranks)
   u_otts <- unique(ott_vec)
   n_uo <- length(u_otts)

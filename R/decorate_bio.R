@@ -21,7 +21,18 @@
 #' @param score_biological_genus Minimum score for genus-level matches
 #' @param score_biological_species Minimum score for species-level matches
 #' @param score_biological_variety Minimum score for variety-level matches
-#' @param score_biological_variety Minimum score for Biota-level matches
+#' @param score_biological_biota Minimum score for Biota-level matches
+#' @param score_biological_domain Optional minimum score for domain-level matches
+#' @param score_biological_infraorder Optional minimum score for infraorder-level
+#'     matches
+#' @param score_biological_subfamily Optional minimum score for subfamily-level
+#'     matches
+#' @param score_biological_subtribe Optional minimum score for subtribe-level
+#'     matches
+#' @param score_biological_subgenus Optional minimum score for subgenus-level
+#'     matches
+#' @param score_biological_subspecies Optional minimum score for subspecies-level
+#'     matches
 #'
 #' @return The input annotation table (unchanged), for pipeline compatibility
 #'
@@ -55,7 +66,13 @@ decorate_bio <- function(
   score_biological_genus,
   score_biological_species,
   score_biological_variety,
-  score_biological_biota
+  score_biological_biota,
+  score_biological_domain = NULL,
+  score_biological_infraorder = NULL,
+  score_biological_subfamily = NULL,
+  score_biological_subtribe = NULL,
+  score_biological_subgenus = NULL,
+  score_biological_subspecies = NULL
 ) {
   ctx <- log_operation(
     "decorate_bio",
@@ -125,6 +142,20 @@ decorate_bio <- function(
     param_name = "score_biological_biota"
   )
 
+  optional_scores <- list(
+    score_biological_domain = score_biological_domain,
+    score_biological_infraorder = score_biological_infraorder,
+    score_biological_subfamily = score_biological_subfamily,
+    score_biological_subtribe = score_biological_subtribe,
+    score_biological_subgenus = score_biological_subgenus,
+    score_biological_subspecies = score_biological_subspecies
+  )
+  for (nm in names(optional_scores)) {
+    if (!is.null(optional_scores[[nm]])) {
+      validate_numeric_range(optional_scores[[nm]], 0, 1, param_name = nm)
+    }
+  }
+
   required_cols <- c(
     "score_biological",
     "candidate_structure_inchikey_connectivity_layer"
@@ -142,22 +173,28 @@ decorate_bio <- function(
   # Count total candidates and unique structures at a given score threshold.
   # OPTIMIZATION: Pre-sort the data once by score descending, then for each
   # threshold compute counts via cumulative sum + duplicated() tracking.
-  # This replaces 10 separate filter+distinct operations with a single
-  # O(N log N) sort + O(1) lookups per level, scaling to millions of rows.
+  # This replaces filter+distinct passes with a single O(N log N) sort and
+  # O(1) lookups per level.
 
-  # Create score list for efficient processing
-  levels <- list(
+  all_levels <- list(
+    domain = score_biological_domain,
     kingdom = score_biological_kingdom,
     phylum = score_biological_phylum,
     class = score_biological_class,
     order = score_biological_order,
+    infraorder = score_biological_infraorder,
     family = score_biological_family,
+    subfamily = score_biological_subfamily,
     tribe = score_biological_tribe,
+    subtribe = score_biological_subtribe,
     genus = score_biological_genus,
+    subgenus = score_biological_subgenus,
     species = score_biological_species,
+    subspecies = score_biological_subspecies,
     variety = score_biological_variety,
     biota = score_biological_biota
   )
+  levels <- Filter(Negate(is.null), all_levels)
   level_vals <- unlist(levels, use.names = FALSE)
   min_level <- min(level_vals, na.rm = TRUE)
 
@@ -167,7 +204,7 @@ decorate_bio <- function(
   valid_sc <- which(!is.na(score) & score >= min_level)
 
   if (length(valid_sc) == 0L) {
-    count_stats_at_level <- function(min_score, df) {
+    count_stats_at_level <- function(min_score) {
       c(n_candidates = 0L, n_unique_structures = 0L)
     }
   } else {
@@ -184,7 +221,7 @@ decorate_bio <- function(
       max_sc_id_ik <- sc_id[ord_sc[!duplicated(ik_id[ord_sc])]]
       u_ik_counts_by_sc_id <- tabulate(max_sc_id_ik, nbins = length(u_sc))
 
-      count_stats_at_level <- function(min_score, df) {
+      count_stats_at_level <- function(min_score) {
         keep_sc <- u_sc >= min_score
         c(
           n_candidates = as.integer(sum(sc_counts[keep_sc])),
@@ -197,7 +234,7 @@ decorate_bio <- function(
       first_occurrence <- !duplicated(ik_id[ord])
       cum_unique <- cumsum(first_occurrence)
 
-      count_stats_at_level <- function(min_score, df) {
+      count_stats_at_level <- function(min_score) {
         n_candidates <- sum(score_sorted >= min_score)
         n_unique <- if (n_candidates == 0L) 0L else cum_unique[n_candidates]
         c(n_candidates = n_candidates, n_unique_structures = n_unique)
@@ -205,13 +242,14 @@ decorate_bio <- function(
     }
   }
 
-  counts <- lapply(levels, count_stats_at_level, df = annot_table_wei_bio)
+  counts <- lapply(levels, count_stats_at_level)
+  label_width <- max(8L, max(nchar(names(levels))))
 
-  fmt_level <- function(level_name, width = 8L) {
+  fmt_level <- function(level_name) {
     level_counts <- counts[[level_name]]
     sprintf(
       "    %-*s level: %d candidates (%d unique)",
-      width,
+      label_width,
       tools::toTitleCase(level_name),
       level_counts[["n_candidates"]],
       level_counts[["n_unique_structures"]]
@@ -222,16 +260,7 @@ decorate_bio <- function(
     paste(
       c(
         "Taxonomically informed metabolite annotation reranked:",
-        fmt_level("kingdom"),
-        fmt_level("phylum"),
-        fmt_level("class"),
-        fmt_level("order"),
-        fmt_level("family"),
-        fmt_level("tribe"),
-        fmt_level("genus"),
-        fmt_level("species"),
-        fmt_level("variety"),
-        fmt_level("biota")
+        vapply(names(levels), fmt_level, character(1L))
       ),
       collapse = "\n"
     )

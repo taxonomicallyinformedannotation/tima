@@ -204,3 +204,53 @@ test_that("decorate_bio ignores below-minimum rows when counting unique structur
     na_df
   )
 })
+
+test_that("decorate_bio formats optional domain and sub-rank biological levels", {
+  rec <- new.env(parent = emptyenv())
+  rec$logs <- character()
+  local_mocked_bindings(
+    log_info = function(msg, ...) {
+      formatted <- if (...length() > 0L) sprintf(msg, ...) else msg
+      rec$logs <- c(rec$logs, formatted)
+      invisible(NULL)
+    }
+  )
+
+  df_sub <- tidytable::tidytable(
+    feature_id = c("F1", "F2", "F3"),
+    score_biological = c(0.10, 0.55, 0.85),
+    candidate_structure_inchikey_connectivity_layer = c("IK1", "IK2", "IK3")
+  )
+
+  res <- decorate_bio(
+    annot_table_wei_bio = df_sub,
+    score_biological_domain = 0.05,
+    score_biological_kingdom = 0.1,
+    score_biological_phylum = 0.2,
+    score_biological_class = 0.3,
+    score_biological_order = 0.4,
+    score_biological_infraorder = 0.5,
+    score_biological_family = 0.6,
+    score_biological_subfamily = 0.65,
+    score_biological_tribe = 0.7,
+    score_biological_subtribe = 0.75,
+    score_biological_genus = 0.8,
+    score_biological_subgenus = 0.85,
+    score_biological_species = 0.9,
+    score_biological_subspecies = 0.95,
+    score_biological_variety = 0.98,
+    score_biological_biota = 1.0
+  )
+
+  expect_identical(res, df_sub)
+  logged <- paste(rec$logs, collapse = "\n")
+  expect_true(grepl("Domain\\s+level:\\s+3 candidates \\(3 unique\\)", logged))
+  expect_true(grepl(
+    "Infraorder\\s+level:\\s+2 candidates \\(2 unique\\)",
+    logged
+  ))
+  expect_true(grepl(
+    "Subgenus\\s+level:\\s+1 candidates \\(1 unique\\)",
+    logged
+  ))
+})

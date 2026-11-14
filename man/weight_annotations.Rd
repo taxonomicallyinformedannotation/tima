@@ -121,9 +121,9 @@ filtering between mini and filtered outputs.}
 
 \item{weight_spectral}{Weight for the spectral score}
 
-\item{weight_chemical}{Weight for the biological score}
+\item{weight_chemical}{Weight for the chemical consistency score}
 
-\item{weight_biological}{Weight for the chemical consistency score}
+\item{weight_biological}{Weight for the biological score}
 
 \item{score_biological_domain}{Score for a \code{domain} match
 (should be lower than \code{kingdom})}
@@ -141,13 +141,13 @@ filtering between mini and filtered outputs.}
 (should be lower than \code{infraorder})}
 
 \item{score_biological_infraorder}{Score for a \code{infraorder} match
-(should be lower than \code{order})}
+(should be lower than \code{family})}
 
 \item{score_biological_family}{Score for a \code{family} match
 (should be lower than \code{subfamily})}
 
 \item{score_biological_subfamily}{Score for a \code{subfamily} match
-(should be lower than \code{family})}
+(should be lower than \code{tribe})}
 
 \item{score_biological_tribe}{Score for a \code{tribe} match
 (should be lower than \code{subtribe})}

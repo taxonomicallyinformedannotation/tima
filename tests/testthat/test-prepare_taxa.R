@@ -198,16 +198,119 @@ test_that("prepare_taxa works with single taxon assignment", {
       "sample_organism_03_phylum",
       "sample_organism_04_class",
       "sample_organism_05_order",
+      "sample_organism_05_1_infraorder",
       "sample_organism_06_family",
+      "sample_organism_06_1_subfamily",
       "sample_organism_07_tribe",
+      "sample_organism_07_1_subtribe",
       "sample_organism_08_genus",
+      "sample_organism_08_1_subgenus",
       "sample_organism_09_species",
+      "sample_organism_09_1_subspecies",
       "sample_organism_10_varietas"
     ) %in%
       names(df)
   ))
+  expect_identical(unique(df$sample_organism_05_1_infraorder), "ND")
   expect_identical(unique(df$sample_organism_06_family), "Hominidae")
   expect_equal(nrow(df), 2) # Both features assigned to same organism
+})
+
+test_that("prepare_taxa preserves all 5 sub-ranks and weights cleanly in weight_bio", {
+  input <- temp_test_path("features.tsv")
+  ott <- temp_test_path("ott_subranks.tsv")
+  output <- temp_test_path("output_subranks.tsv")
+
+  writeLines("feature_id\trt\tmz\nFT001\t1.5\t200", input)
+  writeLines(
+    paste0(
+      "organism_name\torganism_taxonomy_ottid\t",
+      "organism_taxonomy_01domain\torganism_taxonomy_02kingdom\t",
+      "organism_taxonomy_03phylum\torganism_taxonomy_04class\t",
+      "organism_taxonomy_05order\torganism_taxonomy_05_1infraorder\t",
+      "organism_taxonomy_06family\torganism_taxonomy_06_1subfamily\t",
+      "organism_taxonomy_07tribe\torganism_taxonomy_07_1subtribe\t",
+      "organism_taxonomy_08genus\torganism_taxonomy_08_1subgenus\t",
+      "organism_taxonomy_09species\torganism_taxonomy_09_1subspecies\t",
+      "organism_taxonomy_10varietas\n",
+      "Homo sapiens neanderthalensis\t990001\tEukaryota\tMetazoa\tChordata\t",
+      "Mammalia\tPrimates\tSimiiformes\tHominidae\tHomininae\tHominini\t",
+      "Hominina\tHomo\tHomo (subgenus)\tHomo sapiens\t",
+      "Homo sapiens neanderthalensis\tNA"
+    ),
+    ott
+  )
+
+  prepare_taxa(
+    input = input,
+    org_tax_ott = ott,
+    taxon = "Homo sapiens neanderthalensis",
+    output = output,
+    extension = FALSE,
+    metadata = NULL
+  )
+  taxa_tbl <- tidytable::fread(output)
+  expect_identical(taxa_tbl$sample_organism_05_1_infraorder, "Simiiformes")
+  expect_identical(taxa_tbl$sample_organism_06_1_subfamily, "Homininae")
+  expect_identical(taxa_tbl$sample_organism_07_1_subtribe, "Hominina")
+  expect_identical(taxa_tbl$sample_organism_08_1_subgenus, "Homo (subgenus)")
+  expect_identical(
+    taxa_tbl$sample_organism_09_1_subspecies,
+    "Homo sapiens neanderthalensis"
+  )
+
+  annot_tbl <- tidytable::tidytable(
+    feature_id = "FT001",
+    candidate_structure_inchikey_connectivity_layer = "IK1",
+    candidate_score_similarity = 0.8,
+    candidate_score_sirius_csi = NA_real_
+  ) |>
+    tidytable::left_join(taxa_tbl, by = "feature_id")
+
+  sop_tbl <- tidytable::tidytable(
+    structure_inchikey_connectivity_layer = "IK1",
+    organism_name = "Other primate",
+    organism_taxonomy_ottid = "990099",
+    organism_taxonomy_01domain = "Eukaryota",
+    organism_taxonomy_02kingdom = "Metazoa",
+    organism_taxonomy_03phylum = "Chordata",
+    organism_taxonomy_04class = "Mammalia",
+    organism_taxonomy_05order = "Primates",
+    organism_taxonomy_05_1infraorder = "Simiiformes",
+    organism_taxonomy_06family = "OtherFamily",
+    organism_taxonomy_06_1subfamily = "OtherSubfamily",
+    organism_taxonomy_07tribe = "OtherTribe",
+    organism_taxonomy_07_1subtribe = "OtherSubtribe",
+    organism_taxonomy_08genus = "OtherGenus",
+    organism_taxonomy_08_1subgenus = "OtherSubgenus",
+    organism_taxonomy_09species = "OtherSpecies",
+    organism_taxonomy_09_1subspecies = "OtherSubspecies",
+    organism_taxonomy_10varietas = "OtherVariety"
+  )
+
+  weighted <- weight_bio(
+    annotation_table_taxed = annot_tbl,
+    structure_organism_pairs_table = sop_tbl,
+    weight_spectral = 0.5,
+    weight_biological = 0.5,
+    score_biological_domain = 0.1,
+    score_biological_kingdom = 0.2,
+    score_biological_phylum = 0.3,
+    score_biological_class = 0.4,
+    score_biological_order = 0.5,
+    score_biological_infraorder = 0.55,
+    score_biological_family = 0.6,
+    score_biological_subfamily = 0.65,
+    score_biological_tribe = 0.7,
+    score_biological_subtribe = 0.75,
+    score_biological_genus = 0.8,
+    score_biological_subgenus = 0.85,
+    score_biological_species = 0.9,
+    score_biological_subspecies = 0.95,
+    score_biological_variety = 1.0,
+    score_biological_biota = 1.0
+  )
+  expect_equal(weighted$score_biological, 0.55)
 })
 
 test_that("prepare_taxa works with multiple taxon assignment", {

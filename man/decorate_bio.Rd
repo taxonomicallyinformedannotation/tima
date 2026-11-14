@@ -15,7 +15,13 @@ decorate_bio(
   score_biological_genus,
   score_biological_species,
   score_biological_variety,
-  score_biological_biota
+  score_biological_biota,
+  score_biological_domain = NULL,
+  score_biological_infraorder = NULL,
+  score_biological_subfamily = NULL,
+  score_biological_subtribe = NULL,
+  score_biological_subgenus = NULL,
+  score_biological_subspecies = NULL
 )
 }
 \arguments{
@@ -37,7 +43,26 @@ decorate_bio(
 
 \item{score_biological_species}{Minimum score for species-level matches}
 
-\item{score_biological_variety}{Minimum score for Biota-level matches}
+\item{score_biological_variety}{Minimum score for variety-level matches}
+
+\item{score_biological_biota}{Minimum score for Biota-level matches}
+
+\item{score_biological_domain}{Optional minimum score for domain-level matches}
+
+\item{score_biological_infraorder}{Optional minimum score for infraorder-level
+matches}
+
+\item{score_biological_subfamily}{Optional minimum score for subfamily-level
+matches}
+
+\item{score_biological_subtribe}{Optional minimum score for subtribe-level
+matches}
+
+\item{score_biological_subgenus}{Optional minimum score for subgenus-level
+matches}
+
+\item{score_biological_subspecies}{Optional minimum score for subspecies-level
+matches}
 }
 \value{
 The input annotation table (unchanged), for pipeline compatibility

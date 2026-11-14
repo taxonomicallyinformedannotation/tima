@@ -49,18 +49,7 @@ validate_sop_merged_inputs <- function(
   validate_all_single_strings(output_paths, "Output parameter(s)")
 
   if (isTRUE(filter)) {
-    valid_levels <- c(
-      "domain",
-      "kingdom",
-      "phylum",
-      "class",
-      "order",
-      "family",
-      "tribe",
-      "genus",
-      "species",
-      "varietas"
-    )
+    valid_levels <- names(.OTT_RANK_COL_MAP)
 
     if (!level %in% valid_levels) {
       cli::cli_abort(
@@ -169,12 +158,21 @@ apply_taxonomic_filter <- function(
   level,
   value
 ) {
-  # Find column matching the taxonomic level before joining
-  level_col <- colnames(table_org_tax_ott)[grepl(
-    pattern = level,
-    x = colnames(table_org_tax_ott),
-    perl = TRUE
-  )]
+  # Prefer canonical 15-rank OTT column name, falling back to anchored legacy suffix
+  canonical_col <- unname(.OTT_RANK_COL_MAP[level])
+  level_col <- if (
+    length(canonical_col) == 1L &&
+      !is.na(canonical_col) &&
+      canonical_col %in% colnames(table_org_tax_ott)
+  ) {
+    canonical_col
+  } else {
+    colnames(table_org_tax_ott)[grepl(
+      pattern = paste0("(?:_|\\d)", level, "$"),
+      x = colnames(table_org_tax_ott),
+      perl = TRUE
+    )]
+  }
 
   if (length(level_col) == 0) {
     cli::cli_abort(
