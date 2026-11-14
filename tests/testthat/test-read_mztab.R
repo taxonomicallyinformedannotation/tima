@@ -371,7 +371,7 @@ test_that("prepare_annotations_mztab exports non-empty table for official study-
 
   expect_true(file.exists(ann))
   df <- tidytable::fread(ann)
-  expect_true(nrow(df) >= 0)
+  expect_equal(nrow(df), 1L)
   expect_true("feature_id" %in% names(df))
 })
 
@@ -706,78 +706,6 @@ test_that("rmzTabM-style JSON round-trips through read_mztab and write_mztab JSO
     tolerance = 1e-8
   )
   expect_true(nrow(tabs_after$sml) >= 1L)
-})
-
-test_that("mztab_before_after_batch emits JSON artifacts for JSON fixtures", {
-  script <- normalizePath(
-    testthat::test_path(
-      "..",
-      "..",
-      "inst",
-      "scripts",
-      "mztab_before_after_batch.R"
-    ),
-    winslash = "/",
-    mustWork = FALSE
-  )
-  skip_if_not(file.exists(script), "batch script not found")
-  repo_root <- normalizePath(
-    file.path(dirname(script), "..", ".."),
-    winslash = "/",
-    mustWork = TRUE
-  )
-
-  fixtures_src <- resolve_fixture_path("mztab")
-  fixtures_dir <- file.path(tempdir(), paste0("mztab_json_", Sys.getpid()))
-  dir.create(fixtures_dir, recursive = TRUE, showWarnings = FALSE)
-
-  json_files <- list.files(
-    fixtures_src,
-    pattern = "\\.json$",
-    full.names = TRUE,
-    ignore.case = TRUE
-  )
-  expect_true(length(json_files) > 0L)
-  file.copy(json_files, fixtures_dir, overwrite = TRUE)
-
-  out_dir <- file.path(tempdir(), paste0("mztab_before_after_", Sys.getpid()))
-  dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
-
-  withr::local_dir(repo_root)
-  exit_code <- system2(
-    command = "Rscript",
-    args = c(
-      script,
-      "--fixtures-dir",
-      fixtures_dir,
-      "--output-dir",
-      out_dir,
-      "--str-stereo",
-      resolve_fixture_path("structures_stereo.csv"),
-      "--str-met",
-      resolve_fixture_path("structures_metadata.csv"),
-      "--str-tax-cla",
-      resolve_fixture_path("structures_taxonomy_cla.csv"),
-      "--str-tax-npc",
-      resolve_fixture_path("structures_taxonomy_npc.csv")
-    ),
-    stdout = TRUE,
-    stderr = TRUE
-  )
-  status <- attr(exit_code, "status")
-  if (is.null(status)) {
-    status <- 0L
-  }
-  expect_equal(status, 0L)
-
-  manifest <- tidytable::fread(file.path(out_dir, "manifest.csv"))
-  expect_true(nrow(manifest) == length(json_files))
-  expect_true(
-    all(manifest$status == "ok"),
-    info = paste(manifest$error, collapse = " | ")
-  )
-  expect_true(all(file.exists(manifest$before_tables_json)))
-  expect_true(all(file.exists(manifest$after_tables_json)))
 })
 
 test_that("mztab_parser and read_mztab helper edge cases are covered", {

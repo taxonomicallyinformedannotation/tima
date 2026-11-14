@@ -50,9 +50,9 @@ setup_yaml_test_env <- function() {
 
 # Unit Tests ----
 
-test_that("load_yaml_files function exists", {
-  expect_true(exists("load_yaml_files"))
-  expect_type(load_yaml_files, "closure")
+test_that("load_yaml_files has documented parameter signature", {
+  expect_true(is.function(load_yaml_files))
+  expect_null(formals(load_yaml_files))
 })
 
 test_that("load_yaml_files parses yaml files from configured paths", {

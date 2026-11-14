@@ -191,6 +191,22 @@ test_that("prepare_taxa works with single taxon assignment", {
   # Check output content
   df <- tidytable::fread(output)
   expect_true(all(df$sample_organism_name == "Homo sapiens"))
+  expect_true(all(
+    c(
+      "sample_organism_01_domain",
+      "sample_organism_02_kingdom",
+      "sample_organism_03_phylum",
+      "sample_organism_04_class",
+      "sample_organism_05_order",
+      "sample_organism_06_family",
+      "sample_organism_07_tribe",
+      "sample_organism_08_genus",
+      "sample_organism_09_species",
+      "sample_organism_10_varietas"
+    ) %in%
+      names(df)
+  ))
+  expect_identical(unique(df$sample_organism_06_family), "Hominidae")
   expect_equal(nrow(df), 2) # Both features assigned to same organism
 })
 

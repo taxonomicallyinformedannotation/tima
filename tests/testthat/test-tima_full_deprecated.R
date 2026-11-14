@@ -68,25 +68,20 @@ test_that("tima_full deprecation message is clear", {
 })
 
 test_that("tima_full documentation mentions deprecation", {
-  # Try to get the help text, but skip if not available in test context
   skip_on_cran()
-  skip_on_ci()
 
-  # Simpler approach - just verify the Rd file exists and contains DEPRECATED
   rd_file <- system.file("help", "tima_full.Rd", package = "tima")
-
-  if (rd_file == "" || !file.exists(rd_file)) {
-    # Try alternative location
-    rd_file <- file.path("man", "tima_full.Rd")
+  if (!nzchar(rd_file) || !file.exists(rd_file)) {
+    rd_file <- normalizePath(
+      testthat::test_path("..", "..", "man", "tima_full.Rd"),
+      mustWork = FALSE
+    )
   }
 
-  if (file.exists(rd_file)) {
-    help_content <- readLines(rd_file, warn = FALSE)
-    help_string <- paste(help_content, collapse = " ")
-    expect_true(grepl("DEPRECATED|deprecated", help_string, ignore.case = TRUE))
-  } else {
-    skip("Help file not available in test context")
-  }
+  skip_if_not(file.exists(rd_file), "Help file not available in test context")
+  help_content <- readLines(rd_file, warn = FALSE)
+  help_string <- paste(help_content, collapse = " ")
+  expect_true(grepl("DEPRECATED|deprecated", help_string, ignore.case = TRUE))
 })
 
 test_that("tima_full calls run_tima with correct arguments", {

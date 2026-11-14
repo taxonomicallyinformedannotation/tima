@@ -318,9 +318,11 @@ test_that("read_from_sirius_zip handles quotes in data", {
 
 # Documentation Tests ----
 
-test_that("read_from_sirius_zip has documentation", {
-  # Check that function is documented
-  expect_type(read_from_sirius_zip, "closure")
+test_that("read_from_sirius_zip has expected formals", {
+  expect_true(is.function(read_from_sirius_zip))
+  expect_true(all(
+    c("sirius_zip", "file") %in% names(formals(read_from_sirius_zip))
+  ))
 })
 
 # Character Encoding Tests ----

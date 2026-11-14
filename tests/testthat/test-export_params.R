@@ -2,9 +2,19 @@
 
 library(testthat)
 
-test_that("export_params function exists", {
-  expect_true(exists("export_params"))
-  expect_type(export_params, "closure")
+test_that("export_params writes YAML file to specified directory", {
+  td <- withr::local_tempdir()
+  out <- export_params(
+    parameters = list(alpha = 1L, beta = "ok"),
+    step = "unit_test",
+    directory = td
+  )
+  expect_null(out)
+  files <- list.files(td, pattern = "_unit_test[.]yaml$", full.names = TRUE)
+  expect_length(files, 1L)
+  parsed <- yaml::read_yaml(files[[1L]])
+  expect_identical(parsed$alpha, 1L)
+  expect_identical(parsed$beta, "ok")
 })
 
 test_that("export_params raises classed runtime error when write fails", {

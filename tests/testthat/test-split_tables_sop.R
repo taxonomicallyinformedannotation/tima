@@ -185,7 +185,7 @@ test_that("split_tables_sop handles missing SMILES gracefully", {
       result <- split_tables_sop(table = sop_table, cache = NULL)
 
       expect_type(result, "list")
-      expect_true(nrow(result$key) >= 0)
+      expect_equal(nrow(result$key), 1L)
       expect_true("structure_inchikey" %in% colnames(result$str_stereo))
     }
   )
@@ -276,7 +276,7 @@ test_that("split_tables_sop handles missing taxonomy fields", {
   )
 
   expect_type(result, "list")
-  expect_true(nrow(result$org_tax_ott) >= 0)
+  expect_equal(nrow(result$org_tax_ott), 0L)
 })
 
 test_that("split_tables_sop collapses multi-source structure names and taxonomy", {

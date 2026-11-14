@@ -33,14 +33,10 @@ write_minimal_mgf <- function(path, precursors, charge = "1+") {
 # Validation tests ----
 
 test_that("annotate_spectra validates parameters", {
-  skip_if_no_network("https://github.com")
   withr::local_dir(new = temp_test_dir("ann_spe_validate"))
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
-  get_file(
-    url = paths$urls$examples$spectra_mini,
-    export = paths$data$source$spectra
-  )
+  write_minimal_mgf(paths$data$source$spectra, precursors = c(150))
   lib_path <- file.path(
     "data",
     "interim",

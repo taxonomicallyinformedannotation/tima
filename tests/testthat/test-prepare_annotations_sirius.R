@@ -571,7 +571,8 @@ test_that("create_empty_sirius_annotations returns proper template", {
   result <- create_empty_sirius_annotations()
 
   expect_true(tidytable::is_tidytable(result))
-  expect_true(nrow(result) >= 0)
+  expect_equal(nrow(result), 1L)
+  expect_true(all(is.na(unlist(result))))
 
   # Check for SIRIUS-specific columns
   expected_cols <- c(

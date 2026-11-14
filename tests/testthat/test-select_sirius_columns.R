@@ -162,7 +162,7 @@ test_that("test-select_sirius_columns_structures processes SIRIUS v5 structures"
   result <- select_sirius_columns_structures(df = df, sirius_version = "5")
 
   expect_true("feature_id" %in% names(result))
-  expect_true(nrow(result) >= 0)
+  expect_equal(nrow(result), 1L)
 })
 
 test_that("test-select_sirius_columns_structures processes SIRIUS v6 structures", {
@@ -176,7 +176,7 @@ test_that("test-select_sirius_columns_structures processes SIRIUS v6 structures"
   result <- select_sirius_columns_structures(df = df, sirius_version = "6")
 
   expect_true("feature_id" %in% names(result))
-  expect_true(nrow(result) >= 0)
+  expect_equal(nrow(result), 1L)
 })
 
 test_that("test-select_sirius_columns_structures accepts both string and numeric versions", {

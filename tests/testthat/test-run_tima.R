@@ -7,7 +7,7 @@ library(testthat)
 test_that("archive_log_file handles existing log file", {
   tmp <- temp_test_dir("run_tima_existing")
   withr::local_dir(new = tmp)
-  log_file <- temp_test_path("test.log")
+  log_file <- file.path(tmp, "test.log")
   writeLines("test log content", log_file)
   timestamp <- Sys.time()
   # Use relative processed dir creation implicitly
@@ -15,14 +15,14 @@ test_that("archive_log_file handles existing log file", {
     log_file = basename(log_file),
     timestamp = timestamp
   )
-  expect_true(is.logical(result))
+  expect_true(result)
   # Archived file should exist in data/processed inside temp dir
   archived <- list.files(
     "data/processed",
     pattern = basename(log_file),
     full.names = TRUE
   )
-  expect_true(length(archived) >= 0) # Allow empty if archiving skipped
+  expect_length(archived, 1L)
 })
 
 test_that("archive_log_file handles missing log file", {
@@ -55,8 +55,7 @@ test_that("execute_targets_pipeline handles errors gracefully", {
 # Integration Tests: Main Function ----
 
 test_that("run_tima function exists and has correct signature", {
-  expect_true(exists("run_tima"))
-  expect_type(run_tima, "closure")
+  expect_true(is.function(run_tima))
 
   params <- names(formals(run_tima))
   expect_true("target_pattern" %in% params)
@@ -127,41 +126,68 @@ test_that("run_tima validates clean_old_logs parameter", {
 # Functional tests for run_tima orchestration are covered by
 # integration-style pipeline tests below.
 
-test_that("run_tima execution flow (requires targets setup)", {
-  skip_if_not(interactive(), "Requires complete TIMA cache setup")
-  # This test would require:
-  # 1. copy_backbone()
-  # 2. go_to_cache()
-  # 3. Proper _targets.R file
-  # Therefore, we skip in normal test runs
+test_that("run_tima handles custom target patterns offline", {
+  tmp <- temp_test_dir("run_tima_custom_pattern")
+  withr::local_dir(tmp)
+  state <- new.env(parent = emptyenv())
+  state$seen_pattern <- NULL
 
-  expect_type(run_tima, "closure")
-})
-
-# Edge Cases ----
-
-test_that("run_tima handles custom target patterns", {
-  skip_if_not(interactive(), "Requires targets setup")
-
-  # Should accept custom patterns without error in validation
-  expect_error(
-    run_tima(
-      target_pattern = "^prepare_.*",
-      log_file = temp_test_path("custom.log")
-    ),
-    NA, # Expect NO validation error (execution error is OK)
-    class = "simpleError"
+  with_mocked_bindings(
+    log_operation = function(...) "ctx",
+    setup_logger = function(...) invisible(NULL),
+    log_info = function(...) invisible(NULL),
+    log_debug = function(...) invisible(NULL),
+    log_success = function(...) invisible(NULL),
+    log_complete = function(ctx) invisible(ctx),
+    go_to_cache = function() invisible(NULL),
+    execute_targets_pipeline = function(target_pattern) {
+      state$seen_pattern <- target_pattern
+      invisible(NULL)
+    },
+    archive_log_file = function(...) TRUE,
+    {
+      run_tima(
+        target_pattern = "^prepare_.*",
+        log_file = "custom.log",
+        log_level = "info"
+      )
+    }
   )
+
+  expect_identical(state$seen_pattern, "^prepare_.*")
 })
 
 test_that("run_tima preserves logs when clean_old_logs = FALSE", {
-  skip_if_not(interactive(), "Requires targets setup")
-
-  log_file <- temp_test_path("preserve.log")
+  tmp <- temp_test_dir("run_tima_preserve_logs")
+  withr::local_dir(tmp)
+  log_file <- "preserve.log"
   writeLines("old log content", log_file)
+  state <- new.env(parent = emptyenv())
+  state$captured_content <- NULL
 
-  # Validation should pass even though execution will fail
-  expect_type(run_tima, "closure")
+  with_mocked_bindings(
+    log_operation = function(...) "ctx",
+    setup_logger = function(...) invisible(NULL),
+    log_info = function(...) invisible(NULL),
+    log_debug = function(...) invisible(NULL),
+    log_success = function(...) invisible(NULL),
+    log_complete = function(ctx) invisible(ctx),
+    go_to_cache = function() invisible(NULL),
+    execute_targets_pipeline = function(target_pattern) {
+      state$captured_content <- readLines(log_file, warn = FALSE)
+      invisible(NULL)
+    },
+    archive_log_file = function(...) TRUE,
+    {
+      run_tima(
+        log_file = log_file,
+        clean_old_logs = FALSE,
+        log_level = "info"
+      )
+    }
+  )
+
+  expect_identical(state$captured_content, "old log content")
 })
 
 # Performance Tests ----
@@ -173,21 +199,19 @@ test_that("archive_log_file timestamp format is correct", {
   writeLines("test", log_file)
   timestamp <- as.POSIXct("2024-01-15 14:30:45")
   archive_log_file(log_file = basename(log_file), timestamp = timestamp)
-  if (dir.exists("data/processed")) {
-    files <- list.files(
-      "data/processed",
-      pattern = "^20240115_143045_",
-      full.names = TRUE
-    )
-    expect_true(length(files) >= 0)
-  }
+  expect_true(dir.exists("data/processed"))
+  files <- list.files(
+    "data/processed",
+    pattern = "^20240115_143045_",
+    full.names = TRUE
+  )
+  expect_length(files, 1L)
 })
 
 # Regression Tests ----
 
 test_that("run_tima maintains backward compatibility", {
-  # Ensure function can still be called with no arguments
-  expect_type(run_tima, "closure")
+  expect_true(is.function(run_tima))
 
   # Check that default parameters exist
   params <- formals(run_tima)
@@ -353,7 +377,9 @@ test_that("run_tima reports cache navigation errors", {
     class = "tima_validation_error"
   )
 
-  # archive_log_file error fallback
+  # archive_log_file error fallback (isolate working directory before creating data/processed)
+  td_pipe <- withr::local_tempdir()
+  withr::local_dir(td_pipe)
   tf_src <- withr::local_tempfile(lines = "log line")
   testthat::with_mocked_bindings(
     file.copy = function(...) stop("disk full"),
@@ -362,8 +388,6 @@ test_that("run_tima reports cache navigation errors", {
   )
 
   # execute_targets_pipeline success, warning, and error paths
-  td_pipe <- withr::local_tempdir()
-  withr::local_dir(td_pipe)
   writeLines("# dummy targets script", "_targets.R")
 
   testthat::with_mocked_bindings(

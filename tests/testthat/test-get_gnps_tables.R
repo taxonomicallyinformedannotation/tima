@@ -80,14 +80,18 @@ test_that("get_gnps_tables works with example GNPS ID", {
 })
 
 test_that("get_gnps_tables handles NULL GNPS job ID", {
-  skip_if_no_network("https://github.com")
   withr::local_dir(new = temp_test_dir("get_gnps_tables_null"))
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
 
-  get_file(
-    url = paths$urls$examples$features,
-    export = paths$data$source$features
+  dir.create(
+    dirname(paths$data$source$features),
+    recursive = TRUE,
+    showWarnings = FALSE
+  )
+  writeLines(
+    "row ID\trow m/z\trow retention time\n1\t150.0558\t1.5",
+    paths$data$source$features
   )
 
   expect_no_error(
@@ -102,14 +106,18 @@ test_that("get_gnps_tables handles NULL GNPS job ID", {
 })
 
 test_that("get_gnps_tables handles empty GNPS job ID", {
-  skip_if_no_network("https://github.com")
   withr::local_dir(new = temp_test_dir("get_gnps_tables_empty"))
   local_test_project(copy = TRUE)
   paths <- get_default_paths()
 
-  get_file(
-    url = paths$urls$examples$features,
-    export = paths$data$source$features
+  dir.create(
+    dirname(paths$data$source$features),
+    recursive = TRUE,
+    showWarnings = FALSE
+  )
+  writeLines(
+    "row ID\trow m/z\trow retention time\n1\t150.0558\t1.5",
+    paths$data$source$features
   )
 
   expect_no_error(

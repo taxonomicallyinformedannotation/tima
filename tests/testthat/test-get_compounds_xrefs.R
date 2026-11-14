@@ -2,6 +2,32 @@
 
 library(testthat)
 
+.mock_xrefs_network <- function(qlever_csv, env = parent.frame()) {
+  local_mocked_bindings(
+    fromJSON = function(...) {
+      list(chebi = list(wikidata.property = list(prefix = "P683")))
+    },
+    .package = "jsonlite",
+    .env = env
+  )
+  local_mocked_bindings(
+    req_perform = function(req, ...) structure(list(), class = "mock_resp"),
+    resp_status = function(resp) 200L,
+    resp_body_json = function(resp, ...) list(banana = "CHEBI"),
+    resp_body_string = function(resp, ...) qlever_csv,
+    .package = "httr2",
+    .env = env
+  )
+}
+
+.qlever_header <- "item,inchikey,db,id"
+.qlever_row <- paste0(
+  "http://www.wikidata.org/entity/Q1,",
+  "BSYNRYMUTXBXSQ-UHFFFAOYSA-N,",
+  "http://www.wikidata.org/prop/direct/P683,",
+  "15365"
+)
+
 ## Cache Behavior ----
 
 test_that("get_compounds_xrefs returns cached file when it is fresh", {
@@ -45,10 +71,11 @@ test_that("get_compounds_xrefs detects stale cache", {
   export_output(x = mock_data, file = output_file)
 
   # Set max_age_hours = 0 so the file is always considered stale.
-  # This will trigger the fetch path, which we expect to fail here
-
-  # because we don't have network access in unit tests — that's fine,
-  # we just verify the cache-skip logic is NOT triggered.
+  # Mock offline fetch failure so we verify fallback behavior offline.
+  local_mocked_bindings(
+    fromJSON = function(...) stop("offline"),
+    .package = "jsonlite"
+  )
   expect_no_error(
     get_compounds_xrefs(
       output = output_file,
@@ -229,7 +256,7 @@ test_that("get_compounds_xrefs refreshes stale cache with real data", {
 ## Error Handling ----
 
 test_that("get_compounds_xrefs errors on invalid props", {
-  skip_if_no_network("https://raw.githubusercontent.com")
+  .mock_xrefs_network(.qlever_header)
   output_file <- temp_test_path("xrefs_bad_props.tsv.gz")
 
   expect_error(
@@ -243,32 +270,6 @@ test_that("get_compounds_xrefs errors on invalid props", {
 })
 
 ## Truncated QLever response (offline, mocked) ----
-
-.mock_xrefs_network <- function(qlever_csv, env = parent.frame()) {
-  local_mocked_bindings(
-    fromJSON = function(...) {
-      list(chebi = list(wikidata.property = list(prefix = "P683")))
-    },
-    .package = "jsonlite",
-    .env = env
-  )
-  local_mocked_bindings(
-    req_perform = function(req, ...) structure(list(), class = "mock_resp"),
-    resp_status = function(resp) 200L,
-    resp_body_json = function(resp, ...) list(banana = "CHEBI"),
-    resp_body_string = function(resp, ...) qlever_csv,
-    .package = "httr2",
-    .env = env
-  )
-}
-
-.qlever_header <- "item,inchikey,db,id"
-.qlever_row <- paste0(
-  "http://www.wikidata.org/entity/Q1,",
-  "BSYNRYMUTXBXSQ-UHFFFAOYSA-N,",
-  "http://www.wikidata.org/prop/direct/P683,",
-  "15365"
-)
 
 test_that("get_compounds_xrefs keeps the cache when QLever's response is truncated", {
   output_file <- temp_test_path("xrefs_truncated.tsv.gz")

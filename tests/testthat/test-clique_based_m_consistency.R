@@ -338,8 +338,8 @@ test_that("large edge sets use greedy fallback gracefully", {
     tolerance_dalton = 1.0
   )
 
-  # Just verify it returns a valid table (may be empty if incompatible)
-  expect_true(is.data.frame(result) || is.null(result) || nrow(result) >= 0)
+  expect_s3_class(result, "data.frame")
+  expect_equal(nrow(result), 29L)
 })
 
 test_that("global consistency preserves original edge structure", {
