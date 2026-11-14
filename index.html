@@ -101,7 +101,7 @@ div.csl-indent {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-3dba021ccb97a5709654d2c27fb431b2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-7e52812dfc6a7b4c743579661ce18315.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -700,7 +700,7 @@ div.csl-indent {
 <section id="validate-your-data" class="level3">
 <h3 class="anchored" data-anchor-id="validate-your-data">Validate Your Data</h3>
 <p><strong>Start by validating your input files</strong> to catch issues early and save debugging time:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">validate_inputs</span>(</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>tima<span class="sc">::</span><span class="fu">validate_inputs</span>(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">features =</span> <span class="st">"data/source/example_features.csv"</span>,</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">spectra =</span> <span class="st">"data/source/example_spectra.mgf"</span>,</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">metadata =</span> <span class="st">"data/source/example_metadata.tsv"</span>,</span>
@@ -727,21 +727,15 @@ div.csl-indent {
 <h3 class="anchored" data-anchor-id="docker">Docker</h3>
 <p>A container is also available, together with a small compose file. Main commands are below:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> pull adafede/tima-r</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># docker build inst/. -t adafede/tima-r --no-cache</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># docker build -f inst/Dockerfile . -t adafede/tima-r --no-cache</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="dt">\</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>--user tima-user <span class="dt">\</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>--memory=<span class="st">"12g"</span> <span class="dt">\</span></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>-v <span class="st">"</span><span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span><span class="st">/.tima/_targets:/home/tima-user/.tima/_targets"</span> <span class="dt">\</span></span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>-v <span class="st">"</span><span class="va">$(</span><span class="bu">pwd</span><span class="va">)</span><span class="st">/.tima/data:/home/tima-user/.tima/data"</span> <span class="dt">\</span></span>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>-p 3838:3838 <span class="dt">\</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>adafede/tima-r</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># docker run \</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># --user tima-user \</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co"># --memory="12g" \</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co"># -v "$(pwd)/.tima/_targets:/home/tima-user/.tima/_targets" \</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co"># -v "$(pwd)/.tima/data:/home/tima-user/.tima/data" \</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co"># adafede/tima-r</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Adapt the memory limit as needed. The app will be available at <a href="http://localhost:3838/tima" class="uri">http://localhost:3838/tima</a>. Results will be written to <code>.tima/data</code> (your mounted folder).</p>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>adafede/tima-r</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Adapt the memory limit as needed. The app will be available at <a href="http://localhost:3838" class="uri">http://localhost:3838</a>. Results will be written to <code>.tima/data</code> (your mounted folder).</p>
 </section>
 </section>
 <section id="main-citations" class="level2">
@@ -750,17 +744,17 @@ div.csl-indent {
 <section id="tima-1" class="level3">
 <h3 class="anchored" data-anchor-id="tima-1">TIMA</h3>
 <p>General: <a href="https://doi.org/10.3389/fpls.2019.01329" class="uri">https://doi.org/10.3389/fpls.2019.01329</a></p>
-<p>⚠️ Do not forget to cite which version you used: <a href="https://doi.org/10.5281/zenodo.5797920" class="uri">https://doi.org/10.5281/zenodo.5797920</a></p>
+<p>Please cite the specific version used: <a href="https://doi.org/10.5281/zenodo.5797920" class="uri">https://doi.org/10.5281/zenodo.5797920</a></p>
 </section>
 <section id="lotus" class="level3">
 <h3 class="anchored" data-anchor-id="lotus">LOTUS</h3>
 <p>General: <a href="https://doi.org/10.7554/eLife.70780" class="uri">https://doi.org/10.7554/eLife.70780</a></p>
-<p>⚠️ Do not forget to cite which version you used: <a href="https://doi.org/10.5281/zenodo.5794106" class="uri">https://doi.org/10.5281/zenodo.5794106</a></p>
+<p>Please cite the specific version used: <a href="https://doi.org/10.5281/zenodo.5794106" class="uri">https://doi.org/10.5281/zenodo.5794106</a></p>
 </section>
 <section id="isdb" class="level3">
 <h3 class="anchored" data-anchor-id="isdb">ISDB</h3>
 <p>General: <a href="https://doi.org/10.1021/acs.analchem.5b04804" class="uri">https://doi.org/10.1021/acs.analchem.5b04804</a></p>
-<p>⚠️ Do not forget to cite which version you used: <a href="https://doi.org/10.5281/zenodo.5607185" class="uri">https://doi.org/10.5281/zenodo.5607185</a></p>
+<p>Please cite the specific version used: <a href="https://doi.org/10.5281/zenodo.5607185" class="uri">https://doi.org/10.5281/zenodo.5607185</a></p>
 </section>
 <section id="gnps" class="level3">
 <h3 class="anchored" data-anchor-id="gnps">GNPS</h3>
@@ -789,11 +783,10 @@ div.csl-indent {
 <li>Fecal: <a href="https://doi.org/10.1016/j.aca.2018.05.031" class="uri">https://doi.org/10.1016/j.aca.2018.05.031</a></li>
 <li>Saliva: <a href="https://doi.org/10.1007/s11306-015-0840-5" class="uri">https://doi.org/10.1007/s11306-015-0840-5</a></li>
 <li>Serum: <a href="https://doi.org/10.1371/journal.pone.0016957" class="uri">https://doi.org/10.1371/journal.pone.0016957</a></li>
-<li>Sweat:</li>
 <li>Urine: <a href="https://doi.org/10.1371/journal.pone.0073076" class="uri">https://doi.org/10.1371/journal.pone.0073076</a></li>
 </ul></li>
 <li>MCDB: <a href="https://doi.org/10.1021/acs.jafc.9b00204" class="uri">https://doi.org/10.1021/acs.jafc.9b00204</a></li>
-<li>SMPDB 2.0: <a href="https://doi.org/10.1093/nar/gkt1067" class="uri">https://doi.org/10.1093/nar/gkt1067</a> <!-- -   MiMeDB 2.0: <https://doi.org/10.1093/nar/gkaf1272> --></li>
+<li>SMPDB 2.0: <a href="https://doi.org/10.1093/nar/gkt1067" class="uri">https://doi.org/10.1093/nar/gkt1067</a></li>
 <li>T3DB: <a href="https://doi.org/10.1093/nar/gku1004" class="uri">https://doi.org/10.1093/nar/gku1004</a></li>
 <li>YMDB 2.0: <a href="https://doi.org/10.1093/nar/gkw1058" class="uri">https://doi.org/10.1093/nar/gkw1058</a></li>
 <li>Enveda-180: <a href="https://doi.org/10.5281/zenodo.21346580" class="uri">https://doi.org/10.5281/zenodo.21346580</a></li>

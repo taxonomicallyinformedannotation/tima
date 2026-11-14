@@ -84,7 +84,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-3dba021ccb97a5709654d2c27fb431b2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-7e52812dfc6a7b4c743579661ce18315.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -713,7 +713,7 @@ Additional arguments (currently unused)
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
-<p>Numeric similarity score (0-1), or list with score and matches if return_matched_peaks = TRUE. Returns 0.0 if calculation fails.</p>
+<p>Scalar numeric similarity score (0-1) when <code>return_matched_peaks = FALSE</code>. When <code>return_matched_peaks = TRUE</code>, methods <code>“gnps”</code> and <code>“cosine”</code> return a numeric vector of length 4 <code>c(score, matches, score_forward, score_reverse)</code> (or <code>c(0.0, 0)</code> when an input spectrum has zero rows), while <code>“entropy”</code> returns the scalar similarity score from <code>msentropy</code> (or <code>c(0.0, 0)</code> on zero rows or error). Falls back to <code>0.0</code> (or zero-vector) if calculation fails.</p>
 </section>
 <section id="see-also" class="level3">
 <h3 class="anchored" data-anchor-id="see-also">See Also</h3>

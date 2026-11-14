@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Adriano Rutz">
-<meta name="dcterms.date" content="2026-11-13">
+<meta name="dcterms.date" content="2026-11-14">
 
 <title>0 Validating your data – tima</title>
 <style>
@@ -84,7 +84,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-3dba021ccb97a5709654d2c27fb431b2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-7e52812dfc6a7b4c743579661ce18315.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -128,11 +128,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <meta name="citation_title" content="0 Validating your data">
 <meta name="citation_author" content="Adriano Rutz">
-<meta name="citation_publication_date" content="2026-11-13">
-<meta name="citation_cover_date" content="2026-11-13">
+<meta name="citation_publication_date" content="2026-11-14">
+<meta name="citation_cover_date" content="2026-11-14">
 <meta name="citation_year" content="2026">
-<meta name="citation_online_date" content="2026-11-13">
-<meta name="citation_fulltext_html_url" content="https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validation.html">
+<meta name="citation_online_date" content="2026-11-14">
+<meta name="citation_fulltext_html_url" content="https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validating.html">
 <meta name="citation_language" content="en">
 </head>
 
@@ -636,7 +636,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">November 13, 2026</p>
+      <p class="date">November 14, 2026</p>
     </div>
   </div>
   
@@ -661,15 +661,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">sirius =</span> <span class="st">"output/sirius"</span></span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>You can also validate a single input at a time (any omitted argument is skipped), and <code>annotate_masses()</code> / <code>annotate_spectra()</code> automatically run the relevant checks before starting.</p>
+<p>You can also validate a single input at a time (any <code>NULL</code> argument is skipped) as a standalone pre-flight check before running downstream steps.</p>
 </section>
 <section id="what-is-checked-and-why" class="level2">
 <h2 class="anchored" data-anchor-id="what-is-checked-and-why">What is checked and why</h2>
 <ul>
-<li><strong>Features table (<code>features</code>):</strong> Must be a non-empty CSV/TSV containing your feature ID, <code>mz</code>, and <code>rt</code> columns (<code>feature_col</code> if not named <code>feature_id</code>).</li>
-<li><strong>Spectra (<code>spectra</code>):</strong> Must be a readable MGF with balanced <code>BEGIN IONS</code> / <code>END IONS</code> blocks, a precursor <code>PEPMASS</code> per spectrum, and non-empty peak lists.</li>
-<li><strong>Metadata (<code>metadata</code>):</strong> When provided, verifies the sample filename column (<code>metadata_filename_col</code>) and checks that referenced files exist in <code>metadata_data_dir</code>.</li>
-<li><strong>SIRIUS workspace (<code>sirius</code>):</strong> Checks that summary files (<code>formula_identifications_all.tsv</code>, <code>canopus_formula_summary_all.tsv</code>, and <code>compound_identifications_all.tsv</code> / <code>structure_identifications_all.tsv</code>) were exported (<code>--full-summary</code> in the CLI or the summary export button in the GUI).</li>
+<li><strong>Features table (<code>features</code>):</strong> Must be a readable, non-empty CSV/TSV containing your feature ID column (<code>feature_col</code>, default <code>"feature_id"</code>), <code>rt</code>, and <code>mz</code> columns.</li>
+<li><strong>Spectra (<code>spectra</code>):</strong> Must be a non-empty MGF file with balanced <code>BEGIN IONS</code> / <code>END IONS</code> blocks, a valid precursor <code>PEPMASS</code> per spectrum, and non-empty peak lists.</li>
+<li><strong>Metadata (<code>metadata</code>):</strong> Must be a readable CSV/TSV containing <code>filename_col</code> (default <code>"filename"</code>) and <code>organism_col</code> (default <code>"organism"</code>). When both <code>features</code> and <code>metadata</code> are supplied, it also cross-checks sample filenames against intensity columns in the features table.</li>
+<li><strong>SIRIUS workspace (<code>sirius</code>):</strong> Accepts either a directory or a <code>.zip</code> archive and verifies exported summary files (<code>formula_identifications*</code>, <code>canopus_formula_summary*</code>, and <code>compound_identifications*</code> / <code>structure_identifications*</code> via <code>--full-summary</code> in the CLI or summary export in the GUI).</li>
 </ul>
 </section>
 <section id="next-steps" class="level2">
@@ -687,13 +687,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-reuse"><h2 class="anchored quarto-appendix-heading">Reuse</h2><div class="quarto-appendix-contents"><div><a rel="license" href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></div></div></section><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><div class="code-copy-outer-scaffold"><pre class="sourceCode quarto-appendix-bibtex code-with-copy"><code class="sourceCode bibtex">@online{rutz2026,
   author = {Rutz, Adriano},
   title = {0 {Validating} Your Data},
-  date = {2026-11-13},
-  url = {https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validation.html},
+  date = {2026-11-14},
+  url = {https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validating.html},
   langid = {en}
 }
 </code></pre><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-rutz2026" class="csl-entry quarto-appendix-citeas" role="listitem">
-Rutz, Adriano. 2026. <span>“0 Validating Your Data.”</span> November 13.
-<a href="https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validation.html">https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validation.html</a>.
+Rutz, Adriano. 2026. <span>“0 Validating Your Data.”</span> November 14.
+<a href="https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validating.html">https://taxonomicallyinformedannotation.github.io/tima/vignettes/articles/0-validating.html</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
