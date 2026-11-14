@@ -12,7 +12,7 @@ test_that("fake_lotus creates file with correct structure", {
   expect_true(file.exists(temp_file))
 
   # Read and verify structure
-  data <- tidytable::fread(temp_file)
+  data <- safe_fread(temp_file)
 
   expect_s3_class(data, "data.frame")
   expect_equal(nrow(data), 0)

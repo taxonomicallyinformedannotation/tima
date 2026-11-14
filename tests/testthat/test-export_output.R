@@ -53,7 +53,7 @@ test_that("export_output writes gzip-compressed TSV", {
   export_output(x = df, file = file_path)
 
   expect_true(file.exists(file_path))
-  loaded <- tidytable::fread(file_path)
+  loaded <- safe_fread(file_path)
   expect_equal(nrow(loaded), 100)
 })
 

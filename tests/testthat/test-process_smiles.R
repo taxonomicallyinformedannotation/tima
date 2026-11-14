@@ -637,7 +637,7 @@ test_that("process_smiles combines partial cache matches with new RDKit results 
 
   # Updated gz_cache on disk should be gzip-compressed and contain INIT_SEED, CAN_SEED, and C
   expect_identical(readBin(gz_cache, "raw", n = 2L), as.raw(c(0x1f, 0x8b)))
-  disk_cache <- tidytable::fread(gz_cache)
+  disk_cache <- safe_fread(gz_cache)
   expect_true(all(
     c("INIT_SEED", "CAN_SEED", "C") %in% disk_cache$structure_smiles_initial
   ))

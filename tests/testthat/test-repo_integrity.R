@@ -246,6 +246,7 @@ test_that("codetools::checkUsagePackage reports no issues", {
       dir.exists(file.path(root, "R")) &&
       isNamespaceLoaded("tima")
   )
+  skip_if_not_installed("codetools")
 
   rec <- new.env(parent = emptyenv())
   rec$issues <- character(0)
@@ -272,4 +273,34 @@ test_that("tests/testthat.R runs test_check rather than test_package", {
   )
   expect_match(txt, "test_check\\s*\\(", perl = TRUE)
   expect_no_match(txt, "test_package\\s*\\(", perl = TRUE)
+})
+
+test_that("tests only use declared or base package namespaces", {
+  root <- .repo_root()
+  desc_path <- file.path(root, "DESCRIPTION")
+  tests_dir <- file.path(root, "tests")
+  skip_if_not(file.exists(desc_path) && dir.exists(tests_dir))
+
+  desc <- read.dcf(desc_path)
+  cols <- intersect(
+    c("Depends", "Imports", "Suggests", "Enhances"),
+    colnames(desc)
+  )
+  raw_deps <- unlist(strsplit(paste(desc[, cols], collapse = ","), ","))
+  declared <- trimws(sub("\\(.*", "", raw_deps))
+  declared <- declared[nzchar(declared) & declared != "R"]
+  base_pkgs <- rownames(installed.packages(priority = "base"))
+  allowed <- unique(c("tima", base_pkgs, declared))
+
+  test_files <- list.files(
+    tests_dir,
+    pattern = "\\.[Rr]$",
+    recursive = TRUE,
+    full.names = TRUE
+  )
+  used <- sort(unique(unlist(lapply(test_files, function(f) {
+    pd <- utils::getParseData(parse(f, keep.source = TRUE))
+    pd$text[pd$token == "SYMBOL_PACKAGE"]
+  }))))
+  expect_identical(setdiff(used, allowed), character(0))
 })

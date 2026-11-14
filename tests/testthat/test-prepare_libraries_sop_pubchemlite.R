@@ -80,7 +80,7 @@ test_that("prepare_libraries_sop_pubchemlite standardizes PubChem Lite rows", {
   expect_equal(result, output_file)
   expect_true(file.exists(output_file))
 
-  out <- tidytable::fread(output_file)
+  out <- safe_fread(output_file)
   expect_equal(nrow(out), 2L)
   expect_true(all(
     c("structure_name", "structure_inchikey", "structure_smiles") %in%
@@ -118,7 +118,7 @@ test_that("prepare_libraries_sop_pubchemlite deduplicates identical structures a
   )
 
   prepare_libraries_sop_pubchemlite(input = input_file, output = output_file)
-  out <- tidytable::fread(output_file, na.strings = c("", "NA"))
+  out <- safe_fread(output_file, na.strings = c("", "NA"))
 
   expect_equal(nrow(out), 2L)
   expect_equal(out$structure_name, c("CompA", NA_character_))

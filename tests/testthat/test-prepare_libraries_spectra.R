@@ -233,7 +233,7 @@ test_that("prepare_libraries_spectra creates empty templates when input is missi
 
   spectra_pos <- readRDS(out[["pos"]])
   spectra_neg <- readRDS(out[["neg"]])
-  sop <- tidytable::fread(out[["sop"]])
+  sop <- safe_fread(out[["sop"]])
 
   expect_s4_class(spectra_pos, "Spectra")
   expect_s4_class(spectra_neg, "Spectra")

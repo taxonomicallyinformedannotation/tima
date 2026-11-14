@@ -370,7 +370,7 @@ test_that("prepare_annotations_mztab exports non-empty table for official study-
   )
 
   expect_true(file.exists(ann))
-  df <- tidytable::fread(ann)
+  df <- safe_fread(ann)
   expect_equal(nrow(df), 1L)
   expect_true("feature_id" %in% names(df))
 })
@@ -455,7 +455,7 @@ test_that("prepare_annotations_mztab works across representative mzTab fixtures"
       )
 
       expect_true(file.exists(ann), info = basename(f))
-      df <- tidytable::fread(ann)
+      df <- safe_fread(ann)
       expect_true("feature_id" %in% names(df), info = basename(f))
     } else {
       expect_error(
@@ -474,7 +474,7 @@ test_that("prepare_annotations_mztab works across representative mzTab fixtures"
 })
 
 test_that("prepare_annotations_mztab splits spectral similarity from overall confidence", {
-  ann <- tidytable::fread(prepare_annotations_mztab(
+  ann <- safe_fread(prepare_annotations_mztab(
     input = resolve_fixture_path("mztab/score_split.mztab"),
     output = file.path(temp_test_dir("score_split_ann"), "ann.tsv.gz"),
     str_stereo = resolve_fixture_path("structures_stereo.csv"),

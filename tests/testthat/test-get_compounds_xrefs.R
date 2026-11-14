@@ -124,7 +124,7 @@ test_that("get_compounds_xrefs cached file content is readable", {
     max_age_hours = 24
   )
 
-  df <- tidytable::fread(result)
+  df <- safe_fread(result)
   expect_s3_class(df, "data.frame")
   expect_true("inchikey" %in% names(df))
   expect_true("prefix" %in% names(df))
@@ -169,7 +169,7 @@ test_that("get_compounds_xrefs fetches fresh data from QLever", {
   expect_true(file.exists(result))
   expect_equal(result, output_file)
 
-  df <- tidytable::fread(result)
+  df <- safe_fread(result)
   expect_s3_class(df, "data.frame")
   expect_true(all(c("inchikey", "prefix", "id") %in% names(df)))
 
@@ -236,7 +236,7 @@ test_that("get_compounds_xrefs refreshes stale cache with real data", {
 
   expect_true(file.exists(result))
 
-  df <- tidytable::fread(result)
+  df <- safe_fread(result)
 
   # If the service returned stale/empty data, skip gracefully
   if (nrow(df) == 0L || (nrow(df) == 1L && "FAKE-INCHIKEY" %in% df$inchikey)) {
@@ -275,7 +275,7 @@ test_that("get_compounds_xrefs keeps the cache when QLever's response is truncat
   output_file <- temp_test_path("xrefs_truncated.tsv.gz")
   cached <- tidytable::tidytable(inchikey = "CACHED", prefix = "x", id = "1")
   export_output(x = cached, file = output_file)
-  before <- tidytable::fread(output_file)
+  before <- safe_fread(output_file)
 
   # Cut off mid-IRI, as observed on CI
   .mock_xrefs_network(
@@ -291,7 +291,7 @@ test_that("get_compounds_xrefs keeps the cache when QLever's response is truncat
   expect_no_warning(
     get_compounds_xrefs(props = "P683", output = output_file, max_age_hours = 0)
   )
-  expect_equal(tidytable::fread(output_file), before)
+  expect_equal(safe_fread(output_file), before)
 })
 
 test_that("get_compounds_xrefs writes a complete QLever response", {
@@ -300,7 +300,7 @@ test_that("get_compounds_xrefs writes a complete QLever response", {
 
   get_compounds_xrefs(props = "P683", output = output_file, max_age_hours = 0)
 
-  out <- tidytable::fread(output_file)
+  out <- safe_fread(output_file)
   expect_setequal(out$prefix, c("CHEBI", "wikidata"))
   expect_true(all(out$inchikey == "BSYNRYMUTXBXSQ"))
 
@@ -316,7 +316,7 @@ test_that("get_compounds_xrefs writes a complete QLever response", {
         max_age_hours = 0
       )
       expect_equal(res_fb, out_no_cache)
-      expect_equal(nrow(tidytable::fread(out_no_cache)), 0L)
+      expect_equal(nrow(safe_fread(out_no_cache)), 0L)
     }
   )
 
@@ -363,7 +363,7 @@ test_that("get_compounds_xrefs writes a complete QLever response", {
             output = out_banana_fb,
             max_age_hours = 0
           )
-          out_b <- tidytable::fread(out_banana_fb)
+          out_b <- safe_fread(out_banana_fb)
           expect_true("chebi" %in% out_b$prefix)
         }
       )

@@ -1494,7 +1494,7 @@ test_that(".normalize_and_write_cache normalizes columns, replaces notClassified
     taxonomy_name = "NPClassifier"
   )
   expect_true(ok_gz)
-  read_gz <- tidytable::fread(gz_path, na.strings = "")
+  read_gz <- safe_fread(gz_path, na.strings = "")
   expect_identical(nrow(read_gz), 2L)
 
   # 3. Error fallback returns FALSE without throwing
@@ -1881,7 +1881,7 @@ test_that("taxonomy cache internal helpers cover all compression, headerless, no
     needs_disk_norm = TRUE
   )
   expect_true(ok_wb)
-  wb_read <- tidytable::fread(wb_gz, na.strings = "")
+  wb_read <- safe_fread(wb_gz, na.strings = "")
   expect_identical(nrow(wb_read), 2L)
   expect_true(all(is.na(wb_read$structure_tax_npc_01pat)))
 

@@ -117,7 +117,7 @@ test_that("prepare_features_tables handles mzmine format (Peak area)", {
   expect_equal(result, output_file)
   expect_true(file.exists(output_file))
 
-  prepared <- tidytable::fread(output_file)
+  prepared <- safe_fread(output_file)
   expect_true("feature_id" %in% colnames(prepared))
   expect_true("mz" %in% colnames(prepared))
 })
@@ -173,7 +173,7 @@ test_that("prepare_features_tables resolves mzTab-style core column names", {
     )
   )
 
-  prepared <- tidytable::fread(output_file)
+  prepared <- safe_fread(output_file)
   expect_true(all(
     c("feature_id", "mz", "rt", "adduct", "sample") %in% colnames(prepared)
   ))
@@ -208,7 +208,7 @@ test_that("prepare_features_tables retains top intensity samples", {
     candidates = 3
   )
 
-  prepared <- tidytable::fread(output_file)
+  prepared <- safe_fread(output_file)
   sample_cols <- grep("^sample", colnames(prepared), value = TRUE)
   expect_lte(length(sample_cols), n_samples)
 })
@@ -238,7 +238,7 @@ test_that("prepare_features_tables skips rows without usable intensities", {
     )
   )
 
-  prepared <- tidytable::fread(output_file)
+  prepared <- safe_fread(output_file)
   expect_equal(nrow(prepared), 0L)
 })
 
@@ -271,7 +271,7 @@ test_that("prepare_features_tables handles both Peak area and Peak height", {
   )
 
   expect_true(file.exists(result))
-  prepared <- tidytable::fread(output_file)
+  prepared <- safe_fread(output_file)
   expect_true("feature_id" %in% colnames(prepared))
   # Should not have duplicate sample columns
   expect_equal(length(unique(colnames(prepared))), length(colnames(prepared)))

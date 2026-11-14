@@ -55,6 +55,7 @@ Suggests:
     altdoc (>= 0.7.2),
     BiocManager (>= 1.30.27),
     BiocVersion (>= 3.22.0),
+    codetools,
     grateful (>= 0.3.0),
     knitr (>= 1.51),
     MsBackendMgf (>= 1.18.0),

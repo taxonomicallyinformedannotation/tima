@@ -108,7 +108,7 @@ test_that("annotate_spectra produces output file and columns", {
     "Skipped.*MS1.*spectrum|cannot be annotated by spectral matching"
   )
   expect_true(file.exists(out))
-  df <- tidytable::fread(out)
+  df <- safe_fread(out)
   expect_true(all(
     c(
       "feature_id",
@@ -154,8 +154,8 @@ test_that("threshold filtering removes low similarity candidates", {
     ),
     "Skipped.*MS1.*spectrum|cannot be annotated by spectral matching"
   )
-  df_low <- tidytable::fread(out_low)
-  df_high <- tidytable::fread(out_high)
+  df_low <- safe_fread(out_low)
+  df_high <- safe_fread(out_high)
   expect_true(nrow(df_low) >= nrow(df_high))
 })
 
@@ -195,8 +195,8 @@ test_that("approx mode keeps more library spectra than strict mode", {
     dalton = 0.01,
     threshold = 0
   )
-  df_strict <- tidytable::fread(out_strict)
-  df_approx <- tidytable::fread(out_approx)
+  df_strict <- safe_fread(out_strict)
+  df_approx <- safe_fread(out_approx)
   # Approximated search should not have fewer distinct library candidates when any matches occur
   expect_true(nrow(df_approx) >= nrow(df_strict) || nrow(df_approx) == 0)
 })
@@ -227,7 +227,7 @@ test_that("empty result exports template", {
     ppm = 5,
     threshold = 0.5
   )
-  df <- tidytable::fread(out)
+  df <- safe_fread(out)
   expect_true(all(fake_annotations_columns() |> names() %in% names(df)))
   expect_equal(nrow(df), 1) # template has single row
 })
@@ -267,7 +267,7 @@ test_that("polarity filtering drops non-matching libraries and handles none left
     ),
     "Skipped.*MS1.*spectrum|cannot be annotated by spectral matching"
   )
-  df2 <- tidytable::fread(out2)
+  df2 <- safe_fread(out2)
   expect_equal(nrow(df2), 1)
 })
 
@@ -320,7 +320,7 @@ test_that("library spectra with empty peaks are removed before concatenation", {
     "Skipped.*MS1.*spectrum|cannot be annotated by spectral matching"
   )
   expect_true(file.exists(out))
-  df <- tidytable::fread(out)
+  df <- safe_fread(out)
   expect_true(nrow(df) >= 1)
 })
 
@@ -350,7 +350,7 @@ test_that("high cutoff removes all query peaks leading to empty template", {
     cutoff = 1e9,
     threshold = 0
   )
-  df <- tidytable::fread(out)
+  df <- safe_fread(out)
   expect_equal(nrow(df), 1)
 })
 
@@ -379,7 +379,7 @@ test_that("duplicate candidates collapsed by SMILES are unique", {
     ),
     "Skipped.*MS1.*spectrum|cannot be annotated by spectral matching"
   )
-  df <- tidytable::fread(out)
+  df <- safe_fread(out)
   uniq <- tidytable::distinct(
     df,
     feature_id,
@@ -433,7 +433,7 @@ test_that("NA fallback for smiles is applied", {
     ),
     "Skipped.*MS1.*spectrum|cannot be annotated by spectral matching"
   )
-  df <- tidytable::fread(out)
+  df <- safe_fread(out)
   expect_true("candidate_structure_smiles_no_stereo" %in% names(df))
   # Filter out placeholder/template rows (no similarity score)
   actual <- df[!is.na(df$candidate_score_similarity), ]

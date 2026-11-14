@@ -157,7 +157,7 @@ prepare_taxa <- function(
   }
 
   hdr_feat <- tryCatch(
-    names(data.table::fread(file = input, nrows = 0L, showProgress = FALSE)),
+    names(.safe_fread_read(file = input, nrows = 0L, showProgress = FALSE)),
     error = function(e) character(0L)
   )
   wanted_feat_cols <- if (!is.null(taxon)) {
