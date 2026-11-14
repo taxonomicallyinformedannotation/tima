@@ -40,6 +40,23 @@ test_that("is_spectrum_sanitized returns TRUE for single-row matrix", {
   expect_true(is_spectrum_sanitized(sp))
 })
 
+test_that("is_spectrum_sanitized rejects non-finite, non-positive, and non-numeric peaks", {
+  expect_false(is_spectrum_sanitized(cbind(mz = NA_real_, intensity = 100)))
+  expect_false(is_spectrum_sanitized(cbind(mz = 100, intensity = NaN)))
+  expect_false(is_spectrum_sanitized(cbind(mz = Inf, intensity = 100)))
+  expect_false(is_spectrum_sanitized(cbind(mz = 100, intensity = 0)))
+  expect_false(is_spectrum_sanitized(cbind(mz = 100, intensity = -5)))
+  expect_false(
+    is_spectrum_sanitized(cbind(mz = c(100, Inf), intensity = c(10, 20)))
+  )
+  expect_false(
+    is_spectrum_sanitized(cbind(mz = c(100, 200), intensity = c(0, 10)))
+  )
+  expect_false(
+    is_spectrum_sanitized(cbind(mz = "100", intensity = "10"))
+  )
+})
+
 test_that("is_spectrum_sanitized returns FALSE for non-matrix", {
   expect_false(is_spectrum_sanitized(data.frame(mz = 1, intensity = 1)))
   expect_false(is_spectrum_sanitized(c(1, 2, 3)))
@@ -121,6 +138,14 @@ test_that("sanitize_spectrum_matrix returns input for empty or non-matrix", {
 
   not_matrix <- data.frame(mz = 1)
   expect_equal(sanitize_spectrum_matrix(not_matrix), not_matrix)
+
+  char_mat <- cbind(mz = "100", intensity = "10")
+  char_out <- sanitize_spectrum_matrix(char_mat)
+  expect_true(is.numeric(char_out))
+  expect_equal(dim(char_out), c(0L, 2L))
+
+  bad_single <- cbind(mz = Inf, intensity = 0)
+  expect_equal(nrow(sanitize_spectrum_matrix(bad_single)), 0L)
 })
 
 # ---- round-trip: sanitize then is_sanitized ----------------------------------

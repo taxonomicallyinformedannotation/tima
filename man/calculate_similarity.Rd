@@ -39,8 +39,13 @@ Not compatible with 'entropy' method. Default: FALSE}
 \item{...}{Additional arguments (currently unused)}
 }
 \value{
-Numeric similarity score (0-1), or list with score and matches
-if return_matched_peaks = TRUE. Returns 0.0 if calculation fails.
+Scalar numeric similarity score (0-1) when
+\code{return_matched_peaks = FALSE}. When \code{return_matched_peaks = TRUE},
+methods \code{"gnps"} and \code{"cosine"} return a numeric vector of length 4
+\code{c(score, matches, score_forward, score_reverse)} (or \code{c(0.0, 0)} when
+an input spectrum has zero rows), while \code{"entropy"} returns the scalar
+similarity score from \code{msentropy} (or \code{c(0.0, 0)} on zero rows or error).
+Falls back to \code{0.0} (or zero-vector) if calculation fails.
 }
 \description{
 Calculates similarity scores between query and

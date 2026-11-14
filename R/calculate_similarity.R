@@ -66,8 +66,13 @@
 #'     Not compatible with 'entropy' method. Default: FALSE
 #' @param ... Additional arguments (currently unused)
 #'
-#' @return Numeric similarity score (0-1), or list with score and matches
-#'     if return_matched_peaks = TRUE. Returns 0.0 if calculation fails.
+#' @return Scalar numeric similarity score (0-1) when
+#'     `return_matched_peaks = FALSE`. When `return_matched_peaks = TRUE`,
+#'     methods `"gnps"` and `"cosine"` return a numeric vector of length 4
+#'     `c(score, matches, score_forward, score_reverse)` (or `c(0.0, 0)` when
+#'     an input spectrum has zero rows), while `"entropy"` returns the scalar
+#'     similarity score from `msentropy` (or `c(0.0, 0)` on zero rows or error).
+#'     Falls back to `0.0` (or zero-vector) if calculation fails.
 #'
 #' @family mass-spectrometry
 #'

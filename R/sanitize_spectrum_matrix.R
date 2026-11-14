@@ -5,8 +5,8 @@
 #'     \itemize{
 #'       \item m/z values sorted in ascending order
 #'       \item No duplicate m/z within matching tolerance
-#'       \item No NaN or NA values
-#'       \item Non-negative intensities
+#'       \item All m/z and intensity values finite (no NaN, NA, or Inf)
+#'       \item Strictly positive intensities
 #'     }
 #'
 #' @param spectrum [matrix] Numeric matrix with at least 2 columns (mz,
@@ -25,22 +25,24 @@ is_spectrum_sanitized <- function(spectrum, tolerance = 0.01, ppm = 10) {
       if (is.null(spectrum)) {
         return(TRUE)
       }
-      if (!is.matrix(spectrum)) {
+      if (!is.matrix(spectrum) || !is.numeric(spectrum)) {
         return(FALSE)
       }
       if (ncol(spectrum) < 2L) {
         return(FALSE)
       }
-      if (nrow(spectrum) < 2L) {
+      if (nrow(spectrum) == 0L) {
         return(TRUE)
       }
 
       mz <- spectrum[, 1L]
       int <- spectrum[, 2L]
 
-      # Check for NaN/NA
-      if (anyNA(mz) || anyNA(int)) {
+      if (!all(is.finite(mz)) || !all(is.finite(int)) || !all(int > 0)) {
         return(FALSE)
+      }
+      if (nrow(spectrum) == 1L) {
+        return(TRUE)
       }
 
       # Check sorted
@@ -90,6 +92,13 @@ is_spectrum_sanitized <- function(spectrum, tolerance = 0.01, ppm = 10) {
 sanitize_spectrum_matrix <- function(spectrum, tolerance = 0.01, ppm = 10) {
   if (!is.matrix(spectrum) || nrow(spectrum) == 0L) {
     return(spectrum)
+  }
+  if (!is.numeric(spectrum) || ncol(spectrum) < 2L) {
+    return(matrix(
+      numeric(0L),
+      ncol = 2L,
+      dimnames = list(NULL, c("mz", "intensity"))
+    ))
   }
 
   mz <- spectrum[, 1L]

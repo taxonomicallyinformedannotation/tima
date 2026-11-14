@@ -24,8 +24,8 @@ by the C-level GNPS scoring functions:
 \itemize{
 \item m/z values sorted in ascending order
 \item No duplicate m/z within matching tolerance
-\item No NaN or NA values
-\item Non-negative intensities
+\item All m/z and intensity values finite (no NaN, NA, or Inf)
+\item Strictly positive intensities
 }
 }
 \keyword{internal}
