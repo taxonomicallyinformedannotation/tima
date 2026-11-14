@@ -680,6 +680,11 @@ test_that("load_python_smiles_processor and process_smiles abort with tima_runti
   reticulate::py_run_string(
     "def process_smiles(a, b):\n    raise RuntimeError('simulated rdkit crash')\n"
   )
+  before_tmp <- list.files(
+    tempdir(),
+    pattern = "[.](smi|csv[.]gz)$",
+    full.names = TRUE
+  )
   expect_error(
     with_mocked_bindings(
       source_python = function(...) invisible(NULL),
@@ -692,4 +697,10 @@ test_that("load_python_smiles_processor and process_smiles abort with tima_runti
     "rdkit smiles processing failed",
     class = "tima_runtime_error"
   )
+  after_tmp <- list.files(
+    tempdir(),
+    pattern = "[.](smi|csv[.]gz)$",
+    full.names = TRUE
+  )
+  expect_identical(setdiff(after_tmp, before_tmp), character(0))
 })

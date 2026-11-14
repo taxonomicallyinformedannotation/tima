@@ -211,6 +211,7 @@ process_smiles <- function(
   # Create temporary files for Python processing
   input_smi_file <- tempfile(fileext = ".smi")
   output_csv_file <- tempfile(fileext = ".csv.gz")
+  on.exit(unlink(c(input_smi_file, output_csv_file)), add = TRUE)
 
   log_info(
     "Processing %d new SMILES with RDKit",

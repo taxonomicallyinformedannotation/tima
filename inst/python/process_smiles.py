@@ -1,26 +1,23 @@
-"""
-SMILES Processing Pipeline
+"""SMILES processing pipeline using RDKit and ChEMBL structure pipeline."""
 
-Processes SMILES (Simplified Molecular Input Line Entry System)
-chemical structure strings using RDKit to compute molecular properties.
-
-Author: TIMA Development Team
-License: AGPL (>= 3)
-"""
-
+import argparse
 import csv
+import datetime
 import gzip
 import logging
 import os
 import sys
-from chembl_structure_pipeline import standardizer
+from collections.abc import Iterable
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from typing import List, Optional, Tuple, Any, Iterable
+from typing import Any
+
+from chembl_structure_pipeline import standardizer
 from rdkit import rdBase
 from rdkit.Chem import (
-    MolToSmiles,
+    Mol,
     MolToInchiKey,
+    MolToSmiles,
     RemoveStereochemistry,
     SmilesMolSupplier,
 )
@@ -30,16 +27,11 @@ from rdkit.Chem.rdMolDescriptors import (
     CalcMolFormula,
 )
 
-
-# =====================================================================================
-# Configuration and Constants
-# =====================================================================================
-
 DEFAULT_BATCH_SIZE = 1000
 DEFAULT_PROGRESS_INTERVAL = 10000
-DEFAULT_MAX_WORKERS: Optional[int] = None  # Auto-detect
+DEFAULT_MAX_WORKERS: int | None = None
 
-OUTPUT_COLUMNS: List[str] = [
+OUTPUT_COLUMNS: list[str] = [
     "structure_smiles_initial",
     "structure_smiles",
     "structure_inchikey",
@@ -51,7 +43,7 @@ OUTPUT_COLUMNS: List[str] = [
 
 
 def _resolve_log_level_from_env(default: int = logging.INFO) -> int:
-    """Resolve TIMA log level from environment."""
+    """Resolve TIMA log level from the TIMA_LOG_LEVEL environment variable."""
     level_name = os.getenv("TIMA_LOG_LEVEL", "INFO")
     if not isinstance(level_name, str):
         return default
@@ -75,33 +67,23 @@ LOG_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 
 class MillisecondFormatter(logging.Formatter):
-    """Custom formatter to add milliseconds to timestamp."""
+    """Log formatter that appends millisecond precision to timestamps."""
 
-    def formatTime(self, record, datefmt=None):
-        """Override formatTime to include milliseconds.
-
-        Parameters
-        ----------
-        record : Any
-            Record.
-        datefmt : Any
-            None. Default is None.
-        """
-        import datetime
-
-        ct = datetime.datetime.fromtimestamp(record.created)
+    def formatTime(self, record: logging.LogRecord, datefmt: str | None = None) -> str:
+        """Format log record timestamp with local timezone and milliseconds."""
+        ct = datetime.datetime.fromtimestamp(
+            record.created, tz=datetime.timezone.utc
+        ).astimezone()
         if datefmt:
             s = ct.strftime(datefmt)
         else:
             s = ct.strftime("%Y-%m-%d %H:%M:%S")
-        # Add milliseconds (3 digits)
-        s = f"{s}.{int(record.msecs):03d}"
-        return s
+        return f"{s}.{int(record.msecs):03d}"
 
 
 __all__ = [
-    "process_smiles",
     "process_molecule",
+    "process_smiles",
     "validate_input_file",
     "validate_output_file",
     "validate_processing_params",
@@ -109,22 +91,7 @@ __all__ = [
 
 
 def get_logger(name: str = __name__, level: int = DEFAULT_LOG_LEVEL) -> logging.Logger:
-    """Create or retrieve a configured logger.
-
-        This avoids global side effects and allows dependency injection for tests.
-
-    Parameters
-    ----------
-    name : str
-        Default is __name__.
-    level : int
-        DEFAULT_LOG_LEVEL. Default is DEFAULT_LOG_LEVEL.
-
-    Returns
-    -------
-    logging.Logger
-        Retrieved logger.
-    """
+    """Create or retrieve a logger writing formatted timestamps to stderr."""
     configured_logger = logging.getLogger(name)
     configured_logger.setLevel(level)
     if not configured_logger.handlers:
@@ -136,16 +103,10 @@ def get_logger(name: str = __name__, level: int = DEFAULT_LOG_LEVEL) -> logging.
     return configured_logger
 
 
-# Use module-level logger but allow injection into functions
 logger = get_logger()
 
-# Silence RDKit warnings (can be re-enabled by tests if needed)
+# Silence noisy RDKit parser warnings unless a caller re-enables them.
 rdBase.DisableLog("rdApp.warning")
-
-
-# =====================================================================================
-# Custom Exceptions
-# =====================================================================================
 
 
 class SmilesProcessingError(Exception):
@@ -153,21 +114,17 @@ class SmilesProcessingError(Exception):
 
 
 class FileValidationError(SmilesProcessingError):
-    """Raised when input/output file validation fails."""
+    """Raised when input or output file validation fails."""
 
 
 class MoleculeProcessingError(SmilesProcessingError):
     """Raised when individual molecule processing fails."""
 
 
-# =====================================================================================
-# Validation Functions
-# =====================================================================================
-
-
 def validate_input_file(
-    input_file: str, *, _logger: Optional[logging.Logger] = None
+    input_file: str, *, _logger: logging.Logger | None = None
 ) -> Path:
+    """Validate that the input SMILES path exists and is a readable file."""
     path = Path(input_file)
     if not path.exists():
         raise FileValidationError(f"Input SMILES file not found: {input_file}")
@@ -180,8 +137,9 @@ def validate_input_file(
 
 
 def validate_output_file(
-    output_file: str, *, _logger: Optional[logging.Logger] = None
+    output_file: str, *, _logger: logging.Logger | None = None
 ) -> Path:
+    """Ensure the parent directory of the output path exists and is writable."""
     path = Path(output_file)
     out_dir = path.parent
     if not out_dir.exists():
@@ -194,12 +152,13 @@ def validate_output_file(
 
 
 def validate_processing_params(
-    num_workers: Optional[int],
+    num_workers: int | None,
     batch_size: int,
     progress_interval: int,
     *,
-    _logger: Optional[logging.Logger] = None,
-) -> Tuple[int, int, int]:
+    _logger: logging.Logger | None = None,
+) -> tuple[int, int, int]:
+    """Validate worker count, batch size, and progress reporting interval."""
     if num_workers is None:
         num_workers = min(32, (os.cpu_count() or 1) * 2)
     if num_workers < 1:
@@ -215,47 +174,25 @@ def validate_processing_params(
     return num_workers, batch_size, progress_interval
 
 
-# =====================================================================================
-# Core Molecule Processing
-# =====================================================================================
+def process_molecule(mol: Any, original_smiles: str) -> list[Any] | None:
+    """Standardize a molecule clone and compute SMILES, InChIKey, formula, mass, and xLogP.
 
-
-def process_molecule(mol: Any, original_smiles: str) -> Optional[List[Any]]:
-    """Process a single molecule to extract chemical properties.
-
-        **Output Format:**
-        - SMILES: Canonical with isotope notation preserved (e.g., [13C], [2H])
-        - InChIKey: Isotope-aware
-        - Formula: Isotopes shown separated (e.g., C2[13C]4H12O6, [2H]4C)
-        - Exact mass: RDKit automatically uses isotope atomic masses
-
-    Parameters
-    ----------
-    mol : Any
-        Mol.
-    original_smiles : str
-        Original smiles.
-
-    Returns
-    -------
-    Optional[List[Any]]
-        Result process molecule.
+    Isotope notation is preserved in SMILES, InChIKey, separated-isotope formulas,
+    and exact molecular weight calculations.
     """
-
     if mol is None:
         return None
 
     try:
-        m = standardizer.standardize_mol(mol)
+        # Clone before standardizing/stripping stereo so callers keep their Mol intact.
+        m = standardizer.standardize_mol(Mol(mol))
 
-        # Generate outputs from standardized molecule
         smiles = MolToSmiles(m)
         inchikey = MolToInchiKey(m)
         formula = CalcMolFormula(m, separateIsotopes=True)
         exact_mass = CalcExactMolWt(m)
         xlogp, _ = CalcCrippenDescriptors(m)
 
-        # Create stereo-removed version without copying the original molecule
         RemoveStereochemistry(m)
         smiles_no_stereo = MolToSmiles(m)
 
@@ -268,44 +205,22 @@ def process_molecule(mol: Any, original_smiles: str) -> Optional[List[Any]]:
             smiles_no_stereo,
             xlogp,
         ]
-    except Exception as e:
+    except (RuntimeError, ValueError, TypeError) as e:
         logger.warning(f"Failed to process SMILES '{original_smiles}': {e}")
         return None
 
 
 def open_output_file(output_file: Path):
-    """Open output file with appropriate compression if needed.
-
-    Parameters
-    ----------
-    output_file : Path
-        Output file.
-    """
+    """Open a CSV or gzipped CSV output stream in UTF-8 text mode."""
     if str(output_file).endswith(".gz"):
         return gzip.open(output_file, "wt", newline="", encoding="utf-8")
     return open(output_file, "w", newline="", encoding="utf-8")
 
 
-def _process_molecule_wrapper(args: Tuple[Any, str]) -> Optional[List[Any]]:
-    """Wrapper for process_molecule to work with map parallelization.
-
-    Parameters
-    ----------
-    args : Tuple[Any, str]
-        Args.
-
-    Returns
-    -------
-    Optional[List[Any]]
-        Result process molecule wrapper.
-    """
+def _process_molecule_wrapper(args: tuple[Any, str]) -> list[Any] | None:
+    """Unpack a `(mol, smiles)` tuple for `Executor.map`."""
     mol, smiles = args
     return process_molecule(mol, smiles)
-
-
-# =====================================================================================
-# Batch and Pipeline Processing
-# =====================================================================================
 
 
 def process_batch(
@@ -316,43 +231,16 @@ def process_batch(
     current_count: int,
     progress_interval: int,
     *,
-    _logger: Optional[logging.Logger] = None,
+    _logger: logging.Logger | None = None,
 ) -> int:
-    """Process a batch of molecules in parallel and write results.
-
-    Parameters
-    ----------
-    executor : ThreadPoolExecutor
-        Executor.
-    batch : Iterable[Any]
-        Batch.
-    original_smiles_list : Iterable[str]
-        Original smiles list.
-    writer : csv.writer
-        Writer.
-    current_count : int
-        Current count.
-    progress_interval : int
-        Progress interval.
-    _logger : Optional[logging.Logger]
-        None. Default is None.
-
-    Returns
-    -------
-    int
-        Numeric value for process batch.
-    """
+    """Process a batch of molecules in the executor and write rows on the caller thread."""
     log = _logger or logger
     batch_processed = 0
     batch_failed = 0
 
-    # Prepare work pairs and process in parallel; writing remains on the main thread
     pairs = list(zip(batch, original_smiles_list))
-
-    # Process all results at once
     results = list(executor.map(_process_molecule_wrapper, pairs))
 
-    # Write results and count successes/failures
     for result in results:
         if result:
             writer.writerow(result)
@@ -372,37 +260,13 @@ def process_batch(
 def process_smiles(
     input_smi_file: str,
     output_csv_file: str,
-    num_workers: Optional[int] = DEFAULT_MAX_WORKERS,
+    num_workers: int | None = DEFAULT_MAX_WORKERS,
     batch_size: int = DEFAULT_BATCH_SIZE,
     progress_interval: int = DEFAULT_PROGRESS_INTERVAL,
     *,
-    _logger: Optional[logging.Logger] = None,
+    _logger: logging.Logger | None = None,
 ) -> int:
-    """Process SMILES file to compute molecular properties.
-
-        This function reads a SMILES file, processes molecules in parallel batches,
-        and outputs molecular properties to a CSV file.
-
-    Parameters
-    ----------
-    input_smi_file : str
-        Input smi file.
-    output_csv_file : str
-        Output csv file.
-    num_workers : Optional[int]
-        DEFAULT_MAX_WORKERS. Default is DEFAULT_MAX_WORKERS.
-    batch_size : int
-        DEFAULT_BATCH_SIZE. Default is DEFAULT_BATCH_SIZE.
-    progress_interval : int
-        DEFAULT_PROGRESS_INTERVAL. Default is DEFAULT_PROGRESS_INTERVAL.
-    _logger : Optional[logging.Logger]
-        None. Default is None.
-
-    Returns
-    -------
-    int
-        Numeric value for process smiles.
-    """
+    """Read `input_smi_file`, compute molecular descriptors in batches, and write CSV output."""
     log = _logger or logger
     log.info("Starting SMILES processing pipeline")
     log.info(f"Input: {input_smi_file}")
@@ -417,7 +281,7 @@ def process_smiles(
     try:
         supplier = SmilesMolSupplier(str(input_path), nameColumn=-1)
         log.info("SMILES supplier initialized")
-    except Exception as e:
+    except (OSError, RuntimeError, ValueError) as e:
         raise SmilesProcessingError(f"Failed to load SMILES file: {e}") from e
 
     molecules_processed = 0
@@ -426,9 +290,8 @@ def process_smiles(
         writer = csv.writer(f)
         writer.writerow(OUTPUT_COLUMNS)
 
-        # Pre-allocate lists to reduce reallocation overhead
-        batch: List[Any] = []
-        originals: List[str] = []
+        batch: list[Any] = []
+        originals: list[str] = []
 
         with ThreadPoolExecutor(max_workers=num_workers) as executor:
             for i, mol in enumerate(supplier):
@@ -436,7 +299,6 @@ def process_smiles(
                     batch.append(mol)
                     originals.append(supplier.GetItemText(i))
 
-                    # Process batch when full
                     if len(batch) >= batch_size:
                         molecules_processed += process_batch(
                             executor,
@@ -447,11 +309,9 @@ def process_smiles(
                             progress_interval,
                             _logger=log,
                         )
-                        # Clear lists efficiently
                         batch.clear()
                         originals.clear()
 
-            # Process remaining molecules
             if batch:
                 molecules_processed += process_batch(
                     executor,
@@ -467,28 +327,8 @@ def process_smiles(
     return molecules_processed
 
 
-# =====================================================================================
-# Command-Line Interface (safe for reticulate)
-# =====================================================================================
-
-
-def main(argv: Optional[List[str]] = None) -> int:
-    """CLI entry point.
-
-        Returns an exit code for easier testing.
-
-    Parameters
-    ----------
-    argv : Optional[List[str]]
-        None. Default is None.
-
-    Returns
-    -------
-    int
-        Numeric value for main.
-    """
-    import argparse
-
+def main(argv: list[str] | None = None) -> int:
+    """CLI entry point returning 0 on success or 1 on processing error."""
     parser = argparse.ArgumentParser(
         description="Process SMILES file to compute molecular properties",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -507,7 +347,6 @@ def main(argv: Optional[List[str]] = None) -> int:
     args = parser.parse_args(argv)
 
     if args.verbose:
-        # Reconfigure logger at DEBUG level
         dbg = get_logger(__name__, level=logging.DEBUG)
         for h in dbg.handlers:
             h.setLevel(logging.DEBUG)
@@ -522,16 +361,11 @@ def main(argv: Optional[List[str]] = None) -> int:
         )
         print(f"Success! Processed {count} molecules.")
         return 0
-    except Exception as e:
+    except (SmilesProcessingError, OSError, RuntimeError, ValueError) as e:
         get_logger().error(f"SMILES processing failed: {e}")
         return 1
 
 
-# =====================================================================================
-# Entry Point Guard (safe for reticulate)
-# =====================================================================================
-
-# When imported by R or another Python module, `__name__` != "__main__" — this prevents argparse from running.
-# When executed directly from the command line, it behaves as a proper CLI.
+# Guarded so importing via reticulate::source_python() does not invoke argparse.
 if __name__ == "__main__" and len(sys.argv) > 1:
     sys.exit(main())
