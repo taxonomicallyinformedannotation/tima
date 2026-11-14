@@ -227,7 +227,7 @@ process_smiles <- function(
   # Process SMILES using Python/RDKit
   tryCatch(
     {
-      reticulate::py$process_smiles(input_smi_file, output_csv_file)
+      run_python_smiles_processor(input_smi_file, output_csv_file)
     },
     error = function(e) {
       cli::cli_abort(
@@ -320,9 +320,15 @@ process_smiles <- function(
 load_python_smiles_processor <- function() {
   tryCatch(
     {
-      reticulate::py_require(packages = c("rdkit", "chembl_structure_pipeline"))
-      py_script <- system.file("python/process_smiles.py", package = "tima")
-      reticulate::source_python(file = py_script)
+      if (is_windows_arm64()) {
+        resolve_win_arm64_python()
+      } else {
+        reticulate::py_require(
+          packages = c("rdkit", "chembl_structure_pipeline")
+        )
+        py_script <- system.file("python/process_smiles.py", package = "tima")
+        reticulate::source_python(file = py_script)
+      }
     },
     error = function(e) {
       log_error(
@@ -339,6 +345,284 @@ load_python_smiles_processor <- function() {
       )
     }
   )
+}
+
+#' @noRd
+is_windows_arm64 <- function() {
+  identical(.Platform$OS.type, "windows") &&
+    grepl("aarch64|arm64", R.version$arch, ignore.case = TRUE)
+}
+
+#' @noRd
+.system2 <- function(command, args = character(), ...) {
+  base::system2(command, args = args, ...)
+}
+
+#' @noRd
+maybe_sh_quote <- function(x) {
+  needs_quote <- !grepl("^[[:alnum:]/._-]+$", x)
+  if (any(needs_quote)) {
+    x[needs_quote] <- shQuote(x[needs_quote])
+  }
+  x
+}
+
+#' @noRd
+with_temp_envvar <- function(vars, code) {
+  if (length(vars) == 0L) {
+    return(force(code))
+  }
+  old <- Sys.getenv(names(vars), unset = NA_character_, names = TRUE)
+  on.exit(
+    {
+      set_old <- !is.na(old)
+      if (any(set_old)) {
+        do.call(Sys.setenv, as.list(old[set_old]))
+      }
+      if (!all(set_old)) {
+        Sys.unsetenv(names(old)[!set_old])
+      }
+    },
+    add = TRUE
+  )
+  to_set <- !is.na(vars)
+  if (!all(to_set)) {
+    Sys.unsetenv(names(vars)[!to_set])
+  }
+  if (any(to_set)) {
+    do.call(Sys.setenv, as.list(vars[to_set]))
+  }
+  force(code)
+}
+
+.win_arm64_python_store <- local({
+  .env <- new.env(parent = emptyenv())
+  list(
+    get = function() {
+      if (exists("exe", envir = .env, inherits = FALSE)) {
+        exe <- .env$exe
+        if (is.character(exe) && length(exe) == 1L && file.exists(exe)) {
+          return(exe)
+        }
+      }
+      NULL
+    },
+    set = function(exe) {
+      .env$exe <- exe
+      invisible(exe)
+    },
+    clear = function() {
+      if (exists("exe", envir = .env, inherits = FALSE)) {
+        rm("exe", envir = .env)
+      }
+      invisible(NULL)
+    }
+  )
+})
+
+#' @noRd
+resolve_uv_binary <- function() {
+  configured_uv <- Sys.getenv("RETICULATE_UV", unset = NA_character_)
+  if (
+    !is.na(configured_uv) &&
+      nzchar(configured_uv) &&
+      !identical(configured_uv, "managed")
+  ) {
+    if (file.exists(configured_uv)) {
+      return(configured_uv)
+    }
+    found <- unname(Sys.which(configured_uv))
+    if (nzchar(found) && file.exists(found)) {
+      return(found)
+    }
+  }
+
+  cached_uv <- getOption("reticulate.uv_binary")
+  if (
+    is.na(configured_uv) &&
+      is.character(cached_uv) &&
+      length(cached_uv) == 1L &&
+      nzchar(cached_uv) &&
+      !identical(cached_uv, "managed") &&
+      file.exists(cached_uv)
+  ) {
+    return(cached_uv)
+  }
+
+  force_managed <- identical(configured_uv, "managed") ||
+    identical(cached_uv, "managed")
+  if (!force_managed) {
+    candidates <- c(
+      unname(Sys.which("uv")),
+      path.expand("~/.local/bin/uv"),
+      path.expand("~/.local/bin/uv.exe")
+    )
+    for (cand in candidates) {
+      if (
+        is.character(cand) &&
+          length(cand) == 1L &&
+          nzchar(cand) &&
+          file.exists(cand)
+      ) {
+        return(cand)
+      }
+    }
+  }
+
+  managed_uv <- normalizePath(
+    file.path(
+      tools::R_user_dir("reticulate", "cache"),
+      "uv",
+      "bin",
+      if (identical(.Platform$OS.type, "windows")) "uv.exe" else "uv"
+    ),
+    mustWork = FALSE
+  )
+  if (!file.exists(managed_uv)) {
+    suppressWarnings(
+      tryCatch(
+        reticulate::uv_run_tool(
+          "python",
+          "--version",
+          stdout = FALSE,
+          stderr = FALSE
+        ),
+        error = function(e) NULL
+      )
+    )
+  }
+  if (file.exists(managed_uv)) {
+    attr(managed_uv, "reticulate-managed") <- TRUE
+    return(managed_uv)
+  }
+
+  boot_uv <- getOption("reticulate.uv_binary")
+  if (
+    is.character(boot_uv) &&
+      length(boot_uv) == 1L &&
+      nzchar(boot_uv) &&
+      !identical(boot_uv, "managed") &&
+      file.exists(boot_uv)
+  ) {
+    return(boot_uv)
+  }
+
+  stop("uv executable not found.", call. = FALSE)
+}
+
+#' @noRd
+resolve_win_arm64_python <- function() {
+  cached_exe <- .win_arm64_python_store$get()
+  if (!is.null(cached_exe)) {
+    return(invisible(cached_exe))
+  }
+
+  uv <- resolve_uv_binary()
+  out_file <- tempfile()
+  on.exit(unlink(out_file), add = TRUE)
+
+  uv_env <- c(VIRTUAL_ENV = NA_character_, PYTHONUTF8 = "1")
+  if (isTRUE(attr(uv, "reticulate-managed", exact = TRUE))) {
+    reticulate_cache <- tools::R_user_dir("reticulate", "cache")
+    uv_env <- c(
+      uv_env,
+      UV_CACHE_DIR = normalizePath(
+        file.path(reticulate_cache, "uv", "cache"),
+        mustWork = FALSE
+      ),
+      UV_PYTHON_INSTALL_DIR = normalizePath(
+        file.path(reticulate_cache, "uv", "python"),
+        mustWork = FALSE
+      )
+    )
+  }
+
+  uv_args <- c(
+    "tool",
+    "run",
+    "--isolated",
+    "--python",
+    "cpython-3.13-windows-x86_64-none",
+    "--with",
+    "rdkit",
+    "--with",
+    "chembl_structure_pipeline",
+    "--",
+    "python",
+    "-c",
+    "import pathlib, sys; pathlib.Path(sys.argv[1]).write_text(sys.executable)",
+    out_file
+  )
+
+  res <- suppressWarnings(
+    with_temp_envvar(
+      uv_env,
+      .system2(
+        uv,
+        args = maybe_sh_quote(uv_args),
+        stdout = TRUE,
+        stderr = TRUE
+      )
+    )
+  )
+  status <- attr(res, "status")
+  if (!is.null(status) && !identical(as.integer(status), 0L)) {
+    detail <- paste(res, collapse = "\n")
+    stop(
+      sprintf("uv failed with exit code %d: %s", as.integer(status), detail),
+      call. = FALSE
+    )
+  }
+
+  exe <- if (file.exists(out_file)) {
+    trimws(paste(readLines(out_file, warn = FALSE), collapse = ""))
+  } else {
+    ""
+  }
+  if (!nzchar(exe) || !file.exists(exe)) {
+    stop(
+      "uv did not produce a valid Windows x86_64 Python executable.",
+      call. = FALSE
+    )
+  }
+
+  .win_arm64_python_store$set(exe)
+  invisible(exe)
+}
+
+#' @noRd
+run_python_smiles_processor <- function(input_smi_file, output_csv_file) {
+  if (!is_windows_arm64()) {
+    reticulate::py$process_smiles(input_smi_file, output_csv_file)
+    return(invisible(NULL))
+  }
+
+  exe <- resolve_win_arm64_python()
+  py_script <- system.file("python/process_smiles.py", package = "tima")
+  res <- suppressWarnings(
+    with_temp_envvar(
+      c(VIRTUAL_ENV = NA_character_, PYTHONUTF8 = "1"),
+      .system2(
+        exe,
+        args = maybe_sh_quote(c(py_script, input_smi_file, output_csv_file)),
+        stdout = TRUE,
+        stderr = TRUE
+      )
+    )
+  )
+  status <- attr(res, "status")
+  if (!is.null(status) && !identical(as.integer(status), 0L)) {
+    detail <- paste(res, collapse = "\n")
+    stop(
+      sprintf(
+        "process_smiles.py failed with exit code %d: %s",
+        as.integer(status),
+        detail
+      ),
+      call. = FALSE
+    )
+  }
+  invisible(NULL)
 }
 
 #' Extract unique SMILES from dataframe

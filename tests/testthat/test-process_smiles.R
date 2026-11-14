@@ -663,23 +663,60 @@ test_that("process_smiles combines partial cache matches with new RDKit results 
 })
 
 test_that("load_python_smiles_processor and process_smiles abort with tima_runtime_error on Python failures", {
-  # 1. load_python_smiles_processor failure when py_require fails
+  if (!is_windows_arm64()) {
+    # 1. load_python_smiles_processor failure when py_require fails
+    expect_error(
+      with_mocked_bindings(
+        py_require = function(...) stop("simulated python environment error"),
+        load_python_smiles_processor(),
+        .package = "reticulate"
+      ),
+      "cannot load python smiles processor",
+      class = "tima_runtime_error"
+    )
+
+    # 2. process_smiles failure when reticulate::py$process_smiles raises an error
+    load_python_smiles_processor()
+    withr::defer(load_python_smiles_processor())
+    reticulate::py_run_string(
+      "def process_smiles(a, b):\n    raise RuntimeError('simulated rdkit crash')\n"
+    )
+    before_tmp <- list.files(
+      tempdir(),
+      pattern = "[.](smi|csv[.]gz)$",
+      full.names = TRUE
+    )
+    expect_error(
+      with_mocked_bindings(
+        source_python = function(...) invisible(NULL),
+        process_smiles(
+          tidytable::tidytable(structure_smiles_initial = "C"),
+          cache = NULL
+        ),
+        .package = "reticulate"
+      ),
+      "rdkit smiles processing failed",
+      class = "tima_runtime_error"
+    )
+    after_tmp <- list.files(
+      tempdir(),
+      pattern = "[.](smi|csv[.]gz)$",
+      full.names = TRUE
+    )
+    expect_identical(setdiff(after_tmp, before_tmp), character(0))
+  }
+
+  # Cross-platform Windows ARM64 subprocess load and execution error paths
   expect_error(
     with_mocked_bindings(
-      py_require = function(...) stop("simulated python environment error"),
-      load_python_smiles_processor(),
-      .package = "reticulate"
+      is_windows_arm64 = function() TRUE,
+      resolve_win_arm64_python = function() stop("simulated uv setup error"),
+      load_python_smiles_processor()
     ),
     "cannot load python smiles processor",
     class = "tima_runtime_error"
   )
 
-  # 2. process_smiles failure when reticulate::py$process_smiles raises an error
-  load_python_smiles_processor()
-  withr::defer(load_python_smiles_processor())
-  reticulate::py_run_string(
-    "def process_smiles(a, b):\n    raise RuntimeError('simulated rdkit crash')\n"
-  )
   before_tmp <- list.files(
     tempdir(),
     pattern = "[.](smi|csv[.]gz)$",
@@ -687,12 +724,12 @@ test_that("load_python_smiles_processor and process_smiles abort with tima_runti
   )
   expect_error(
     with_mocked_bindings(
-      source_python = function(...) invisible(NULL),
+      load_python_smiles_processor = function() invisible(NULL),
+      run_python_smiles_processor = function(...) stop("simulated rdkit crash"),
       process_smiles(
         tidytable::tidytable(structure_smiles_initial = "C"),
         cache = NULL
-      ),
-      .package = "reticulate"
+      )
     ),
     "rdkit smiles processing failed",
     class = "tima_runtime_error"
@@ -703,4 +740,132 @@ test_that("load_python_smiles_processor and process_smiles abort with tima_runti
     full.names = TRUE
   )
   expect_identical(setdiff(after_tmp, before_tmp), character(0))
+})
+
+test_that("Windows ARM64 x86_64 Python subprocess helpers resolve, cache, execute, and surface errors", {
+  # 1. with_temp_envvar sets, unsets, and restores previous state on exit
+  withr::local_envvar(
+    TIMA_TEST_EXISTING = "before",
+    TIMA_TEST_TEMP = NA_character_
+  )
+  observed <- with_temp_envvar(
+    c(TIMA_TEST_EXISTING = NA_character_, TIMA_TEST_TEMP = "during"),
+    c(
+      existing = Sys.getenv("TIMA_TEST_EXISTING", unset = NA_character_),
+      temp = Sys.getenv("TIMA_TEST_TEMP", unset = NA_character_)
+    )
+  )
+  expect_identical(observed, c(existing = NA_character_, temp = "during"))
+  expect_identical(Sys.getenv("TIMA_TEST_EXISTING"), "before")
+  expect_true(is.na(Sys.getenv("TIMA_TEST_TEMP", unset = NA_character_)))
+
+  # 2. maybe_sh_quote leaves safe tokens unquoted and quotes paths needing protection
+  tokens <- c("tool", "cpython-3.13", "C:\\path\\to file.exe", "a b/c")
+  quoted <- maybe_sh_quote(tokens)
+  expect_identical(quoted[1:2], tokens[1:2])
+  expect_identical(quoted[3:4], shQuote(tokens[3:4]))
+
+  # 3. resolve_uv_binary honors RETICULATE_UV, reticulate.uv_binary, and errors if missing
+  tmp_dir <- withr::local_tempdir()
+  fake_uv_env <- file.path(tmp_dir, "uv-env")
+  fake_uv_opt <- file.path(tmp_dir, "uv-opt")
+  file.create(fake_uv_env)
+  file.create(fake_uv_opt)
+
+  withr::with_envvar(c(RETICULATE_UV = fake_uv_env), {
+    expect_identical(resolve_uv_binary(), fake_uv_env)
+  })
+  withr::with_envvar(
+    c(RETICULATE_UV = NA_character_),
+    withr::with_options(list(reticulate.uv_binary = fake_uv_opt), {
+      expect_identical(resolve_uv_binary(), fake_uv_opt)
+    })
+  )
+
+  empty_home <- file.path(tmp_dir, "empty-home")
+  empty_cache <- file.path(tmp_dir, "empty-cache")
+  dir.create(empty_home)
+  dir.create(empty_cache)
+  withr::with_envvar(
+    c(
+      RETICULATE_UV = "managed",
+      HOME = empty_home,
+      R_USER_CACHE_DIR = empty_cache,
+      PATH = ""
+    ),
+    withr::with_options(
+      list(reticulate.uv_binary = NULL),
+      with_mocked_bindings(
+        uv_run_tool = function(...) NULL,
+        .package = "reticulate",
+        expect_error(resolve_uv_binary(), "uv executable not found")
+      )
+    )
+  )
+
+  # 4. resolve_win_arm64_python caches across repeated calls and errors on non-zero exit
+  .win_arm64_python_store$clear()
+  withr::defer(.win_arm64_python_store$clear())
+  fake_py <- file.path(tmp_dir, "python.exe")
+  file.create(fake_py)
+
+  state <- new.env(parent = emptyenv())
+  state$uv_calls <- 0L
+  with_mocked_bindings(
+    resolve_uv_binary = function() {
+      uv <- fake_uv_env
+      attr(uv, "reticulate-managed") <- TRUE
+      uv
+    },
+    .system2 = function(command, args = character(), ...) {
+      state$uv_calls <- state$uv_calls + 1L
+      out_file <- utils::tail(args, 1L)
+      out_file <- gsub("^['\"]|['\"]$", "", out_file)
+      writeLines(fake_py, out_file)
+      structure(character(0), status = 0L)
+    },
+    {
+      expect_identical(resolve_win_arm64_python(), fake_py)
+      expect_identical(resolve_win_arm64_python(), fake_py)
+    }
+  )
+  expect_identical(state$uv_calls, 1L)
+
+  .win_arm64_python_store$clear()
+  with_mocked_bindings(
+    resolve_uv_binary = function() fake_uv_env,
+    .system2 = function(command, args = character(), ...) {
+      structure("uv resolution failed", status = 2L)
+    },
+    expect_error(resolve_win_arm64_python(), "uv failed with exit code 2")
+  )
+
+  # 5. run_python_smiles_processor invokes process_smiles.py and surfaces non-zero exit
+  state$captured <- NULL
+  expect_no_error(
+    with_mocked_bindings(
+      is_windows_arm64 = function() TRUE,
+      resolve_win_arm64_python = function() fake_py,
+      .system2 = function(command, args = character(), ...) {
+        state$captured <- list(command = command, args = args)
+        structure(character(0), status = 0L)
+      },
+      run_python_smiles_processor("in.smi", "out.csv.gz")
+    )
+  )
+  expect_identical(state$captured$command, fake_py)
+  expect_match(state$captured$args[[1L]], "process_smiles\\.py$")
+  expect_identical(state$captured$args[2:3], c("in.smi", "out.csv.gz"))
+
+  expect_error(
+    with_mocked_bindings(
+      is_windows_arm64 = function() TRUE,
+      resolve_win_arm64_python = function() fake_py,
+      .system2 = function(command, args = character(), ...) {
+        structure("boom", status = 1L)
+      },
+      run_python_smiles_processor("in.smi", "out.csv.gz")
+    ),
+    "process_smiles\\.py failed with exit code 1"
+  )
 })
