@@ -854,7 +854,10 @@ test_that("Windows ARM64 x86_64 Python subprocess helpers resolve, cache, execut
     )
   )
   expect_identical(state$captured$command, fake_py)
-  expect_match(state$captured$args[[1L]], "process_smiles\\.py$")
+  expect_match(
+    gsub("^['\"]|['\"]$", "", state$captured$args[[1L]]),
+    "process_smiles\\.py$"
+  )
   expect_identical(state$captured$args[2:3], c("in.smi", "out.csv.gz"))
 
   expect_error(
