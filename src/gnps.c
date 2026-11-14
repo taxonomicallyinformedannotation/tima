@@ -34,10 +34,10 @@
  *    everything's grown to the largest spectrum size you'll see, calls do
  *    zero allocation.
  *
- * 2. The conflict bitsets (x_dirty/y_dirty) used to be allocated on every
+ * 2. The conflict bitset (x_dirty) used to be allocated on every
  *    call even though, per the comments below, conflicts only happen on
  *    maybe 1% of pairs - so 99% of that allocation was pure waste, since
- *    the bitsets are never even read on the no-conflict path. Now we do a
+ *    the bitset is never even read on the no-conflict path. Now we do a
  *    cheap allocation-free scan first to check whether a conflict exists
  *    at all, and only touch the bitset scratch if it does.
  *
@@ -134,7 +134,7 @@
  *     backward-compatible pre-aligned scoring / peak-matching-only paths.
  *
  * @author TIMA Development Team
- * @license GPL-3+
+ * @license AGPL-3.0-or-later
  * @see https://github.com/taxonomicallyinformedannotation/tima
  */
 
@@ -211,13 +211,17 @@
 
 static void *xmalloc(size_t n) {
     void *p = malloc(n);
+#if GNPS_HAS_R_API
     if (!p && GNPS_SAFE_R_ERROR()) error("gnps: memory allocation failed (%zu bytes)", n);
+#endif
     return p;
 }
 
 static void *xcalloc(size_t n, size_t s) {
     void *p = calloc(n, s);
+#if GNPS_HAS_R_API
     if (!p && GNPS_SAFE_R_ERROR()) error("gnps: memory allocation failed (%zu bytes)", n * s);
+#endif
     return p;
 }
 
@@ -226,7 +230,12 @@ static int scratch_ensure(void **ptr, size_t *cap_bytes, size_t need_bytes) {
     size_t new_cap = *cap_bytes ? *cap_bytes : (size_t) 256;
     while (new_cap < need_bytes) new_cap = new_cap + new_cap / 2 + 256;
     void *newp = realloc(*ptr, new_cap);
-    if (!newp) { if (GNPS_SAFE_R_ERROR()) error("gnps: scratch allocation failed (%zu bytes)", new_cap); return 0; }
+    if (!newp) {
+#if GNPS_HAS_R_API
+        if (GNPS_SAFE_R_ERROR()) error("gnps: scratch allocation failed (%zu bytes)", new_cap);
+#endif
+        return 0;
+    }
     *ptr = newp;
     *cap_bytes = new_cap;
     return 1;
@@ -326,8 +335,6 @@ typedef struct {
 
     unsigned char *x_dirty;
     size_t         x_dirty_cap;
-    unsigned char *y_dirty;
-    size_t         y_dirty_cap;
 
     int    *xi_map, *xi_rmap, *yi_map, *yi_rmap;
     size_t  xi_map_cap, xi_rmap_cap, yi_map_cap, yi_rmap_cap;
@@ -339,6 +346,20 @@ typedef struct {
 
 /** @brief The scratch instance itself - one per thread, see GNPS_TLS. */
 static GNPS_TLS GnpsScratch g_scratch = {0};
+
+/**
+ * @brief Check whether a double should be treated as "missing".
+ *
+ * Under the R API, this means R's NA_real_ or a plain NaN; without it,
+ * just NaN (there's no separate NA representation in portable C).
+ */
+static inline int gnps_is_missing(double v) {
+#if GNPS_HAS_R_API
+    return ISNA(v) || isnan(v);
+#else
+    return isnan(v);
+#endif
+}
 
 /* ══════════════════════════════════════════════════════════════════════
  * score_matched - the actual matching + scoring work. Same result as the
@@ -382,7 +403,8 @@ static double score_matched(
     const double eps_tol = sqrt(DBL_EPSILON);
 
     size_t int_need = (size_t) (nx + nx + ny) * sizeof(int);
-    scratch_ensure((void **) &sc->idx_buf, &sc->idx_buf_cap, int_need);
+    if (!scratch_ensure((void **) &sc->idx_buf, &sc->idx_buf_cap, int_need))
+        return -1.0;
     int *dm_arr = sc->idx_buf;
     int *sm_arr = dm_arr + nx;
     int *bd_arr = sm_arr + nx;
@@ -391,7 +413,8 @@ static double score_matched(
     memset(bd_arr, 0xFF, (size_t) ny * sizeof(int));
 
     /* per-peak tolerance, computed once instead of on every window check */
-    scratch_ensure((void **) &sc->x_tol, &sc->x_tol_cap, (size_t) nx * sizeof(double));
+    if (!scratch_ensure((void **) &sc->x_tol, &sc->x_tol_cap, (size_t) nx * sizeof(double)))
+        return -1.0;
     double *x_tol = sc->x_tol;
     for (int i = 0; i < nx; i++)
         x_tol[i] = tol + ppm_val * x_mz[i] * 1e-6 + eps_tol;
@@ -430,10 +453,12 @@ static double score_matched(
 
     /* Step 2: shifted matching, same idea on x+pdiff vs y */
     if (do_shift) {
-        scratch_ensure((void **) &sc->x_shift_val, &sc->x_shift_val_cap,
-                       (size_t) nx * sizeof(double));
-        scratch_ensure((void **) &sc->x_shift_tol, &sc->x_shift_tol_cap,
-                       (size_t) nx * sizeof(double));
+        if (!scratch_ensure((void **) &sc->x_shift_val, &sc->x_shift_val_cap,
+                            (size_t) nx * sizeof(double)))
+            return -1.0;
+        if (!scratch_ensure((void **) &sc->x_shift_tol, &sc->x_shift_tol_cap,
+                            (size_t) nx * sizeof(double)))
+            return -1.0;
         double *shift_val = sc->x_shift_val;
         double *shift_tol = sc->x_shift_tol;
         for (int i = 0; i < nx; i++) {
@@ -469,8 +494,10 @@ static double score_matched(
     /* scaled intensities: sqrt(x)*inv_sx and sqrt(y)*inv_sy computed once
      * each instead of per candidate pair - scoring a pair is now just one
      * multiply, no sqrt in the loop at all */
-    scratch_ensure((void **) &sc->scaled_x, &sc->scaled_x_cap, (size_t) nx * sizeof(double));
-    scratch_ensure((void **) &sc->scaled_y, &sc->scaled_y_cap, (size_t) ny * sizeof(double));
+    if (!scratch_ensure((void **) &sc->scaled_x, &sc->scaled_x_cap, (size_t) nx * sizeof(double)))
+        return -1.0;
+    if (!scratch_ensure((void **) &sc->scaled_y, &sc->scaled_y_cap, (size_t) ny * sizeof(double)))
+        return -1.0;
     double *scaled_x = sc->scaled_x;
     double *scaled_y = sc->scaled_y;
     for (int i = 0; i < nx; i++) scaled_x[i] = sqrt(x_int[i]) * inv_sx;
@@ -512,13 +539,10 @@ static double score_matched(
         /* now that we know we need it, build the dirty bitset by redoing
          * the same scan with marking turned on */
         size_t x_bs = (size_t) (((unsigned) nx + 7u) >> 3);
-        size_t y_bs = (size_t) (((unsigned) ny + 7u) >> 3);
-        scratch_ensure((void **) &sc->x_dirty, &sc->x_dirty_cap, x_bs);
-        scratch_ensure((void **) &sc->y_dirty, &sc->y_dirty_cap, y_bs);
+        if (!scratch_ensure((void **) &sc->x_dirty, &sc->x_dirty_cap, x_bs))
+            return -1.0;
         unsigned char *x_dirty = sc->x_dirty;
-        unsigned char *y_dirty = sc->y_dirty;
         memset(x_dirty, 0, x_bs);
-        memset(y_dirty, 0, y_bs);
 
         for (int i = 0; i < nx; i++) {
             int sj = sm_arr[i];
@@ -527,9 +551,6 @@ static double score_matched(
             if (k >= 0 && k != i) {
                 BS_SET(x_dirty, (unsigned)i);
                 BS_SET(x_dirty, (unsigned)k);
-                BS_SET(y_dirty, (unsigned)sj);
-                if (dm_arr[i] >= 0) BS_SET(y_dirty, (unsigned)dm_arr[i]);
-                if (sm_arr[k] >= 0) BS_SET(y_dirty, (unsigned)sm_arr[k]);
             }
         }
 
@@ -553,8 +574,10 @@ static double score_matched(
         }
 
         /* Hungarian on the dirty cluster only - all workspace reused */
-        scratch_ensure((void **) &sc->xi_map, &sc->xi_map_cap, (size_t) nx * sizeof(int));
-        scratch_ensure((void **) &sc->xi_rmap, &sc->xi_rmap_cap, (size_t) nx * sizeof(int));
+        if (!scratch_ensure((void **) &sc->xi_map, &sc->xi_map_cap, (size_t) nx * sizeof(int)))
+            return -1.0;
+        if (!scratch_ensure((void **) &sc->xi_rmap, &sc->xi_rmap_cap, (size_t) nx * sizeof(int)))
+            return -1.0;
         int *xi_map = sc->xi_map, *xi_rmap = sc->xi_rmap;
         memset(xi_map, 0xFF, (size_t) nx * sizeof(int));
 
@@ -565,8 +588,10 @@ static double score_matched(
                 xi_map[i] = n_xm++;
             }
 
-        scratch_ensure((void **) &sc->yi_map, &sc->yi_map_cap, (size_t) ny * sizeof(int));
-        scratch_ensure((void **) &sc->yi_rmap, &sc->yi_rmap_cap, (size_t) ny * sizeof(int));
+        if (!scratch_ensure((void **) &sc->yi_map, &sc->yi_map_cap, (size_t) ny * sizeof(int)))
+            return -1.0;
+        if (!scratch_ensure((void **) &sc->yi_rmap, &sc->yi_rmap_cap, (size_t) ny * sizeof(int)))
+            return -1.0;
         int *yi_map = sc->yi_map, *yi_rmap = sc->yi_rmap;
         memset(yi_map, 0xFF, (size_t) ny * sizeof(int));
 
@@ -583,8 +608,9 @@ static double score_matched(
         }
 
         int N = (n_xm > n_ym) ? n_xm : n_ym;
-        scratch_ensure((void **) &sc->smat, &sc->smat_cap,
-                       (size_t) N * (size_t) N * sizeof(double));
+        if (!scratch_ensure((void **) &sc->smat, &sc->smat_cap,
+                            (size_t) N * (size_t) N * sizeof(double)))
+            return -1.0;
         double *smat = sc->smat;
         memset(smat, 0, (size_t) N * (size_t) N * sizeof(double));
 
@@ -611,7 +637,8 @@ static double score_matched(
         size_t N1 = (size_t) (N + 1);
         size_t hneed = N1 * 2 * sizeof(double) + N1 * 2 * sizeof(int) +
                        N1 * sizeof(double) + N1 * sizeof(int);
-        scratch_ensure((void **) &sc->hbuf, &sc->hbuf_cap, hneed);
+        if (!scratch_ensure((void **) &sc->hbuf, &sc->hbuf_cap, hneed))
+            return -1.0;
         char *hbuf = sc->hbuf;
 
         double *hu = (double *) hbuf;
@@ -724,12 +751,12 @@ int gnps_chain_dp_core_api(
 
     double inv_sx = 1.0 / sqrt(xsum), inv_sy = 1.0 / sqrt(ysum);
 
-    int do_shift = (!isnan(x_pre) && !isnan(y_pre));
+    int do_shift = (!gnps_is_missing(x_pre) && !gnps_is_missing(y_pre));
     double pdiff = 0.0;
     if (do_shift) {
         pdiff = y_pre - x_pre;
         double mp = (x_pre > y_pre) ? x_pre : y_pre;
-        if (fabs(pdiff) <= tol + ppm_val * mp * 1e-6) do_shift = 0;
+        if (fabs(pdiff) <= tol + ppm_val * fabs(mp) * 1e-6) do_shift = 0;
     }
 
     int matched = 0;
@@ -738,6 +765,7 @@ int gnps_chain_dp_core_api(
                                  inv_sx, inv_sy, pdiff, do_shift,
                                  tol, ppm_val, &matched,
                                  &matched_xsum, &matched_ysum);
+    if (score < 0.0) return -1;
 
     double score_fwd = 0.0;
     double score_rev = 0.0;
@@ -829,20 +857,6 @@ int gnps_chain_dp_batch_core_api(
  */
 void gnps_free_ptr(void *ptr) {
     free(ptr);
-}
-
-/**
- * @brief Check whether a double should be treated as "missing".
- *
- * Under the R API, this means R's NA_real_ or a plain NaN; without it,
- * just NaN (there's no separate NA representation in portable C).
- */
-static int gnps_is_missing(double v) {
-#if GNPS_HAS_R_API
-    return ISNA(v) || isnan(v);
-#else
-    return isnan(v);
-#endif
 }
 
 /* ══════════════════════════════════════════════════════════════════════
@@ -1270,6 +1284,22 @@ int gnps_join_core_api(
 
 #if GNPS_HAS_R_API
 
+static int check_spectrum_matrix_sexp(SEXP m, const char *name) {
+    if (!isReal(m)) {
+        error("%s must be a numeric (double) 2-column matrix", name);
+    }
+    SEXP dim = getAttrib(m, R_DimSymbol);
+    if (!isInteger(dim) || LENGTH(dim) != 2) {
+        error("%s must be a 2D matrix", name);
+    }
+    int nrow = INTEGER(dim)[0];
+    int ncol = INTEGER(dim)[1];
+    if (nrow < 0 || ncol < 2 || XLENGTH(m) < (R_xlen_t) nrow * 2) {
+        error("%s must have at least 2 columns (mz, intensity)", name);
+    }
+    return nrow;
+}
+
 /**
  * @brief R entry point: score one query spectrum against one library
  *        spectrum (the hot path).
@@ -1285,11 +1315,8 @@ int gnps_join_core_api(
 SEXP C_gnps_chain_dp(SEXP x, SEXP y,
                      SEXP xPrecursorMz, SEXP yPrecursorMz,
                      SEXP tolerance, SEXP ppm) {
-    if (!isReal(x) || !isReal(y)) error("x and y must be numeric matrices");
-    SEXP xd = getAttrib(x, R_DimSymbol), yd = getAttrib(y, R_DimSymbol);
-    if (!isInteger(xd) || !isInteger(yd)) error("dim must be integer");
-
-    int nx = INTEGER(xd)[0], ny = INTEGER(yd)[0];
+    int nx = check_spectrum_matrix_sexp(x, "x");
+    int ny = check_spectrum_matrix_sexp(y, "y");
     const double *x_mz = REAL(x), *x_int = x_mz + nx;
     const double *y_mz = REAL(y), *y_int = y_mz + ny;
     double x_pre = asReal(xPrecursorMz), y_pre = asReal(yPrecursorMz);
@@ -1329,12 +1356,10 @@ SEXP C_gnps_chain_dp(SEXP x, SEXP y,
 SEXP C_gnps_chain_dp_batch(SEXP x, SEXP xPrecursorMz,
                            SEXP y_list, SEXP yPrecursorMz,
                            SEXP tolerance, SEXP ppm) {
-    if (!isReal(x)) error("x must be a numeric matrix");
+    int nx = check_spectrum_matrix_sexp(x, "x");
     if (!isNewList(y_list)) error("y_list must be a list of matrices");
-    SEXP xd = getAttrib(x, R_DimSymbol);
-    if (!isInteger(xd)) error("x must have a dim attribute");
+    if (!isReal(yPrecursorMz)) error("yPrecursorMz must be a numeric vector");
 
-    int nx = INTEGER(xd)[0];
     const double *x_mz = REAL(x), *x_int = x_mz + nx;
     double x_pre = asReal(xPrecursorMz);
     double tol = asReal(tolerance), ppm_val = asReal(ppm);
@@ -1342,39 +1367,36 @@ SEXP C_gnps_chain_dp_batch(SEXP x, SEXP xPrecursorMz,
     int n_lib = LENGTH(y_list);
     if (LENGTH(yPrecursorMz) != n_lib)
         error("yPrecursorMz must have one entry per y_list element");
+    if (n_lib == 0) {
+        return allocMatrix(REALSXP, 0, 4);
+    }
     const double *y_pre_arr = REAL(yPrecursorMz);
 
     /* All R API access happens here, on the main thread, before any
-     * parallel work starts - the batch loop below only ever touches raw
-     * double/int arrays. */
-    const double **y_mz_arr  = (const double **) xmalloc((size_t) n_lib * sizeof(double *));
-    const double **y_int_arr = (const double **) xmalloc((size_t) n_lib * sizeof(double *));
-    int *ny_arr = (int *) xmalloc((size_t) n_lib * sizeof(int));
+     * parallel work starts - R_alloc ensures cleanup on longjmp if any
+     * y_list element fails validation. */
+    const double **y_mz_arr  = (const double **) R_alloc((size_t) n_lib, sizeof(double *));
+    const double **y_int_arr = (const double **) R_alloc((size_t) n_lib, sizeof(double *));
+    int *ny_arr = (int *) R_alloc((size_t) n_lib, sizeof(int));
 
     for (int k = 0; k < n_lib; k++) {
-        SEXP yk = VECTOR_ELT(y_list, k);
-        if (!isReal(yk)) error("y_list[[%d]] is not a numeric matrix", k + 1);
-        SEXP ykd = getAttrib(yk, R_DimSymbol);
-        if (!isInteger(ykd)) error("y_list[[%d]] has no dim attribute", k + 1);
-        int nyk = INTEGER(ykd)[0];
+        char elem_name[48];
+        snprintf(elem_name, sizeof(elem_name), "y_list[[%d]]", k + 1);
+        int nyk = check_spectrum_matrix_sexp(VECTOR_ELT(y_list, k), elem_name);
         ny_arr[k] = nyk;
-        y_mz_arr[k] = REAL(yk);
+        y_mz_arr[k] = REAL(VECTOR_ELT(y_list, k));
         y_int_arr[k] = y_mz_arr[k] + nyk;
     }
 
     GnpsCoreResult *results =
-        (GnpsCoreResult *) xmalloc((size_t) n_lib * sizeof(GnpsCoreResult));
+        (GnpsCoreResult *) R_alloc((size_t) n_lib, sizeof(GnpsCoreResult));
 
     int rc = gnps_chain_dp_batch_core_api(
         x_mz, x_int, nx, x_pre,
         y_mz_arr, y_int_arr, ny_arr, y_pre_arr, n_lib,
         tol, ppm_val, results);
 
-    free(y_mz_arr);
-    free(y_int_arr);
-    free(ny_arr);
-
-    if (rc != 0) { free(results); error("gnps_chain_dp_batch_core_api failed"); }
+    if (rc != 0) error("gnps_chain_dp_batch_core_api failed");
 
     SEXP out = PROTECT(allocMatrix(REALSXP, n_lib, 4));
     double *o = REAL(out);
@@ -1384,7 +1406,6 @@ SEXP C_gnps_chain_dp_batch(SEXP x, SEXP xPrecursorMz,
         o[k + 2 * n_lib] = results[k].score_forward;
         o[k + 3 * n_lib] = results[k].score_reverse;
     }
-    free(results);
     UNPROTECT(1);
     return out;
 }
@@ -1400,11 +1421,9 @@ SEXP C_gnps_chain_dp_batch(SEXP x, SEXP xPrecursorMz,
  *         input.
  */
 SEXP C_gnps(SEXP x, SEXP y) {
-    if (!isReal(x) || !isReal(y)) error("Inputs must be numeric matrices");
-    SEXP xd = getAttrib(x, R_DimSymbol), yd = getAttrib(y, R_DimSymbol);
-    if (!isInteger(xd) || !isInteger(yd)) error("dim must be integer");
-    int n = INTEGER(xd)[0];
-    if (n != INTEGER(yd)[0]) error("number of rows");
+    int n = check_spectrum_matrix_sexp(x, "x");
+    int ny = check_spectrum_matrix_sexp(y, "y");
+    if (n != ny) error("number of rows");
     const double *xmz = REAL(x), *xin = xmz + n;
     const double *ymz = REAL(y), *yin = ymz + n;
 

@@ -373,4 +373,50 @@ test_that("join_gnps_wrapper and gnps_wrapper cover shifted matches, NAs, and ti
     ),
     "yPrecursorMz must have one entry per y_list element"
   )
+
+  # Input dimension, type, and empty-batch validation
+  one_col <- matrix(c(100.0, 200.0), ncol = 1L)
+  expect_error(
+    .Call(C_gnps_chain_dp, one_col, ay, 200.0, 200.0, 0.01, 0.0),
+    "at least 2 columns"
+  )
+  expect_error(
+    .Call(C_gnps, one_col, ax[1:2, , drop = FALSE]),
+    "at least 2 columns"
+  )
+
+  arr3d <- array(c(100.0, 200.0, 10.0, 20.0), dim = c(2L, 2L, 1L))
+  expect_error(
+    .Call(C_gnps_chain_dp, arr3d, ay, 200.0, 200.0, 0.01, 0.0),
+    "2D matrix"
+  )
+
+  expect_error(
+    .Call(C_gnps_chain_dp_batch, ax, 200.0, list(ay), 200L, 0.01, 0.0),
+    "numeric vector"
+  )
+
+  empty_batch <- .Call(
+    C_gnps_chain_dp_batch,
+    ax,
+    200.0,
+    list(),
+    numeric(0),
+    0.01,
+    0.0
+  )
+  expect_equal(dim(empty_batch), c(0L, 4L))
+
+  expect_error(
+    .Call(
+      C_gnps_chain_dp_batch,
+      ax,
+      200.0,
+      list(ay, one_col),
+      c(200.0, 200.0),
+      0.01,
+      0.0
+    ),
+    "y_list\\[\\[2\\]\\].*at least 2 columns"
+  )
 })

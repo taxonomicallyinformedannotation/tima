@@ -1,6 +1,6 @@
 # Portable GNPS C API (ctypes quickstart)
 
-This package now exposes three C symbols in `tima` native library:
+The `tima` native library exports three portable C symbols:
 
 - `gnps_chain_dp_core_api`
 - `gnps_aligned_core_api`
@@ -12,15 +12,21 @@ Plus memory helper:
 
 ## Build local shared object for demo
 
+From the repository root, compile either via R:
+
 ```bash
-cd /Users/adrutz/Git/tima
-R CMD SHLIB src/gnps.c
+R CMD SHLIB -o src/tima.so src/gnps.c src/init.c
+```
+
+Or standalone without R headers using any C compiler:
+
+```bash
+cc -shared -fPIC -O3 -DGNPS_HAS_R_API=0 src/gnps.c -lm -o src/gnps.so
 ```
 
 ## Run Python demo
 
 ```bash
-cd /Users/adrutz/Git/tima
 python3 inst/python/gnps_portable_demo.py
 ```
 

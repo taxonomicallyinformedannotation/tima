@@ -70,9 +70,23 @@ def load_lib(path: Path) -> ctypes.CDLL:
     return lib
 
 
+def find_lib_path(root: Path) -> Path:
+    src_dir = root / "src"
+    candidates = ("tima.so", "tima.dylib", "tima.dll", "gnps.so", "gnps.dylib", "gnps.dll")
+    for name in candidates:
+        candidate = src_dir / name
+        if candidate.is_file():
+            return candidate
+    tried = ", ".join(candidates)
+    raise FileNotFoundError(
+        f"No compiled shared library found in {src_dir} (tried: {tried}). "
+        "Run R CMD SHLIB src/gnps.c or pkgload::load_all(recompile = TRUE) first."
+    )
+
+
 def main() -> None:
     root = Path(__file__).resolve().parents[2]
-    lib_path = root / "src" / "gnps.so"
+    lib_path = find_lib_path(root)
     lib = load_lib(lib_path)
 
     x_mz = (ctypes.c_double * 2)(100.0, 200.0)
