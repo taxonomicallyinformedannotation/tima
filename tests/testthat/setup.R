@@ -10,8 +10,8 @@ Sys.setenv(
   TIMA_LOG_CONSOLE = "FALSE"
 )
 
-# Keep setup compatible with both load-all style and testthat::test_package().
-# test_package() runs against an installed namespace.
+# Keep setup compatible with both load-all style and testthat::test_check().
+# test_check() runs against an installed namespace.
 if (!isTRUE(requireNamespace("tima", quietly = TRUE))) {
   if (isTRUE(requireNamespace("pkgload", quietly = TRUE))) {
     suppressPackageStartupMessages(pkgload::load_all(

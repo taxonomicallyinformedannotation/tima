@@ -260,3 +260,16 @@ test_that("codetools::checkUsagePackage reports no issues", {
   )
   expect_identical(rec$issues, character(0))
 })
+
+test_that("tests/testthat.R runs test_check rather than test_package", {
+  root <- .repo_root()
+  runner <- file.path(root, "tests", "testthat.R")
+  skip_if_not(file.exists(runner))
+
+  txt <- paste(
+    readLines(runner, warn = FALSE, encoding = "UTF-8"),
+    collapse = "\n"
+  )
+  expect_match(txt, "test_check\\s*\\(", perl = TRUE)
+  expect_no_match(txt, "test_package\\s*\\(", perl = TRUE)
+})

@@ -86,11 +86,12 @@ test_that(".mztab_write_metadata writes null for NA values", {
     key = c("a", "b"),
     value = c(NA_character_, "x")
   )
-  out <- tempfile(fileext = ".mztab")
-  on.exit(unlink(out), add = TRUE)
-  con <- file(out, open = "wt")
-  write_meta(con, meta)
-  close(con)
+  out <- withr::local_tempfile(fileext = ".mztab")
+  local({
+    con <- file(out, open = "wt")
+    on.exit(close(con))
+    write_meta(con, meta)
+  })
 
   txt <- readLines(out, warn = FALSE)
   expect_true(any(grepl("MTD\ta\tnull$", txt)))
@@ -103,11 +104,12 @@ test_that(".mztab_write_section writes header and rows without feature_id", {
     database_identifier = c("CHEBI:1", NA),
     chemical_name = c("A", "")
   )
-  out <- tempfile(fileext = ".mztab")
-  on.exit(unlink(out), add = TRUE)
-  con <- file(out, open = "wt")
-  write_section(con, "SMH", "SML", tbl)
-  close(con)
+  out <- withr::local_tempfile(fileext = ".mztab")
+  local({
+    con <- file(out, open = "wt")
+    on.exit(close(con))
+    write_section(con, "SMH", "SML", tbl)
+  })
 
   txt <- readLines(out, warn = FALSE)
   expect_true(any(grepl("^SMH\tdatabase_identifier\tchemical_name$", txt)))
@@ -117,8 +119,8 @@ test_that(".mztab_write_section writes header and rows without feature_id", {
 
 test_that(".mztab_write_section no-op on empty table", {
   tbl <- tidytable::tidytable(a = character(0))
-  out <- tempfile(fileext = ".mztab")
-  on.exit(unlink(out), add = TRUE)
+  out <- withr::local_tempfile(fileext = ".mztab")
   con <- file(out, open = "wt")
+  withr::defer(close(con))
   expect_invisible(write_section(con, "SMH", "SML", tbl))
 })

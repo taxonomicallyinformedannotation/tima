@@ -47,7 +47,7 @@ library(testthat)
   )
   tidytable::fwrite(
     tidytable::tidytable(
-      structure_smiles_no_stereo = "CN1C=NC2=C1C(=O)N(C(=O)N2C)C",
+      structure_smiles = "CN1C=NC2=C1C(=O)N(C(=O)N2C)C",
       structure_tax_npc_01pat = "Alkaloids",
       structure_tax_npc_02sup = "Pseudoalkaloids",
       structure_tax_npc_03cla = "Purine alkaloids"
