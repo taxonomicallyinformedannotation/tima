@@ -66,19 +66,14 @@ prepare_params <- function(
   ann_thr_ms1_che <- params_advanced$annotations$thresholds$ms1$chemical
   ann_thr_ms1_con <- params_advanced$annotations$thresholds$ms1$condition
 
-  # fil_pat <- params_advanced$files$pattern
-
   fil_ann_raw_spe_gnp <- params_advanced$files$annotations$raw$spectral$gnps
   fil_ann_raw_spe_mzm <- params_advanced$files$annotations$raw$spectral$mzmine
   fil_ann_raw_spe_spe <- params_advanced$files$annotations$raw$spectral$spectral
-  # fil_ann_raw_sir <- params_advanced$files$annotations$raw$sirius
   fil_ann_pre_can <- params_advanced$files$annotations$prepared$canopus
   fil_ann_pre_for <- params_advanced$files$annotations$prepared$formula
   fil_ann_pre_str <- params_advanced$files$annotations$prepared$structural
   fil_ann_pre_str_gnp <-
     params_advanced$files$annotations$prepared$structural$gnps
-  # fil_ann_pre_str_ms1 <-
-  # params_advanced$files$annotations$prepared$structural$ms1
   fil_ann_pre_str_mzm <-
     params_advanced$files$annotations$prepared$structural$mzmine
   fil_ann_pre_str_mzt <-
@@ -90,7 +85,6 @@ prepare_params <- function(
   fil_ann_fil <- params_advanced$files$annotations$filtered
   fil_ann_pro <- params_advanced$files$annotations$processed
 
-  # fil_fea_raw <- params_advanced$files$features$raw
   fil_fea_pre <- params_advanced$files$features$prepared
 
   fil_lib_sop_raw_clo <- params_advanced$files$libraries$sop$raw$closed

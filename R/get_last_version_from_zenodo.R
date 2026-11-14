@@ -259,7 +259,7 @@ is_download_needed <- function(path, zenodo_size) {
 #'     record.
 #' This function checks the file size and only downloads if the local file is
 #'     missing
-#' or differs from the remote version. Implements robust error handling and
+#' or differs from the remote version. Implements structured error handling and
 #'     retry logic.
 #'
 #' @details

@@ -22,7 +22,7 @@
 #' standardized empty template (see `fake_annotations_columns()`) is exported
 #' to ensure downstream code receives expected columns.
 #'
-#' @section Robustness:
+#' @section Error handling:
 #'   The function performs strict validation and logs informative messages.
 #'   File existence is checked early; similarity computation is wrapped in a
 #'   `tryCatch` to surface errors without leaving partially allocated objects.

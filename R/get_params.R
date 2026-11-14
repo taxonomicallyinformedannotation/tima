@@ -165,10 +165,8 @@ get_params <- function(step) {
 
   # Load and merge YAML parameters
   params <- if (file.exists(user_param_path)) {
-    # log_debug("Using user parameters: %s", user_param_path)
     parse_yaml_params(def = default_param_path, usr = user_param_path)
   } else {
-    # log_debug("Using default parameters: %s", default_param_path)
     parse_yaml_params(def = default_param_path, usr = default_param_path)
   }
 

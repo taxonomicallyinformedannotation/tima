@@ -233,7 +233,7 @@ filter_annotations <- function(
     ) |>
       tidytable::bind_rows()
 
-    # Robust rename: support either 'rt' or pre-renamed 'rt_target'
+    # Support either 'rt' or pre-renamed 'rt_target'
     if ("rt" %in% names(rt_table)) {
       rt_table <- rt_table |>
         tidytable::rename(rt_target = rt)

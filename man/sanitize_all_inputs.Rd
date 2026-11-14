@@ -38,7 +38,7 @@ ZIP (optional)}
 Invisible TRUE if all validations pass, stops with error otherwise
 }
 \description{
-Comprehensive validation of all input data before starting
+Up-front validation of input files and columns before starting
 expensive processing. Reports issues immediately to save time.
 }
 \examples{

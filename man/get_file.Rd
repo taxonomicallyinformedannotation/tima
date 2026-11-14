@@ -17,7 +17,7 @@ get_file(url, export, limit = 3600L)
 Path to the downloaded file (invisibly)
 }
 \description{
-Downloads a file from a URL with robust error handling,
+Downloads a file from a URL with structured error handling,
 retry logic, and validation. Automatically creates necessary directories
 and validates downloaded content. Skips download if file already exists.
 }

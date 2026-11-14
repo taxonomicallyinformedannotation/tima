@@ -18,32 +18,12 @@ validate_install_inputs <- function(
   type = getOption("pkgType"),
   dependencies
 ) {
-  # Normalize `type` to a single character value to tolerate platform-specific
-  # pkgType option values (which may be a vector). Use the first non-empty
-  # element so callers that omit `type` behave consistently across systems.
-  type <- as.character(type)
-  if (length(type) > 1L) {
-    type <- type[[1L]]
-  }
-  # Map common platform pkgType variants to the canonical 'source'/'binary'
-  # so callers don't need to normalize their options.
-  if (length(type) == 1L && !type %in% c("source", "binary")) {
-    type_l <- tolower(type)
-    if (grepl("source", type_l)) {
-      type <- "source"
-    } else if (
-      grepl("binary", type_l) ||
-        grepl("mac.binary", type_l) ||
-        grepl("win.binary", type_l)
-    ) {
-      type <- "binary"
-    } else if (identical(type_l, "both")) {
-      # Treat 'both' as source by default for deterministic behaviour in tests
-      type <- "source"
-    }
-  }
-
-  if (!is.character(package) || length(package) != 1L || nchar(package) == 0L) {
+  if (
+    !is.character(package) ||
+      length(package) != 1L ||
+      is.na(package) ||
+      !nzchar(package)
+  ) {
     cli::cli_abort(
       "package must be a single non-empty character string, got {.val {if (is.null(package)) 'NULL' else class(package)[1]}}",
       class = c("tima_validation_error", "tima_error")
@@ -57,25 +37,26 @@ validate_install_inputs <- function(
     )
   }
 
-  if (any(nchar(repos) == 0L)) {
+  if (anyNA(repos) || !all(nzchar(repos))) {
     cli::cli_abort(
       "all repository URLs must be non-empty strings",
       class = c("tima_validation_error", "tima_error")
     )
   }
 
-  if (
-    !is.character(type) ||
-      length(type) != 1L ||
-      !(type %in% c("source", "binary"))
-  ) {
+  type_norm <- .normalize_install_type(type)
+  if (is.na(type_norm)) {
     cli::cli_abort(
       "type must be a single character string, either 'source' or 'binary'",
       class = c("tima_validation_error", "tima_error")
     )
   }
 
-  if (!is.logical(dependencies) || length(dependencies) != 1L) {
+  if (
+    !is.logical(dependencies) ||
+      length(dependencies) != 1L ||
+      is.na(dependencies)
+  ) {
     cli::cli_abort(
       "dependencies must be a single logical value (TRUE or FALSE)",
       class = c("tima_validation_error", "tima_error")
@@ -85,20 +66,36 @@ validate_install_inputs <- function(
   invisible(NULL)
 }
 
+.normalize_install_type <- function(type) {
+  if (is.null(type) || length(type) == 0L) {
+    return(NA_character_)
+  }
+  t1 <- as.character(type)[[1L]]
+  if (is.na(t1) || !nzchar(t1)) {
+    return(NA_character_)
+  }
+  if (t1 %in% c("source", "binary")) {
+    return(t1)
+  }
+  tl <- tolower(t1)
+  if (grepl("source", tl)) {
+    return("source")
+  }
+  if (grepl("binary|mac\\.binary|win\\.binary", tl)) {
+    return("binary")
+  }
+  if (identical(tl, "both")) {
+    return("source")
+  }
+  NA_character_
+}
+
 .require_namespace <- function(package, quietly = TRUE) {
   requireNamespace(package, quietly = quietly)
 }
 
-.find_package_paths <- function(package, quiet = TRUE) {
-  find.package(package, quiet = quiet)
-}
-
 .path_exists <- function(path) {
   file.exists(path)
-}
-
-.read_description_dcf <- function(path) {
-  read.dcf(path)
 }
 
 .load_namespace <- function(package) {
@@ -151,41 +148,6 @@ validate_install_inputs <- function(
 
 .tar_destroy <- function() {
   targets::tar_destroy(ask = FALSE)
-}
-
-#' Display System-Specific Installation Messages
-#'
-#' @description Internal helper to show OS-specific installation instructions.
-#'
-#' @param system [character] OS name from Sys.info()
-#'
-#' @return NULL (side effect: logging)
-#' @keywords internal
-show_system_messages <- function(system) {
-  log_info("Detected operating system: %s", system)
-
-  if (system == "Windows") {
-    log_info("You should install RTools if not already done")
-    log_info(
-      "Download from: https://cran.r-project.org/bin/windows/Rtools/"
-    )
-  }
-
-  if (system == "Linux") {
-    log_info("You may need system dependencies:")
-    log_info(
-      "  sudo apt install libarchive-dev libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev"
-    )
-  }
-
-  if (system == "Darwin") {
-    log_info(
-      "macOS detected. Ensure Xcode Command Line Tools are installed:"
-    )
-    log_info("  xcode-select --install")
-  }
-
-  invisible(NULL)
 }
 
 #' Check or Install Python
@@ -288,204 +250,6 @@ setup_virtualenv <- function(envname = "tima-env", python = NULL) {
   invisible(NULL)
 }
 
-#' Verify Package Installation is Complete
-#'
-#' @description Robust validation that the package is fully installed,
-#'   not corrupted, and actually loadable. Avoids false positives from
-#'   leftover / half-installed directories in Windows or CI paths.
-#'
-#' @param package Character package name
-#'
-#' @return Logical TRUE if valid, FALSE otherwise
-#' @keywords internal
-verify_package_installation <- function(package) {
-  # 1. Namespace reachable?
-  if (!.require_namespace(package, quietly = TRUE)) {
-    log_error("Namespace for '%s' not found.", package)
-    return(FALSE)
-  }
-
-  # 2. Attempt to resolve ALL possible paths
-  pkg_paths <- .find_package_paths(package, quiet = TRUE)
-
-  # find.package returns character(0) on failure
-  if (length(pkg_paths) == 0) {
-    log_error("find.package() could not resolve path for '%s'.", package)
-    return(FALSE)
-  }
-
-  # 3. Filter out invalid paths (empty, nonexistent, no DESCRIPTION)
-  # Helper to check if a path is valid for installation
-  .is_valid_install_path <- function(p) {
-    .path_exists(p) && .path_exists(file.path(p, "DESCRIPTION"))
-  }
-
-  valid_paths <- pkg_paths[
-    vapply(
-      X = pkg_paths,
-      FUN = .is_valid_install_path,
-      logical(1L)
-    )
-  ]
-
-  if (length(valid_paths) == 0) {
-    log_error(
-      "No valid installation directory for '%s'. " |>
-        paste(
-          "Possible broken R library structure. All found paths:\n  - ",
-          paste(pkg_paths, collapse = "\n  - ")
-        )
-    )
-    return(FALSE)
-  }
-
-  # Prefer the first good match
-  pkg_path <- valid_paths[[1L]]
-  desc_file <- file.path(pkg_path, "DESCRIPTION")
-
-  # 4. Try reading DESCRIPTION robustly
-  desc_ok <- tryCatch(
-    {
-      df <- .read_description_dcf(desc_file)
-      isTRUE(nrow(df) > 0)
-    },
-    error = function(e) {
-      log_error(
-        "Could not read DESCRIPTION for '%s' at '%s': %s",
-        package,
-        pkg_path,
-        e$message
-      )
-      FALSE
-    },
-    warning = function(w) {
-      log_warn(
-        "Warning while reading DESCRIPTION for '%s' at '%s': %s",
-        package,
-        pkg_path,
-        w$message
-      )
-      FALSE
-    }
-  )
-
-  if (!desc_ok) {
-    return(FALSE)
-  }
-
-  # 5. Validate namespace loading
-  load_ok <- tryCatch(
-    {
-      .load_namespace(package)
-      TRUE
-    },
-    error = function(e) {
-      log_error(
-        "Namespace load failed for '%s' at '%s': %s",
-        package,
-        pkg_path,
-        e$message
-      )
-      FALSE
-    }
-  )
-
-  if (!load_ok) {
-    return(FALSE)
-  }
-
-  log_success(
-    "Package '%s' installation verified successfully at: %s",
-    package,
-    pkg_path
-  )
-  TRUE
-}
-
-
-#' Attempt Package Installation
-#'
-#' @description Internal helper to attempt R package installation with error
-#'     handling.
-#'
-#' @param package Character package name
-#' @param repos Character vector of repositories
-#' @param type [character] Type of install ("source", "binary")
-#' @param dependencies Logical dependencies flag
-#'
-#' @return Logical TRUE if successful, FALSE otherwise
-#' @keywords internal
-try_install_package <- function(
-  package,
-  repos,
-  type = getOption("pkgType"),
-  dependencies
-) {
-  # Check if package was already installed before attempt
-  was_installed <- .require_namespace(package, quietly = TRUE)
-
-  tryCatch(
-    expr = {
-      log_info(
-        "Installing R package: %s (from %s)",
-        package,
-        type
-      )
-
-      # Capture warnings as well as errors
-      result <- tryCatch(
-        {
-          .install_packages(
-            package,
-            repos = repos,
-            dependencies = dependencies,
-            type = type,
-            INSTALL_opts = c("--no-lock", "--no-test-load")
-          )
-          TRUE
-        },
-        warning = function(w) {
-          # Some installation failures only produce warnings
-          if (
-            grepl(
-              "package.*not available|is not available",
-              w$message,
-              ignore.case = TRUE
-            )
-          ) {
-            log_warn("Package not available: %s", w$message)
-            return(FALSE)
-          }
-          TRUE
-        }
-      )
-
-      # If warning handler already returned FALSE, bail out early
-      if (isFALSE(result)) {
-        return(FALSE)
-      }
-
-      # Verify package was actually installed
-      is_now_installed <- .require_namespace(package, quietly = TRUE)
-
-      if (!was_installed && !is_now_installed) {
-        log_error(
-          "Installation failed: package '%s' not found in repositories",
-          package
-        )
-        return(FALSE)
-      }
-
-      log_success("Successfully installed R package: %s", package)
-      return(TRUE)
-    },
-    error = function(e) {
-      log_error("Installation failed: %s", e$message)
-      FALSE
-    }
-  )
-}
-
 #' @title Install TIMA Package and Dependencies
 #'
 #' @description Installs or updates the TIMA package from r-universe and sets up
@@ -520,8 +284,10 @@ install_tima <- function(
   validate_install_inputs(
     package = package,
     repos = repos,
+    type = type,
     dependencies = dependencies
   )
+  type <- .normalize_install_type(type)
 
   log_info("Starting installation of '%s'", package)
 

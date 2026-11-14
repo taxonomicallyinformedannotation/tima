@@ -302,7 +302,6 @@ apply_adduct_consistency_filter <- function(
   df_add
 ) {
   # Fixed consistency policy for legacy helper callers.
-  mode <- "conditional"
   support_minimum <- 2L
   degree_minimum <- 3L
 

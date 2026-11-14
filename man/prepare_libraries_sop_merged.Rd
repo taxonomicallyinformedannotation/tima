@@ -91,7 +91,7 @@ Character string path to the prepared merged SOP library
 }
 \description{
 This function merges all structure-organism pair libraries
-(LOTUS, HMDB, ECMDB, etc.) into a single comprehensive library. Can
+(LOTUS, HMDB, ECMDB, etc.) into a single combined library. Can
 optionally filter by taxonomic level to create biologically-focused
 subsets. Also splits structures into separate metadata tables.
 }

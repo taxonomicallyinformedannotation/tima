@@ -5,7 +5,7 @@
 #'     filtering, ranking, and optional high-evidence filtering. Ranking is
 #'     score-based, and optional cluster-consensus promotion can retain
 #'     plausible siblings when they are the best coherent choices. Returns
-#'     three-tier output: full (comprehensive), filtered (top candidates), and
+#'     three-tier output: full (all retained candidates), filtered (top candidates), and
 #'     mini (one row per feature).
 #'
 #' @include add_xrefs_to_annotations.R

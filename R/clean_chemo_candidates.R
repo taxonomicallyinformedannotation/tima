@@ -1652,7 +1652,6 @@ enforce_cluster_entity_consensus <- function(df_ranked, components_table) {
   }
   # General case: split whenever diameter from current cluster start > tol
   starts <- starts_sl[cid_sl]
-  idx_all <- seq_len(n_x)
   repeat {
     exceed <- which((x_sorted - x_sorted[starts]) > tol)
     if (length(exceed) == 0L) {

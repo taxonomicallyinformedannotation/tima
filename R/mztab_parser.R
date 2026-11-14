@@ -38,7 +38,7 @@ NULL
 #'
 #' mzTab Param values use bracket notation: `[cvLabel, accession, name, value]`.
 #' Commas can appear in fields when escaped (`\,`), so we cannot use plain
-#' `strsplit(..., ",")` for robust parsing.
+#' `strsplit(..., ",")` without corrupting escaped fields.
 #'
 #' @keywords internal
 .mztab_split_param_fields <- function(x) {

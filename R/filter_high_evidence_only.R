@@ -418,6 +418,3 @@ filter_high_evidence_only <- function(
 
   df_filtered
 }
-
-# Backwards-compatible alias used by existing callers/tests.
-filter_high_evidence_only <- filter_high_evidence_only

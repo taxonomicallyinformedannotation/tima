@@ -13,22 +13,69 @@ library(testthat)
 # ---- Input validation ----
 
 test_that("validate_install_inputs rejects invalid package values", {
-  expect_error(validate_install_inputs(NULL, .make_repos(), TRUE))
-  expect_error(validate_install_inputs("", .make_repos(), TRUE))
-  expect_error(validate_install_inputs(c("a", "b"), .make_repos(), TRUE))
-  expect_error(validate_install_inputs(123, .make_repos(), TRUE))
+  expect_error(
+    validate_install_inputs(NULL, .make_repos(), dependencies = TRUE),
+    class = "tima_validation_error"
+  )
+  expect_error(
+    validate_install_inputs("", .make_repos(), dependencies = TRUE),
+    class = "tima_validation_error"
+  )
+  expect_error(
+    validate_install_inputs(NA_character_, .make_repos(), dependencies = TRUE),
+    class = "tima_validation_error"
+  )
+  expect_error(
+    validate_install_inputs(c("a", "b"), .make_repos(), dependencies = TRUE),
+    class = "tima_validation_error"
+  )
+  expect_error(
+    validate_install_inputs(123, .make_repos(), dependencies = TRUE),
+    class = "tima_validation_error"
+  )
 })
 
 test_that("validate_install_inputs rejects invalid repos and dependencies", {
-  expect_error(validate_install_inputs("tima", character(0), TRUE))
-  expect_error(validate_install_inputs(
-    "tima",
-    c("https://cran.r-project.org", ""),
-    TRUE
-  ))
-  expect_error(validate_install_inputs("tima", 123, TRUE))
-  expect_error(validate_install_inputs("tima", .make_repos(), "yes"))
-  expect_error(validate_install_inputs("tima", .make_repos(), c(TRUE, FALSE)))
+  expect_error(
+    validate_install_inputs("tima", character(0), dependencies = TRUE),
+    class = "tima_validation_error"
+  )
+  expect_error(
+    validate_install_inputs(
+      "tima",
+      c("https://cran.r-project.org", ""),
+      dependencies = TRUE
+    ),
+    class = "tima_validation_error"
+  )
+  expect_error(
+    validate_install_inputs(
+      "tima",
+      c("https://cran.r-project.org", NA_character_),
+      dependencies = TRUE
+    ),
+    class = "tima_validation_error"
+  )
+  expect_error(
+    validate_install_inputs("tima", 123, dependencies = TRUE),
+    class = "tima_validation_error"
+  )
+  expect_error(
+    validate_install_inputs("tima", .make_repos(), dependencies = "yes"),
+    class = "tima_validation_error"
+  )
+  expect_error(
+    validate_install_inputs("tima", .make_repos(), dependencies = NA),
+    class = "tima_validation_error"
+  )
+  expect_error(
+    validate_install_inputs(
+      "tima",
+      .make_repos(),
+      dependencies = c(TRUE, FALSE)
+    ),
+    class = "tima_validation_error"
+  )
 })
 
 test_that("validate_install_inputs accepts valid inputs", {
@@ -45,13 +92,6 @@ test_that("validate_install_inputs accepts valid inputs", {
 })
 
 # ---- Lightweight helpers ----
-
-test_that("show_system_messages handles known and unknown OS names", {
-  expect_no_error(show_system_messages("Windows"))
-  expect_no_error(show_system_messages("Linux"))
-  expect_no_error(show_system_messages("Darwin"))
-  expect_no_error(show_system_messages("Unknown"))
-})
 
 test_that("check_or_install_python returns an executable path", {
   path <- check_or_install_python()
@@ -197,122 +237,6 @@ test_that("setup_virtualenv surfaces create and install failures", {
   )
 })
 
-test_that("verify_package_installation succeeds for base package and fails for missing", {
-  expect_true(verify_package_installation("stats"))
-  expect_false(verify_package_installation("definitelynotapackage12345"))
-})
-
-test_that("verify_package_installation handles broken install states", {
-  expect_false(
-    with_mocked_bindings(
-      .require_namespace = function(package, quietly = TRUE) FALSE,
-      log_error = function(...) invisible(NULL),
-      verify_package_installation("brokenpkg")
-    )
-  )
-
-  expect_false(
-    with_mocked_bindings(
-      .require_namespace = function(package, quietly = TRUE) TRUE,
-      .find_package_paths = function(package, quiet = TRUE) character(),
-      log_error = function(...) invisible(NULL),
-      verify_package_installation("brokenpkg")
-    )
-  )
-
-  expect_false(
-    with_mocked_bindings(
-      .require_namespace = function(package, quietly = TRUE) TRUE,
-      .find_package_paths = function(package, quiet = TRUE) {
-        c("/bad/a", "/bad/b")
-      },
-      .path_exists = function(path) FALSE,
-      log_error = function(...) invisible(NULL),
-      verify_package_installation("brokenpkg")
-    )
-  )
-})
-
-test_that("verify_package_installation handles DESCRIPTION and namespace failures", {
-  expect_false(
-    with_mocked_bindings(
-      .require_namespace = function(package, quietly = TRUE) TRUE,
-      .find_package_paths = function(package, quiet = TRUE) "/good/pkg",
-      .path_exists = function(path) TRUE,
-      .read_description_dcf = function(path) stop("cannot read"),
-      log_error = function(...) invisible(NULL),
-      verify_package_installation("brokenpkg")
-    )
-  )
-
-  expect_false(
-    with_mocked_bindings(
-      .require_namespace = function(package, quietly = TRUE) TRUE,
-      .find_package_paths = function(package, quiet = TRUE) "/good/pkg",
-      .path_exists = function(path) TRUE,
-      .read_description_dcf = function(path) {
-        structure(matrix("x", nrow = 1), class = "matrix")
-      },
-      .load_namespace = function(package) stop("namespace load failed"),
-      log_error = function(...) invisible(NULL),
-      verify_package_installation("brokenpkg")
-    )
-  )
-})
-
-# ---- Network/install wrappers (stable failure mode) ----
-
-test_that("try_install_package returns FALSE on unreachable repository", {
-  result <- try_install_package(
-    package = "somepkgthatdoesnotexist",
-    repos = "https://invalid.invalid",
-    dependencies = FALSE
-  )
-  expect_false(result)
-})
-
-test_that("try_install_package handles successful, unavailable and error install paths", {
-  expect_true(
-    with_mocked_bindings(
-      .require_namespace = local({
-        state <- new.env(parent = emptyenv())
-        state$calls <- 0L
-        function(package, quietly = TRUE) {
-          state$calls <- state$calls + 1L
-          state$calls >= 2L
-        }
-      }),
-      .install_packages = function(...) invisible(NULL),
-      log_info = function(...) invisible(NULL),
-      log_success = function(...) invisible(NULL),
-      log_error = function(...) invisible(NULL),
-      try_install_package("pkg", repos = .make_repos(), dependencies = FALSE)
-    )
-  )
-
-  expect_false(
-    with_mocked_bindings(
-      .require_namespace = function(package, quietly = TRUE) FALSE,
-      .install_packages = function(...) warning("package is not available"),
-      log_info = function(...) invisible(NULL),
-      log_warn = function(...) invisible(NULL),
-      log_error = function(...) invisible(NULL),
-      try_install_package("pkg", repos = .make_repos(), dependencies = FALSE)
-    )
-  )
-
-  expect_false(
-    with_mocked_bindings(
-      .require_namespace = function(package, quietly = TRUE) FALSE,
-      .install_packages = function(...) stop("boom"),
-      log_info = function(...) invisible(NULL),
-      log_warn = function(...) invisible(NULL),
-      log_error = function(...) invisible(NULL),
-      try_install_package("pkg", repos = .make_repos(), dependencies = FALSE)
-    )
-  )
-})
-
 test_that("install_tima input validation fails fast", {
   expect_error(
     install_tima(package = "", repos = .make_repos(), dependencies = TRUE),
@@ -320,6 +244,15 @@ test_that("install_tima input validation fails fast", {
   )
   expect_error(
     install_tima(package = "tima", repos = character(), dependencies = TRUE),
+    class = "tima_validation_error"
+  )
+  expect_error(
+    install_tima(
+      package = "tima",
+      repos = .make_repos(),
+      type = "unsupported_type",
+      dependencies = TRUE
+    ),
     class = "tima_validation_error"
   )
   expect_error(
@@ -453,6 +386,45 @@ test_that("validate_install_inputs normalizes platform pkgType variants and reje
     ),
     class = "tima_validation_error"
   )
+  expect_error(
+    validate_install_inputs(
+      package = "tima",
+      repos = .make_repos(),
+      type = NA_character_,
+      dependencies = TRUE
+    ),
+    class = "tima_validation_error"
+  )
+})
+
+test_that("install_tima passes normalized type to install.packages", {
+  rec <- new.env(parent = emptyenv())
+  rec$type <- NULL
+
+  with_mocked_bindings(
+    log_info = function(...) invisible(NULL),
+    log_success = function(...) invisible(NULL),
+    log_warn = function(...) invisible(NULL),
+    log_debug = function(...) invisible(NULL),
+    check_or_install_python = function() "/usr/bin/python3",
+    .install_packages = function(package, repos, dependencies, type, ...) {
+      rec$type <- type
+      invisible(NULL)
+    },
+    .require_namespace = function(package, quietly = TRUE) TRUE,
+    setup_virtualenv = function(...) invisible(NULL),
+    .load_namespace = function(package) invisible(TRUE),
+    copy_backbone = function() invisible(NULL),
+    .tar_destroy = function() invisible(NULL),
+    install_tima(
+      package = "tima",
+      repos = .make_repos(),
+      type = "mac.binary.big-sur-arm64",
+      dependencies = FALSE
+    )
+  )
+
+  expect_identical(rec$type, "binary")
 })
 
 test_that("setup_virtualenv resolves python via check_or_install_python when python is NULL", {
@@ -479,19 +451,6 @@ test_that("setup_virtualenv resolves python via check_or_install_python when pyt
 
   expect_identical(resolved$called, 1L)
   expect_identical(resolved$created_with, "/mock/python3")
-})
-
-test_that("verify_package_installation returns FALSE when reading DESCRIPTION emits a warning", {
-  expect_false(
-    with_mocked_bindings(
-      .require_namespace = function(package, quietly = TRUE) TRUE,
-      .find_package_paths = function(package, quiet = TRUE) "/good/pkg",
-      .path_exists = function(path) TRUE,
-      .read_description_dcf = function(path) warning("corrupt DCF header"),
-      log_warn = function(...) invisible(NULL),
-      verify_package_installation("warnpkg")
-    )
-  )
 })
 
 test_that("install_tima tolerates post-install copy_backbone and tar_destroy errors", {

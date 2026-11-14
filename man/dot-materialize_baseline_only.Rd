@@ -3,8 +3,7 @@
 \name{.materialize_baseline_only}
 \alias{.materialize_baseline_only}
 \title{Materialize baseline-only output when no library-supported hypothesis was
-found. Keeps the pipeline robust: every feature still receives the
-protonated/deprotonated form as a fallback.}
+found so every feature still receives the protonated/deprotonated fallback.}
 \usage{
 .materialize_baseline_only(
   feature_ids,
@@ -17,7 +16,6 @@ protonated/deprotonated form as a fallback.}
 }
 \description{
 Materialize baseline-only output when no library-supported hypothesis was
-found. Keeps the pipeline robust: every feature still receives the
-protonated/deprotonated form as a fallback.
+found so every feature still receives the protonated/deprotonated fallback.
 }
 \keyword{internal}

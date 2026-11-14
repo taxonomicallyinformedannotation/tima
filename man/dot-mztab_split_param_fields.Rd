@@ -9,6 +9,6 @@
 \description{
 mzTab Param values use bracket notation: \verb{[cvLabel, accession, name, value]}.
 Commas can appear in fields when escaped (\verb{\\,}), so we cannot use plain
-\code{strsplit(..., ",")} for robust parsing.
+\code{strsplit(..., ",")} without corrupting escaped fields.
 }
 \keyword{internal}

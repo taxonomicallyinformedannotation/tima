@@ -549,9 +549,7 @@ build_evidence_supported_hypotheses <- function(
   tidytable::as_tidytable(hyps)
 }
 
-#' Materialize baseline-only output when no library-supported hypothesis was
-#' found. Keeps the pipeline robust: every feature still receives the
-#' protonated/deprotonated form as a fallback.
+#' Split single-linkage RT runs whose span exceeds tolerance_rt.
 #' @keywords internal
 .split_transitive_rt_runs <- function(step_rt, rt_vec, tolerance_rt) {
   n_h <- length(step_rt)
@@ -569,6 +567,9 @@ build_evidence_supported_hypotheses <- function(
   step_rt
 }
 
+#' Materialize baseline-only output when no library-supported hypothesis was
+#' found so every feature still receives the protonated/deprotonated fallback.
+#' @keywords internal
 .materialize_baseline_only <- function(
   feature_ids,
   feature_rts,

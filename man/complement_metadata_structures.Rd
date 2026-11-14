@@ -31,7 +31,7 @@ Data frame with enriched structural metadata
 \description{
 Complements structural metadata by joining stereochemistry,
 metadata, and chemical taxonomy from reference libraries.
-Enriches annotation results with comprehensive structure information.
+Enriches annotation results with reference structure metadata and chemical taxonomy.
 }
 \examples{
 \dontrun{

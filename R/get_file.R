@@ -1,6 +1,6 @@
 #' @title Download file from URL
 #'
-#' @description Downloads a file from a URL with robust error handling,
+#' @description Downloads a file from a URL with structured error handling,
 #'     retry logic, and validation. Automatically creates necessary directories
 #'     and validates downloaded content. Skips download if file already exists.
 #'

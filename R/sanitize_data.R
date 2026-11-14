@@ -1,6 +1,6 @@
 #' Sanitize All Input Data
 #'
-#' @description Comprehensive validation of all input data before starting
+#' @description Up-front validation of input files and columns before starting
 #'     expensive processing. Reports issues immediately to save time.
 #'
 #' @include logs_utils.R
