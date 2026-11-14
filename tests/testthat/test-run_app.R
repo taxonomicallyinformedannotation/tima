@@ -138,3 +138,40 @@ test_that("run_app aborts when app file is missing", {
     }
   )
 })
+
+test_that("run_app validates reinstall and sets and restores app options", {
+  expect_error(
+    run_app(reinstall = "yes"),
+    class = "tima_validation_error"
+  )
+
+  old_opts <- options(tima.app.port = 1234L, tima.app.host = "0.0.0.0")
+  on.exit(options(old_opts), add = TRUE)
+
+  captured <- new.env(parent = emptyenv())
+  with_mocked_bindings(
+    is_docker_env = function() FALSE,
+    log_info = function(...) invisible(NULL),
+    get_app_path = function() "mock_app.R",
+    app_path_exists = function(path) TRUE,
+    build_shiny_app_dir = function(app_path) paste0("dir:", app_path),
+    run_shiny_app = function(appDir, port, host, launch.browser) {
+      captured$port <- getOption("tima.app.port")
+      captured$host <- getOption("tima.app.host")
+      NULL
+    },
+    {
+      run_app(
+        host = "127.0.0.1",
+        port = 4567,
+        browser = FALSE,
+        reinstall = FALSE
+      )
+    }
+  )
+
+  expect_identical(captured$port, 4567L)
+  expect_identical(captured$host, "127.0.0.1")
+  expect_identical(getOption("tima.app.port"), 1234L)
+  expect_identical(getOption("tima.app.host"), "0.0.0.0")
+})

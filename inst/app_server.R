@@ -6,6 +6,23 @@
 .log_trace <- getFromNamespace("log_trace", "tima")
 .replace_id <- getFromNamespace("replace_id", "tima")
 
+.stage_multi_upload <- function(upload_df, dest_dir, default = NULL) {
+  if (is.null(upload_df) || length(upload_df[[1L]]) == 0L) {
+    return(default)
+  }
+  dest_paths <- file.path(dest_dir, basename(upload_df[[1L]]))
+  .create_dir(dest_dir)
+  to_copy <- !file.exists(dest_paths)
+  if (any(to_copy)) {
+    file.copy(
+      from = upload_df[[4L]][to_copy],
+      to = dest_paths[to_copy],
+      overwrite = TRUE
+    )
+  }
+  dest_paths
+}
+
 .save_input <- function(input) {
   paths_data_source <- .get_default_paths()$data$source$path
   paths_data_interim_annotations <-
@@ -161,28 +178,14 @@
       .log_trace("Reusing cached mzTab-derived source files")
     }
   }
-  if (!is.null(lib_tmp_exp_csv)) {
-    if (!file.exists(lib_tmp_exp_csv)) {
-      file.copy(
-        from = lib_tmp_exp_csv[[4L]],
-        to = file.path(lib_tmp_exp_csv),
-        overwrite = TRUE
-      )
-    }
-  } else {
-    lib_tmp_exp_csv <- NULL
-  }
-  if (!is.null(lib_tmp_is_csv)) {
-    if (!file.exists(lib_tmp_is_csv)) {
-      file.copy(
-        from = lib_tmp_is_csv[[4L]],
-        to = file.path(lib_tmp_is_csv),
-        overwrite = TRUE
-      )
-    }
-  } else {
-    lib_tmp_is_csv <- NULL
-  }
+  lib_tmp_exp_csv <- .stage_multi_upload(
+    upload_df = lib_tmp_exp_csv,
+    dest_dir = file.path(paths_data_source, "libraries", "temporal", "exp")
+  )
+  lib_tmp_is_csv <- .stage_multi_upload(
+    upload_df = lib_tmp_is_csv,
+    dest_dir = file.path(paths_data_source, "libraries", "temporal", "is")
+  )
 
   fil_fea_raw <- prefil_fea_raw_1
   fil_spe_raw <- prefil_spe_raw_1
@@ -196,6 +199,12 @@
   gnps_job_id <- input$gnps_id
   if (gnps_job_id == "") {
     gnps_job_id <- NULL
+  }
+  if (!is.null(gnps_job_id) && is.null(fil_met_raw)) {
+    fil_met_raw <- file.path(
+      paths_data_source,
+      paste0(gnps_job_id, "_metadata.tsv")
+    )
   }
 
   org_tax <- input$org_tax
@@ -212,7 +221,7 @@
   yaml_small$files$pattern <- fil_pat
   yaml_small$files$features$raw <- fil_fea_raw
   yaml_small$files$metadata$raw <- fil_met_raw
-  yaml_small$files$annotations$raw$mzmine <- fil_mzm_raw
+  yaml_small$files$annotations$raw$spectral$mzmine <- fil_mzm_raw
   yaml_small$files$mztab$raw <- fil_mzt_raw
   yaml_small$files$annotations$raw$sirius <- fil_sir_raw
   yaml_small$files$spectral$raw <- fil_spe_raw
@@ -252,14 +261,11 @@
   yaml_advanced$files$annotations$raw$spectral$gnps <-
     yaml_advanced$files$annotations$raw$spectral$gnps |>
     .replace_id()
-  yaml_advanced$files$annotations$raw$mzmine <- fil_mzm_raw
+  yaml_advanced$files$annotations$raw$spectral$mzmine <- fil_mzm_raw
   yaml_advanced$files$annotations$raw$spectral$spectral <-
     yaml_advanced$files$annotations$raw$spectral$spectral |>
     .replace_id()
   yaml_advanced$files$mztab$raw <- fil_mzt_raw
-  # yaml_advanced$files$annotations$raw$sirius <-
-  #   yaml_advanced$files$annotations$raw$sirius |>
-  #   .replace_id()
   yaml_advanced$files$annotations$raw$sirius <- fil_sir_raw
   yaml_advanced$files$annotations$prepared$canopus <-
     yaml_advanced$files$annotations$prepared$canopus |>
@@ -282,16 +288,16 @@
   yaml_advanced$files$annotations$filtered <-
     yaml_advanced$files$annotations$filtered |>
     .replace_id()
-  # yaml_advanced$files$annotations$processed <-
-  #   yaml_advanced$files$annotations$processed |>
-  #   .replace_id()
   yaml_advanced$files$features$raw <-
     fil_fea_raw
   yaml_advanced$files$features$prepared <-
     yaml_advanced$files$features$prepared |>
     .replace_id()
-  yaml_advanced$files$libraries$spectral$raw <-
-    input$lib_spe_mgf
+  yaml_advanced$files$libraries$spectral$raw <- .stage_multi_upload(
+    upload_df = input$lib_spe_mgf,
+    dest_dir = file.path(paths_data_source, "libraries", "spectra", "exp"),
+    default = yaml_advanced$files$libraries$spectral$raw
+  )
   yaml_advanced$files$libraries$temporal$exp$csv <- lib_tmp_exp_csv
   yaml_advanced$files$libraries$temporal$is$csv <- lib_tmp_is_csv
   yaml_advanced$files$networks$spectral$edges$raw$ms1 <-
@@ -414,22 +420,10 @@
     input$sim_met_edg
   yaml_advanced$similarities$thresholds$annotations <-
     input$sim_thr_ann
-  # TODO
-  # yaml_advanced$tools$metadata <-
-  #   input$too_x
-  # yaml_advanced$tools$networks$spectral$components <-
-  #   input$too_x
-  # yaml_advanced$tools$networks$spectral$edges <-
-  #   input$too_x
   yaml_advanced$tools$sirius$version <-
     input$too_sir_ver
   yaml_advanced$tools$sirius$max_analog_abs_mz_error <-
     input$too_sir_max_analog_abs_mz_error
-  # TODO
-  # yaml_advanced$tools$taxonomies$biological <-
-  #   input$too_x
-  # yaml_advanced$tools$taxonomies$chemical <-
-  #   input$too_x
   yaml_advanced$units$rt <-
     input$uni_rt
   yaml_advanced$weights$global$biological <-
@@ -492,13 +486,6 @@
   yaml_advanced$options$remove_ties <-
     input$remove_ties
   yaml_advanced$options$summarize <- summarize
-  if (!is.null(prefil_met_raw)) {
-    yamls_params$prepare_taxa$files$metadata$raw <- fil_met_raw
-  }
-  if (!is.null(gnps_job_id)) {
-    yamls_params$prepare_taxa$files$metadata$raw <-
-      file.path(paths_data_source, paste0(gnps_job_id, "_metadata.tsv"))
-  }
   yaml::write_yaml(
     x = yaml_advanced,
     file = .get_default_paths()$params$prepare_params_advanced
@@ -586,7 +573,7 @@ server <- function(input, output) {
     if (
       anyNA(
         lapply(
-          X = stri_split_fixed(str = taxon, pattern = "|"),
+          X = strsplit(x = taxon, split = "|", fixed = TRUE),
           FUN = function(taxon) {
             rotl::tnrs_match_names(
               names = taxon,
@@ -601,11 +588,17 @@ server <- function(input, output) {
   })
   iv$enable()
 
+  shiny::observeEvent(eventExpr = input$close, handlerExpr = {
+    shiny::stopApp()
+  })
+
   ## When the Save button is clicked, save the response
   shiny::observeEvent(eventExpr = input$save, handlerExpr = {
     ## User-experience stuff
     shinyjs::show("save_msg")
-    shinyjs::enable("launch")
+    shinyjs::disable("save")
+    shinyjs::disable("launch")
+    shinyjs::hide("thankyou_msg")
     shinyjs::hide("error")
     shinyjs::hide("job_msg")
     shinyjs::hide("job_end")
@@ -616,9 +609,11 @@ server <- function(input, output) {
     shinyjs::hide("close")
 
     ## Save the data (show an error message in case of error)
+    saved_ok <- FALSE
     tryCatch(
       expr = {
         .save_input(input = input)
+        saved_ok <- TRUE
         shinyjs::show("thankyou_msg")
       },
       error = function(err) {
@@ -631,16 +626,10 @@ server <- function(input, output) {
       },
       finally = {
         shinyjs::enable("save")
-        shinyjs::enable("launch")
         shinyjs::hide("save_msg")
-        shinyjs::hide("error")
-        shinyjs::hide("job_msg")
-        shinyjs::hide("job_end")
-        shinyjs::hide("results_mini")
-        shinyjs::hide("results_filtered")
-        shinyjs::hide("results_full")
-        shinyjs::hide("results_mztab")
-        shinyjs::hide("close")
+        if (saved_ok) {
+          shinyjs::enable("launch")
+        }
       }
     )
   })
@@ -670,38 +659,45 @@ server <- function(input, output) {
       )
     }
 
-    results <- utils::tail(
+    result_files <- utils::tail(
       list.files(
         path = "data/processed",
-        pattern = ".tsv",
+        pattern = "[.]tsv$",
         full.names = TRUE,
         recursive = TRUE
       ),
       n = 3L
     )
-    names(results) <- c("filtered", "mini", "full")
+    result_slots <- c("filtered", "mini", "full")
+    results <- stats::setNames(
+      result_files,
+      result_slots[seq_along(result_files)]
+    )
     results_mztab <- targets::tar_read(exp_mzt)
-    observe({
-      shiny::invalidateLater(millis = 5000)
-      shinyjs::hide("job_msg")
-      shinyjs::show("job_end")
-      lapply(names(results), function(name) {
-        output[[paste0("results_", name)]] <- downloadHandler(
-          filename = basename(results[[name]]),
-          content = function(file) {
-            ok <- file.copy(results[[name]], file, overwrite = TRUE)
-            if (!ok) {
-              cli::cli_abort(
-                "failed to copy result file {.file {results[[name]]}}",
-                class = c("tima_runtime_error", "tima_error"),
-                call = NULL
-              )
-            }
+    shinyjs::hide("job_msg")
+    shinyjs::show("job_end")
+    lapply(names(results), function(name) {
+      output[[paste0("results_", name)]] <- shiny::downloadHandler(
+        filename = basename(results[[name]]),
+        content = function(file) {
+          ok <- file.copy(results[[name]], file, overwrite = TRUE)
+          if (!ok) {
+            cli::cli_abort(
+              "failed to copy result file {.file {results[[name]]}}",
+              class = c("tima_runtime_error", "tima_error"),
+              call = NULL
+            )
           }
-        )
-        shinyjs::show(paste0("results_", name))
-      })
-      output[["results_mztab"]] <- downloadHandler(
+        }
+      )
+      shinyjs::show(paste0("results_", name))
+    })
+    if (
+      is.character(results_mztab) &&
+        length(results_mztab) == 1L &&
+        file.exists(results_mztab)
+    ) {
+      output[["results_mztab"]] <- shiny::downloadHandler(
         filename = basename(results_mztab),
         content = function(file) {
           ok <- file.copy(results_mztab, file, overwrite = TRUE)
@@ -715,10 +711,7 @@ server <- function(input, output) {
         }
       )
       shinyjs::show("results_mztab")
-      shinyjs::show("close")
-      shiny::observeEvent(eventExpr = input$close, handlerExpr = {
-        shiny::stopApp()
-      })
-    })
+    }
+    shinyjs::show("close")
   })
 }

@@ -112,7 +112,7 @@ targets_section_benchmark <- function() {
                       ),
                       !is.na(b)
                     ),
-                    stri_length(as.numeric(b)) > 1
+                    nchar(as.character(as.numeric(b))) > 1L
                   ),
                   -a,
                   -b

@@ -76,9 +76,10 @@ parse_cli_params <- function(arguments, parameters) {
       type = as.character
     ),
     fil_pat = list(path = c("files", "pattern"), type = as.character),
-    # fil_ann_raw_spe = list(path = c("files", "annotations", "raw",
-    # "spectral"),
-    #                        type = as.character),
+    fil_ann_raw_spe = list(
+      path = c("files", "annotations", "raw", "spectral", "spectral"),
+      type = as.character
+    ),
     fil_ann_raw_spe_gnp = list(
       path = c("files", "annotations", "raw", "spectral", "gnps"),
       type = as.character
@@ -305,10 +306,10 @@ parse_cli_params <- function(arguments, parameters) {
       path = c("names", "mgf", "polarity"),
       type = as.character
     ),
-    # names_mgf_pc = list(path = c("names", "mgf", "precursor_charge"), type =
-    # as.character),
-    # names_mgf_pm = list(path = c("names", "mgf", "precursor_mz"), type =
-    # as.character),
+    names_mgf_rt = list(
+      path = c("names", "mgf", "retention_time"),
+      type = as.character
+    ),
     names_mgf_sm = list(
       path = c("names", "mgf", "smiles"),
       type = as.character
@@ -481,7 +482,15 @@ parse_cli_params <- function(arguments, parameters) {
       path = c("weights", "chemical", "cla", "kingdom"),
       type = as.numeric
     ),
+    wei_che_11 = list(
+      path = c("weights", "chemical", "cla", "kingdom"),
+      type = as.numeric
+    ),
     wei_che12 = list(
+      path = c("weights", "chemical", "cla", "superclass"),
+      type = as.numeric
+    ),
+    wei_che_12 = list(
       path = c("weights", "chemical", "cla", "superclass"),
       type = as.numeric
     ),
@@ -489,7 +498,15 @@ parse_cli_params <- function(arguments, parameters) {
       path = c("weights", "chemical", "cla", "class"),
       type = as.numeric
     ),
+    wei_che_13 = list(
+      path = c("weights", "chemical", "cla", "class"),
+      type = as.numeric
+    ),
     wei_che14 = list(
+      path = c("weights", "chemical", "cla", "parent"),
+      type = as.numeric
+    ),
+    wei_che_14 = list(
       path = c("weights", "chemical", "cla", "parent"),
       type = as.numeric
     ),
@@ -497,11 +514,23 @@ parse_cli_params <- function(arguments, parameters) {
       path = c("weights", "chemical", "npc", "pathway"),
       type = as.numeric
     ),
+    wei_che_21 = list(
+      path = c("weights", "chemical", "npc", "pathway"),
+      type = as.numeric
+    ),
     wei_che22 = list(
       path = c("weights", "chemical", "npc", "superclass"),
       type = as.numeric
     ),
+    wei_che_22 = list(
+      path = c("weights", "chemical", "npc", "superclass"),
+      type = as.numeric
+    ),
     wei_che23 = list(
+      path = c("weights", "chemical", "npc", "class"),
+      type = as.numeric
+    ),
+    wei_che_23 = list(
       path = c("weights", "chemical", "npc", "class"),
       type = as.numeric
     ),

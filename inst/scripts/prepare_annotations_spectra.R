@@ -2,15 +2,18 @@ start <- Sys.time()
 
 library(tima)
 
-log_trace(
+.log_trace <- getFromNamespace("log_trace", "tima")
+.log_success <- getFromNamespace("log_success", "tima")
+
+.log_trace(
   "This script formats spectral annotations results"
 )
-log_trace("Authors: AR")
-log_trace("Contributors: ...")
+.log_trace("Authors: AR")
+.log_trace("Contributors: ...")
 
 ## Not ann_spe because of `ann_spe_int` (see #69)
-targets::tar_make(names = tidyselect::matches("^ann_spe_is"))
+targets::tar_make(names = tidyselect::matches("^ann_spe_pre$"))
 
 end <- Sys.time()
 
-log_success("Script finished in ", format(end - start))
+.log_success("Script finished in %s", format(end - start))

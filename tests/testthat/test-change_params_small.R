@@ -664,7 +664,10 @@ test_that("change_params_small uses go_to_cache when cache_dir is NULL", {
               features = list(raw = "old_features.csv"),
               metadata = list(raw = "old_metadata.tsv"),
               annotations = list(
-                raw = list(sirius = "old_sirius.zip", mzmine = "old_mzmine.csv")
+                raw = list(
+                  sirius = "old_sirius.zip",
+                  spectral = list(mzmine = "old_mzmine.csv")
+                )
               ),
               spectral = list(raw = "old_spectra.mgf")
             ),
@@ -968,7 +971,7 @@ test_that("change_params_small initializes missing mztab entry and updates optio
     file.path(tmp, "data", "source", "input.mztab")
   )
   expect_identical(
-    captured$yaml$files$annotations$raw$mzmine,
+    captured$yaml$files$annotations$raw$spectral$mzmine,
     file.path(tmp, "data", "interim", "annotations", "input.mztab")
   )
   expect_identical(captured$yaml$organisms$taxon, NA)

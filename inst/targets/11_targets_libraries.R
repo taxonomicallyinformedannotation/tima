@@ -317,11 +317,9 @@ targets_section_libraries <- function() {
                 getFromNamespace("fake_ecmdb", "tima")(
                   export = paths$data$source$libraries$sop$ecmdb
                 )
-              },
-              finally = {
-                paths$data$source$libraries$sop$ecmdb
               }
             )
+            paths$data$source$libraries$sop$ecmdb
           },
           format = "file"
         ),
@@ -404,11 +402,9 @@ targets_section_libraries <- function() {
                 getFromNamespace("fake_pubchemlite", "tima")(
                   export = pub_export
                 )
-              },
-              finally = {
-                pub_export
               }
             )
+            pub_export
           },
           format = "file"
         ),

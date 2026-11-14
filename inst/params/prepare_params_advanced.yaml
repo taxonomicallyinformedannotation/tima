@@ -118,7 +118,7 @@ files:
       #' Raw structure organism pairs libraries.
       raw:
         #' Closed structure organism pairs library. STRING
-        closed: ~/Git/lotus-processor/data/processed/240412_closed_metadata.csv.gz
+        closed: data/source/libraries/sop/closed.csv.gz
 
         #' ECMDB structure organism pairs library. STRING
         ecmdb: data/source/libraries/sop/ecmdb.json.zip

@@ -53,6 +53,7 @@ run_app <- function(
     param_name = "port"
   )
   validate_logical(browser, param_name = "browser")
+  validate_logical(reinstall, param_name = "reinstall")
 
   port <- as.integer(port)
 
@@ -78,6 +79,9 @@ run_app <- function(
       class = c("tima_runtime_error", "tima_error")
     )
   }
+
+  old_opts <- options(tima.app.port = port, tima.app.host = host)
+  on.exit(options(old_opts), add = TRUE)
 
   run_shiny_app(
     appDir = build_shiny_app_dir(app_path),

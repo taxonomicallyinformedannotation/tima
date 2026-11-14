@@ -25,12 +25,10 @@ source(file.path(.app_dir, "app_server.R"))
 .log_info <- getFromNamespace("log_info", "tima")
 .copy_backbone <- getFromNamespace("copy_backbone", "tima")
 
-url <- "http://127.0.0.1:3838"
-if (file.exists("/.dockerenv")) {
-  host <- "0.0.0.0"
-} else {
-  host <- "127.0.0.1"
-}
+default_host <- if (file.exists("/.dockerenv")) "0.0.0.0" else "127.0.0.1"
+host <- getOption("tima.app.host", default = default_host)
+port <- as.integer(getOption("tima.app.port", default = 3838L))
+url <- sprintf("http://%s:%d", host, port)
 options(shiny.maxRequestSize = 2000 * 1024^2)
 .log_info("Please, open: %s on your favorite browser, but not Edge.", url)
 shiny::shinyApp(
@@ -40,5 +38,5 @@ shiny::shinyApp(
     .copy_backbone()
     tima::go_to_cache()
   },
-  options = list(host = host, port = 3838)
+  options = list(host = host, port = port)
 )

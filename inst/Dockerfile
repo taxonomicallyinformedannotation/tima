@@ -3,13 +3,13 @@ FROM bioconductor/bioconductor_docker:RELEASE_3_23-R-4.6.0
 
 # Add a non-root user and set up the R library and working directories
 RUN useradd -m tima-user && \
-    mkdir -p /home/tima-user/Library/Frameworks/R.framework/Resources/site-library && \
+    mkdir -p /home/tima-user/R/site-library && \
     mkdir -p /home/tima-user/.tima/data && \
     mkdir -p /home/tima-user/.tima/_targets && \
     chown -R tima-user:tima-user /home/tima-user
 
 # Set the R library path to the new directory
-ENV R_LIBS_USER=/home/tima-user/Library/Frameworks/R.framework/Resources/site-library
+ENV R_LIBS_USER=/home/tima-user/R/site-library
 
 # Switch to the non-root user
 USER tima-user
@@ -27,9 +27,8 @@ LABEL org.opencontainers.image.revision="${GIT_COMMIT}"
 COPY --chown=tima-user:tima-user . /home/tima-user/app
 WORKDIR /home/tima-user/app
 
-# Clean pak cache, install package locally from the current commit, and run post-install setup
-RUN Rscript -e "pak::cache_clean(); options(timeout = 30); pak::pkg_install('.', ask = FALSE)" && \
-    Rscript -e "tima::install_tima()"
+# Clean pak cache, install package locally from the current commit
+RUN Rscript -e "pak::cache_clean(); options(timeout = 600); pak::pkg_install('.', ask = FALSE)"
 
 # Expose the necessary ports for Shiny
 EXPOSE 3838
@@ -38,4 +37,4 @@ EXPOSE 3838
 HEALTHCHECK NONE
 
 # Define default command
-CMD ["Rscript", "-e", "tima::run_app()"]
+CMD ["Rscript", "-e", "tima::run_app(reinstall = FALSE)"]

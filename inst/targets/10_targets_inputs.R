@@ -8,22 +8,15 @@ targets_section_inputs <- function() {
       format = "file"
     ),
     tar_target(
-      name = test_spectra_mini,
-      command = {
-        get_file(
-          url = paths$urls$examples$spectra_mini,
-          export = paths$data$source$spectra
-        )
-      },
-      format = "file"
-    ),
-    tar_target(
       name = input_spectra,
       command = {
         if (!isTRUE(paths$tests$mode)) {
           par_ann_spe$files$spectral$raw
         } else {
-          test_spectra_mini
+          get_file(
+            url = paths$urls$examples$spectra_mini,
+            export = paths$data$source$spectra
+          )
         }
       },
       format = "file"

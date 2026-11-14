@@ -223,7 +223,13 @@ change_params_small <- function(
   }
 
   if (!is.null(fil_ann_mzm)) {
-    yaml_small$files$annotations$raw$mzmine <- copy_file_to_target(
+    if (
+      is.null(yaml_small$files$annotations$raw$spectral) ||
+        !is.list(yaml_small$files$annotations$raw$spectral)
+    ) {
+      yaml_small$files$annotations$raw$spectral <- list(mzmine = NA)
+    }
+    yaml_small$files$annotations$raw$spectral$mzmine <- copy_file_to_target(
       file_path = fil_ann_mzm,
       target_dir = paths_data_interim_annotations,
       file_description = "mzmine annotations"
