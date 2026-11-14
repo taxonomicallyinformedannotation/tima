@@ -736,6 +736,7 @@ test_that("copy_file_to_target copies files correctly", {
   tmpdir <- tempfile()
   dir.create(tmpdir, recursive = TRUE)
   on.exit(unlink(tmpdir, recursive = TRUE))
+  tmpdir <- normalizePath(tmpdir, winslash = "/", mustWork = TRUE)
 
   # Create source file
   source_file <- file.path(tmpdir, "source.txt")

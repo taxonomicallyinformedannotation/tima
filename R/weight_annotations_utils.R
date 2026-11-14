@@ -1126,14 +1126,25 @@ export_results <- function(results_list, output, pattern) {
     paste0(time, "_", pattern)
   )
 
-  final_output <- file.path(dir_time, output)
+  output_name <- basename(output)
+  final_output <- file.path(dir_time, output_name)
   final_output_filtered <- file.path(
     dir_time,
-    gsub(output, pattern = ".tsv", replacement = "_filtered.tsv", fixed = TRUE)
+    gsub(
+      output_name,
+      pattern = ".tsv",
+      replacement = "_filtered.tsv",
+      fixed = TRUE
+    )
   )
   final_output_mini <- file.path(
     dir_time,
-    gsub(output, pattern = ".tsv", replacement = "_mini.tsv", fixed = TRUE)
+    gsub(
+      output_name,
+      pattern = ".tsv",
+      replacement = "_mini.tsv",
+      fixed = TRUE
+    )
   )
 
   # Export parameters

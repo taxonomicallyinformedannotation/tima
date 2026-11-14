@@ -64,36 +64,27 @@ test_that("fake_ecmdb handles zip creation failures gracefully", {
 test_that("fake_ecmdb calls fallback zip when system zip command fails", {
   withr::local_dir(tempdir())
   temp_file <- withr::local_tempfile(fileext = ".json.zip")
-  shim_dir <- tempfile(pattern = "fake_zip_shim_")
-  dir.create(shim_dir)
-  shim_zip <- file.path(shim_dir, "zip")
-  writeLines(
-    c(
-      "#!/bin/sh",
-      "first=\"$1\"",
-      "case \"$first\" in",
-      "  -*)",
-      "    zipfile=\"\"",
-      "    for arg in \"$@\"; do",
-      "      case \"$arg\" in",
-      "        -*) continue ;;",
-      "        *) zipfile=\"$arg\"; break ;;",
-      "      esac",
-      "    done",
-      "    : > \"$zipfile\"",
-      "    exit 0",
-      "    ;;",
-      "  *)",
-      "    exit 1",
-      "    ;;",
-      "esac"
-    ),
-    shim_zip
-  )
-  Sys.chmod(shim_zip, mode = "0755")
-  withr::local_envvar(PATH = paste(shim_dir, Sys.getenv("PATH"), sep = ":"))
+  state <- new.env(parent = emptyenv())
+  state$fallback_called <- FALSE
 
-  expect_equal(fake_ecmdb(export = temp_file), temp_file)
+  with_mocked_bindings(
+    system2 = function(command, args = character(), ...) 1L,
+    .package = "base",
+    with_mocked_bindings(
+      zip = function(zipfile, files, ...) {
+        state$fallback_called <- TRUE
+        expect_true(all(file.exists(files)))
+        file.create(zipfile)
+        invisible(0L)
+      },
+      .package = "utils",
+      {
+        expect_equal(fake_ecmdb(export = temp_file), temp_file)
+      }
+    )
+  )
+
+  expect_true(state$fallback_called)
   expect_true(file.exists(temp_file))
 })
 

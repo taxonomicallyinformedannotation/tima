@@ -331,7 +331,7 @@ test_that(".normalize_annotation_text handles large (>1024) clean and dirty vect
 test_that("select_annotations_columns helpers cover cache resolution and process_smiles fallbacks", {
   expect_identical(.normalize_annotation_text(character(0)), character(0))
 
-  td <- withr::local_tempdir()
+  td <- normalizePath(withr::local_tempdir(), winslash = "/", mustWork = TRUE)
   stereo_path <- file.path(td, "str_stereo.tsv")
   cache_path <- file.path(td, "processed.csv.gz")
   file.create(cache_path)

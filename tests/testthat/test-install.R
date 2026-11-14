@@ -129,7 +129,11 @@ test_that("check_or_install_python installs miniconda fallback when needed", {
     },
     log_warn = function(...) invisible(NULL),
     log_info = function(...) invisible(NULL),
-    check_or_install_python()
+    testthat::with_mocked_bindings(
+      Sys.info = function() c(sysname = "Linux"),
+      .package = "base",
+      check_or_install_python()
+    )
   )
 
   expect_true(state$installed)

@@ -1542,10 +1542,12 @@ test_that("rearrange_annotations and export_results cover consume_input, join fa
       filtered = tidytable::tidytable(a = 1L),
       full = tidytable::tidytable(a = 1L)
     ),
-    output = "out.tsv",
+    output = file.path(tmp_dir, "nested", "out.tsv"),
     pattern = "pat"
   )
   expect_identical(names(exp_res), c("filtered", "full"))
+  expect_identical(basename(exp_res[["filtered"]]), "out_filtered.tsv")
+  expect_identical(basename(exp_res[["full"]]), "out.tsv")
   expect_true(all(file.exists(exp_res)))
 
   # 4. .dedup_ordered_tuple_indices across 32-bit, 53-bit, and table-fallback regimes

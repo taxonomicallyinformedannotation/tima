@@ -64,16 +64,11 @@ prepare_libraries_sop_ecmdb <- function(
     } else {
       log_debug("Processing ECMDB from: %s", input)
 
-      file <- gsub(
-        pattern = ".zip",
-        replacement = "",
-        x = input,
-        fixed = TRUE
-      ) |>
+      file <- basename(input) |>
         gsub(
-          pattern = ".*/",
+          pattern = ".zip",
           replacement = "",
-          perl = TRUE
+          fixed = TRUE
         )
 
       ecmdb <- jsonlite::stream_in(

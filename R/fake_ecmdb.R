@@ -46,12 +46,7 @@ fake_ecmdb <- function(export) {
   log_warn("ECMDB download failed. Creating empty placeholder file.")
 
   # Extract filename without path and .zip extension
-  fake_export <- export |>
-    gsub(
-      pattern = ".*/",
-      replacement = "",
-      perl = TRUE
-    ) |>
+  fake_export <- basename(export) |>
     gsub(
       pattern = ".zip",
       replacement = "",

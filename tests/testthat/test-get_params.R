@@ -120,21 +120,13 @@ test_that("get_params reports missing default parameter files", {
 
 test_that("get_params reports missing docopt files", {
   mocked_paths <- make_mock_paths()
-  mocked_root <- tempfile(pattern = "tima-get-params-")
-  dir.create(mocked_root, recursive = TRUE, showWarnings = FALSE)
-  withr::defer(
-    unlink(mocked_root, recursive = TRUE, force = TRUE),
-    envir = parent.frame()
-  )
+  mocked_root <- make_mock_pkg_root(steps = "prepare_params")
+  state <- new.env(parent = emptyenv())
+  state$docopt_calls <- 0L
 
   write_mock_file(
     file.path(mocked_root, "params", "prepare_params.yaml"),
     "x: 1"
-  )
-  dir.create(file.path(mocked_root, "scripts", "docopt"), recursive = TRUE)
-  file.symlink(
-    from = file.path(mocked_root, "scripts", "docopt", "missing.txt"),
-    to = file.path(mocked_root, "scripts", "docopt", "prepare_params.txt")
   )
 
   with_mocked_bindings(
@@ -145,6 +137,17 @@ test_that("get_params reports missing docopt files", {
       pieces <- c(...)
       if (length(pieces) == 0L) {
         return(mocked_root)
+      }
+      if (identical(pieces, "scripts/docopt")) {
+        state$docopt_calls <- state$docopt_calls + 1L
+        if (state$docopt_calls >= 2L) {
+          unlink(file.path(
+            mocked_root,
+            "scripts",
+            "docopt",
+            "prepare_params.txt"
+          ))
+        }
       }
       file.path(mocked_root, pieces)
     },

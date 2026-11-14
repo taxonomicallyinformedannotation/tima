@@ -84,7 +84,11 @@ test_that("write_mztab validates output parameter", {
 test_that("write_mztab coerces vector-valued scalar parameters", {
   local_test_project(copy = TRUE)
 
-  tmpdir <- withr::local_tempdir()
+  tmpdir <- normalizePath(
+    withr::local_tempdir(),
+    winslash = "/",
+    mustWork = TRUE
+  )
   results <- .make_tima_results(tmpdir, n_features = 1L, n_candidates = 1L)
   out <- file.path(tmpdir, "vector_params.mztab")
 
@@ -119,7 +123,11 @@ test_that("write_mztab writes output in the same folder as input", {
 test_that("write_mztab produces a file for a typical TIMA results table", {
   local_test_project(copy = TRUE)
 
-  tmpdir <- withr::local_tempdir()
+  tmpdir <- normalizePath(
+    withr::local_tempdir(),
+    winslash = "/",
+    mustWork = TRUE
+  )
   results <- .make_tima_results(tmpdir)
   out <- file.path(tmpdir, "out.mztab")
 
@@ -958,7 +966,11 @@ test_that("write_mztab spectra_ref is formatted as 'ms_run[1]:{id}'", {
 test_that("write_mztab emits ms_run[1]-scan_polarity with PSI-MS CV term", {
   local_test_project(copy = TRUE)
 
-  tmpdir <- withr::local_tempdir()
+  tmpdir <- normalizePath(
+    withr::local_tempdir(),
+    winslash = "/",
+    mustWork = TRUE
+  )
   results <- .make_tima_results(tmpdir, n_features = 1L, n_candidates = 1L)
   out_pos <- file.path(tmpdir, "pos.mztab")
   out_neg <- file.path(tmpdir, "neg.mztab")
@@ -987,7 +999,11 @@ test_that("write_mztab emits ms_run[1]-scan_polarity with PSI-MS CV term", {
 test_that("write_mztab polarity abbreviations are accepted", {
   local_test_project(copy = TRUE)
 
-  tmpdir <- withr::local_tempdir()
+  tmpdir <- normalizePath(
+    withr::local_tempdir(),
+    winslash = "/",
+    mustWork = TRUE
+  )
   results <- .make_tima_results(tmpdir, n_features = 1L, n_candidates = 1L)
   out <- file.path(tmpdir, "abbr.mztab")
 
@@ -1001,7 +1017,11 @@ test_that("write_mztab polarity abbreviations are accepted", {
 test_that("write_mztab emits software[1]-setting[1] with TIMA repository URL", {
   local_test_project(copy = TRUE)
 
-  tmpdir <- withr::local_tempdir()
+  tmpdir <- normalizePath(
+    withr::local_tempdir(),
+    winslash = "/",
+    mustWork = TRUE
+  )
   results <- .make_tima_results(tmpdir, n_features = 1L, n_candidates = 1L)
   out <- file.path(tmpdir, "sw.mztab")
 
@@ -1019,7 +1039,11 @@ test_that("write_mztab emits software[1]-setting[1] with TIMA repository URL", {
 test_that("write_mztab emits colunit-small_molecule for neutral mass (UO:0000221)", {
   local_test_project(copy = TRUE)
 
-  tmpdir <- withr::local_tempdir()
+  tmpdir <- normalizePath(
+    withr::local_tempdir(),
+    winslash = "/",
+    mustWork = TRUE
+  )
   results <- .make_tima_results(tmpdir, n_features = 1L, n_candidates = 1L)
   out <- file.path(tmpdir, "colunit.mztab")
 
@@ -1033,7 +1057,11 @@ test_that("write_mztab emits colunit-small_molecule for neutral mass (UO:0000221
 test_that("write_mztab emits colunit-small_molecule_evidence for id_confidence_measure[1]", {
   local_test_project(copy = TRUE)
 
-  tmpdir <- withr::local_tempdir()
+  tmpdir <- normalizePath(
+    withr::local_tempdir(),
+    winslash = "/",
+    mustWork = TRUE
+  )
   results <- .make_tima_results(tmpdir, n_features = 1L, n_candidates = 1L)
   out <- file.path(tmpdir, "colunit_ev.mztab")
 
@@ -1048,7 +1076,11 @@ test_that("write_mztab emits colunit-small_molecule_evidence for id_confidence_m
 test_that("write_mztab contact info is emitted when provided", {
   local_test_project(copy = TRUE)
 
-  tmpdir <- withr::local_tempdir()
+  tmpdir <- normalizePath(
+    withr::local_tempdir(),
+    winslash = "/",
+    mustWork = TRUE
+  )
   results <- .make_tima_results(tmpdir, n_features = 1L, n_candidates = 1L)
   out <- file.path(tmpdir, "contact.mztab")
 
@@ -1242,7 +1274,11 @@ test_that(".mztab_pick_best_uri handles single row correctly", {
 test_that("write_mztab ms_run_format and ms_run_id_format are emitted when set", {
   local_test_project(copy = TRUE)
 
-  tmpdir <- withr::local_tempdir()
+  tmpdir <- normalizePath(
+    withr::local_tempdir(),
+    winslash = "/",
+    mustWork = TRUE
+  )
   results <- .make_tima_results(tmpdir, n_features = 1L, n_candidates = 1L)
   out <- file.path(tmpdir, "format.mztab")
 
@@ -1596,7 +1632,11 @@ test_that("write_mztab SME identification_method is valid Param syntax", {
 test_that("write_mztab merge mode preserves COM lines from after managed sections", {
   local_test_project(copy = TRUE)
 
-  tmpdir <- withr::local_tempdir()
+  tmpdir <- normalizePath(
+    withr::local_tempdir(),
+    winslash = "/",
+    mustWork = TRUE
+  )
   results <- .make_tima_results(tmpdir, n_features = 1L, n_candidates = 1L)
   base <- file.path(tmpdir, "base_com.mztab")
   out <- file.path(tmpdir, "merged_com.mztab")
@@ -1624,7 +1664,11 @@ test_that("write_mztab merge mode preserves COM lines from after managed section
 test_that("write_mztab merge mode preserves optional columns from base tables", {
   local_test_project(copy = TRUE)
 
-  tmpdir <- withr::local_tempdir()
+  tmpdir <- normalizePath(
+    withr::local_tempdir(),
+    winslash = "/",
+    mustWork = TRUE
+  )
   results <- .make_tima_results(tmpdir, n_features = 1L, n_candidates = 1L)
   base <- file.path(tmpdir, "base_opt.mztab")
   out <- file.path(tmpdir, "merged_opt.mztab")
@@ -1865,7 +1909,11 @@ test_that("write_mztab expands summarized rows even when score_final is absent",
 test_that("write_mztab merge mode preserves unmanaged non-COM lines after managed sections", {
   local_test_project(copy = TRUE)
 
-  tmpdir <- withr::local_tempdir()
+  tmpdir <- normalizePath(
+    withr::local_tempdir(),
+    winslash = "/",
+    mustWork = TRUE
+  )
   results <- .make_tima_results(tmpdir, n_features = 1L, n_candidates = 1L)
   base <- file.path(tmpdir, "base_unmanaged_tail.mztab")
   out <- file.path(tmpdir, "merged_unmanaged_tail.mztab")

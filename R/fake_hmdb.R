@@ -48,12 +48,7 @@ fake_hmdb <- function(export) {
   )
 
   # Extract filename and convert .zip to .sdf
-  fake_export <- export |>
-    gsub(
-      pattern = ".*/",
-      replacement = "",
-      perl = TRUE
-    ) |>
+  fake_export <- basename(export) |>
     gsub(
       pattern = ".zip",
       replacement = ".sdf",
