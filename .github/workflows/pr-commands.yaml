@@ -70,7 +70,7 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: posit-dev/setup-air@fd20dd239848b9d807848a7ab92265cf197de694
+      - uses: posit-dev/setup-air@482cb5912394878ab5a63b75db0f9d19cc6df5ba
 
       - name: Style
         run: air format .
