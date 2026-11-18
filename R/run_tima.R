@@ -47,6 +47,23 @@ archive_log_file <- function(log_file, timestamp) {
   success
 }
 
+#' Ensure the Workspace Contains the Targets Backbone
+#'
+#' @description Internal helper that copies the bundled backbone (including
+#'     `_targets.R`) into the current working directory when it is missing,
+#'     e.g. in containers where the home directory is replaced at runtime.
+#'
+#' @return Logical TRUE if the backbone was copied, FALSE otherwise
+#' @keywords internal
+ensure_targets_backbone <- function() {
+  if (file.exists("_targets.R")) {
+    return(invisible(FALSE))
+  }
+  log_info("_targets.R not found in %s, copying backbone", getwd())
+  copy_backbone(cache_dir = getwd())
+  invisible(TRUE)
+}
+
 #' Execute TIMA Targets Pipeline
 #'
 #' @description Internal helper to run the targets workflow with error handling.
@@ -308,6 +325,7 @@ run_tima <- function(
     {
       go_to_cache()
       log_debug("Working directory: %s", getwd())
+      ensure_targets_backbone()
     },
     error = function(e) {
       cli::cli_abort(

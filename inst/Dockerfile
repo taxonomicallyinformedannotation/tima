@@ -27,8 +27,12 @@ LABEL org.opencontainers.image.revision="${GIT_COMMIT}"
 COPY --chown=tima-user:tima-user . /home/tima-user/app
 WORKDIR /home/tima-user/app
 
-# Clean pak cache, install package locally from the current commit
-RUN Rscript -e "pak::cache_clean(); options(timeout = 600); pak::pkg_install('.', ask = FALSE)"
+# Clean pak cache, install package locally from the current commit, then run
+# the post-install setup (Python env and ~/.tima workspace with _targets.R).
+# install_tima() is not used here because it would reinstall tima from
+# r-universe instead of keeping the current commit.
+RUN Rscript -e "pak::cache_clean(); options(timeout = 600); pak::pkg_install('.', ask = FALSE)" && \
+    Rscript -e "tima:::setup_virtualenv(); tima:::copy_backbone()"
 
 # Expose the necessary ports for Shiny
 EXPOSE 3838

@@ -140,6 +140,7 @@ test_that("run_tima handles custom target patterns offline", {
     log_success = function(...) invisible(NULL),
     log_complete = function(ctx) invisible(ctx),
     go_to_cache = function() invisible(NULL),
+    ensure_targets_backbone = function() invisible(FALSE),
     execute_targets_pipeline = function(target_pattern) {
       state$seen_pattern <- target_pattern
       invisible(NULL)
@@ -173,6 +174,7 @@ test_that("run_tima preserves logs when clean_old_logs = FALSE", {
     log_success = function(...) invisible(NULL),
     log_complete = function(ctx) invisible(ctx),
     go_to_cache = function() invisible(NULL),
+    ensure_targets_backbone = function() invisible(FALSE),
     execute_targets_pipeline = function(target_pattern) {
       state$captured_content <- readLines(log_file, warn = FALSE)
       invisible(NULL)
@@ -329,6 +331,7 @@ test_that("run_tima orchestrates workflow steps", {
     log_success = function(...) invisible(NULL),
     log_complete = function(ctx) invisible(ctx),
     go_to_cache = function() invisible(NULL),
+    ensure_targets_backbone = function() invisible(FALSE),
     execute_targets_pipeline = function(target_pattern) {
       calls$pattern <- target_pattern
       invisible(NULL)
@@ -431,3 +434,25 @@ test_that("run_tima reports cache navigation errors", {
 #     }),
 #     "workflow pipeline failed|cache directory"
 #   )
+
+test_that("ensure_targets_backbone copies backbone only when missing", {
+  withr::local_dir(new = temp_test_dir("ensure_backbone"))
+  state <- new.env(parent = emptyenv())
+  state$calls <- character()
+
+  with_mocked_bindings(
+    log_info = function(...) invisible(NULL),
+    copy_backbone = function(cache_dir) {
+      state$calls <- c(state$calls, cache_dir)
+      writeLines("# targets", file.path(cache_dir, "_targets.R"))
+      invisible(NULL)
+    },
+    {
+      expect_true(ensure_targets_backbone())
+      expect_false(ensure_targets_backbone())
+    }
+  )
+
+  expect_length(state$calls, 1L)
+  expect_true(file.exists("_targets.R"))
+})
