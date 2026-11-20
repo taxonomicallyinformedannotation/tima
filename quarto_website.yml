@@ -57,9 +57,6 @@ website:
       </picture>
     </a>
     </div>
-  body-header: |
-    <!-- 100% privacy-first analytics -->
-    <script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
   sidebar:
     contents:
       - section: Functions
@@ -180,6 +177,22 @@ format:
     linkcolor: "#3377c4"
     respect-user-color-scheme: true
     toc: true
+    include-in-header:
+      - text: |
+          <style>.analytics-pixel{position:absolute;inset-block-start:0;inset-inline-start:0;inline-size:1px;block-size:1px;opacity:0;pointer-events:none;}</style>
+    include-after-body:
+      - text: |
+          <img
+            src="https://queue.simpleanalyticscdn.com/noscript.gif?hostname=taxonomicallyinformedannotation.github.io"
+            alt=""
+            width="1"
+            height="1"
+            referrerpolicy="no-referrer-when-downgrade"
+            decoding="async"
+            fetchpriority="low"
+            aria-hidden="true"
+            class="analytics-pixel"
+          />
 
 knitr:
   opts_knit:
