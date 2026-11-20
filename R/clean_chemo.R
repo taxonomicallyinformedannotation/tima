@@ -330,11 +330,6 @@ clean_chemo <- function(
   )
 
   # Clean up intermediate objects
-  rm(
-    features_table,
-    components_table,
-    structure_organism_pairs_table
-  )
 
   results_list
 }

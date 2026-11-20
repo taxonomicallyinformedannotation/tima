@@ -317,7 +317,6 @@
     x
   })
   result <- .mapply(list, cols_clean, NULL)
-  rm(tbl, df, cols_clean, drop_feature_id)
   result
 }
 
@@ -361,7 +360,6 @@
     null = "null"
   )
 
-  rm(sml_rows, smf_rows, sme_rows, edges_rows, payload)
   invisible(file)
 }
 

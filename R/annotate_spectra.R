@@ -444,7 +444,6 @@ annotate_spectra <- function(
 
   persist_annotation_parameters(params)
   export_output(x = df_final, file = output_path)
-  rm(df_final)
   invisible(output_path)
 }
 

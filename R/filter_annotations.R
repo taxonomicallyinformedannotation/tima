@@ -310,7 +310,6 @@ filter_annotations <- function(
 
   log_complete(ctx, n_filtered = nrow(final_table))
 
-  rm(final_table)
   output[[1L]]
 }
 

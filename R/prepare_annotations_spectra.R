@@ -200,7 +200,6 @@ prepare_annotations_spectra <- function(
     step = "prepare_annotations_spectra"
   )
   export_output(x = table, file = output[[1L]])
-  rm(table)
 
   output[[1L]]
 }

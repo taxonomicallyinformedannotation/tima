@@ -296,16 +296,6 @@ prepare_libraries_sop_merged <- function(
   )
 
   # Clean up
-  rm(
-    table_keys,
-    table_org_tax_ott,
-    table_structures_canonical,
-    table_structures_stereo,
-    table_structures_metadata,
-    table_structures_taxonomy_cla,
-    table_structures_taxonomy_npc,
-    tables
-  )
 
   result
 }

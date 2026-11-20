@@ -670,10 +670,7 @@ normalize_chemontid <- function(x) {
   if (!any(is_num)) {
     return(x_chr)
   }
-  u[is_num] <- paste0(
-    "CHEMONTID:",
-    sprintf("%07d", as.integer(stripped[is_num]))
-  )
+  u[is_num] <- sprintf("CHEMONTID:%07d", as.integer(stripped[is_num]))
   if (identical(u, u_orig)) {
     return(x_chr)
   }

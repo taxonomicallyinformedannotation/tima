@@ -112,6 +112,5 @@ benchmark_taxize_spectra <- function(input, keys, org_tax_ott, output) {
   )
 
   export_output(x = features_taxed, file = output)
-  rm(features_taxed)
   output
 }

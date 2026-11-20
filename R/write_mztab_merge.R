@@ -124,20 +124,6 @@
   # Back-fill SMF -> SML references from final SML table.
   smf_all <- .mztab_refresh_smf_sml_refs(smf_all, sml_all)
 
-  rm(
-    smf_base,
-    sme_base,
-    sml_base,
-    smf_new,
-    sme_new,
-    sml_new,
-    map_smf,
-    map_sme,
-    map_sml,
-    smf_id_map,
-    sme_id_map
-  )
-
   list(
     sml = sml_all,
     smf = smf_all,
@@ -202,7 +188,6 @@
     opt_sig,
     sep = "||"
   )
-  rm(tbl_df, opt_cols, opt_sig)
   result
 }
 

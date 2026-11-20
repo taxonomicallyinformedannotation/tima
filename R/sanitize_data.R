@@ -41,9 +41,9 @@ sanitize_all_inputs <- function(
   organism_col = "organism",
   feature_col = "feature_id"
 ) {
-  log_info("=" |> rep(60) |> paste(collapse = ""))
+  log_info(strrep("=", 60L))
   log_info("Data Sanitizing: Pre-flight Checks")
-  log_info("=" |> rep(60) |> paste(collapse = ""))
+  log_info(strrep("=", 60L))
 
   all_valid <- TRUE
   issues_found <- list()
@@ -184,12 +184,12 @@ sanitize_all_inputs <- function(
   }
 
   # Summary
-  log_info("=" |> rep(60) |> paste(collapse = ""))
+  log_info(strrep("=", 60L))
 
   if (all_valid) {
     log_success("[OK] All pre-flight checks passed!")
     log_info("Data validation complete. Ready to proceed.")
-    log_info("=" |> rep(60) |> paste(collapse = ""))
+    log_info(strrep("=", 60L))
     invisible(TRUE)
   } else {
     log_error("[X] Pre-flight checks failed!")
@@ -197,7 +197,7 @@ sanitize_all_inputs <- function(
       "Found issues in: %s",
       paste(names(issues_found), collapse = ", ")
     )
-    log_info("=" |> rep(60) |> paste(collapse = ""))
+    log_info(strrep("=", 60L))
 
     tima_abort(
       problem = "Input data validation failed",

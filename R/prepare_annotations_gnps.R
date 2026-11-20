@@ -142,6 +142,5 @@ prepare_annotations_gnps <- function(
     step = "prepare_annotations_gnps"
   )
   export_output(x = table, file = output[[1L]])
-  rm(table)
   output[[1L]]
 }

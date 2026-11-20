@@ -322,6 +322,5 @@ prepare_features_edges <- function(
   )
   export_output(x = edges_table_treated, file = output)
 
-  rm(edges_table_treated)
   output
 }

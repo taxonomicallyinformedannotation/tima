@@ -309,13 +309,13 @@ run_tima <- function(
   # Setup logger with specified threshold
   setup_logger(filename = log_file, threshold = log_threshold)
 
-  log_info("=" |> rep(60) |> paste(collapse = ""))
+  log_info(strrep("=", 60L))
   log_info("Starting Complete TIMA Annotation Workflow")
-  log_info("=" |> rep(60) |> paste(collapse = ""))
+  log_info(strrep("=", 60L))
   log_info("Start time: %s", format(start_time, "%Y-%m-%d %H:%M:%S"))
   log_info("Authors: Adriano Rutz (AR)")
   log_info("Contributors: Pierre-Marie Allard (PMA)")
-  log_info("=" |> rep(60) |> paste(collapse = ""))
+  log_info(strrep("=", 60L))
 
   # Note: Individual functions also validate their inputs
   # This is just for early detection of major issues
@@ -342,9 +342,9 @@ run_tima <- function(
 
   log_complete(ctx)
 
-  log_info("=" |> rep(60) |> paste(collapse = ""))
+  log_info(strrep("=", 60L))
   log_success("Complete TIMA workflow finished successfully")
-  log_info("=" |> rep(60) |> paste(collapse = ""))
+  log_info(strrep("=", 60L))
 
   archive_log_file(log_file = log_file, timestamp = Sys.time())
 

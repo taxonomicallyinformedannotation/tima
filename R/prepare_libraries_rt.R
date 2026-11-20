@@ -430,6 +430,5 @@ prepare_libraries_rt <- function(
   org_col[is.na(org_col)] <- "NA"
   data.table::set(sop_to_write, j = "organism_name", value = org_col)
   export_output(x = sop_to_write, file = output_sop)
-  rm(rts, sop)
   c("rt" = output_rt, "sop" = output_sop)
 }

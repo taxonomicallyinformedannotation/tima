@@ -103,6 +103,5 @@ prepare_libraries_sop_closed <- function(
   )
   export_output(x = closed_prepared, file = output)
 
-  rm(closed_prepared)
   output
 }

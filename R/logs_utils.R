@@ -432,7 +432,6 @@ log_similarity_distribution <- function(scores, title) {
   counts <- stats::setNames(as.integer(tab[lvl]), lvl)
   log_similarity_distribution_counts(counts = counts, title = title)
 
-  rm(sc, bins, lvl, tab, counts)
   invisible(NULL)
 }
 

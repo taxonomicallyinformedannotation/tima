@@ -398,6 +398,5 @@ get_mztab_required_columns <- function() {
     SME = sme_required
   )
 
-  rm(schema, sml_required, smf_required, sme_required)
   result
 }

@@ -392,6 +392,5 @@ select_sirius_columns_spectral <- function(df, sirius_version) {
     )
   )
 
-  rm(analog_vals, analog_logical, feature_id, ion_mz, ref_mz, raw_mz_dev)
   result
 }

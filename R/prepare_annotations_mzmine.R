@@ -144,6 +144,5 @@ prepare_annotations_mzmine <- function(
     step = "prepare_annotations_mzmine"
   )
   export_output(x = table, file = output[[1L]])
-  rm(table)
   output[[1L]]
 }

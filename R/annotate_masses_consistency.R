@@ -689,7 +689,7 @@ adduct_to_state_key <- function(adduct) {
   }
   mod_mass <- calculate_net_mod_mass_from_text(adduct)
   if (is.finite(mod_mass)) {
-    return(paste0("fallback-d:", sprintf("%.6f", mod_mass)))
+    return(sprintf("fallback-d:%.6f", mod_mass))
   }
   paste0("raw:", adduct)
 }

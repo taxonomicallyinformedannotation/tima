@@ -90,7 +90,6 @@ prepare_taxa <- function(
       step = "prepare_taxa"
     )
     export_output(x = taxed_tbl, file = output)
-    rm(taxed_tbl)
     output
   }
 

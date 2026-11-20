@@ -143,6 +143,5 @@ prepare_features_components <- function(
   )
   export_output(x = table, file = output)
 
-  rm(table)
   output
 }
