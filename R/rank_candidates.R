@@ -46,7 +46,7 @@ rank_candidates <- function(df) {
     return(df)
   }
 
-  .clean_rank_score <- function(raw_s, n_rows) {
+  .clean_rank_score <- function(raw_s) {
     s <- if (is.numeric(raw_s)) {
       as.double(raw_s)
     } else {
@@ -57,9 +57,9 @@ rank_candidates <- function(df) {
     s
   }
 
-  score_final <- .clean_rank_score(df[[score_col]], n)
+  score_final <- .clean_rank_score(df[[score_col]])
   score_initial <- if ("candidate_score_pseudo_initial" %in% names(df)) {
-    .clean_rank_score(df[["candidate_score_pseudo_initial"]], n)
+    .clean_rank_score(df[["candidate_score_pseudo_initial"]])
   } else {
     rep.int(NA_real_, n)
   }

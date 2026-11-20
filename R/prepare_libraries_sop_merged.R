@@ -104,9 +104,6 @@ prepare_libraries_sop_merged <- function(
   output_key = get_params(
     step = "prepare_libraries_sop_merged"
   )$files$libraries$sop$merged$keys,
-  ## document it above in case
-  # output_org_nam = get_params(step =
-  # "prepare_libraries_sop_merged")$files$libraries$sop$merged$organisms$names,
   output_org_tax_ott = get_params(
     step = "prepare_libraries_sop_merged"
   )$files$libraries$sop$merged$organisms$taxonomies$ott,

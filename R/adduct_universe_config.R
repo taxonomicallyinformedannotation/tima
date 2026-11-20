@@ -327,7 +327,6 @@ generate_adduct_hypotheses <- function(
   max_losses_per_adduct,
   plausible_mz_range
 ) {
-  carrier_idx <- seq_len(n_carriers)
   z_valid_mask <- abs(charges_polarity) >= 1L & abs(charges_polarity) <= 6L
   valid_z_vals <- charges_polarity[z_valid_mask]
 
@@ -342,7 +341,6 @@ generate_adduct_hypotheses <- function(
     lapply(valid_ri, function(ri) {
       .adduct_carrier_state(
         counts = comp_mat[ri, ],
-        carrier_idx = carrier_idx,
         parsed_carriers = parsed_carriers,
         carrier_mass = carrier_mass
       )
@@ -388,7 +386,6 @@ generate_adduct_hypotheses <- function(
 
 .adduct_carrier_state <- function(
   counts,
-  carrier_idx,
   parsed_carriers,
   carrier_mass
 ) {

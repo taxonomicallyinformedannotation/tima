@@ -124,13 +124,6 @@ download_example_files_impl <- function(
       export = paths$data$source$features
     )
   }
-  # if ("hmdb_is" %in% example) {
-  #   log_trace("HMDB in silico")
-  #   get_file(
-  #     url = get_default_paths()$urls$hmdb$spectra$predicted,
-  #     export = get_default_paths()$data$source$libraries$spectra$is$hmdb
-  #   )
-  # }
   if ("metadata" %in% example) {
     log_debug("Downloading metadata example")
     download_file(
@@ -148,7 +141,6 @@ download_example_files_impl <- function(
     log_debug("Downloading spectra example")
     download_file(
       url = paths$urls$examples$spectra,
-      # url = get_default_paths()$urls$examples$spectra_mini,
       export = paths$data$source$spectra
     )
   }

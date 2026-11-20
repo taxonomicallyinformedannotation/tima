@@ -49,8 +49,6 @@ prepare_params <- function(
     min_length = 1
   )
 
-  # log_info("Preparing TIMA workflow parameters")
-
   # Load all YAML parameter files
   yaml_data <- load_yaml_files()
   yamls_params <- yaml_data$yamls_params
@@ -100,8 +98,6 @@ prepare_params <- function(
   fil_lib_sop_pre_pub <- params_advanced$files$libraries$sop$prepared$pubchemlite
   fil_lib_sop_pre_lot <- params_advanced$files$libraries$sop$prepared$lotus
   fil_lib_sop_pre_rt <- params_advanced$files$libraries$sop$prepared$rt
-  # fil_lib_sop_pre_spe <- params_advanced$files$libraries$sop$prepared$spectral
-  # fil_lib_sop_pre_wik <- params_advanced$files$libraries$sop$prepared$wikidata
   fil_lib_sop_mer_key <- params_advanced$files$libraries$sop$merged$keys
   fil_lib_sop_mer_org_nam <-
     params_advanced$files$libraries$sop$merged$organisms$names
@@ -136,7 +132,6 @@ prepare_params <- function(
   fil_lib_tem_is_mgf_neg <- params_advanced$files$libraries$temporal$is$mgf$neg
   fil_lib_tem_is_mgf_pos <- params_advanced$files$libraries$temporal$is$mgf$pos
   fil_lib_tem_pre <- params_advanced$files$libraries$temporal$prepared
-  # fil_net_spe_edg_raw <- params_advanced$files$networks$spectral$edges$raw
 
   fil_net_spe_edg_raw_ms1 <-
     params_advanced$files$networks$spectral$edges$raw$ms1
@@ -147,18 +142,13 @@ prepare_params <- function(
   fil_net_spe_com_pre <-
     params_advanced$files$networks$spectral$components$prepared
 
-  # fil_met_raw <- params_advanced$files$metadata$raw
   fil_met_pre <- params_advanced$files$metadata$prepared
-
-  # gnps_id <- params_advanced$gnps$id
-  # gnps_workflow <- params_advanced$gnps$workflow
 
   ms_add_neg <- params_advanced$ms$adducts$neg
   ms_add_pos <- params_advanced$ms$adducts$pos
   ms_clu <- unique(as.character(params_advanced$ms$clusters))
   ms_sol <- unique(as.character(params_advanced$ms$solvents))
   ms_neu <- params_advanced$ms$neutral_losses
-  # ms_pol <- params_advanced$ms$polarity
   ms_thr_ms2_int <- params_advanced$ms$thresholds$ms2$intensity
   ms_thr_ms2_min_fragments <- params_advanced$ms$thresholds$ms2$min_fragments
   ms_tol_mas_ppm_ms1 <- params_advanced$ms$tolerances$mass$ppm$ms1
@@ -199,18 +189,12 @@ prepare_params <- function(
   org_fil_mod <- params_advanced$organisms$filter$mode
   org_fil_lev <- params_advanced$organisms$filter$level
   org_fil_val <- params_advanced$organisms$filter$value
-  # org_tax <- params_advanced$organisms$taxon
   sim_met_ann <- params_advanced$similarities$methods$annotations
   sim_met_edg <- params_advanced$similarities$methods$edges
   sim_thr_ann <- params_advanced$similarities$thresholds$annotations
-  # too_met <- params_advanced$tools$metadata
-  # too_net_spe_com <- params_advanced$tools$networks$spectral$components
-  # too_net_spe_edg <- params_advanced$tools$networks$spectral$edges
   too_sir_ver <- params_advanced$tools$sirius$version
   too_sir_max_analog_abs_mz_error <-
     params_advanced$tools$sirius$max_analog_abs_mz_error
-  # too_tax_bio <- params_advanced$tools$taxonomies$biological
-  # too_tax_che <- params_advanced$tools$taxonomies$chemical
   units_rt <- params_advanced$units$rt
   wei_glo_bio <- params_advanced$weights$global$biological
   wei_glo_che <- params_advanced$weights$global$chemical
@@ -239,10 +223,8 @@ prepare_params <- function(
   wei_che_23 <- params_advanced$weights$chemical$npc$class
   wei_che_14 <- params_advanced$weights$chemical$cla$parent
   opt_cpd_nam <- params_advanced$options$compounds_names
-  # opt_hig_evi <- params_advanced$options$high_evidence
   opt_for <- params_advanced$options$force
   opt_rem_tie <- params_advanced$options$remove_ties
-  # opt_sum <- params_advanced$options$summarize
 
   fil_pat <- params_small$files$pattern
   fil_fea_raw <- params_small$files$features$raw

@@ -80,8 +80,7 @@ build_evidence_supported_hypotheses <- function(
   tier_v <- as.integer(uni_dt$adduct_tier)
   core_v <- as.logical(uni_dt$is_core_adduct)
   req_core_v <- as.logical(uni_dt$requires_core_support)
-  # min_cluster_support available for future tier-based evidence requirements
-  # min_support_v <- as.integer(uni_dt$min_cluster_support)
+  # min_support_v available for future tier-based evidence requirements
   K <- length(adduct_v)
 
   exact_masses_num <- as.numeric(exact_masses)

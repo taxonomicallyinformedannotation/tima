@@ -280,7 +280,6 @@ MZTAB_TERM_FALLBACKS <- list(
 # on every `write_mztab()` / `validate_mztab_tables()` call.
 .mztab_schema_catalog_cache <- new.env(parent = emptyenv())
 .mztab_schema_cache <- new.env(parent = emptyenv())
-.mztab_terms_cache <- new.env(parent = emptyenv())
 
 #' @keywords internal
 .mztab_schema_catalog <- function(software_version = NULL) {

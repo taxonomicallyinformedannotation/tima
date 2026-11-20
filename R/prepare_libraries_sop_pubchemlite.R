@@ -136,7 +136,6 @@ prepare_libraries_sop_pubchemlite <- function(
   } else {
     log_debug("PubChem Lite library already exists and is valid")
     log_complete(ctx, cached = TRUE)
-    output
   }
 
   output

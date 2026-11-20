@@ -169,7 +169,6 @@ prepare_libraries_sop_hmdb_like <- function(
   } else {
     log_debug("%s library already exists and is valid", source_name)
     log_complete(ctx, cached = TRUE)
-    output
   }
   output
 }

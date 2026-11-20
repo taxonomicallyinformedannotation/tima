@@ -126,12 +126,6 @@ VALID_MS_MODES <- c("pos", "neg")
 #' @keywords internal
 VALID_SIMILARITY_METHODS <- c("entropy", "cosine", "gnps")
 
-
-#' Log levels available (in order of severity)
-#' @keywords internal
-LOG_LEVELS <- c("TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL")
-
-
 #' Default batch size for parallel processing
 #' @keywords internal
 DEFAULT_BATCH_SIZE <- 1000
