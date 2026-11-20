@@ -233,7 +233,9 @@ parse_hmdb_like_input <- function(input) {
   }
 
   if (grepl("\\.sdf$", input, ignore.case = TRUE)) {
-    return(parse_hmdb_like_sdf_file(input))
+    return(parse_hmdb_like_sdf_lines(
+      readLines(con = input, warn = FALSE, encoding = "UTF-8")
+    ))
   }
 
   cli::cli_abort(
@@ -243,11 +245,6 @@ parse_hmdb_like_input <- function(input) {
   )
 }
 
-parse_hmdb_like_sdf_file <- function(sdf_file) {
-  parse_hmdb_like_sdf_lines(
-    readLines(con = sdf_file, warn = FALSE, encoding = "UTF-8")
-  )
-}
 
 parse_hmdb_like_sdf_lines <- function(sdf_lines) {
   if (length(sdf_lines) == 0L) {

@@ -1,23 +1,3 @@
-#' Extract m/z values from peak data matrix
-#' @keywords internal
-.extract_mz_values <- function(peak_data) {
-  if (is.matrix(peak_data) && ncol(peak_data) >= 1L) {
-    peak_data[, 1L]
-  } else {
-    numeric(0)
-  }
-}
-
-#' Extract intensity values from peak data matrix
-#' @keywords internal
-.extract_intensity_values <- function(peak_data) {
-  if (is.matrix(peak_data) && ncol(peak_data) >= 2L) {
-    peak_data[, 2L]
-  } else {
-    numeric(0)
-  }
-}
-
 #' @title Extract spectra from Spectra object
 #'
 #' @description Extracts and harmonizes spectra data from a Spectra object into
@@ -105,14 +85,24 @@ extract_spectra <- function(object) {
 
   peaks_data <- object@backend@peaksData
 
+  extract_peak_col <- function(peak_data, col) {
+    if (is.matrix(peak_data) && ncol(peak_data) >= col) {
+      peak_data[, col]
+    } else {
+      numeric(0)
+    }
+  }
+
   spectra[["mz"]] <- lapply(
     X = peaks_data,
-    FUN = .extract_mz_values
+    FUN = extract_peak_col,
+    col = 1L
   )
 
   spectra[["intensity"]] <- lapply(
     X = peaks_data,
-    FUN = .extract_intensity_values
+    FUN = extract_peak_col,
+    col = 2L
   )
 
   spectra <- tidytable::as_tidytable(spectra)

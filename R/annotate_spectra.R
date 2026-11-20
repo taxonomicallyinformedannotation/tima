@@ -482,13 +482,6 @@ normalize_input_files <- function(x, label) {
   x
 }
 
-#' @keywords internal
-annotate_spectra_return_empty_template <- function(path) {
-  log_warn("Returning empty annotation template")
-  empty <- fake_annotations_columns()
-  export_output(x = empty, file = path)
-  invisible(path)
-}
 
 #' @keywords internal
 persist_annotation_parameters <- function(params) {
@@ -502,7 +495,10 @@ annotate_spectra_handle_empty_result <- function(path, params, message = NULL) {
     log_warn(message)
   }
   persist_annotation_parameters(params)
-  annotate_spectra_return_empty_template(path)
+  log_warn("Returning empty annotation template")
+  empty <- fake_annotations_columns()
+  export_output(x = empty, file = path)
+  invisible(path)
 }
 
 #' Classify pre-flight MGF issues as recoverable or fatal.

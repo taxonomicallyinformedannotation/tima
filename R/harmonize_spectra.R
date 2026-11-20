@@ -84,8 +84,8 @@ harmonize_spectra <- function(
   }
 
   # Validate all column parameters are character strings or NULL
-  validate_column_mappings(
-    list(
+  validate_all_with_predicate(
+    x_list = list(
       col_ad = col_ad,
       col_ce = col_ce,
       col_ci = col_ci,
@@ -100,7 +100,9 @@ harmonize_spectra <- function(
       col_si = col_si,
       col_sp = col_sp,
       col_sy = col_sy
-    )
+    ),
+    predicate_fn = is_null_or_single_string,
+    error_prefix = "Column name parameter(s)"
   )
 
   columns <- c(
@@ -281,15 +283,4 @@ harmonize_spectra <- function(
   log_complete(ctx, n_harmonized = nrow(spectra_harmonized))
 
   spectra_harmonized
-}
-
-
-#' Validate column mapping parameters
-#' @keywords internal
-validate_column_mappings <- function(col_params) {
-  validate_all_with_predicate(
-    x_list = col_params,
-    predicate_fn = is_null_or_single_string,
-    error_prefix = "Column name parameter(s)"
-  )
 }

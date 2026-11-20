@@ -45,7 +45,11 @@ replace_id <- function(
   validate_character(x, param_name = "x", allow_empty = FALSE)
 
   # Convert empty strings to NULL for consistent handling
-  user_gnps <- normalize_to_null(user_gnps)
+  if (
+    is.null(user_gnps) || length(user_gnps) == 0L || identical(user_gnps, "")
+  ) {
+    user_gnps <- NULL
+  }
 
   # Normalize example GNPS ID
   if (!is.null(user_gnps) && user_gnps == example_gnps) {
@@ -55,49 +59,20 @@ replace_id <- function(
   dir_path <- dirname(x)
   file_name <- basename(x)
 
-  old_id <- extract_id_prefix(file_name)
+  old_id <- sub("^([^_]+)_.*$", "\\1", file_name)
 
   # GNPS ID takes precedence over filename pattern
   new_id <- user_gnps %||% user_filename
 
-  new_file_name <- replace_id_in_filename(file_name, old_id, new_id)
-
-  reconstruct_path(dir_path, new_file_name)
-}
-
-
-#' Normalize empty values to NULL
-#' @keywords internal
-normalize_to_null <- function(value) {
-  if (is.null(value) || length(value) == 0L || identical(value, "")) {
-    NULL
-  } else {
-    value
-  }
-}
-
-#' Extract ID prefix from filename
-#' @keywords internal
-extract_id_prefix <- function(filename) {
-  sub("^([^_]+)_.*$", "\\1", filename)
-}
-
-#' Replace ID in filename
-#' @keywords internal
-replace_id_in_filename <- function(filename, old_id, new_id) {
-  sub(
+  new_file_name <- sub(
     pattern = paste0("^", old_id),
     replacement = new_id,
-    x = filename
+    x = file_name
   )
-}
 
-#' Reconstruct full path from directory and filename
-#' @keywords internal
-reconstruct_path <- function(dir_path, filename) {
   if (dir_path == ".") {
-    filename
+    new_file_name
   } else {
-    file.path(dir_path, filename)
+    file.path(dir_path, new_file_name)
   }
 }

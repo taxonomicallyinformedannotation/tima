@@ -995,13 +995,30 @@ complement_metadata_structures <- function(
 }
 
 .ensure_structure_placeholders <- function(df) {
-  placeholder_candidate_cols <- .schema_candidate_structure_placeholders()
-  placeholder_structure_cols <- .schema_structure_placeholders()
-
-  needed <- setdiff(
-    c(placeholder_candidate_cols, placeholder_structure_cols),
-    names(df)
+  common_structure_cols <- c(
+    "structure_molecular_formula",
+    "structure_exact_mass",
+    "structure_xlogp",
+    "structure_tag",
+    "structure_name",
+    "structure_inchikey_connectivity_layer",
+    "structure_smiles_no_stereo"
   )
+  placeholder_cols <- c(
+    paste0("candidate_", common_structure_cols),
+    "candidate_structure_inchikey_no_stereo",
+    "candidate_structure_tax_npc_01pat",
+    "candidate_structure_tax_npc_02sup",
+    "candidate_structure_tax_npc_03cla",
+    "candidate_structure_tax_cla_chemontid",
+    "candidate_structure_tax_cla_01kin",
+    "candidate_structure_tax_cla_02sup",
+    "candidate_structure_tax_cla_03cla",
+    "candidate_structure_tax_cla_04dirpar",
+    common_structure_cols
+  )
+
+  needed <- setdiff(placeholder_cols, names(df))
   if (length(needed) == 0L) {
     return(df)
   }
@@ -1054,38 +1071,6 @@ complement_metadata_structures <- function(
   )
 }
 
-.schema_candidate_structure_placeholders <- function() {
-  c(
-    "candidate_structure_molecular_formula",
-    "candidate_structure_exact_mass",
-    "candidate_structure_xlogp",
-    "candidate_structure_tag",
-    "candidate_structure_name",
-    "candidate_structure_inchikey_connectivity_layer",
-    "candidate_structure_inchikey_no_stereo",
-    "candidate_structure_smiles_no_stereo",
-    "candidate_structure_tax_npc_01pat",
-    "candidate_structure_tax_npc_02sup",
-    "candidate_structure_tax_npc_03cla",
-    "candidate_structure_tax_cla_chemontid",
-    "candidate_structure_tax_cla_01kin",
-    "candidate_structure_tax_cla_02sup",
-    "candidate_structure_tax_cla_03cla",
-    "candidate_structure_tax_cla_04dirpar"
-  )
-}
-
-.schema_structure_placeholders <- function() {
-  c(
-    "structure_molecular_formula",
-    "structure_exact_mass",
-    "structure_xlogp",
-    "structure_tag",
-    "structure_name",
-    "structure_inchikey_connectivity_layer",
-    "structure_smiles_no_stereo"
-  )
-}
 
 .safe_fread_selected <- function(file, file_type, selected_cols) {
   header <- names(safe_fread(
