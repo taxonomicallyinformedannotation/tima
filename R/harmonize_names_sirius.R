@@ -1,3 +1,34 @@
+#' Strip prefix or suffix pattern from SIRIUS names with optional unique caching
+#' @noRd
+.strip_sirius_name_part <- function(x, pattern, missing_msg) {
+  if (missing(x) || is.null(x)) {
+    cli::cli_abort(
+      missing_msg,
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
+  }
+
+  if (!is.character(x)) {
+    x <- as.character(x)
+  }
+
+  n <- length(x)
+  if (n > 256L) {
+    ux <- unique(x)
+    if (length(ux) * 2L < n) {
+      u_harm <- sub(pattern = pattern, replacement = "", x = ux, perl = TRUE)
+      return(u_harm[fastmatch::fmatch(x, ux)])
+    }
+  }
+  sub(
+    pattern = pattern,
+    replacement = "",
+    x = x,
+    perl = TRUE
+  )
+}
+
 #' @title Harmonize names sirius
 #'
 #' @description This function harmonizes SIRIUS output column names by removing
@@ -19,32 +50,5 @@
 #' harmonize_names_sirius("score") # Returns "score" (no underscore)
 #' }
 harmonize_names_sirius <- function(x) {
-  if (missing(x) || is.null(x)) {
-    cli::cli_abort(
-      "input {.arg x} must be provided",
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
-  }
-
-  if (!is.character(x)) {
-    x <- as.character(x)
-  }
-
-  # Remove everything up to and including the last underscore
-  # This extracts the meaningful column name from SIRIUS prefixed names
-  n <- length(x)
-  if (n > 256L) {
-    ux <- unique(x)
-    if (length(ux) * 2L < n) {
-      u_harm <- sub(pattern = ".*_", replacement = "", x = ux, perl = TRUE)
-      return(u_harm[fastmatch::fmatch(x, ux)])
-    }
-  }
-  sub(
-    pattern = ".*_",
-    replacement = "",
-    x = x,
-    perl = TRUE
-  )
+  .strip_sirius_name_part(x, ".*_", "input {.arg x} must be provided")
 }

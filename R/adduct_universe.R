@@ -219,10 +219,7 @@ build_adduct_universe_from_legacy <- function(
     losses = rep(list(integer()), n_base)
   ))
 
-  # Cluster-only modifier blocks
-  cl_blocks <- lapply(seq_along(clusters), function(ci) {
-    cl <- clusters[[ci]]
-    new_strings <- apply_modifier_to_adducts(base_adducts, cl, "+")
+  make_mod_block <- function(new_strings, mass_delta, cl_entry, lo_entry) {
     idx <- which(!is.na(new_strings) & nzchar(new_strings))
     n_k <- length(idx)
     list(
@@ -230,26 +227,31 @@ build_adduct_universe_from_legacy <- function(
       n_mer = base_n_mer[idx],
       n_iso = base_n_iso[idx],
       z = base_z[idx],
-      adduct_mass = base_adduct_mass[idx] + cluster_masses[[ci]],
-      clusters = rep(list(stats::setNames(1L, cl)), n_k),
-      losses = rep(list(integer()), n_k)
+      adduct_mass = base_adduct_mass[idx] + mass_delta,
+      clusters = rep(list(cl_entry), n_k),
+      losses = rep(list(lo_entry), n_k)
+    )
+  }
+
+  # Cluster-only modifier blocks
+  cl_blocks <- lapply(seq_along(clusters), function(ci) {
+    cl <- clusters[[ci]]
+    make_mod_block(
+      new_strings = apply_modifier_to_adducts(base_adducts, cl, "+"),
+      mass_delta = cluster_masses[[ci]],
+      cl_entry = stats::setNames(1L, cl),
+      lo_entry = integer()
     )
   })
 
   # Loss-only modifier blocks
   lo_blocks <- lapply(seq_along(neutral_losses), function(li) {
     lo <- neutral_losses[[li]]
-    new_strings <- apply_modifier_to_adducts(base_adducts, lo, "-")
-    idx <- which(!is.na(new_strings) & nzchar(new_strings))
-    n_k <- length(idx)
-    list(
-      adduct = new_strings[idx],
-      n_mer = base_n_mer[idx],
-      n_iso = base_n_iso[idx],
-      z = base_z[idx],
-      adduct_mass = base_adduct_mass[idx] - loss_masses[[li]],
-      clusters = rep(list(integer()), n_k),
-      losses = rep(list(stats::setNames(1L, lo)), n_k)
+    make_mod_block(
+      new_strings = apply_modifier_to_adducts(base_adducts, lo, "-"),
+      mass_delta = -loss_masses[[li]],
+      cl_entry = integer(),
+      lo_entry = stats::setNames(1L, lo)
     )
   })
 
@@ -259,23 +261,15 @@ build_adduct_universe_from_legacy <- function(
       lapply(seq_along(neutral_losses), function(li) {
         lo <- neutral_losses[[li]]
         lo_mass <- loss_masses[[li]]
-        lo_named <- list(stats::setNames(1L, lo))
+        lo_named <- stats::setNames(1L, lo)
         loss_strings <- apply_modifier_to_adducts(base_adducts, lo, "-")
         lapply(seq_along(clusters), function(ci) {
           cl <- clusters[[ci]]
-          new_strings <- apply_modifier_to_adducts(loss_strings, cl, "+")
-          idx <- which(!is.na(new_strings) & nzchar(new_strings))
-          n_k <- length(idx)
-          list(
-            adduct = new_strings[idx],
-            n_mer = base_n_mer[idx],
-            n_iso = base_n_iso[idx],
-            z = base_z[idx],
-            adduct_mass = base_adduct_mass[idx] +
-              cluster_masses[[ci]] -
-              lo_mass,
-            clusters = rep(list(stats::setNames(1L, cl)), n_k),
-            losses = rep(lo_named, n_k)
+          make_mod_block(
+            new_strings = apply_modifier_to_adducts(loss_strings, cl, "+"),
+            mass_delta = cluster_masses[[ci]] - lo_mass,
+            cl_entry = stats::setNames(1L, cl),
+            lo_entry = lo_named
           )
         })
       }),

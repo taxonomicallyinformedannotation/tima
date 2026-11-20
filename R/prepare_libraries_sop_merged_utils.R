@@ -191,7 +191,7 @@ apply_taxonomic_filter <- function(
     matching_orgs <- matching_orgs[!is.na(matching_orgs)]
   }
 
-  if (length(matching_orgs) == 0L) {
+  abort_empty_filter <- function() {
     cli::cli_abort(
       c(
         "filter led to no entries",
@@ -204,6 +204,10 @@ apply_taxonomic_filter <- function(
     )
   }
 
+  if (length(matching_orgs) == 0L) {
+    abort_empty_filter()
+  }
+
   keep_rows <- fastmatch::fmatch(
     table_keys$organism_name,
     matching_orgs,
@@ -211,16 +215,7 @@ apply_taxonomic_filter <- function(
   ) >
     0L
   if (!any(keep_rows)) {
-    cli::cli_abort(
-      c(
-        "filter led to no entries",
-        "x" = paste0("level: ", level),
-        "i" = paste0("value: ", value),
-        "i" = "try different filter criteria"
-      ),
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
+    abort_empty_filter()
   }
 
   idx <- which(keep_rows)

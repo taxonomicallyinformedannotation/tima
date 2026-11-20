@@ -429,17 +429,8 @@ log_similarity_distribution <- function(scores, title) {
   # Ensure all bins are present, including zeros
   lvl <- levels(bins)
   tab <- table(bins)
-  counts <- as.integer(tab[lvl])
-  dist <- data.frame(bin = lvl, N = counts, stringsAsFactors = FALSE)
-  dist <- add_percentage_column(dist, count_col = "N", out_col = "Pct")
-  log_info(title)
-  log_info(
-    "\n%s",
-    paste(
-      utils::capture.output(print.data.frame(x = dist, row.names = FALSE)),
-      collapse = "\n"
-    )
-  )
+  counts <- stats::setNames(as.integer(tab[lvl]), lvl)
+  log_similarity_distribution_counts(counts = counts, title = title)
 
   rm(sc, bins, lvl, tab, counts)
   invisible(NULL)

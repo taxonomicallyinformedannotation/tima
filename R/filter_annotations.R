@@ -384,18 +384,6 @@ validate_filter_annotations_inputs <- function(
         call = NULL
       )
     }
-
-    missing_annotations <- ann_vec[!file.exists(ann_vec)]
-    if (length(missing_annotations) > 0L) {
-      cli::cli_abort(
-        c(
-          "annotation file(s) not found",
-          "x" = paste(missing_annotations, collapse = ", ")
-        ),
-        class = c("tima_validation_error", "tima_error"),
-        call = NULL
-      )
-    }
   } else {
     if (!is.character(annotations) || length(annotations) == 0L) {
       cli::cli_abort(
@@ -404,18 +392,19 @@ validate_filter_annotations_inputs <- function(
         call = NULL
       )
     }
+    ann_vec <- annotations
+  }
 
-    missing_annotations <- annotations[!file.exists(annotations)]
-    if (length(missing_annotations) > 0L) {
-      cli::cli_abort(
-        c(
-          "annotation file(s) not found",
-          "x" = paste(missing_annotations, collapse = ", ")
-        ),
-        class = c("tima_validation_error", "tima_error"),
-        call = NULL
-      )
-    }
+  missing_annotations <- ann_vec[!file.exists(ann_vec)]
+  if (length(missing_annotations) > 0L) {
+    cli::cli_abort(
+      c(
+        "annotation file(s) not found",
+        "x" = paste(missing_annotations, collapse = ", ")
+      ),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
   }
 
   if (length(rts) > 0) {

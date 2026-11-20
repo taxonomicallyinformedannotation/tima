@@ -48,6 +48,17 @@ sanitize_all_inputs <- function(
   all_valid <- TRUE
   issues_found <- list()
 
+  log_issue_bullets <- function(items, prefix = "  - %s") {
+    invisible(vapply(
+      X = items,
+      FUN = function(item) {
+        log_error(prefix, item)
+        TRUE
+      },
+      FUN.VALUE = logical(1L)
+    ))
+  }
+
   # Check features file
   if (!is.null(features_file)) {
     log_info("Checking features file...")
@@ -67,14 +78,7 @@ sanitize_all_inputs <- function(
       log_debug("  Columns: %s", paste(result$columns, collapse = ", "))
     } else {
       log_error("[X] Features file has issues:")
-      invisible(vapply(
-        X = result$issues,
-        FUN = function(issue) {
-          log_error("  - %s", issue)
-          TRUE
-        },
-        FUN.VALUE = logical(1L)
-      ))
+      log_issue_bullets(result$issues)
       issues_found$features <- result$issues
       all_valid <- FALSE
     }
@@ -89,14 +93,7 @@ sanitize_all_inputs <- function(
       log_success("[OK] MGF file: %d MS2 spectra found", result$n_spectra)
     } else {
       log_error("[X] MGF file has issues:")
-      invisible(vapply(
-        X = result$issues,
-        FUN = function(issue) {
-          log_error("  - %s", issue)
-          TRUE
-        },
-        FUN.VALUE = logical(1L)
-      ))
+      log_issue_bullets(result$issues)
       issues_found$mgf <- result$issues
       all_valid <- FALSE
     }
@@ -132,24 +129,13 @@ sanitize_all_inputs <- function(
       }
     } else {
       log_error("[X] Metadata validation has issues:")
-      invisible(vapply(
-        X = result$issues,
-        FUN = function(issue) {
-          log_error("  - %s", issue)
-          TRUE
-        },
-        FUN.VALUE = logical(1L)
-      ))
+      log_issue_bullets(result$issues)
       if (length(result$unmatched_files) > 0L) {
         log_error("  Unmatched files:")
-        invisible(vapply(
-          X = utils::head(result$unmatched_files, 5),
-          FUN = function(f) {
-            log_error("    - %s", f)
-            TRUE
-          },
-          FUN.VALUE = logical(1L)
-        ))
+        log_issue_bullets(
+          utils::head(result$unmatched_files, 5),
+          prefix = "    - %s"
+        )
         if (length(result$unmatched_files) > 5L) {
           log_error("    ... and %d more", length(result$unmatched_files) - 5L)
         }
@@ -191,14 +177,7 @@ sanitize_all_inputs <- function(
       )
     } else {
       log_error("[X] SIRIUS output has issues:")
-      invisible(vapply(
-        X = result$issues,
-        FUN = function(issue) {
-          log_error("  - %s", issue)
-          TRUE
-        },
-        FUN.VALUE = logical(1L)
-      ))
+      log_issue_bullets(result$issues)
       issues_found$sirius <- result$issues
       all_valid <- FALSE
     }

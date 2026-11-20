@@ -20,32 +20,5 @@
 #' pre_harmonize_names_sirius("name/extra/info") # Returns "name"
 #' }
 pre_harmonize_names_sirius <- function(x) {
-  if (missing(x) || is.null(x)) {
-    cli::cli_abort(
-      "input 'x' must be provided",
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
-  }
-
-  if (!is.character(x)) {
-    x <- as.character(x)
-  }
-
-  # Remove everything from the first forward slash onwards
-  # This strips SIRIUS suffix information from column names
-  n <- length(x)
-  if (n > 256L) {
-    ux <- unique(x)
-    if (length(ux) * 2L < n) {
-      u_clean <- sub(pattern = "/.*", replacement = "", x = ux, perl = TRUE)
-      return(u_clean[fastmatch::fmatch(x, ux)])
-    }
-  }
-  sub(
-    pattern = "/.*",
-    replacement = "",
-    x = x,
-    perl = TRUE
-  )
+  .strip_sirius_name_part(x, "/.*", "input 'x' must be provided")
 }

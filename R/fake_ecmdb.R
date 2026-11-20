@@ -15,6 +15,49 @@
   file.exists(basename(export))
 }
 
+#' Write fake payload to temp file, zip it, move to destination, and clean up
+#' @noRd
+.write_fake_zip_archive <- function(
+  export,
+  fake_export,
+  content,
+  zip_cmd,
+  zip_fallback,
+  archive_exists,
+  label
+) {
+  # Write payload to temporary file
+  writeLines(content, fake_export)
+
+  zip_result <- zip_cmd(export = export, fake_export = fake_export)
+
+  if (zip_result != 0) {
+    log_warn("Failed to create zip file, trying alternative method")
+    zip_fallback(export = export, fake_export = fake_export)
+  }
+
+  # Move to final location (handles cross-device moves in Docker)
+  if (archive_exists(export)) {
+    moved <- move_file_safely(basename(export), export)
+    if (!isTRUE(moved)) {
+      cli::cli_abort(
+        c(
+          "failed to move temporary archive",
+          "x" = export
+        ),
+        class = c("tima_runtime_error", "tima_error"),
+        call = NULL
+      )
+    }
+  }
+
+  # Clean up temporary file
+  unlink(fake_export)
+
+  log_debug("Created fake %s file at: %s", label, export)
+  export
+}
+
 #' @title Fake ECMDB
 #'
 #' @description This function creates a minimal fake ECMDB JSON file when the
@@ -59,34 +102,13 @@ fake_ecmdb <- function(export) {
     "}]"
   )
 
-  # Write JSON to temporary file
-  writeLines(fake_json, fake_export)
-
-  zip_result <- .fake_zip_cmd(export = export, fake_export = fake_export)
-
-  if (zip_result != 0) {
-    log_warn("Failed to create zip file, trying alternative method")
-    .fake_zip_fallback(export = export, fake_export = fake_export)
-  }
-
-  # Move to final location (handles cross-device moves in Docker)
-  if (.fake_archive_exists(export)) {
-    moved <- move_file_safely(basename(export), export)
-    if (!isTRUE(moved)) {
-      cli::cli_abort(
-        c(
-          "failed to move temporary archive",
-          "x" = export
-        ),
-        class = c("tima_runtime_error", "tima_error"),
-        call = NULL
-      )
-    }
-  }
-
-  # Clean up temporary file
-  unlink(fake_export)
-
-  log_debug("Created fake ECMDB file at: %s", export)
-  export
+  .write_fake_zip_archive(
+    export = export,
+    fake_export = fake_export,
+    content = fake_json,
+    zip_cmd = .fake_zip_cmd,
+    zip_fallback = .fake_zip_fallback,
+    archive_exists = .fake_archive_exists,
+    label = "ECMDB"
+  )
 }

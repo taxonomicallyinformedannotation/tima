@@ -38,32 +38,32 @@ NULL
 #' Monoisotopic neutral mass (Da) for the atomic / radical building blocks
 #' used to compose charge carriers.
 #' @keywords internal
-ATOMIC_MONOISOTOPIC_MASS <- c(
+ATOMIC_MONOISOTOPIC_MASS <- ISOTOPE_MONOISOTOPIC_MASS[c(
   # Same values as calculate_formula_mass(), so that carrier masses
   # and library exact masses come from one element table
-  H = 1.007825032,
-  Li = 7.01600455,
-  B = 11.0093054,
-  C = 12.0000000,
-  N = 14.003074,
-  O = 15.99491462,
-  F = 18.99840322,
-  Na = 22.98976928,
-  Mg = 23.9850417,
-  Al = 26.98153863,
-  Si = 27.97692653,
-  P = 30.97376163,
-  S = 31.972071,
-  Cl = 34.96885268,
-  K = 38.96370668,
-  Ca = 39.96259098,
-  Mn = 54.9380451,
-  Fe = 55.9349375,
-  Cu = 62.9295975,
-  Zn = 63.9291422,
-  Br = 78.9183371,
-  I = 126.904473
-)
+  "H",
+  "Li",
+  "B",
+  "C",
+  "N",
+  "O",
+  "F",
+  "Na",
+  "Mg",
+  "Al",
+  "Si",
+  "P",
+  "S",
+  "Cl",
+  "K",
+  "Ca",
+  "Mn",
+  "Fe",
+  "Cu",
+  "Zn",
+  "Br",
+  "I"
+)]
 
 #' Intrinsic ion charge for charge-carrier *names* as declared in YAML.
 #' Compound carriers like "Na-2H" are decomposed by [parse_carrier_token()].

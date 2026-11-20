@@ -188,51 +188,7 @@ import_spectra <- function(
     )
   }
 
-  # Harmonize legacy metadata fields to standard names
-  spec_cols <- colnames(spectra@backend@spectraData)
-  ms_level_cols <- intersect(c("MSLEVEL", "MS_LEVEL"), spec_cols)
-  if (length(ms_level_cols) > 0L) {
-    spectra$msLevel <- as.integer(spectra[[ms_level_cols[[length(
-      ms_level_cols
-    )]]]])
-  }
-  prec_mz_cols <- intersect(
-    c("PRECURSOR_MZ", "PrecursorMZ", "PrecursorMz", "precursor_mz"),
-    spec_cols
-  )
-  if (length(prec_mz_cols) > 0L) {
-    spectra$precursorMz <- as.numeric(spectra[[prec_mz_cols[[length(
-      prec_mz_cols
-    )]]]])
-  }
-  if ("spectrum_id" %in% spec_cols) {
-    spectra$spectrum_id <- as.character(spectra$spectrum_id)
-  }
-
-  # Parse feature ID from TITLE field (e.g. "id:42, rt:168.84, mz:293.1762, ...")
-  # Only if no dedicated ID field is already present.
-  if (
-    "TITLE" %in% spec_cols && !any(c("FEATURE_ID", "SLAW_ID") %in% spec_cols)
-  ) {
-    parsed_ids <- stri_match_first_regex(
-      spectra@backend@spectraData$TITLE,
-      "(?<![_a-zA-Z])id:(\\d+)"
-    )[, 2L]
-    if (!all(is.na(parsed_ids))) {
-      log_debug(
-        "Extracted FEATURE_ID from TITLE field for %d spectra",
-        sum(!is.na(parsed_ids))
-      )
-      spectra$FEATURE_ID <- parsed_ids
-    }
-    # parsed_ids (length == n_initial) has done its job the moment it's
-    # folded into spectra$FEATURE_ID above. Everything from here to the end
-    # of the function -- MS-level filtering, precursor/polarity filtering,
-    # combineSpectra/combinePeaks, and the full sanitize_spectra() call --
-    # builds successive new copies of `spectra`, and there's no reason for
-    # this vector to keep riding along underneath all of that.
-    rm(parsed_ids)
-  }
+  spectra <- .harmonize_legacy_spectra_metadata(spectra, log_title_ids = TRUE)
 
   # Track how many MS1 (precursor-only) features were dropped during MS2
   # filtering. The count is attached as an attribute on the returned Spectra
@@ -374,6 +330,29 @@ import_spectra <- function(
     )
   }
 
+  spectra <- .harmonize_legacy_spectra_metadata(spectra)
+
+  if (!is.na(polarity)) {
+    charge_values <- if (polarity == "pos") {
+      c(0L, 1L, 2L, 3L)
+    } else {
+      c(0L, -1L, -2L, -3L)
+    }
+    spectra <- Spectra::filterPrecursorCharge(
+      object = spectra,
+      z = charge_values
+    )
+  }
+
+  spectra
+}
+
+#' Harmonize legacy MGF/RDS metadata field names and extract TITLE feature IDs
+#' @noRd
+.harmonize_legacy_spectra_metadata <- function(
+  spectra,
+  log_title_ids = FALSE
+) {
   spec_cols <- colnames(spectra@backend@spectraData)
   ms_level_cols <- intersect(c("MSLEVEL", "MS_LEVEL"), spec_cols)
   if (length(ms_level_cols) > 0L) {
@@ -394,6 +373,8 @@ import_spectra <- function(
     spectra$spectrum_id <- as.character(spectra$spectrum_id)
   }
 
+  # Parse feature ID from TITLE field (e.g. "id:42, rt:168.84, mz:293.1762, ...")
+  # Only if no dedicated ID field is already present.
   if (
     "TITLE" %in% spec_cols && !any(c("FEATURE_ID", "SLAW_ID") %in% spec_cols)
   ) {
@@ -402,23 +383,17 @@ import_spectra <- function(
       "(?<![_a-zA-Z])id:(\\d+)"
     )[, 2L]
     if (!all(is.na(parsed_ids))) {
+      if (log_title_ids) {
+        log_debug(
+          "Extracted FEATURE_ID from TITLE field for %d spectra",
+          sum(!is.na(parsed_ids))
+        )
+      }
       spectra$FEATURE_ID <- parsed_ids
     }
-    # Same reasoning as in import_spectra(): done with its job, no reason to
-    # keep it referenced through the polarity filtering below.
+    # parsed_ids has done its job once folded into spectra$FEATURE_ID; drop it
+    # before downstream MS-level / polarity filtering copies `spectra`.
     rm(parsed_ids)
-  }
-
-  if (!is.na(polarity)) {
-    charge_values <- if (polarity == "pos") {
-      c(0L, 1L, 2L, 3L)
-    } else {
-      c(0L, -1L, -2L, -3L)
-    }
-    spectra <- Spectra::filterPrecursorCharge(
-      object = spectra,
-      z = charge_values
-    )
   }
 
   spectra

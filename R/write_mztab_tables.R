@@ -321,13 +321,7 @@
     if (is.null(x) || length(x) == 0L) {
       return(rep.int("null", n))
     }
-
-    x <- if (is.character(x)) x else as.character(x)
-    bad <- is.na(x) | !nzchar(x)
-    if (any(bad)) {
-      x[bad] <- "null"
-    }
-    x
+    .mztab_norm_scalar(x)
   }
 
   exact_mass_raw <- suppressWarnings(as.numeric(.mztab_safe_scalar(ann[[
@@ -536,15 +530,6 @@
     check.names = FALSE
   )
 
-  .mztab_norm_scalar <- function(x) {
-    x <- if (is.character(x)) x else as.character(x)
-    bad <- is.na(x) | !nzchar(x)
-    if (any(bad)) {
-      x[bad] <- "null"
-    }
-    x
-  }
-
   sme_fids_chr <- as.character(sme_src$feature_id)
   valid_sme_mask <- !is.na(sme_fids_chr) &
     nzchar(sme_fids_chr) &
@@ -636,9 +621,8 @@
     as.numeric(sme_src[["id_confidence_measure[1]"]])
   )
 
-  if (all(counts == 1L)) {
-    ord <- match(seq_len(n_fids), fid_idx)
-    best_score <- score_raw[ord]
+  score_and_reliability <- function(idx) {
+    best_score <- score_raw[idx]
     best_score[!is.finite(best_score)] <- NA_real_
     score_val <- rep.int("null", n_fids)
     valid_bs <- which(!is.na(best_score))
@@ -649,11 +633,20 @@
         fastmatch::fmatch(best_score[valid_bs], u_bs)
       ]
     }
-    best_method <- method_vec[ord]
-    reliability <- as.character(.mztab_score_to_reliability(
-      best_score,
-      best_method
-    ))
+    list(
+      score_val = score_val,
+      reliability = as.character(.mztab_score_to_reliability(
+        best_score,
+        method_vec[idx]
+      ))
+    )
+  }
+
+  if (all(counts == 1L)) {
+    ord <- match(seq_len(n_fids), fid_idx)
+    sr <- score_and_reliability(ord)
+    score_val <- sr$score_val
+    reliability <- sr$reliability
     sme_ids <- sme_id_vec[ord]
     sme_id_refs <- ifelse(sme_ids != "null", sme_ids, "null")
 
@@ -716,22 +709,9 @@
   first_pos <- which(!duplicated(fid_ord))
   best_idx <- ord[first_pos]
 
-  best_score <- score_raw[best_idx]
-  best_score[!is.finite(best_score)] <- NA_real_
-  score_val <- rep.int("null", n_fids)
-  valid_bs <- which(!is.na(best_score))
-  if (length(valid_bs) > 0L) {
-    u_bs <- unique(best_score[valid_bs])
-    u_bs_chr <- as.character(round(u_bs, 6))
-    score_val[valid_bs] <- u_bs_chr[
-      fastmatch::fmatch(best_score[valid_bs], u_bs)
-    ]
-  }
-  best_method <- method_vec[best_idx]
-  reliability <- as.character(.mztab_score_to_reliability(
-    best_score,
-    best_method
-  ))
+  sr <- score_and_reliability(best_idx)
+  score_val <- sr$score_val
+  reliability <- sr$reliability
 
   out_db <- db_vec[best_idx]
   out_cf <- cf_vec[best_idx]
@@ -847,4 +827,15 @@
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
+}
+
+#' Normalize mzTab scalar strings (NA / empty -> "null")
+#' @noRd
+.mztab_norm_scalar <- function(x) {
+  x <- if (is.character(x)) x else as.character(x)
+  bad <- is.na(x) | !nzchar(x)
+  if (any(bad)) {
+    x[bad] <- "null"
+  }
+  x
 }

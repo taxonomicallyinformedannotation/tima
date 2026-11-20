@@ -238,92 +238,77 @@
   ifelse(primary == "null" | !nzchar(primary), fallback, primary)
 }
 
-#' Merge SMF rows and return id map from new IDs to final IDs
-#' @keywords internal
-.mztab_merge_smf_rows <- function(smf_base, smf_new) {
-  smf_all <- smf_base
-  base_keys <- if (nrow(smf_all) > 0L) .mztab_smf_key(smf_all) else character(0)
+#' Shared SMF/SME row merge helper returning merged rows and remapped ID map
+#' @noRd
+.mztab_merge_rows <- function(
+  base_df,
+  new_df,
+  id_col,
+  key_fn,
+  set_sml_null = FALSE
+) {
+  base_keys <- if (nrow(base_df) > 0L) key_fn(base_df) else character(0)
   id_map <- stats::setNames(character(0), character(0))
-  next_id <- .mztab_next_numeric_id(smf_all$SMF_ID)
+  next_id <- .mztab_next_numeric_id(base_df[[id_col]])
 
-  new_keys <- .mztab_smf_key(smf_new)
+  new_keys <- key_fn(new_df)
   match_idx <- match(new_keys, base_keys)
 
-  # Map duplicates and collect new row indices
   dup_idx <- which(!is.na(match_idx))
   new_row_indices <- which(is.na(match_idx))
   new_rows_count <- length(new_row_indices)
 
   if (length(dup_idx) > 0L) {
-    old_ids <- smf_new$SMF_ID[dup_idx]
-    mapped_ids <- smf_all$SMF_ID[match_idx[dup_idx]]
+    old_ids <- new_df[[id_col]][dup_idx]
+    mapped_ids <- base_df[[id_col]][match_idx[dup_idx]]
     id_map <- stats::setNames(as.list(mapped_ids), old_ids)
   }
 
   if (new_rows_count > 0L) {
-    new_rows <- smf_new[new_row_indices, , drop = FALSE]
-    new_rows$SMF_ID <- as.character(next_id + seq_len(new_rows_count) - 1L)
-    new_rows$SML_ID_REFS <- "null"
-
-    # Map new row IDs and append
-    new_old_ids <- smf_new$SMF_ID[new_row_indices]
-    new_mapped_ids <- new_rows$SMF_ID
-    if (length(id_map) > 0L) {
-      id_map <- c(id_map, stats::setNames(as.list(new_mapped_ids), new_old_ids))
-    } else {
-      id_map <- stats::setNames(as.list(new_mapped_ids), new_old_ids)
+    new_rows <- new_df[new_row_indices, , drop = FALSE]
+    new_rows[[id_col]] <- as.character(next_id + seq_len(new_rows_count) - 1L)
+    if (set_sml_null) {
+      new_rows$SML_ID_REFS <- "null"
     }
 
-    smf_all <- tidytable::bind_rows(smf_all, new_rows)
+    new_map <- stats::setNames(
+      as.list(new_rows[[id_col]]),
+      new_df[[id_col]][new_row_indices]
+    )
+    id_map <- c(as.list(id_map), new_map)
+    base_df <- tidytable::bind_rows(base_df, new_rows)
   }
 
-  list(smf = smf_all, id_map = id_map)
+  list(rows = base_df, id_map = id_map)
+}
+
+#' Merge SMF rows and return id map from new IDs to final IDs
+#' @keywords internal
+.mztab_merge_smf_rows <- function(smf_base, smf_new) {
+  res <- .mztab_merge_rows(
+    base_df = smf_base,
+    new_df = smf_new,
+    id_col = "SMF_ID",
+    key_fn = .mztab_smf_key,
+    set_sml_null = TRUE
+  )
+  list(smf = res$rows, id_map = res$id_map)
 }
 
 #' Merge SME rows and return id map from new IDs to final IDs
 #' @keywords internal
 .mztab_merge_sme_rows <- function(sme_base, sme_new, smf_id_map) {
-  sme_all <- sme_base
   sme_new <- sme_new |>
     tidytable::mutate(
       evidence_input_id = .mztab_remap_ref_ids(evidence_input_id, smf_id_map)
     )
-
-  base_keys <- if (nrow(sme_all) > 0L) .mztab_sme_key(sme_all) else character(0)
-  id_map <- stats::setNames(character(0), character(0))
-  next_id <- .mztab_next_numeric_id(sme_all$SME_ID)
-
-  new_keys <- .mztab_sme_key(sme_new)
-  match_idx <- match(new_keys, base_keys)
-
-  # Map duplicates and collect new row indices
-  dup_idx <- which(!is.na(match_idx))
-  new_row_indices <- which(is.na(match_idx))
-  new_rows_count <- length(new_row_indices)
-
-  if (length(dup_idx) > 0L) {
-    old_ids <- sme_new$SME_ID[dup_idx]
-    mapped_ids <- sme_all$SME_ID[match_idx[dup_idx]]
-    id_map <- stats::setNames(as.list(mapped_ids), old_ids)
-  }
-
-  if (new_rows_count > 0L) {
-    new_rows <- sme_new[new_row_indices, , drop = FALSE]
-    new_rows$SME_ID <- as.character(next_id + seq_len(new_rows_count) - 1L)
-
-    # Map new row IDs and append
-    new_old_ids <- sme_new$SME_ID[new_row_indices]
-    new_mapped_ids <- new_rows$SME_ID
-    if (length(id_map) > 0L) {
-      id_map <- c(id_map, stats::setNames(as.list(new_mapped_ids), new_old_ids))
-    } else {
-      id_map <- stats::setNames(as.list(new_mapped_ids), new_old_ids)
-    }
-
-    sme_all <- tidytable::bind_rows(sme_all, new_rows)
-  }
-
-  list(sme = sme_all, id_map = id_map)
+  res <- .mztab_merge_rows(
+    base_df = sme_base,
+    new_df = sme_new,
+    id_col = "SME_ID",
+    key_fn = .mztab_sme_key
+  )
+  list(sme = res$rows, id_map = res$id_map)
 }
 
 #' Merge SML rows and enrich references for duplicates

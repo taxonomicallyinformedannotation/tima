@@ -149,6 +149,28 @@ stri_trans_totitle <- function(str) {
   tools::toTitleCase(str)
 }
 
+#' Recycle pattern/replacement pairs and fold step_fn over string input
+#' @noRd
+.stri_replace_all_recycle <- function(str, pattern, replacement, step_fn) {
+  patterns <- as.character(pattern)
+  replacements <- as.character(replacement)
+  n <- max(length(patterns), length(replacements))
+  if (n == 0L) {
+    return(str)
+  }
+  Reduce(
+    function(cur, i) {
+      step_fn(
+        cur = cur,
+        pat = patterns[(i - 1L) %% length(patterns) + 1L],
+        repl = replacements[(i - 1L) %% length(replacements) + 1L]
+      )
+    },
+    seq_len(n),
+    init = str
+  )
+}
+
 stri_replace_all_fixed <- function(
   str,
   pattern,
@@ -156,19 +178,11 @@ stri_replace_all_fixed <- function(
   case_insensitive = FALSE,
   vectorize_all = FALSE
 ) {
-  x <- str
-  patterns <- as.character(pattern)
-  replacements <- as.character(replacement)
-  n <- max(length(patterns), length(replacements))
-
-  if (n == 0L) {
-    return(x)
-  }
-
-  Reduce(
-    function(cur, i) {
-      pat <- patterns[(i - 1L) %% length(patterns) + 1L]
-      repl <- replacements[(i - 1L) %% length(replacements) + 1L]
+  .stri_replace_all_recycle(
+    str = str,
+    pattern = pattern,
+    replacement = replacement,
+    step_fn = function(cur, pat, repl) {
       if (case_insensitive) {
         pat <- gsub(
           pattern = "([][{}()+*^$.|\\\\?])",
@@ -191,9 +205,7 @@ stri_replace_all_fixed <- function(
           fixed = TRUE
         )
       }
-    },
-    seq_len(n),
-    init = x
+    }
   )
 }
 
@@ -203,26 +215,13 @@ stri_replace_all_regex <- function(
   replacement,
   vectorize_all = FALSE
 ) {
-  x <- str
-  patterns <- as.character(pattern)
-  replacements <- as.character(replacement)
-  n <- max(length(patterns), length(replacements))
-
-  if (n == 0L) {
-    return(x)
-  }
-
-  Reduce(
-    function(cur, i) {
-      gsub(
-        pattern = patterns[(i - 1L) %% length(patterns) + 1L],
-        replacement = replacements[(i - 1L) %% length(replacements) + 1L],
-        x = cur,
-        perl = TRUE
-      )
-    },
-    seq_len(n),
-    init = x
+  .stri_replace_all_recycle(
+    str = str,
+    pattern = pattern,
+    replacement = replacement,
+    step_fn = function(cur, pat, repl) {
+      gsub(pattern = pat, replacement = repl, x = cur, perl = TRUE)
+    }
   )
 }
 

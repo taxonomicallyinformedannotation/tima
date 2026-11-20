@@ -66,34 +66,13 @@ fake_hmdb <- function(export) {
     ""
   )
 
-  # Write SDF to temporary file
-  writeLines(fake_sdf, fake_export)
-
-  zip_result <- .fake_hmdb_zip_cmd(export = export, fake_export = fake_export)
-
-  if (zip_result != 0) {
-    log_warn("Failed to create zip file, trying alternative method")
-    .fake_hmdb_zip_fallback(export = export, fake_export = fake_export)
-  }
-
-  # Move to final location (handles cross-device moves in Docker)
-  if (.fake_hmdb_archive_exists(export)) {
-    moved <- move_file_safely(basename(export), export)
-    if (!isTRUE(moved)) {
-      cli::cli_abort(
-        c(
-          "failed to move temporary archive",
-          "x" = export
-        ),
-        class = c("tima_runtime_error", "tima_error"),
-        call = NULL
-      )
-    }
-  }
-
-  # Clean up temporary file
-  unlink(fake_export)
-
-  log_debug("Created fake HMDB file at: %s", export)
-  export
+  .write_fake_zip_archive(
+    export = export,
+    fake_export = fake_export,
+    content = fake_sdf,
+    zip_cmd = .fake_hmdb_zip_cmd,
+    zip_fallback = .fake_hmdb_zip_fallback,
+    archive_exists = .fake_hmdb_archive_exists,
+    label = "HMDB"
+  )
 }

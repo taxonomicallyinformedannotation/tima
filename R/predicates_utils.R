@@ -91,13 +91,21 @@ validate_all_single_strings <- function(
     )
   }
 
-  checks <- all_single_strings(x_list)
+  .abort_if_failed_predicates(
+    x_list = x_list,
+    checks = all_single_strings(x_list),
+    error_msg = paste0(error_prefix, " must be single character strings")
+  )
+}
 
+#' Abort when any named list element fails its predicate check
+#' @noRd
+.abort_if_failed_predicates <- function(x_list, checks, error_msg) {
   if (!all(checks)) {
     invalid_params <- names(x_list)[!checks]
     cli::cli_abort(
       c(
-        paste0(error_prefix, " must be single character strings"),
+        error_msg,
         "x" = paste(invalid_params, collapse = ", ")
       ),
       class = c("tima_validation_error", "tima_error"),
@@ -236,17 +244,9 @@ validate_all_with_predicate <- function(
     ...
   )
 
-  if (!all(checks)) {
-    invalid_params <- names(x_list)[!checks]
-    cli::cli_abort(
-      c(
-        paste0(error_prefix, " must satisfy validation"),
-        "x" = paste(invalid_params, collapse = ", ")
-      ),
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
-  }
-
-  invisible(NULL)
+  .abort_if_failed_predicates(
+    x_list = x_list,
+    checks = checks,
+    error_msg = paste0(error_prefix, " must satisfy validation")
+  )
 }

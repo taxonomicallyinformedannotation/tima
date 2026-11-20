@@ -142,11 +142,15 @@ columns_model <- function() {
   )
 }
 
-#' Select structure-organism pair columns
-#' @keywords internal
-select_structure_organism_pair_columns <- function(df) {
+#' Select SOP columns matching canonical structure/organism prefixes
+#' @noRd
+.select_sop_prefixed_columns <- function(
+  df,
+  extra_leading = character(0)
+) {
   nms <- names(df)
   wanted <- unique(c(
+    extra_leading,
     nms[startsWith(nms, "candidate_structure_")],
     nms[startsWith(nms, "structure_")],
     nms[startsWith(nms, "organism_")],
@@ -160,26 +164,24 @@ select_structure_organism_pair_columns <- function(df) {
   tidytable::as_tidytable(as.list(df)[keep])
 }
 
+#' Select structure-organism pair columns
+#' @keywords internal
+select_structure_organism_pair_columns <- function(df) {
+  .select_sop_prefixed_columns(df)
+}
+
 #' Select loading columns for structure-organism pairs
 #' @keywords internal
 select_structure_organism_pair_loading_columns <- function(df) {
-  nms <- names(df)
-  wanted <- unique(c(
-    "inchikey",
-    "structure_inchikey",
-    "candidate_structure_inchikey",
-    "candidate_structure_inchikey_connectivity_layer",
-    nms[startsWith(nms, "candidate_structure_")],
-    nms[startsWith(nms, "structure_")],
-    nms[startsWith(nms, "organism_")],
-    "reference_doi",
-    "stereo_name"
-  ))
-  keep <- intersect(wanted, nms)
-  if (identical(keep, nms) && inherits(df, "tidytable")) {
-    return(df)
-  }
-  tidytable::as_tidytable(as.list(df)[keep])
+  .select_sop_prefixed_columns(
+    df,
+    extra_leading = c(
+      "inchikey",
+      "structure_inchikey",
+      "candidate_structure_inchikey",
+      "candidate_structure_inchikey_connectivity_layer"
+    )
+  )
 }
 
 #' Select working columns for cluster consensus in clean_chemo

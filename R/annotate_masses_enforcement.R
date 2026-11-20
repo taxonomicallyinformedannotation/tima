@@ -627,6 +627,22 @@ build_output_edges <- function(
   name_source,
   name_target
 ) {
+  project_edges <- function(
+    df,
+    src_col = "feature_id",
+    dst_col = "feature_id_dest"
+  ) {
+    df |>
+      tidytable::select(
+        !!as.name(name_source) := !!as.name(src_col),
+        !!as.name(name_target) := !!as.name(dst_col),
+        label,
+        correlation,
+        p_value
+      ) |>
+      tidytable::distinct()
+  }
+
   parts <- list()
   if (nrow(adduct_edges) > 0L) {
     parts[[length(parts) + 1L]] <- adduct_edges |>
@@ -635,14 +651,7 @@ build_output_edges <- function(
         correlation = NA_real_,
         p_value = NA_real_
       ) |>
-      tidytable::select(
-        !!as.name(name_source) := feature_id,
-        !!as.name(name_target) := feature_id_dest,
-        label,
-        correlation,
-        p_value
-      ) |>
-      tidytable::distinct()
+      project_edges()
   }
   if (
     nrow(loss_edges) > 0L &&
@@ -696,15 +705,8 @@ build_output_edges <- function(
         correlation = NA_real_,
         p_value = NA_real_
       ) |>
-      tidytable::select(
-        # NL convention: precursor (higher mz, feature_id_dest) -> product
-        !!as.name(name_source) := feature_id_dest,
-        !!as.name(name_target) := feature_id,
-        label,
-        correlation,
-        p_value
-      ) |>
-      tidytable::distinct()
+      # NL convention: precursor (higher mz, feature_id_dest) -> product
+      project_edges(src_col = "feature_id_dest", dst_col = "feature_id")
   }
   if (nrow(cluster_edges) > 0L) {
     parts[[length(parts) + 1L]] <- cluster_edges |>
@@ -713,28 +715,14 @@ build_output_edges <- function(
         correlation = NA_real_,
         p_value = NA_real_
       ) |>
-      tidytable::select(
-        # cluster: lower mz -> higher mz (which carries the cluster)
-        !!as.name(name_source) := feature_id,
-        !!as.name(name_target) := feature_id_dest,
-        label,
-        correlation,
-        p_value
-      ) |>
-      tidytable::distinct()
+      # cluster: lower mz -> higher mz (which carries the cluster)
+      project_edges()
   }
 
   if (!is.null(covariance_edges) && nrow(covariance_edges) > 0L) {
     parts[[length(parts) + 1L]] <- covariance_edges |>
       tidytable::mutate(label = "covariance") |>
-      tidytable::select(
-        !!as.name(name_source) := feature_id,
-        !!as.name(name_target) := feature_id_dest,
-        label,
-        correlation,
-        p_value
-      ) |>
-      tidytable::distinct()
+      project_edges()
   }
 
   edges <- if (length(parts) > 0L) {

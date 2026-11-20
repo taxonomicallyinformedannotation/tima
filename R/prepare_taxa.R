@@ -83,6 +83,17 @@ prepare_taxa <- function(
 ) {
   ctx <- log_operation("prepare_taxa", taxon = taxon)
 
+  export_and_return <- function(taxed_tbl) {
+    log_complete(ctx, n_features = nrow(taxed_tbl))
+    export_params(
+      parameters = get_params(step = "prepare_taxa"),
+      step = "prepare_taxa"
+    )
+    export_output(x = taxed_tbl, file = output)
+    rm(taxed_tbl)
+    output
+  }
+
   .make_nd_taxa_table <- function(feature_ids) {
     feature_ids <- unique(as.character(feature_ids))
     nd_cols <- stats::setNames(
@@ -207,15 +218,9 @@ prepare_taxa <- function(
         log_warn(
           "No organism column found in metadata; exporting ND taxonomy for all features"
         )
-        taxed_features_table <- .make_nd_taxa_table(feature_table_0$feature_id)
-        log_complete(ctx, n_features = nrow(taxed_features_table))
-        export_params(
-          parameters = get_params(step = "prepare_taxa"),
-          step = "prepare_taxa"
-        )
-        export_output(x = taxed_features_table, file = output)
-        rm(taxed_features_table)
-        return(output)
+        return(export_and_return(.make_nd_taxa_table(
+          feature_table_0$feature_id
+        )))
       }
     }
 
@@ -228,15 +233,7 @@ prepare_taxa <- function(
         "Metadata column '%s' has no organism values; exporting ND taxonomy for all features",
         colname
       )
-      taxed_features_table <- .make_nd_taxa_table(feature_table_0$feature_id)
-      log_complete(ctx, n_features = nrow(taxed_features_table))
-      export_params(
-        parameters = get_params(step = "prepare_taxa"),
-        step = "prepare_taxa"
-      )
-      export_output(x = taxed_features_table, file = output)
-      rm(taxed_features_table)
-      return(output)
+      return(export_and_return(.make_nd_taxa_table(feature_table_0$feature_id)))
     }
   }
 
@@ -612,15 +609,9 @@ prepare_taxa <- function(
         log_warn(
           "No metadata rows matched features by sample name; exporting ND taxonomy for all features"
         )
-        taxed_features_table <- .make_nd_taxa_table(feature_table_0$feature_id)
-        log_complete(ctx, n_features = nrow(taxed_features_table))
-        export_params(
-          parameters = get_params(step = "prepare_taxa"),
-          step = "prepare_taxa"
-        )
-        export_output(x = taxed_features_table, file = output)
-        rm(taxed_features_table)
-        return(output)
+        return(export_and_return(.make_nd_taxa_table(
+          feature_table_0$feature_id
+        )))
       }
     }
     rm(feature_table_0, metadata_table)
@@ -647,6 +638,30 @@ prepare_taxa <- function(
         class = c("tima_validation_error", "tima_error"),
         call = NULL
       )
+    }
+
+    join_and_collapse_taxa <- function(dt) {
+      dt |>
+        tidytable::left_join(
+          y = biological_metadata,
+          by = c("organismOriginal" = "organism_name")
+        ) |>
+        tidytable::distinct() |>
+        tidytable::select(
+          feature_id,
+          sample_organism_name = organismOriginal,
+          tidyselect::all_of(.SAMPLE_FROM_OTT_COLS)
+        ) |>
+        tidytable::mutate(tidytable::across(
+          .cols = tidyselect::everything(),
+          .fns = as.character
+        )) |>
+        tidytable::group_by(feature_id) |>
+        clean_collapse(cols = collapse_cols) |>
+        tidytable::mutate(tidytable::across(
+          .cols = tidyselect::where(fn = is.character),
+          .fns = ~ tidytable::replace_na(.x = .x, replace = "ND")
+        ))
     }
 
     if (
@@ -729,27 +744,7 @@ prepare_taxa <- function(
         )
       }
 
-      joined_rep <- rep_dt |>
-        tidytable::left_join(
-          y = biological_metadata,
-          by = c("organismOriginal" = "organism_name")
-        ) |>
-        tidytable::distinct() |>
-        tidytable::select(
-          feature_id,
-          sample_organism_name = organismOriginal,
-          tidyselect::all_of(.SAMPLE_FROM_OTT_COLS)
-        ) |>
-        tidytable::mutate(tidytable::across(
-          .cols = tidyselect::everything(),
-          .fns = as.character
-        )) |>
-        tidytable::group_by(feature_id) |>
-        clean_collapse(cols = collapse_cols) |>
-        tidytable::mutate(tidytable::across(
-          .cols = tidyselect::where(fn = is.character),
-          .fns = ~ tidytable::replace_na(.x = .x, replace = "ND")
-        ))
+      joined_rep <- join_and_collapse_taxa(rep_dt)
       rm(biological_metadata, feat_org, rep_dt)
 
       m_rep <- as.vector(fastmatch::fmatch(
@@ -759,41 +754,12 @@ prepare_taxa <- function(
       taxed_features_table <- joined_rep[m_rep, ]
       data.table::set(taxed_features_table, j = "feature_id", value = u_f)
     } else {
-      joined_data <- metadata_table_joined |>
+      taxed_features_table <- metadata_table_joined |>
         tidytable::mutate(organismOriginal = trimws(organismOriginal)) |>
-        tidytable::left_join(
-          y = biological_metadata,
-          by = c("organismOriginal" = "organism_name")
-        ) |>
-        tidytable::distinct()
-
-      taxed_features_table <- joined_data |>
-        tidytable::select(
-          feature_id,
-          sample_organism_name = organismOriginal,
-          tidyselect::all_of(.SAMPLE_FROM_OTT_COLS)
-        ) |>
-        tidytable::mutate(tidytable::across(
-          .cols = tidyselect::everything(),
-          .fns = as.character
-        )) |>
-        tidytable::group_by(feature_id) |>
-        clean_collapse(cols = collapse_cols) |>
-        tidytable::mutate(tidytable::across(
-          .cols = tidyselect::where(fn = is.character),
-          .fns = ~ tidytable::replace_na(.x = .x, replace = "ND")
-        ))
-      rm(biological_metadata, metadata_table_joined, joined_data)
+        join_and_collapse_taxa()
+      rm(biological_metadata, metadata_table_joined)
     }
   }
 
-  log_complete(ctx, n_features = nrow(taxed_features_table))
-
-  export_params(
-    parameters = get_params(step = "prepare_taxa"),
-    step = "prepare_taxa"
-  )
-  export_output(x = taxed_features_table, file = output)
-  rm(taxed_features_table)
-  output
+  export_and_return(taxed_features_table)
 }

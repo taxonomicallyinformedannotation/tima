@@ -254,22 +254,27 @@ clean_chemo <- function(
     df_filtered <- drop_cross_rt_duplicate_final_candidates(df_filtered)
   }
 
-  if (!is.null(xrefs_table) && nrow(xrefs_table) > 0L) {
-    df_filtered <- .add_xrefs_to_df(df_filtered, xrefs_table)
+  finalize_tier <- function(df) {
+    if (!is.null(xrefs_table) && nrow(xrefs_table) > 0L) {
+      df <- .add_xrefs_to_df(df, xrefs_table)
+    }
+    df |>
+      summarize_results(
+        features_table = features_table,
+        components_table = components_table,
+        structure_organism_pairs_table = structure_organism_pairs_table,
+        feature_consensus_table = feature_consensus_table,
+        remove_ties = remove_ties,
+        summarize = summarize,
+        annotation_notes_lookup = annotation_notes_lookup
+      ) |>
+      .attach_candidate_counts(results_candidates = results_candidates) |>
+      .restore_annotation_notes(
+        annotation_notes_lookup = annotation_notes_lookup
+      )
   }
 
-  results_filtered <- df_filtered |>
-    summarize_results(
-      features_table = features_table,
-      components_table = components_table,
-      structure_organism_pairs_table = structure_organism_pairs_table,
-      feature_consensus_table = feature_consensus_table,
-      remove_ties = remove_ties,
-      summarize = summarize,
-      annotation_notes_lookup = annotation_notes_lookup
-    ) |>
-    .attach_candidate_counts(results_candidates = results_candidates) |>
-    .restore_annotation_notes(annotation_notes_lookup = annotation_notes_lookup)
+  results_filtered <- finalize_tier(df_filtered)
 
   # Tier 1: MINI - Extract from df_percentile BEFORE high-evidence filter
   # This ensures we get predicted taxonomy for features without inchikey
@@ -303,22 +308,7 @@ clean_chemo <- function(
     df_ranked
   }
 
-  if (!is.null(xrefs_table) && nrow(xrefs_table) > 0L) {
-    df_full <- .add_xrefs_to_df(df_full, xrefs_table)
-  }
-
-  results_full <- df_full |>
-    summarize_results(
-      features_table = features_table,
-      components_table = components_table,
-      structure_organism_pairs_table = structure_organism_pairs_table,
-      feature_consensus_table = feature_consensus_table,
-      remove_ties = remove_ties,
-      summarize = summarize,
-      annotation_notes_lookup = annotation_notes_lookup
-    ) |>
-    .attach_candidate_counts(results_candidates = results_candidates) |>
-    .restore_annotation_notes(annotation_notes_lookup = annotation_notes_lookup)
+  results_full <- finalize_tier(df_full)
   rm(annot_table_wei_chemo, annotation_notes_lookup, results_candidates)
 
   rm(df_full, df_ranked, feature_consensus_table)
