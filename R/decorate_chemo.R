@@ -64,48 +64,15 @@ decorate_chemo <- function(
     param_name = "annot_table_wei_chemo"
   )
 
-  validate_numeric_range(
-    score_chemical_cla_kingdom,
-    min_value = 0,
-    max_value = 1,
-    param_name = "score_chemical_cla_kingdom"
-  )
-  validate_numeric_range(
-    score_chemical_cla_superclass,
-    min_value = 0,
-    max_value = 1,
-    param_name = "score_chemical_cla_superclass"
-  )
-  validate_numeric_range(
-    score_chemical_cla_class,
-    min_value = 0,
-    max_value = 1,
-    param_name = "score_chemical_cla_class"
-  )
-  validate_numeric_range(
-    score_chemical_cla_parent,
-    min_value = 0,
-    max_value = 1,
-    param_name = "score_chemical_cla_parent"
-  )
-  validate_numeric_range(
-    score_chemical_npc_pathway,
-    min_value = 0,
-    max_value = 1,
-    param_name = "score_chemical_npc_pathway"
-  )
-  validate_numeric_range(
-    score_chemical_npc_superclass,
-    min_value = 0,
-    max_value = 1,
-    param_name = "score_chemical_npc_superclass"
-  )
-  validate_numeric_range(
-    score_chemical_npc_class,
-    min_value = 0,
-    max_value = 1,
-    param_name = "score_chemical_npc_class"
-  )
+  .validate_score_ranges(list(
+    score_chemical_cla_kingdom = score_chemical_cla_kingdom,
+    score_chemical_cla_superclass = score_chemical_cla_superclass,
+    score_chemical_cla_class = score_chemical_cla_class,
+    score_chemical_cla_parent = score_chemical_cla_parent,
+    score_chemical_npc_pathway = score_chemical_npc_pathway,
+    score_chemical_npc_superclass = score_chemical_npc_superclass,
+    score_chemical_npc_class = score_chemical_npc_class
+  ))
 
   required_cols <- c(
     "score_chemical",

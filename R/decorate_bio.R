@@ -81,80 +81,34 @@ decorate_bio <- function(
 
   validate_dataframe(annot_table_wei_bio, param_name = "annot_table_wei_bio")
 
-  validate_numeric_range(
-    score_biological_kingdom,
-    0,
-    1,
-    param_name = "score_biological_kingdom"
-  )
-  validate_numeric_range(
-    score_biological_phylum,
-    0,
-    1,
-    param_name = "score_biological_phylum"
-  )
-  validate_numeric_range(
-    score_biological_class,
-    0,
-    1,
-    param_name = "score_biological_class"
-  )
-  validate_numeric_range(
-    score_biological_order,
-    0,
-    1,
-    param_name = "score_biological_order"
-  )
-  validate_numeric_range(
-    score_biological_family,
-    0,
-    1,
-    param_name = "score_biological_family"
-  )
-  validate_numeric_range(
-    score_biological_tribe,
-    0,
-    1,
-    param_name = "score_biological_tribe"
-  )
-  validate_numeric_range(
-    score_biological_genus,
-    0,
-    1,
-    param_name = "score_biological_genus"
-  )
-  validate_numeric_range(
-    score_biological_species,
-    0,
-    1,
-    param_name = "score_biological_species"
-  )
-  validate_numeric_range(
-    score_biological_variety,
-    0,
-    1,
-    param_name = "score_biological_variety"
-  )
+  .validate_score_ranges(list(
+    score_biological_kingdom = score_biological_kingdom,
+    score_biological_phylum = score_biological_phylum,
+    score_biological_class = score_biological_class,
+    score_biological_order = score_biological_order,
+    score_biological_family = score_biological_family,
+    score_biological_tribe = score_biological_tribe,
+    score_biological_genus = score_biological_genus,
+    score_biological_species = score_biological_species,
+    score_biological_variety = score_biological_variety
+  ))
   validate_numeric_range(
     score_biological_biota,
     0,
     1.007277,
     param_name = "score_biological_biota"
   )
-
-  optional_scores <- list(
-    score_biological_domain = score_biological_domain,
-    score_biological_infraorder = score_biological_infraorder,
-    score_biological_subfamily = score_biological_subfamily,
-    score_biological_subtribe = score_biological_subtribe,
-    score_biological_subgenus = score_biological_subgenus,
-    score_biological_subspecies = score_biological_subspecies
+  .validate_score_ranges(
+    list(
+      score_biological_domain = score_biological_domain,
+      score_biological_infraorder = score_biological_infraorder,
+      score_biological_subfamily = score_biological_subfamily,
+      score_biological_subtribe = score_biological_subtribe,
+      score_biological_subgenus = score_biological_subgenus,
+      score_biological_subspecies = score_biological_subspecies
+    ),
+    allow_null = TRUE
   )
-  for (nm in names(optional_scores)) {
-    if (!is.null(optional_scores[[nm]])) {
-      validate_numeric_range(optional_scores[[nm]], 0, 1, param_name = nm)
-    }
-  }
 
   required_cols <- c(
     "score_biological",

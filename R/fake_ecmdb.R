@@ -35,13 +35,7 @@
 #' fake_ecmdb(export = "data/source/ecmdb.json.zip")
 #' }
 fake_ecmdb <- function(export) {
-  if (missing(export) || !is.character(export) || length(export) != 1L) {
-    cli::cli_abort(
-      "export path must be a single character string",
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
-  }
+  .assert_single_char(export, "export path")
 
   log_warn("ECMDB download failed. Creating empty placeholder file.")
 

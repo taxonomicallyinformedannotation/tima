@@ -352,21 +352,8 @@ validate_filter_annotations_inputs <- function(
     }
   }
 
-  if (!is.character(output) || length(output) != 1L) {
-    cli::cli_abort(
-      "output must be a single character string",
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
-  }
-
-  if (!is.character(features) || length(features) != 1L) {
-    cli::cli_abort(
-      "features must be a single character string",
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
-  }
+  .assert_single_char(output, "output")
+  .assert_single_char(features, "features")
 
   if (!file.exists(features)) {
     cli::cli_abort(

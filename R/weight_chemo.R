@@ -88,48 +88,15 @@ weight_chemo <- function(
       weight_chemical
     )
   )
-  validate_numeric_range(
-    score_chemical_cla_kingdom,
-    0,
-    1,
-    param_name = "score_chemical_cla_kingdom"
-  )
-  validate_numeric_range(
-    score_chemical_cla_superclass,
-    0,
-    1,
-    param_name = "score_chemical_cla_superclass"
-  )
-  validate_numeric_range(
-    score_chemical_cla_class,
-    0,
-    1,
-    param_name = "score_chemical_cla_class"
-  )
-  validate_numeric_range(
-    score_chemical_cla_parent,
-    0,
-    1,
-    param_name = "score_chemical_cla_parent"
-  )
-  validate_numeric_range(
-    score_chemical_npc_pathway,
-    0,
-    1,
-    param_name = "score_chemical_npc_pathway"
-  )
-  validate_numeric_range(
-    score_chemical_npc_superclass,
-    0,
-    1,
-    param_name = "score_chemical_npc_superclass"
-  )
-  validate_numeric_range(
-    score_chemical_npc_class,
-    0,
-    1,
-    param_name = "score_chemical_npc_class"
-  )
+  .validate_score_ranges(list(
+    score_chemical_cla_kingdom = score_chemical_cla_kingdom,
+    score_chemical_cla_superclass = score_chemical_cla_superclass,
+    score_chemical_cla_class = score_chemical_cla_class,
+    score_chemical_cla_parent = score_chemical_cla_parent,
+    score_chemical_npc_pathway = score_chemical_npc_pathway,
+    score_chemical_npc_superclass = score_chemical_npc_superclass,
+    score_chemical_npc_class = score_chemical_npc_class
+  ))
 
   annot_table_wei_bio_clean <- select_weight_annotations_working_columns(
     annot_table_wei_bio_clean

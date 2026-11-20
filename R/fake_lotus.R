@@ -20,13 +20,7 @@
 #' fake_lotus(export = "data/source/lotus.tsv.gz")
 #' }
 fake_lotus <- function(export) {
-  if (missing(export) || !is.character(export) || length(export) != 1L) {
-    cli::cli_abort(
-      "export path must be a single character string",
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
-  }
+  .assert_single_char(export, "export path")
 
   log_warn(
     "LOTUS download failed. Creating empty placeholder file with proper structure."

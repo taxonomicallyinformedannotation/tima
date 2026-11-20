@@ -40,27 +40,9 @@ prepare_libraries_sop_hmdb_like <- function(
   ),
   tag = NA_character_
 ) {
-  if (!is.character(input) || length(input) != 1L) {
-    cli::cli_abort(
-      "input must be a single character string",
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
-  }
-  if (!is.character(output) || length(output) != 1L) {
-    cli::cli_abort(
-      "output must be a single character string",
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
-  }
-  if (!is.character(source_name) || length(source_name) != 1L) {
-    cli::cli_abort(
-      "source_name must be a single character string",
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
-  }
+  .assert_single_char(input, "input")
+  .assert_single_char(output, "output")
+  .assert_single_char(source_name, "source_name")
 
   if (is.null(tag) || length(tag) == 0L) {
     tag <- NA_character_

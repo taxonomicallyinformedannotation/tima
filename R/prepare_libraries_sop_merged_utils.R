@@ -63,13 +63,7 @@ validate_sop_merged_inputs <- function(
       )
     }
 
-    if (!is.character(value) || length(value) != 1L) {
-      cli::cli_abort(
-        "value must be a single character string",
-        class = c("tima_validation_error", "tima_error"),
-        call = NULL
-      )
-    }
+    .assert_single_char(value, "value")
   }
 
   invisible(NULL)

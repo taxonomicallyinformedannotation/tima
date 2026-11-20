@@ -536,3 +536,28 @@ validate_tolerance_ppm <- function(
     }
   )
 }
+
+#' Assert single character string parameter
+#' @noRd
+.assert_single_char <- function(x, param_name) {
+  if (missing(x) || !is.character(x) || length(x) != 1L) {
+    cli::cli_abort(
+      paste(param_name, "must be a single character string"),
+      class = c("tima_validation_error", "tima_error"),
+      call = NULL
+    )
+  }
+  invisible(TRUE)
+}
+
+#' Validate named list of biological/chemical scores in 0..1
+#' @noRd
+.validate_score_ranges <- function(scores, allow_null = FALSE) {
+  for (nm in names(scores)) {
+    val <- scores[[nm]]
+    if (!allow_null || !is.null(val)) {
+      validate_numeric_range(val, 0, 1, param_name = nm)
+    }
+  }
+  invisible(TRUE)
+}

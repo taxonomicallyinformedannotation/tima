@@ -151,13 +151,7 @@ create_edges_spectra <- function(
     )
   }
 
-  if (!is.character(output) || length(output) != 1L) {
-    cli::cli_abort(
-      "output must be a single character string",
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
-  }
+  .assert_single_char(output, "output")
 
   source_col <- if (
     is.null(name_source) ||

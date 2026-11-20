@@ -35,21 +35,8 @@ prepare_libraries_sop_pubchemlite <- function(
     step = "prepare_libraries_sop_pubchemlite"
   )$files$libraries$sop$prepared$pubchemlite
 ) {
-  if (!is.character(input) || length(input) != 1L) {
-    cli::cli_abort(
-      "input must be a single character string",
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
-  }
-
-  if (!is.character(output) || length(output) != 1L) {
-    cli::cli_abort(
-      "output must be a single character string",
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
-  }
+  .assert_single_char(input, "input")
+  .assert_single_char(output, "output")
 
   ctx <- log_operation("prepare_libraries_sop_pubchemlite", input = input)
 

@@ -11,13 +11,7 @@
 #'
 #' @keywords internal
 fake_pubchemlite <- function(export) {
-  if (missing(export) || !is.character(export) || length(export) != 1L) {
-    cli::cli_abort(
-      "export path must be a single character string",
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
-  }
+  .assert_single_char(export, "export path")
 
   log_warn("PubChem Lite download failed. Creating empty placeholder CSV.")
 

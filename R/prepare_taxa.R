@@ -119,13 +119,7 @@ prepare_taxa <- function(
     param_name = "org_tax_ott"
   )
 
-  if (!is.character(output) || length(output) != 1L) {
-    cli::cli_abort(
-      "output must be a single character string",
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
-  }
+  .assert_single_char(output, "output")
 
   if (!is.logical(extension) || length(extension) != 1L) {
     cli::cli_abort(

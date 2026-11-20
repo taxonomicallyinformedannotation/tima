@@ -185,66 +185,18 @@ weight_bio <- function(
     )
   )
 
-  validate_numeric_range(
-    score_biological_domain,
-    0,
-    1,
-    param_name = "score_biological_domain"
-  )
-  validate_numeric_range(
-    score_biological_kingdom,
-    0,
-    1,
-    param_name = "score_biological_kingdom"
-  )
-  validate_numeric_range(
-    score_biological_phylum,
-    0,
-    1,
-    param_name = "score_biological_phylum"
-  )
-  validate_numeric_range(
-    score_biological_class,
-    0,
-    1,
-    param_name = "score_biological_class"
-  )
-  validate_numeric_range(
-    score_biological_order,
-    0,
-    1,
-    param_name = "score_biological_order"
-  )
-  validate_numeric_range(
-    score_biological_family,
-    0,
-    1,
-    param_name = "score_biological_family"
-  )
-  validate_numeric_range(
-    score_biological_tribe,
-    0,
-    1,
-    param_name = "score_biological_tribe"
-  )
-  validate_numeric_range(
-    score_biological_genus,
-    0,
-    1,
-    param_name = "score_biological_genus"
-  )
-  validate_numeric_range(
-    score_biological_species,
-    0,
-    1,
-    param_name = "score_biological_species"
-  )
-  validate_numeric_range(
-    score_biological_variety,
-    0,
-    1,
-    param_name = "score_biological_variety"
-  )
+  .validate_score_ranges(list(
+    score_biological_domain = score_biological_domain,
+    score_biological_kingdom = score_biological_kingdom,
+    score_biological_phylum = score_biological_phylum,
+    score_biological_class = score_biological_class,
+    score_biological_order = score_biological_order,
+    score_biological_family = score_biological_family,
+    score_biological_tribe = score_biological_tribe,
+    score_biological_genus = score_biological_genus,
+    score_biological_species = score_biological_species,
+    score_biological_variety = score_biological_variety
+  ))
 
   annotation_table_taxed <- select_weight_annotations_working_columns(
     annotation_table_taxed
@@ -262,26 +214,15 @@ weight_bio <- function(
     return(annotation_table_taxed)
   }
 
-  subrank_scores <- list(
-    infraorder = score_biological_infraorder,
-    subfamily = score_biological_subfamily,
-    subtribe = score_biological_subtribe,
-    subgenus = score_biological_subgenus,
-    subspecies = score_biological_subspecies
-  )
-  lapply(
-    names(subrank_scores),
-    function(sr_nm) {
-      sr_val <- subrank_scores[[sr_nm]]
-      if (!is.null(sr_val)) {
-        validate_numeric_range(
-          sr_val,
-          0,
-          1,
-          param_name = paste0("score_biological_", sr_nm)
-        )
-      }
-    }
+  .validate_score_ranges(
+    list(
+      score_biological_infraorder = score_biological_infraorder,
+      score_biological_subfamily = score_biological_subfamily,
+      score_biological_subtribe = score_biological_subtribe,
+      score_biological_subgenus = score_biological_subgenus,
+      score_biological_subspecies = score_biological_subspecies
+    ),
+    allow_null = TRUE
   )
 
   log_info("Weighting %d annotations by biological source", n_annotations)

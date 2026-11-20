@@ -62,13 +62,7 @@ prepare_libraries_sop_bigg <- function(
     step = "prepare_libraries_sop_bigg"
   )$files$libraries$sop$prepared$bigg
 ) {
-  if (!is.character(output) || length(output) != 1L) {
-    cli::cli_abort(
-      "output must be a single character string",
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
-  }
+  .assert_single_char(output, "output")
 
   log_info("Preparing BiGG structure-organism pairs")
 

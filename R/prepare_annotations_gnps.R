@@ -58,13 +58,7 @@ prepare_annotations_gnps <- function(
     step = "prepare_annotations_gnps"
   )$files$libraries$sop$merged$structures$taxonomies$npc
 ) {
-  if (!is.character(output) || length(output) != 1L) {
-    cli::cli_abort(
-      "output must be a single character string",
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
-  }
+  .assert_single_char(output, "output")
 
   validate_file_existence(
     file_list = list(

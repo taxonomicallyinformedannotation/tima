@@ -38,21 +38,8 @@ prepare_libraries_sop_ecmdb <- function(
     step = "prepare_libraries_sop_ecmdb"
   )$files$libraries$sop$prepared$ecmdb
 ) {
-  if (!is.character(input) || length(input) != 1L) {
-    cli::cli_abort(
-      "input must be a single character string",
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
-  }
-
-  if (!is.character(output) || length(output) != 1L) {
-    cli::cli_abort(
-      "output must be a single character string",
-      class = c("tima_validation_error", "tima_error"),
-      call = NULL
-    )
-  }
+  .assert_single_char(input, "input")
+  .assert_single_char(output, "output")
 
   log_info("Preparing ECMDB structure-organism pairs")
 
