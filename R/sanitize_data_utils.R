@@ -625,132 +625,20 @@ sanitize_sirius <- function(sirius_dir) {
     ))
   }
 
+  sirius_filenames <- c(
+    formula_v5 = "formula_identifications.tsv",
+    canopus_v5 = "canopus_summary.tsv",
+    structure_v5 = "compound_identifications.tsv",
+    formula_v6 = "formula_identifications_all.tsv",
+    canopus_v6 = "canopus_formula_summary_all.tsv",
+    structure_v6 = "structure_identifications_all.tsv"
+  )
+
   # Handle ZIP files
+  zip_files <- NULL
   if (file.exists(sirius_dir) && !dir.exists(sirius_dir)) {
     # It's a file, check if it's a ZIP
-    if (grepl("\\.zip$", sirius_dir, ignore.case = TRUE)) {
-      is_zip <- TRUE
-      log_debug("SIRIUS input is a ZIP file, will check contents...")
-
-      zip_files <- NULL
-      unzip_error <- tryCatch(
-        {
-          zip_info <- utils::unzip(sirius_dir, list = TRUE)
-          zip_files <- zip_info$Name
-          NULL
-        },
-        error = function(e) {
-          conditionMessage(e)
-        }
-      )
-      if (!is.null(unzip_error)) {
-        issues <- c(issues, paste0("Failed to extract ZIP: ", unzip_error))
-        return(list(
-          valid = FALSE,
-          has_formula = FALSE,
-          has_canopus = FALSE,
-          has_structure = FALSE,
-          n_features = 0L,
-          is_zip = is_zip,
-          issues = c(issues, "Could not access SIRIUS directory")
-        ))
-      }
-
-      bnames <- basename(zip_files)
-      has_formula_v5 <- "formula_identifications.tsv" %in% bnames
-      has_canopus_v5 <- "canopus_summary.tsv" %in% bnames
-      has_structure_v5 <- "compound_identifications.tsv" %in% bnames
-
-      has_formula_v6 <- "formula_identifications_all.tsv" %in% bnames
-      has_canopus_v6 <- "canopus_formula_summary_all.tsv" %in% bnames
-      has_structure_v6 <- "structure_identifications_all.tsv" %in% bnames
-
-      has_formula <- has_formula_v5 || has_formula_v6
-      has_canopus <- has_canopus_v5 || has_canopus_v6
-      has_structure <- has_structure_v5 || has_structure_v6
-
-      sirius_version <- if (has_formula_v6 || has_canopus_v6) {
-        "6"
-      } else if (has_formula_v5 || has_canopus_v5) {
-        "5"
-      } else {
-        "unknown"
-      }
-
-      if (!has_formula) {
-        issues <- c(
-          issues,
-          "Missing formula identifications file (tried v5 and v6 names)"
-        )
-      }
-      if (!has_canopus) {
-        issues <- c(
-          issues,
-          "Missing CANOPUS summary file (tried v5 and v6 names)"
-        )
-      }
-      if (!has_structure) {
-        issues <- c(
-          issues,
-          "Missing structure identifications file (tried v5 and v6 names)"
-        )
-      }
-
-      if (has_structure) {
-        target_bname <- if (has_structure_v6) {
-          "structure_identifications_all.tsv"
-        } else {
-          "compound_identifications.tsv"
-        }
-        target_in_zip <- zip_files[match(target_bname, bnames)]
-        temp_dir <- tempfile(pattern = "sirius_check_")
-        dir.create(temp_dir, recursive = TRUE)
-        on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
-        tryCatch(
-          {
-            extracted_path <- utils::unzip(
-              sirius_dir,
-              files = target_in_zip,
-              exdir = temp_dir
-            )
-            if (
-              length(extracted_path) == 1L && file.exists(extracted_path[[1L]])
-            ) {
-              structure_data <- safe_fread(
-                file = extracted_path[[1L]],
-                file_type = "SIRIUS structure identifications",
-                na.strings = c("", "NA"),
-                colClasses = "character",
-                select = 1L
-              )
-              n_features <- nrow(structure_data)
-              log_debug(
-                "Counted %d unique annotations from %s",
-                n_features,
-                target_bname
-              )
-            }
-          },
-          error = function(e) {
-            log_debug(
-              "Could not count SIRIUS annotations: %s",
-              conditionMessage(e)
-            )
-          }
-        )
-      }
-
-      return(list(
-        valid = length(issues) == 0L,
-        has_formula = has_formula,
-        has_canopus = has_canopus,
-        has_structure = has_structure,
-        n_features = n_features,
-        is_zip = is_zip,
-        sirius_version = sirius_version,
-        issues = issues
-      ))
-    } else {
+    if (!grepl("\\.zip$", sirius_dir, ignore.case = TRUE)) {
       return(list(
         valid = FALSE,
         has_formula = FALSE,
@@ -764,34 +652,49 @@ sanitize_sirius <- function(sirius_dir) {
         )
       ))
     }
+
+    is_zip <- TRUE
+    log_debug("SIRIUS input is a ZIP file, will check contents...")
+
+    unzip_error <- tryCatch(
+      {
+        zip_files <- utils::unzip(sirius_dir, list = TRUE)$Name
+        NULL
+      },
+      error = function(e) {
+        conditionMessage(e)
+      }
+    )
+    if (!is.null(unzip_error)) {
+      issues <- c(issues, paste0("Failed to extract ZIP: ", unzip_error))
+      return(list(
+        valid = FALSE,
+        has_formula = FALSE,
+        has_canopus = FALSE,
+        has_structure = FALSE,
+        n_features = 0L,
+        is_zip = is_zip,
+        issues = c(issues, "Could not access SIRIUS directory")
+      ))
+    }
+    present_mask <- sirius_filenames %in% basename(zip_files)
+  } else {
+    present_mask <- file.exists(file.path(sirius_dir, sirius_filenames))
   }
+  names(present_mask) <- names(sirius_filenames)
 
   # Check for required summary files (try both SIRIUS v5 and v6 names)
-  # SIRIUS v5 names
-  formula_file_v5 <- file.path(sirius_dir, "formula_identifications.tsv")
-  canopus_file_v5 <- file.path(sirius_dir, "canopus_summary.tsv")
-  structure_file_v5 <- file.path(sirius_dir, "compound_identifications.tsv")
-
-  # SIRIUS v6 names (with _all suffix)
-  formula_file_v6 <- file.path(sirius_dir, "formula_identifications_all.tsv")
-  canopus_file_v6 <- file.path(sirius_dir, "canopus_formula_summary_all.tsv")
-  structure_file_v6 <- file.path(
-    sirius_dir,
-    "structure_identifications_all.tsv"
-  )
-
-  # Check which files exist
-  has_formula <- file.exists(formula_file_v5) || file.exists(formula_file_v6)
-  has_canopus <- file.exists(canopus_file_v5) || file.exists(canopus_file_v6)
-  has_structure <- file.exists(structure_file_v5) ||
-    file.exists(structure_file_v6)
+  has_formula <- present_mask[["formula_v5"]] || present_mask[["formula_v6"]]
+  has_canopus <- present_mask[["canopus_v5"]] || present_mask[["canopus_v6"]]
+  has_structure <- present_mask[["structure_v5"]] ||
+    present_mask[["structure_v6"]]
 
   # Detect SIRIUS version
   sirius_version <- if (
-    file.exists(formula_file_v6) || file.exists(canopus_file_v6)
+    present_mask[["formula_v6"]] || present_mask[["canopus_v6"]]
   ) {
     "6"
-  } else if (file.exists(formula_file_v5) || file.exists(canopus_file_v5)) {
+  } else if (present_mask[["formula_v5"]] || present_mask[["canopus_v5"]]) {
     "5"
   } else {
     "unknown"
@@ -803,11 +706,9 @@ sanitize_sirius <- function(sirius_dir) {
       "Missing formula identifications file (tried v5 and v6 names)"
     )
   }
-
   if (!has_canopus) {
     issues <- c(issues, "Missing CANOPUS summary file (tried v5 and v6 names)")
   }
-
   if (!has_structure) {
     issues <- c(
       issues,
@@ -816,42 +717,51 @@ sanitize_sirius <- function(sirius_dir) {
   }
 
   # Count UNIQUE ANNOTATIONS from structure identifications file
-  n_features <- 0L
-  tryCatch(
-    {
-      # Determine which structure file exists
-      structure_file_to_read <- NULL
-      if (file.exists(structure_file_v6)) {
-        structure_file_to_read <- structure_file_v6
-      } else if (file.exists(structure_file_v5)) {
-        structure_file_to_read <- structure_file_v5
-      }
-
-      if (!is.null(structure_file_to_read)) {
-        # Read first column of structure identifications to count rows
-        structure_data <- safe_fread(
-          file = structure_file_to_read,
-          file_type = "SIRIUS structure identifications",
-          na.strings = c("", "NA"),
-          colClasses = "character",
-          select = 1L
-        )
-
-        # Count unique structure annotations (unique InChIKeys or structure IDs)
-        # Each row is an annotation, count total rows for unique annotations
-        n_features <- nrow(structure_data)
-
-        log_debug(
-          "Counted %d unique annotations from %s",
-          n_features,
-          basename(structure_file_to_read)
-        )
-      }
-    },
-    error = function(e) {
-      log_debug("Could not count SIRIUS annotations: %s", conditionMessage(e))
+  if (has_structure) {
+    target_bname <- if (present_mask[["structure_v6"]]) {
+      sirius_filenames[["structure_v6"]]
+    } else {
+      sirius_filenames[["structure_v5"]]
     }
-  )
+    tryCatch(
+      {
+        structure_file <- if (is_zip) {
+          target_in_zip <- zip_files[match(target_bname, basename(zip_files))]
+          temp_dir <- tempfile(pattern = "sirius_check_")
+          dir.create(temp_dir, recursive = TRUE)
+          on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
+          extracted_path <- utils::unzip(
+            sirius_dir,
+            files = target_in_zip,
+            exdir = temp_dir
+          )
+          if (length(extracted_path) == 1L) extracted_path[[1L]] else NULL
+        } else {
+          file.path(sirius_dir, target_bname)
+        }
+
+        if (!is.null(structure_file) && file.exists(structure_file)) {
+          # Read first column of structure identifications to count rows
+          structure_data <- safe_fread(
+            file = structure_file,
+            file_type = "SIRIUS structure identifications",
+            na.strings = c("", "NA"),
+            colClasses = "character",
+            select = 1L
+          )
+          n_features <- nrow(structure_data)
+          log_debug(
+            "Counted %d unique annotations from %s",
+            n_features,
+            target_bname
+          )
+        }
+      },
+      error = function(e) {
+        log_debug("Could not count SIRIUS annotations: %s", conditionMessage(e))
+      }
+    )
+  }
 
   list(
     valid = length(issues) == 0L,

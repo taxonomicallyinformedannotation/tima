@@ -243,81 +243,6 @@ split_tables_sop <- function(table, cache) {
   )
   rm(stereo_cols)
 
-  # Optimization: most inchikeys map to a single row after distinct().
-  # Only multi-row groups need collapsing. Split into singletons and
-  # duplicates without per-group .by overhead, and collapse vectorially.
-  .collapse_delimited_col <- function(
-    grp_id,
-    n_grp,
-    vals,
-    ignore_case = FALSE,
-    na_default = NA_character_
-  ) {
-    out <- rep(na_default, n_grp)
-    ok <- which(!is.na(vals))
-    if (length(ok) == 0L) {
-      return(out)
-    }
-    v_ok <- as.character(vals[ok])
-    u_v <- unique(v_ok)
-    u_trim <- trimws(u_v)
-    v_trim <- u_trim[fastmatch::fmatch(v_ok, u_v)]
-    nz <- nzchar(v_trim)
-    if (!any(nz)) {
-      return(out)
-    }
-    g_ok <- grp_id[ok[nz]]
-    v_trim <- v_trim[nz]
-
-    dedup_val <- if (ignore_case) {
-      u_t <- unique(v_trim)
-      u_low <- tolower(u_t)
-      u_low[fastmatch::fmatch(v_trim, u_t)]
-    } else {
-      v_trim
-    }
-    u_dv <- unique(dedup_val)
-    dv_id <- fastmatch::fmatch(dedup_val, u_dv)
-    n_dv <- length(u_dv)
-    gv_key <- as.double(g_ok - 1L) * n_dv + dv_id
-    keep <- !duplicated(gv_key)
-    g_ok <- g_ok[keep]
-    v_trim <- v_trim[keep]
-
-    if (!is.unsorted(g_ok)) {
-      g_ord <- g_ok
-      v_ord <- v_trim
-    } else {
-      ord <- order(g_ok, method = "radix")
-      g_ord <- g_ok[ord]
-      v_ord <- v_trim[ord]
-    }
-
-    n_m <- length(g_ord)
-    new_g <- if (n_m > 1L) c(TRUE, g_ord[-1L] != g_ord[-n_m]) else TRUE
-    r_m <- seq_len(n_m) - cummax(ifelse(new_g, seq_len(n_m), 0L)) + 1L
-    max_r <- max(r_m)
-
-    idx1 <- which(r_m == 1L)
-    u_g <- g_ord[idx1]
-    acc <- if (max_r > 1L) {
-      Reduce(
-        function(cur, k) {
-          idx_k <- which(r_m == k)
-          pos_k <- fastmatch::fmatch(g_ord[idx_k], u_g)
-          cur[pos_k] <- paste(cur[pos_k], v_ord[idx_k], sep = " $ ")
-          cur
-        },
-        2L:max_r,
-        init = v_ord[idx1]
-      )
-    } else {
-      v_ord[idx1]
-    }
-    out[u_g] <- acc
-    out
-  }
-
   ik_st <- table_structures_stereo$structure_inchikey
   dup_ik_st <- unique(ik_st[duplicated(ik_st)])
   if (length(dup_ik_st) > 0L) {
@@ -352,14 +277,14 @@ split_tables_sop <- function(table, cache) {
         first_idx_m
       ],
       structure_xlogp = xl_out,
-      structure_name = .collapse_delimited_col(
+      structure_name = .collapse_delimited_lookup(
         grp_id_m,
         n_grp_m,
         multi$structure_name,
         ignore_case = TRUE,
         na_default = NA_character_
       ),
-      structure_tag = .collapse_delimited_col(
+      structure_tag = .collapse_delimited_lookup(
         grp_id_m,
         n_grp_m,
         multi$structure_tag,
@@ -454,7 +379,7 @@ split_tables_sop <- function(table, cache) {
       lapply(
         stats::setNames(npc_cols, npc_cols),
         function(col) {
-          .collapse_delimited_col(
+          .collapse_delimited_lookup(
             grp_npc_m,
             n_npc_m,
             npc_multi[[col]],
@@ -523,7 +448,7 @@ split_tables_sop <- function(table, cache) {
       lapply(
         stats::setNames(cla_cols, cla_cols),
         function(col) {
-          .collapse_delimited_col(
+          .collapse_delimited_lookup(
             grp_cla_m,
             n_cla_m,
             cla_multi[[col]],

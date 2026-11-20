@@ -1132,9 +1132,10 @@ complement_metadata_structures <- function(
   n_grp,
   vals,
   ignore_case = FALSE,
-  sep = " $ "
+  sep = " $ ",
+  na_default = NA_character_
 ) {
-  out <- rep(NA_character_, n_grp)
+  out <- rep(na_default, n_grp)
   ok <- which(!is.na(vals))
   if (length(ok) == 0L) {
     return(out)

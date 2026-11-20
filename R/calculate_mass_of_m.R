@@ -205,6 +205,46 @@ calculate_mass_of_m <- function(
   neutral_mass
 }
 
+#' Parse unique adduct strings into a 5-row coefficient matrix
+#' @noRd
+.parse_adduct_batch_matrix <- function(
+  adducts,
+  electron_mass = ELECTRON_MASS_DALTONS,
+  require_mer = TRUE,
+  suppress_warn = FALSE
+) {
+  vapply(
+    adducts,
+    function(a) {
+      p <- tryCatch(
+        if (suppress_warn) {
+          suppressWarnings(parse_adduct(a))
+        } else {
+          parse_adduct(a)
+        },
+        error = function(...) NULL
+      )
+      if (
+        is.null(p) ||
+          all(p == 0L) ||
+          (require_mer && p[["n_mer"]] == 0L) ||
+          p[["n_charges"]] == 0L
+      ) {
+        c(NA_real_, NA_real_, NA_real_, NA_real_, NA_real_)
+      } else {
+        c(
+          as.numeric(p[["n_charges"]]),
+          as.numeric(p[["n_mer"]]),
+          as.numeric(p[["n_iso"]]) * ISOTOPE_MASS_SHIFT_DALTONS,
+          as.numeric(p[["los_add_clu"]]),
+          as.numeric(p[["n_charges"]] * (p[["charge"]] %||% 0)) * electron_mass
+        )
+      }
+    },
+    numeric(5L)
+  )
+}
+
 #' @title Batch-calculate neutral mass from adduct + m/z vectors
 #'
 #' @description Vectorized version of [calculate_mass_of_m()] that parses each
@@ -245,28 +285,9 @@ calculate_mass_of_m_batch <- function(
   # This avoids repeatedly scanning the whole vector for each adduct.
   if (length(unique_adducts) > 0L) {
     adduct_idx_map <- fastmatch::fmatch(adducts, unique_adducts)
-    p_mat <- vapply(
+    p_mat <- .parse_adduct_batch_matrix(
       unique_adducts,
-      function(a) {
-        p <- tryCatch(parse_adduct(a), error = function(...) NULL)
-        if (
-          is.null(p) ||
-            all(p == 0L) ||
-            p[["n_mer"]] == 0L ||
-            p[["n_charges"]] == 0L
-        ) {
-          c(NA_real_, NA_real_, NA_real_, NA_real_, NA_real_)
-        } else {
-          c(
-            as.numeric(p[["n_charges"]]),
-            as.numeric(p[["n_mer"]]),
-            as.numeric(p[["n_iso"]]) * ISOTOPE_MASS_SHIFT_DALTONS,
-            as.numeric(p[["los_add_clu"]]),
-            as.numeric(p[["n_charges"]] * p[["charge"]]) * electron_mass
-          )
-        }
-      },
-      numeric(5L)
+      electron_mass = electron_mass
     )
     nc_u <- p_mat[1L, ]
     valid_a <- which(!is.na(adduct_idx_map) & !is.na(nc_u[adduct_idx_map]))
@@ -324,23 +345,10 @@ calculate_mz_from_mass_batch <- function(
   ])
   if (length(unique_adducts) > 0L) {
     adduct_idx_map <- fastmatch::fmatch(adduct_vals, unique_adducts)
-    p_mat <- vapply(
+    p_mat <- .parse_adduct_batch_matrix(
       unique_adducts,
-      function(a) {
-        p <- tryCatch(parse_adduct(a), error = function(...) NULL)
-        if (is.null(p) || all(p == 0L) || p[["n_charges"]] == 0L) {
-          c(NA_real_, NA_real_, NA_real_, NA_real_, NA_real_)
-        } else {
-          c(
-            as.numeric(p[["n_charges"]]),
-            as.numeric(p[["n_mer"]]),
-            as.numeric(p[["n_iso"]]) * ISOTOPE_MASS_SHIFT_DALTONS,
-            as.numeric(p[["los_add_clu"]]),
-            as.numeric(p[["n_charges"]] * p[["charge"]]) * electron_mass
-          )
-        }
-      },
-      numeric(5L)
+      electron_mass = electron_mass,
+      require_mer = FALSE
     )
     nc_u <- p_mat[1L, ]
     valid_a <- which(!is.na(adduct_idx_map) & !is.na(nc_u[adduct_idx_map]))

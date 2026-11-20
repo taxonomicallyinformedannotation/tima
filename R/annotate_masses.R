@@ -1673,16 +1673,20 @@ normalize_modifier_terms <- function(x) {
   x
 }
 
-#' Return TRUE when an adduct string explicitly carries a given neutral loss term
-#' @keywords internal
-adduct_has_explicit_loss <- function(adduct, loss_formula) {
+#' Shared explicit modifier check in an adduct string
+#' @noRd
+.adduct_has_explicit_modifier <- function(
+  adduct,
+  modifier_formula,
+  token_prefix
+) {
   adduct <- as.character(adduct)
-  loss_formula <- trimws(sub(" .*", "", as.character(loss_formula)))
+  modifier_formula <- trimws(sub(" .*", "", as.character(modifier_formula)))
   if (
     is.na(adduct) ||
       !nzchar(adduct) ||
-      is.na(loss_formula) ||
-      !nzchar(loss_formula)
+      is.na(modifier_formula) ||
+      !nzchar(modifier_formula)
   ) {
     return(FALSE)
   }
@@ -1698,31 +1702,31 @@ adduct_has_explicit_loss <- function(adduct, loss_formula) {
   if (length(tokens) == 0L) {
     return(FALSE)
   }
-  loss_norm <- normalize_modifier_formula_term(loss_formula)
-  loss_parsed <- parse_atomic_formula(loss_norm)
+  mod_norm <- normalize_modifier_formula_term(modifier_formula)
+  mod_parsed <- parse_atomic_formula(mod_norm)
   any(vapply(
     X = tokens,
     FUN = function(tok) {
-      if (!startsWith(tok, "-")) {
+      if (!startsWith(tok, token_prefix)) {
         return(FALSE)
       }
       body <- substr(tok, 2L, nchar(tok))
       formula <- sub("^[0-9]+", "", body, perl = TRUE)
       formula_norm <- normalize_modifier_formula_term(formula)
-      if (identical(formula_norm, loss_norm)) {
+      if (identical(formula_norm, mod_norm)) {
         return(TRUE)
       }
       token_parsed <- parse_atomic_formula(formula_norm)
       if (
-        is.null(loss_parsed) ||
-          length(loss_parsed) == 0L ||
+        is.null(mod_parsed) ||
+          length(mod_parsed) == 0L ||
           is.null(token_parsed) ||
-          !setequal(names(loss_parsed), names(token_parsed))
+          !setequal(names(mod_parsed), names(token_parsed))
       ) {
         return(FALSE)
       }
-      ratios <- as.numeric(token_parsed[names(loss_parsed)]) /
-        as.numeric(loss_parsed)
+      ratios <- as.numeric(token_parsed[names(mod_parsed)]) /
+        as.numeric(mod_parsed)
       all(abs(ratios - round(ratios)) < 1e-8) &&
         length(unique(round(ratios))) == 1L &&
         unique(round(ratios)) >= 1L
@@ -1731,62 +1735,16 @@ adduct_has_explicit_loss <- function(adduct, loss_formula) {
   ))
 }
 
+#' Return TRUE when an adduct string explicitly carries a given neutral loss term
+#' @keywords internal
+adduct_has_explicit_loss <- function(adduct, loss_formula) {
+  .adduct_has_explicit_modifier(adduct, loss_formula, "-")
+}
+
 #' Return TRUE when an adduct string explicitly carries a given cluster term
 #' @keywords internal
 adduct_has_explicit_cluster <- function(adduct, cluster_formula) {
-  adduct <- as.character(adduct)
-  cluster_formula <- trimws(sub(" .*", "", as.character(cluster_formula)))
-  if (
-    is.na(adduct) ||
-      !nzchar(adduct) ||
-      is.na(cluster_formula) ||
-      !nzchar(cluster_formula)
-  ) {
-    return(FALSE)
-  }
-  inner <- sub("^\\[(.*)\\][0-9]*[+-]+$", "\\1", adduct, perl = TRUE)
-  if (!nzchar(inner) || identical(inner, adduct)) {
-    return(FALSE)
-  }
-  mods <- sub("^[0-9]*M[0-9]*", "", inner, perl = TRUE)
-  if (!nzchar(mods)) {
-    return(FALSE)
-  }
-  tokens <- regmatches(mods, gregexpr("[+-][^+-]+", mods, perl = TRUE))[[1L]]
-  if (length(tokens) == 0L) {
-    return(FALSE)
-  }
-  clu_norm <- normalize_modifier_formula_term(cluster_formula)
-  clu_parsed <- parse_atomic_formula(clu_norm)
-  any(vapply(
-    X = tokens,
-    FUN = function(tok) {
-      if (!startsWith(tok, "+")) {
-        return(FALSE)
-      }
-      body <- substr(tok, 2L, nchar(tok))
-      formula <- sub("^[0-9]+", "", body, perl = TRUE)
-      formula_norm <- normalize_modifier_formula_term(formula)
-      if (identical(formula_norm, clu_norm)) {
-        return(TRUE)
-      }
-      token_parsed <- parse_atomic_formula(formula_norm)
-      if (
-        is.null(clu_parsed) ||
-          length(clu_parsed) == 0L ||
-          is.null(token_parsed) ||
-          !setequal(names(clu_parsed), names(token_parsed))
-      ) {
-        return(FALSE)
-      }
-      ratios <- as.numeric(token_parsed[names(clu_parsed)]) /
-        as.numeric(clu_parsed)
-      all(abs(ratios - round(ratios)) < 1e-8) &&
-        length(unique(round(ratios))) == 1L &&
-        unique(round(ratios)) >= 1L
-    },
-    FUN.VALUE = logical(1L)
-  ))
+  .adduct_has_explicit_modifier(adduct, cluster_formula, "+")
 }
 
 #' Align equivalent multicharged carrier notations (e.g. `[M+2H]2+` vs `[M+H2]2+`)

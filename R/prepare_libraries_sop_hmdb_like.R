@@ -100,34 +100,12 @@ prepare_libraries_sop_hmdb_like <- function(
                 round_reals() |>
                 tidytable::distinct()
 
-              n_c <- nrow(core)
-              na_chr <- rep.int(NA_character_, n_c)
-              out_list <- c(
-                list(
-                  structure_name = core$structure_name,
-                  structure_inchikey = core$structure_inchikey,
-                  structure_smiles = core$structure_smiles,
-                  structure_inchikey_2D = na_chr,
-                  structure_smiles_2D = na_chr,
-                  structure_molecular_formula = core$structure_molecular_formula,
-                  structure_exact_mass = core$structure_exact_mass,
-                  structure_xlogp = core$structure_xlogp,
-                  structure_taxonomy_npclassifier_01pathway = na_chr,
-                  structure_taxonomy_npclassifier_02superclass = na_chr,
-                  structure_taxonomy_npclassifier_03class = na_chr,
-                  structure_taxonomy_classyfire_chemontid = na_chr,
-                  structure_taxonomy_classyfire_01kingdom = na_chr,
-                  structure_taxonomy_classyfire_02superclass = na_chr,
-                  structure_taxonomy_classyfire_03class = na_chr,
-                  structure_taxonomy_classyfire_04directparent = na_chr,
-                  structure_tag = rep.int(tag, n_c),
-                  organism_name = rep.int(organism_name, n_c),
-                  reference_doi = na_chr
-                ),
-                lapply(organism_taxonomy, rep.int, times = n_c)
+              hmdb_like_prepared <- .build_sop_table_from_core(
+                core = core,
+                organism_name = organism_name,
+                organism_taxonomy = organism_taxonomy,
+                structure_tag = tag
               )
-              hmdb_like_prepared <- tidytable::as_tidytable(out_list) |>
-                select_sop_columns()
             }
           }
 

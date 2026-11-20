@@ -35,13 +35,17 @@ build_evidence_edges <- function(
   tolerance_ppm = 5,
   tolerance_dalton = NULL
 ) {
-  if (nrow(hyps) == 0L) {
-    return(tidytable::tidytable(
+  empty_edges <- function() {
+    tidytable::tidytable(
       feature_id = character(),
       adduct = character(),
       feature_id_dest = character(),
       adduct_dest = character()
-    ))
+    )
+  }
+
+  if (nrow(hyps) == 0L) {
+    return(empty_edges())
   }
 
   hyps <- tidytable::as_tidytable(hyps)
@@ -56,24 +60,14 @@ build_evidence_edges <- function(
       (is.na(hyps$evidence_count) | hyps$evidence_count >= 1L)
   }
   if (!any(keep_cl)) {
-    return(tidytable::tidytable(
-      feature_id = character(),
-      adduct = character(),
-      feature_id_dest = character(),
-      adduct_dest = character()
-    ))
+    return(empty_edges())
   }
 
   idx_cl <- which(keep_cl)
   cl_sub <- as.character(ev_cl[idx_cl])
   dup_cl <- unique(cl_sub[duplicated(cl_sub)])
   if (length(dup_cl) == 0L) {
-    return(tidytable::tidytable(
-      feature_id = character(),
-      adduct = character(),
-      feature_id_dest = character(),
-      adduct_dest = character()
-    ))
+    return(empty_edges())
   }
   idx_cl <- idx_cl[!is.na(fastmatch::fmatch(cl_sub, dup_cl))]
 
@@ -112,12 +106,7 @@ build_evidence_edges <- function(
 
   n_rep <- length(cl_rep)
   if (n_rep < 2L) {
-    return(tidytable::tidytable(
-      feature_id = character(),
-      adduct = character(),
-      feature_id_dest = character(),
-      adduct_dest = character()
-    ))
+    return(empty_edges())
   }
 
   ord2 <- order(cl_rep, mz_rep, f_rep, method = "radix")
@@ -128,12 +117,7 @@ build_evidence_edges <- function(
 
   same_cl <- which(cl_rep[-n_rep] == cl_rep[-1L])
   if (length(same_cl) == 0L) {
-    return(tidytable::tidytable(
-      feature_id = character(),
-      adduct = character(),
-      feature_id_dest = character(),
-      adduct_dest = character()
-    ))
+    return(empty_edges())
   }
 
   m_src <- m_rep[same_cl]
@@ -150,12 +134,7 @@ build_evidence_edges <- function(
   m_ok <- na_m | (m_diff <= tol)
   keep_idx <- same_cl[m_ok]
   if (length(keep_idx) == 0L) {
-    return(tidytable::tidytable(
-      feature_id = character(),
-      adduct = character(),
-      feature_id_dest = character(),
-      adduct_dest = character()
-    ))
+    return(empty_edges())
   }
 
   f1_out <- f_rep[keep_idx]

@@ -106,9 +106,9 @@ solve_consistent_adduct_assignments <- function(
   adduct_lookup = NULL,
   baseline_adduct = NULL
 ) {
-  if (nrow(adduct_edges) == 0L || nrow(features_table) == 0L) {
-    return(list(
-      consistent_edges = adduct_edges[0L, ],
+  empty_result <- function(edges_tbl) {
+    list(
+      consistent_edges = edges_tbl[0L, ],
       feature_m_map = tidytable::tidytable(
         feature_id = character(),
         neutral_mass = numeric(),
@@ -118,7 +118,11 @@ solve_consistent_adduct_assignments <- function(
         feature_id = character(),
         component_id = character()
       )
-    ))
+    )
+  }
+
+  if (nrow(adduct_edges) == 0L || nrow(features_table) == 0L) {
+    return(empty_result(adduct_edges))
   }
 
   keep_f <- !duplicated(features_table$feature_id)
@@ -134,18 +138,7 @@ solve_consistent_adduct_assignments <- function(
   edges$mz_dest <- mz_dest_vec[valid_mz]
 
   if (nrow(edges) == 0L) {
-    return(list(
-      consistent_edges = adduct_edges[0L, ],
-      feature_m_map = tidytable::tidytable(
-        feature_id = character(),
-        neutral_mass = numeric(),
-        component_id = character()
-      ),
-      component_membership = tidytable::tidytable(
-        feature_id = character(),
-        component_id = character()
-      )
-    ))
+    return(empty_result(adduct_edges))
   }
 
   m_src <- calculate_neutral_mass_from_lookup(
@@ -188,18 +181,7 @@ solve_consistent_adduct_assignments <- function(
   )
 
   if (nrow(consistent) == 0L) {
-    return(list(
-      consistent_edges = consistent[0L, ],
-      feature_m_map = tidytable::tidytable(
-        feature_id = character(),
-        neutral_mass = numeric(),
-        component_id = character()
-      ),
-      component_membership = tidytable::tidytable(
-        feature_id = character(),
-        component_id = character()
-      )
-    ))
+    return(empty_result(consistent))
   }
 
   # Find connected components using igraph (O(V + E))
@@ -499,13 +481,28 @@ collect_node_adduct_hypotheses <- function(
       candidate_adduct_origin = "supported"
     )
 
-  # Filter preassigned to be compatible with inferred M values
-  if (nrow(pre_hyps) > 0L && nrow(feature_m_map) > 0L) {
-    pre_hyps <- pre_hyps |>
-      tidytable::left_join(
-        features_table |> tidytable::distinct(feature_id, mz),
-        by = "feature_id"
-      ) |>
+  # Filter hypotheses to be compatible with inferred M values
+  filter_m_compatible_hyps <- function(hyps_dt, join_mz = TRUE) {
+    if (nrow(hyps_dt) == 0L || nrow(feature_m_map) == 0L) {
+      return(
+        hyps_dt |>
+          tidytable::select(
+            feature_id,
+            adduct,
+            source,
+            is_preassigned,
+            candidate_adduct_origin
+          )
+      )
+    }
+    if (join_mz) {
+      hyps_dt <- hyps_dt |>
+        tidytable::left_join(
+          features_table |> tidytable::distinct(feature_id, mz),
+          by = "feature_id"
+        )
+    }
+    hyps_dt |>
       tidytable::left_join(
         feature_m_map |> tidytable::select(feature_id, neutral_mass),
         by = "feature_id"
@@ -533,38 +530,8 @@ collect_node_adduct_hypotheses <- function(
       )
   }
 
-  if (nrow(pre_prop_hyps) > 0L && nrow(feature_m_map) > 0L) {
-    pre_prop_hyps <- pre_prop_hyps |>
-      tidytable::left_join(
-        features_table |> tidytable::distinct(feature_id, mz),
-        by = "feature_id"
-      ) |>
-      tidytable::left_join(
-        feature_m_map |> tidytable::select(feature_id, neutral_mass),
-        by = "feature_id"
-      ) |>
-      tidytable::mutate(
-        implied_m = calculate_neutral_mass_from_lookup(
-          mzs = as.numeric(mz),
-          adducts = adduct,
-          adduct_lookup = adduct_lookup
-        ),
-        compatible = is.na(neutral_mass) |
-          abs(implied_m - neutral_mass) <=
-            pmax(
-              tolerance_ppm * 1e-6 * neutral_mass,
-              tolerance_dalton %||% 0
-            )
-      ) |>
-      tidytable::filter(compatible) |>
-      tidytable::select(
-        feature_id,
-        adduct,
-        source,
-        is_preassigned,
-        candidate_adduct_origin
-      )
-  }
+  pre_hyps <- filter_m_compatible_hyps(pre_hyps)
+  pre_prop_hyps <- filter_m_compatible_hyps(pre_prop_hyps)
 
   # (d) evidence-derived adducts from typed-universe inference.
   if (missing(evidence_hypotheses) || is.null(evidence_hypotheses)) {
@@ -622,31 +589,12 @@ collect_node_adduct_hypotheses <- function(
     tidytable::cross_join(
       tidytable::tidytable(adduct = baseline_adducts)
     ) |>
-    tidytable::left_join(
-      feature_m_map |> tidytable::select(feature_id, neutral_mass),
-      by = "feature_id"
-    ) |>
     tidytable::mutate(
-      implied_m = calculate_neutral_mass_from_lookup(
-        mzs = as.numeric(mz),
-        adducts = adduct,
-        adduct_lookup = adduct_lookup
-      ),
-      compatible = is.na(neutral_mass) |
-        abs(implied_m - neutral_mass) <=
-          pmax(tolerance_ppm * 1e-6 * neutral_mass, tolerance_dalton %||% 0),
       source = "baseline",
       is_preassigned = FALSE,
       candidate_adduct_origin = "baseline"
     ) |>
-    tidytable::filter(compatible) |>
-    tidytable::select(
-      feature_id,
-      adduct,
-      source,
-      is_preassigned,
-      candidate_adduct_origin
-    )
+    filter_m_compatible_hyps(join_mz = FALSE)
 
   base_hyps <- tidytable::bind_rows(
     supported_seed,
@@ -1103,6 +1051,99 @@ is_plain_monomer_ion <- function(adduct) {
   u_simp[fastmatch::fmatch(pair_code, u_code)]
 }
 
+#' Shared modifier propagation over edges (forward src->dest or reverse dest->src)
+#' @noRd
+.propagate_modifier <- function(
+  base_hyps,
+  edges,
+  mod_col,
+  mod_sign,
+  strip_label = FALSE,
+  source_label = NULL,
+  reverse = FALSE
+) {
+  if (nrow(edges) == 0L || nrow(base_hyps) == 0L) {
+    return(base_hyps[0L, ])
+  }
+
+  if (is.null(source_label)) {
+    source_label <- if (mod_sign == "+") "cluster" else "loss"
+  }
+
+  edge_map <- edges |>
+    tidytable::distinct(
+      feature_id,
+      feature_id_dest,
+      !!as.name(mod_col)
+    )
+  target_col <- "feature_id_dest"
+  if (reverse) {
+    edge_map <- edge_map |>
+      tidytable::rename(
+        feature_id_src = feature_id,
+        feature_id = feature_id_dest
+      )
+    target_col <- "feature_id_src"
+  }
+
+  if (strip_label) {
+    edge_map <- edge_map |>
+      tidytable::mutate(
+        !!as.name(mod_col) := gsub(" .*", "", !!as.name(mod_col))
+      )
+  }
+
+  joined <- base_hyps |>
+    tidytable::inner_join(edge_map, by = "feature_id")
+
+  explicit_fn <- if (
+    !reverse && identical(mod_col, "loss") && identical(mod_sign, "+")
+  ) {
+    adduct_has_explicit_loss
+  } else if (
+    reverse && identical(mod_col, "cluster") && identical(mod_sign, "-")
+  ) {
+    adduct_has_explicit_cluster
+  }
+  if (nrow(joined) > 0L && !is.null(explicit_fn)) {
+    pair_key <- paste(joined$adduct, joined[[mod_col]], sep = "\r")
+    u_idx <- which(!duplicated(pair_key))
+    u_keep <- mapply(
+      explicit_fn,
+      joined$adduct[u_idx],
+      joined[[mod_col]][u_idx],
+      USE.NAMES = FALSE
+    )
+    keep_rows <- u_keep[fastmatch::fmatch(pair_key, pair_key[u_idx])]
+    joined <- joined[which(keep_rows), , drop = FALSE]
+  }
+  if (nrow(joined) == 0L) {
+    return(base_hyps[0L, ])
+  }
+
+  target_sym <- as.name(target_col)
+  out <- joined |>
+    tidytable::mutate(
+      feature_id = !!target_sym,
+      adduct = .apply_modifier_column_fast(
+        adduct,
+        !!as.name(mod_col),
+        mod_sign
+      ),
+      source = source_label,
+      !!target_sym := NULL
+    )
+
+  if (identical(mod_col, "loss")) {
+    out <- out |>
+      tidytable::mutate(loss_term = as.character(!!as.name(mod_col)))
+  }
+
+  out |>
+    tidytable::select(-tidyselect::all_of(mod_col)) |>
+    harmonize_adducts(adducts_translations = adducts_translations)
+}
+
 #' Propagate a modifier from the SOURCE feature's hypothesis to the DESTINATION
 #' feature, creating a new hypothesis for the destination.
 #'
@@ -1122,74 +1163,15 @@ propagate_modifier_src_to_dest <- function(
   strip_label = FALSE,
   source_label = NULL
 ) {
-  if (nrow(edges) == 0L || nrow(base_hyps) == 0L) {
-    return(base_hyps[0L, ])
-  }
-
-  src_dest <- edges |>
-    tidytable::distinct(
-      feature_id,
-      feature_id_dest,
-      !!as.name(mod_col)
-    )
-
-  if (strip_label) {
-    src_dest <- src_dest |>
-      tidytable::mutate(
-        !!as.name(mod_col) := gsub(" .*", "", !!as.name(mod_col))
-      )
-  }
-
-  if (is.null(source_label)) {
-    source_label <- if (mod_sign == "+") "cluster" else "loss"
-  }
-
-  # Join on the SOURCE feature, then rename feature_id_dest → feature_id
-  joined <- base_hyps |>
-    tidytable::inner_join(src_dest, by = "feature_id")
-
-  # Recovering a precursor from a product over a loss edge (+loss) is only
-  # valid when the source (product) adduct explicitly carries that loss.
-  if (
-    nrow(joined) > 0L &&
-      identical(mod_col, "loss") &&
-      identical(mod_sign, "+")
-  ) {
-    pair_key <- paste(joined$adduct, joined[[mod_col]], sep = "\r")
-    u_idx <- which(!duplicated(pair_key))
-    u_keep <- mapply(
-      adduct_has_explicit_loss,
-      joined$adduct[u_idx],
-      joined[[mod_col]][u_idx],
-      USE.NAMES = FALSE
-    )
-    keep_loss <- u_keep[fastmatch::fmatch(pair_key, pair_key[u_idx])]
-    joined <- joined[which(keep_loss), , drop = FALSE]
-  }
-  if (nrow(joined) == 0L) {
-    return(base_hyps[0L, ])
-  }
-
-  out <- joined |>
-    tidytable::mutate(
-      feature_id = feature_id_dest,
-      adduct = .apply_modifier_column_fast(
-        adduct,
-        !!as.name(mod_col),
-        mod_sign
-      ),
-      source = source_label,
-      feature_id_dest = NULL
-    )
-
-  if (identical(mod_col, "loss")) {
-    out <- out |>
-      tidytable::mutate(loss_term = as.character(!!as.name(mod_col)))
-  }
-
-  out |>
-    tidytable::select(-tidyselect::all_of(mod_col)) |>
-    harmonize_adducts(adducts_translations = adducts_translations)
+  .propagate_modifier(
+    base_hyps = base_hyps,
+    edges = edges,
+    mod_col = mod_col,
+    mod_sign = mod_sign,
+    strip_label = strip_label,
+    source_label = source_label,
+    reverse = FALSE
+  )
 }
 
 #' Propagate a modifier from the DESTINATION feature's hypothesis back to the
@@ -1207,78 +1189,15 @@ propagate_modifier_dest_to_src <- function(
   strip_label = FALSE,
   source_label = NULL
 ) {
-  if (nrow(edges) == 0L || nrow(base_hyps) == 0L) {
-    return(base_hyps[0L, ])
-  }
-
-  if (is.null(source_label)) {
-    source_label <- if (mod_sign == "+") "cluster" else "loss"
-  }
-
-  dest_src <- edges |>
-    tidytable::distinct(
-      feature_id,
-      feature_id_dest,
-      !!as.name(mod_col)
-    ) |>
-    tidytable::rename(
-      feature_id_src = feature_id,
-      feature_id = feature_id_dest
-    )
-
-  if (strip_label) {
-    dest_src <- dest_src |>
-      tidytable::mutate(
-        !!as.name(mod_col) := gsub(" .*", "", !!as.name(mod_col))
-      )
-  }
-
-  joined <- base_hyps |>
-    tidytable::inner_join(dest_src, by = "feature_id")
-
-  # Recovering a lower-mz feature from a cluster-bearing destination over a
-  # cluster edge (-cluster) is only valid when the destination adduct explicitly
-  # carries that cluster.
-  if (
-    nrow(joined) > 0L &&
-      identical(mod_col, "cluster") &&
-      identical(mod_sign, "-")
-  ) {
-    pair_key <- paste(joined$adduct, joined[[mod_col]], sep = "\r")
-    u_idx <- which(!duplicated(pair_key))
-    u_keep <- mapply(
-      adduct_has_explicit_cluster,
-      joined$adduct[u_idx],
-      joined[[mod_col]][u_idx],
-      USE.NAMES = FALSE
-    )
-    keep_clu <- u_keep[fastmatch::fmatch(pair_key, pair_key[u_idx])]
-    joined <- joined[which(keep_clu), , drop = FALSE]
-  }
-  if (nrow(joined) == 0L) {
-    return(base_hyps[0L, ])
-  }
-
-  out <- joined |>
-    tidytable::mutate(
-      feature_id = feature_id_src,
-      adduct = .apply_modifier_column_fast(
-        adduct,
-        !!as.name(mod_col),
-        mod_sign
-      ),
-      source = source_label,
-      feature_id_src = NULL
-    )
-
-  if (identical(mod_col, "loss")) {
-    out <- out |>
-      tidytable::mutate(loss_term = as.character(!!as.name(mod_col)))
-  }
-
-  out |>
-    tidytable::select(-tidyselect::all_of(mod_col)) |>
-    harmonize_adducts(adducts_translations = adducts_translations)
+  .propagate_modifier(
+    base_hyps = base_hyps,
+    edges = edges,
+    mod_col = mod_col,
+    mod_sign = mod_sign,
+    strip_label = strip_label,
+    source_label = source_label,
+    reverse = TRUE
+  )
 }
 
 #' Add +mod or -mod suffix to existing adduct strings on selected features

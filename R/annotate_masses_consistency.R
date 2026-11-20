@@ -13,8 +13,8 @@ build_feature_pairs_within_rt <- function(
   tolerance_ppm,
   tolerance_dalton = NULL
 ) {
-  if (nrow(df_rt_tol) == 0L || nrow(df_fea_min) == 0L) {
-    return(tidytable::tidytable(
+  empty_pairs <- function() {
+    tidytable::tidytable(
       feature_id = character(),
       rt = numeric(),
       mz = numeric(),
@@ -23,7 +23,11 @@ build_feature_pairs_within_rt <- function(
       delta = numeric(),
       delta_min = numeric(),
       delta_max = numeric()
-    ))
+    )
+  }
+
+  if (nrow(df_rt_tol) == 0L || nrow(df_fea_min) == 0L) {
+    return(empty_pairs())
   }
 
   src_fid <- df_rt_tol$feature_id
@@ -63,16 +67,7 @@ build_feature_pairs_within_rt <- function(
   ]
 
   if (length(src_ord) == 0L || length(dest_ord) == 0L) {
-    return(tidytable::tidytable(
-      feature_id = character(),
-      rt = numeric(),
-      mz = numeric(),
-      feature_id_dest = character(),
-      mz_dest = numeric(),
-      delta = numeric(),
-      delta_min = numeric(),
-      delta_max = numeric()
-    ))
+    return(empty_pairs())
   }
 
   u_smp <- unique(src_smp[src_ord])
@@ -82,16 +77,7 @@ build_feature_pairs_within_rt <- function(
   d_smp_id <- d_smp_id[keep_d]
   n_d <- length(dest_ord)
   if (n_d == 0L) {
-    return(tidytable::tidytable(
-      feature_id = character(),
-      rt = numeric(),
-      mz = numeric(),
-      feature_id_dest = character(),
-      mz_dest = numeric(),
-      delta = numeric(),
-      delta_min = numeric(),
-      delta_max = numeric()
-    ))
+    return(empty_pairs())
   }
 
   s_smp_id <- fastmatch::fmatch(src_smp[src_ord], u_smp)
@@ -126,16 +112,7 @@ build_feature_pairs_within_rt <- function(
   }
 
   if (length(s_hit) == 0L) {
-    return(tidytable::tidytable(
-      feature_id = character(),
-      rt = numeric(),
-      mz = numeric(),
-      feature_id_dest = character(),
-      mz_dest = numeric(),
-      delta = numeric(),
-      delta_min = numeric(),
-      delta_max = numeric()
-    ))
+    return(empty_pairs())
   }
 
   mz_s <- src_mz[s_hit]

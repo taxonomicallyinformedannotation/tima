@@ -1344,33 +1344,7 @@ convert_precursor_for_matching <- function(precursors, adducts) {
   u_add <- unique(add_sub)
   add_id <- fastmatch::fmatch(add_sub, u_add)
 
-  p_mat <- vapply(
-    u_add,
-    function(add) {
-      p <- tryCatch(
-        suppressWarnings(parse_adduct(add)),
-        error = function(...) NULL
-      )
-      if (
-        is.null(p) ||
-          all(p == 0) ||
-          p[["n_mer"]] == 0L ||
-          p[["n_charges"]] == 0L
-      ) {
-        c(NA_real_, NA_real_, NA_real_, NA_real_, NA_real_)
-      } else {
-        c(
-          as.numeric(p[["n_charges"]]),
-          as.numeric(p[["n_mer"]]),
-          as.numeric(p[["n_iso"]]) * ISOTOPE_MASS_SHIFT_DALTONS,
-          as.numeric(p[["los_add_clu"]]),
-          as.numeric(p[["n_charges"]] * (p[["charge"]] %||% 0)) *
-            ELECTRON_MASS_DALTONS
-        )
-      }
-    },
-    numeric(5L)
-  )
+  p_mat <- .parse_adduct_batch_matrix(u_add, suppress_warn = TRUE)
 
   nc_u <- p_mat[1L, ]
   valid_a <- !is.na(nc_u[add_id])

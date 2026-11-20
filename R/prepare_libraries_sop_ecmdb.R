@@ -77,40 +77,24 @@ prepare_libraries_sop_ecmdb <- function(
         tidytable::distinct()
       rm(ecmdb)
 
-      n_c <- nrow(core)
-      na_chr <- rep.int(NA_character_, n_c)
-      ecmdb_prepared <- tidytable::tidytable(
-        structure_name = core$structure_name,
-        structure_inchikey = core$structure_inchikey,
-        structure_smiles = core$structure_smiles,
-        structure_inchikey_2D = na_chr,
-        structure_smiles_2D = na_chr,
-        structure_molecular_formula = core$structure_molecular_formula,
-        structure_exact_mass = core$structure_exact_mass,
-        structure_xlogp = core$structure_xlogp,
-        structure_taxonomy_npclassifier_01pathway = na_chr,
-        structure_taxonomy_npclassifier_02superclass = na_chr,
-        structure_taxonomy_npclassifier_03class = na_chr,
-        structure_taxonomy_classyfire_chemontid = na_chr,
-        structure_taxonomy_classyfire_01kingdom = na_chr,
-        structure_taxonomy_classyfire_02superclass = na_chr,
-        structure_taxonomy_classyfire_03class = na_chr,
-        structure_taxonomy_classyfire_04directparent = na_chr,
-        organism_name = rep.int("Escherichia coli", n_c),
-        organism_taxonomy_ottid = rep.int(474506, n_c),
-        organism_taxonomy_01domain = rep.int("Bacteria", n_c),
-        organism_taxonomy_02kingdom = na_chr,
-        organism_taxonomy_03phylum = rep.int("Proteobacteria", n_c),
-        organism_taxonomy_04class = rep.int("Gammaproteobacteria", n_c),
-        organism_taxonomy_05order = rep.int("Enterobacteriales", n_c),
-        organism_taxonomy_06family = rep.int("Enterobacteriaceae", n_c),
-        organism_taxonomy_07tribe = na_chr,
-        organism_taxonomy_08genus = na_chr,
-        organism_taxonomy_09species = rep.int("Escherichia coli", n_c),
-        organism_taxonomy_10varietas = na_chr,
-        reference_doi = rep.int(NA, n_c)
-      ) |>
-        select_sop_columns()
+      ecmdb_prepared <- .build_sop_table_from_core(
+        core = core,
+        organism_name = "Escherichia coli",
+        organism_taxonomy = list(
+          organism_taxonomy_ottid = 474506,
+          organism_taxonomy_01domain = "Bacteria",
+          organism_taxonomy_02kingdom = NA_character_,
+          organism_taxonomy_03phylum = "Proteobacteria",
+          organism_taxonomy_04class = "Gammaproteobacteria",
+          organism_taxonomy_05order = "Enterobacteriales",
+          organism_taxonomy_06family = "Enterobacteriaceae",
+          organism_taxonomy_07tribe = NA_character_,
+          organism_taxonomy_08genus = NA_character_,
+          organism_taxonomy_09species = "Escherichia coli",
+          organism_taxonomy_10varietas = NA_character_
+        ),
+        reference_doi = NA
+      )
       rm(core)
     }
 

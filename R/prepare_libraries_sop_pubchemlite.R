@@ -78,41 +78,24 @@ prepare_libraries_sop_pubchemlite <- function(
           tidytable::distinct()
         rm(pubchemlite)
 
-        n_out <- nrow(pubchemlite_core)
-        na_col <- rep(NA_character_, n_out)
-        pubchemlite_prepared <- tidytable::tidytable(
-          structure_name = pubchemlite_core$structure_name,
-          structure_inchikey = pubchemlite_core$structure_inchikey,
-          structure_smiles = pubchemlite_core$structure_smiles,
-          structure_inchikey_2D = na_col,
-          structure_smiles_2D = na_col,
-          structure_molecular_formula = pubchemlite_core$structure_molecular_formula,
-          structure_exact_mass = pubchemlite_core$structure_exact_mass,
-          structure_xlogp = pubchemlite_core$structure_xlogp,
-          structure_taxonomy_npclassifier_01pathway = na_col,
-          structure_taxonomy_npclassifier_02superclass = na_col,
-          structure_taxonomy_npclassifier_03class = na_col,
-          structure_taxonomy_classyfire_chemontid = na_col,
-          structure_taxonomy_classyfire_01kingdom = na_col,
-          structure_taxonomy_classyfire_02superclass = na_col,
-          structure_taxonomy_classyfire_03class = na_col,
-          structure_taxonomy_classyfire_04directparent = na_col,
-          structure_tag = rep("xenobiotic", n_out),
-          organism_name = rep("xenobiotic", n_out),
-          organism_taxonomy_ottid = rep("93302", n_out), # complicated placeholder, different from Biota
-          organism_taxonomy_01domain = na_col,
-          organism_taxonomy_02kingdom = na_col,
-          organism_taxonomy_03phylum = na_col,
-          organism_taxonomy_04class = na_col,
-          organism_taxonomy_05order = na_col,
-          organism_taxonomy_06family = na_col,
-          organism_taxonomy_07tribe = na_col,
-          organism_taxonomy_08genus = na_col,
-          organism_taxonomy_09species = na_col,
-          organism_taxonomy_10varietas = na_col,
-          reference_doi = na_col
-        ) |>
-          select_sop_columns()
+        pubchemlite_prepared <- .build_sop_table_from_core(
+          core = pubchemlite_core,
+          organism_name = "xenobiotic",
+          organism_taxonomy = list(
+            organism_taxonomy_ottid = "93302", # complicated placeholder, different from Biota
+            organism_taxonomy_01domain = NA_character_,
+            organism_taxonomy_02kingdom = NA_character_,
+            organism_taxonomy_03phylum = NA_character_,
+            organism_taxonomy_04class = NA_character_,
+            organism_taxonomy_05order = NA_character_,
+            organism_taxonomy_06family = NA_character_,
+            organism_taxonomy_07tribe = NA_character_,
+            organism_taxonomy_08genus = NA_character_,
+            organism_taxonomy_09species = NA_character_,
+            organism_taxonomy_10varietas = NA_character_
+          ),
+          structure_tag = "xenobiotic"
+        )
       }
     }
 
