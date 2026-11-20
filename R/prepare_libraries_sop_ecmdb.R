@@ -62,7 +62,6 @@ prepare_libraries_sop_ecmdb <- function(
         con = unz(description = input, filename = file),
         verbose = FALSE
       ) |>
-        data.frame() |>
         tidytable::as_tidytable()
 
       core <- tidytable::tidytable(

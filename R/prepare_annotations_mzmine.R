@@ -72,10 +72,7 @@ prepare_annotations_mzmine <- function(
 
   ctx <- log_operation("prepare_annotations_mzmine", n_files = length(input))
 
-  if (length(input) == 0) {
-    input <- "w1llN3v3r3v3r3x1st"
-  }
-  if (all(file.exists(unlist(input)))) {
+  if (length(input) > 0L && all(file.exists(unlist(input)))) {
     table <- Map(
       function(x, y) {
         safe_fread(

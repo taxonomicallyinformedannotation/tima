@@ -333,7 +333,6 @@ calculate_mz_from_mass_batch <- function(
   out <- rep(NA_real_, n)
 
   valid_idx <- !is.na(neutral_masses) & !is.na(adducts)
-  valid_idx[is.na(valid_idx)] <- FALSE
   if (!any(valid_idx)) {
     return(out)
   }
