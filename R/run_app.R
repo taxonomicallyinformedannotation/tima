@@ -109,7 +109,7 @@ build_shiny_app_dir <- function(app_path) {
 }
 
 run_shiny_app <- function(appDir, port, host, launch.browser) {
-  # nolint: object_name_linter. Shiny API names.
+  # Shiny API names.
   shiny::runApp(
     appDir = appDir,
     port = port,

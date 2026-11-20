@@ -55,7 +55,7 @@
 #' }
 read_mgf_opti <- function(
   f,
-  msLevel = 2L, # nolint: object_name_linter. Bioconductor convention.
+  msLevel = 2L, # Bioconductor convention.
   mapping = c(
     rtime = "RTINSECONDS",
     acquisitionNum = "SCANS",

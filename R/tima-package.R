@@ -14,7 +14,7 @@
 ## usethis namespace: end
 NULL
 
-.datatable.aware <- TRUE # nolint: object_name_linter. datatable convention.
+.datatable.aware <- TRUE # datatable convention.
 
 .onLoad <- function(libname, pkgname) {
   # NOTE: Logging is NOT initialized here to avoid creating empty log files
