@@ -83,7 +83,6 @@ prepare_libraries_sop_lotus <- function(
     lotus_prepared <- fake_sop_columns()
   }
 
-  # Export prepared data
   export_output(x = lotus_prepared, file = output)
 
   output

@@ -113,7 +113,6 @@ prepare_features_components <- function(
     }
   )
 
-  # Early exit for empty data
   if (nrow(table) == 0L) {
     log_warn("No component data found in input files")
     table <- tidytable::tidytable(

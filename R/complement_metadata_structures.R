@@ -46,7 +46,6 @@ complement_metadata_structures <- function(
 
   validate_dataframe(df, param_name = "df")
 
-  # Early exit for empty input
   if (nrow(df) == 0L) {
     log_warn("Empty data frame provided")
     return(df)

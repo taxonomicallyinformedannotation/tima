@@ -267,7 +267,6 @@ create_edges_spectra <- function(
     return(output)
   }
 
-  # Early exit if only one spectrum
   if (length(spectra) == 1L) {
     log_warn(
       "Only %d spectrum found - need at least 2 for network edges",

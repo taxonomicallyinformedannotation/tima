@@ -26,7 +26,6 @@
   archive_exists,
   label
 ) {
-  # Write payload to temporary file
   writeLines(content, fake_export)
 
   zip_result <- zip_cmd(export = export, fake_export = fake_export)
@@ -51,7 +50,6 @@
     }
   }
 
-  # Clean up temporary file
   unlink(fake_export)
 
   log_debug("Created fake %s file at: %s", label, export)

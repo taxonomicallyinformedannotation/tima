@@ -96,7 +96,6 @@ prepare_libraries_sop_closed <- function(
     closed_prepared <- fake_sop_columns()
   }
 
-  # Export parameters and results
   export_params(
     parameters = get_params(step = "prepare_libraries_sop_closed"),
     step = "prepare_libraries_sop_closed"

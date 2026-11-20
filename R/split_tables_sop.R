@@ -44,7 +44,6 @@
 split_tables_sop <- function(table, cache) {
   validate_dataframe(table, param_name = "table")
 
-  # Early exit for empty input
   if (nrow(table) == 0L) {
     log_warn("Empty table provided")
     return(create_empty_sop_tables())

@@ -1147,7 +1147,6 @@ export_results <- function(results_list, output, pattern) {
     )
   )
 
-  # Export parameters
   export_params(
     parameters = get_params(step = "prepare_params"),
     directory = dir_time,
@@ -1159,7 +1158,6 @@ export_results <- function(results_list, output, pattern) {
     step = "prepare_params_advanced"
   )
 
-  # Export results
   export_output(x = results_list$mini, file = final_output_mini)
   export_output(x = results_list$filtered, file = final_output_filtered)
   export_output(x = results_list$full, file = final_output)

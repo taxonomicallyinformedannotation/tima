@@ -40,7 +40,6 @@
 select_sirius_columns_canopus <- function(df, sirius_version) {
   validate_dataframe(df, param_name = "df")
 
-  # Early exit for empty data
   if (nrow(df) == 0L) {
     log_warn("Empty CANOPUS data frame")
     return(df)

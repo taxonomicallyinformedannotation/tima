@@ -218,7 +218,6 @@ process_smiles <- function(
     nrow(table_smiles_to_process)
   )
 
-  # Write SMILES to temporary file
   tidytable::fwrite(
     x = table_smiles_to_process,
     file = input_smi_file

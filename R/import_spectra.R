@@ -169,7 +169,6 @@ import_spectra <- function(
   n_initial <- length(spectra)
   log_info("Loaded %d spectra from file", n_initial)
 
-  # Early exit for empty files
   if (n_initial == 0L) {
     log_warn("No spectra found in file")
     return(spectra)

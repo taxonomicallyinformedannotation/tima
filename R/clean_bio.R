@@ -61,7 +61,6 @@ clean_bio <- function(
     param_name = "minimal_consistency"
   )
 
-  # Early exit for empty inputs
   if (nrow(annot_table_wei_bio) == 0L) {
     log_warn("Empty annotation table provided")
     return(annot_table_wei_bio)

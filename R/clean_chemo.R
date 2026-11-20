@@ -159,7 +159,6 @@ clean_chemo <- function(
     score_chemical_npc_class = score_chemical_npc_class
   )
 
-  # Early exit for empty input
   if (nrow(annot_table_wei_chemo) == 0L) {
     log_complete(ctx, n_final = 0, note = "Empty annotation table")
     return(annot_table_wei_chemo)
@@ -328,8 +327,6 @@ clean_chemo <- function(
     n_final_mini = nrow(results_mini),
     n_features = length(unique(results_filtered$feature_id))
   )
-
-  # Clean up intermediate objects
 
   results_list
 }

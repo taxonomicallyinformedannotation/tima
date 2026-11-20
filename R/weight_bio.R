@@ -205,7 +205,6 @@ weight_bio <- function(
     structure_organism_pairs_table
   )
 
-  # Early exit for empty input
   n_annotations <- nrow(annotation_table_taxed)
   if (n_annotations == 0L) {
     log_warn(

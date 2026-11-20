@@ -295,7 +295,5 @@ prepare_libraries_sop_merged <- function(
     files_exported = length(result)
   )
 
-  # Clean up
-
   result
 }

@@ -73,7 +73,6 @@ summarize_results <- function(
   validate_logical(remove_ties, param_name = "remove_ties")
   validate_logical(summarize, param_name = "summarize")
 
-  # Early exit for empty results
   if (nrow(df) == 0L) {
     msg <- "Empty results table provided"
     warning(msg, call. = FALSE)

@@ -315,7 +315,6 @@ prepare_features_edges <- function(
   # Explicit memory cleanup
   rm(edges_ms1, edges_ms2, features_entropy)
 
-  # Export parameters and results
   export_params(
     parameters = get_params(step = "prepare_features_edges"),
     step = "prepare_features_edges"

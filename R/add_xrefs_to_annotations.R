@@ -76,7 +76,6 @@ add_xrefs_to_annotations <- function(results_list, xrefs_file) {
 #' @keywords internal
 #' @noRd
 .add_xrefs_to_df <- function(df, xrefs) {
-  # Skip if no data
   if (nrow(df) == 0L) {
     return(df)
   }

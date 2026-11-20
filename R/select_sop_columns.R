@@ -21,7 +21,6 @@
 select_sop_columns <- function(df) {
   validate_dataframe(df, param_name = "df", min_rows = 0)
 
-  # Early exit for empty data
   if (nrow(df) == 0L) {
     log_warn("Empty dataframe in select_sop_columns")
     return(df)

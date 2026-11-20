@@ -57,14 +57,12 @@ round_reals <- function(
     )
   }
 
-  # Early exit for empty patterns
   if (length(cols) == 0L) {
     return(df)
   }
 
   matching_cols <- find_matching_columns(names(df), cols)
 
-  # Early exit if no columns found
   if (length(matching_cols) == 0L) {
     return(df)
   }
