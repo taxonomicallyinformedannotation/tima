@@ -32,16 +32,6 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r}
-#| label: setup
-#| include: false
-
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-```
-
 Before running the pipeline, validate your inputs with `validate_inputs()`.
 Catching a malformed MGF, a missing column, or an incomplete SIRIUS export up
 front avoids failing halfway through library downloads or spectral matching.

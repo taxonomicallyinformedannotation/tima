@@ -65,36 +65,6 @@ did not change, we decided to build a
 [{targets}](https://books.ropensci.org/targets/) pipeline. Each step of the
 whole pipeline will be described next.
 
-```{r}
-#| label: targets
-#| echo: false
-#| eval: false
-#| message: false
-#| warning: false
-#| out-width: "100%"
-
-try(
-  expr = {
-    library(targets)
-    Sys.setenv(TAR_WARN = "false")
-    targets::tar_visnetwork(
-      names = starts_with("ann"),
-      exclude = c(
-        "benchmark",
-        "par_",
-        "paths",
-        "_is",
-        "_exp"
-      ) |>
-        tidyselect::contains(),
-      targets_only = TRUE,
-      degree_from = 8
-    )
-  },
-  silent = TRUE
-)
-```
-
 ## Use
 
 All coming steps admit you already installed `tima`:
