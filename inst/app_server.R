@@ -2,9 +2,76 @@
 .get_default_paths <- getFromNamespace("get_default_paths", "tima")
 .create_dir <- getFromNamespace("create_dir", "tima")
 .load_yaml_files <- getFromNamespace("load_yaml_files", "tima")
+.get_params <- getFromNamespace("get_params", "tima")
 .plan_mztab_app_outputs <- getFromNamespace("plan_mztab_app_outputs", "tima")
 .log_trace <- getFromNamespace("log_trace", "tima")
 .replace_id <- getFromNamespace("replace_id", "tima")
+
+.RESULT_AND_STATUS_IDS <- c(
+  "thankyou_msg",
+  "error",
+  "job_end",
+  "results_mini",
+  "results_filtered",
+  "results_full",
+  "results_mztab",
+  "close"
+)
+
+.empty_to_null <- function(x) {
+  if (is.null(x) || identical(x, "")) NULL else x
+}
+
+.has_upload <- function(upload) {
+  !is.null(upload) && length(upload[[1L]]) > 0L && nzchar(upload[[1L]])
+}
+
+.hide_ids <- function(ids) {
+  for (id in ids) {
+    shinyjs::hide(id)
+  }
+}
+
+.make_url_download <- function(filename_url, content_url = filename_url) {
+  force(filename_url)
+  force(content_url)
+  shiny::downloadHandler(
+    filename = basename(filename_url),
+    content = function(file) {
+      writeLines(readLines(content_url), file)
+    }
+  )
+}
+
+.register_result_download <- function(output, output_id, src_path) {
+  force(src_path)
+  output[[output_id]] <- shiny::downloadHandler(
+    filename = basename(src_path),
+    content = function(file) {
+      ok <- file.copy(src_path, file, overwrite = TRUE)
+      if (!ok) {
+        cli::cli_abort(
+          "failed to copy result file {.file {src_path}}",
+          class = c("tima_runtime_error", "tima_error"),
+          call = NULL
+        )
+      }
+    }
+  )
+  shinyjs::show(output_id)
+}
+
+.stage_single_upload <- function(upload_df, dest_dir) {
+  if (is.null(upload_df)) {
+    return(NULL)
+  }
+  dest <- file.path(dest_dir, upload_df[[1L]])
+  if (!file.exists(dest)) {
+    .create_dir(dest_dir)
+    file.copy(from = upload_df[[4L]], to = dest, overwrite = TRUE)
+  }
+  dest
+}
 
 .stage_multi_upload <- function(upload_df, dest_dir, default = NULL) {
   if (is.null(upload_df) || length(upload_df[[1L]]) == 0L) {
@@ -24,182 +91,82 @@
 }
 
 .save_input <- function(input) {
-  paths_data_source <- .get_default_paths()$data$source$path
+  default_paths <- .get_default_paths()
+  paths_data_source <- default_paths$data$source$path
   paths_data_interim_annotations <-
-    .get_default_paths()$data$interim$annotations$path
+    default_paths$data$interim$annotations$path
   ## safety
   .create_dir(paths_data_source)
 
-  list <- .load_yaml_files()
-
-  yamls_params <- list$yamls_params
+  yamls_params <- .load_yaml_files()$yamls_params
 
   ## This allows to keep files correctly placed in `data/source` clean
-  prefil_fea_raw <- input$fil_fea_raw
-  prefil_spe_raw <- input$fil_spe_raw
-  prefil_met_raw <- input$fil_met_raw
-  prefil_mzm_raw <- input$fil_ann_raw_mzm
-  prefil_mzt_raw <- input$fil_mzt_raw
-  prefil_sir_raw <- input$fil_ann_raw_sir
-  lib_tmp_exp_csv <- input$lib_tmp_exp_csv
-  lib_tmp_is_csv <- input$lib_tmp_is_csv
-
-  prefil_fea_raw_1 <- NULL
-  prefil_spe_raw_1 <- NULL
-  prefil_met_raw_1 <- NULL
-  prefil_mzm_raw_1 <- NULL
-  prefil_mzt_raw_1 <- NULL
-  prefil_sir_raw_1 <- NULL
-
-  if (!is.null(prefil_fea_raw)) {
-    prefil_fea_raw_1 <- file.path(paths_data_source, prefil_fea_raw[[1L]])
-  }
-  if (!is.null(prefil_spe_raw)) {
-    prefil_spe_raw_1 <- file.path(paths_data_source, prefil_spe_raw[[1L]])
-  }
-  if (!is.null(prefil_met_raw)) {
-    prefil_met_raw_1 <- file.path(paths_data_source, prefil_met_raw[[1L]])
-  }
-  if (!is.null(prefil_mzm_raw)) {
-    prefil_mzm_raw_1 <- file.path(
-      paths_data_interim_annotations,
-      prefil_mzm_raw[[1L]]
-    )
-  }
-  if (!is.null(prefil_mzt_raw)) {
-    prefil_mzt_raw_1 <- file.path(paths_data_source, prefil_mzt_raw[[1L]])
-  }
-  if (!is.null(prefil_sir_raw)) {
-    prefil_sir_raw_1 <-
-      file.path(paths_data_interim_annotations, prefil_sir_raw[[1L]])
-  }
-
-  if (!is.null(prefil_fea_raw) && !file.exists(prefil_fea_raw_1)) {
-    file.copy(
-      from = prefil_fea_raw[[4L]],
-      to = file.path(prefil_fea_raw_1),
-      overwrite = TRUE
-    )
-  }
-  if (!is.null(prefil_spe_raw) && !file.exists(prefil_spe_raw_1)) {
-    file.copy(
-      from = prefil_spe_raw[[4L]],
-      to = file.path(prefil_spe_raw_1),
-      overwrite = TRUE
-    )
-  }
-  if (!is.null(prefil_met_raw)) {
-    if (!file.exists(prefil_met_raw_1)) {
-      file.copy(
-        from = prefil_met_raw[[4L]],
-        to = file.path(prefil_met_raw_1),
-        overwrite = TRUE
-      )
-    }
-  } else {
-    prefil_met_raw_1 <- NULL
-  }
-  if (!is.null(prefil_mzm_raw)) {
-    if (!file.exists(prefil_mzm_raw_1)) {
-      ## safety
-      .create_dir(paths_data_interim_annotations)
-      file.copy(
-        from = prefil_mzm_raw[[4L]],
-        to = file.path(prefil_mzm_raw_1),
-        overwrite = TRUE
-      )
-    }
-  } else {
-    prefil_mzm_raw_1 <- NULL
-  }
-  if (!is.null(prefil_mzt_raw)) {
-    if (!file.exists(prefil_mzt_raw_1)) {
-      ## safety
-      .create_dir(paths_data_source)
-      file.copy(
-        from = prefil_mzt_raw[[4L]],
-        to = file.path(prefil_mzt_raw_1),
-        overwrite = TRUE
-      )
-    }
-  }
-  if (!is.null(prefil_sir_raw)) {
-    if (!file.exists(prefil_sir_raw_1)) {
-      ## safety
-      .create_dir(paths_data_interim_annotations)
-      file.copy(
-        from = prefil_sir_raw[[4L]],
-        to = file.path(prefil_sir_raw_1),
-        overwrite = TRUE
-      )
-    }
-  } else {
-    prefil_sir_raw_1 <- NULL
-  }
+  fil_fea_raw <- .stage_single_upload(input$fil_fea_raw, paths_data_source)
+  fil_spe_raw <- .stage_single_upload(input$fil_spe_raw, paths_data_source)
+  fil_met_raw <- .stage_single_upload(input$fil_met_raw, paths_data_source)
+  fil_mzm_raw <- .stage_single_upload(
+    input$fil_ann_raw_mzm,
+    paths_data_interim_annotations
+  )
+  fil_mzt_raw <- .stage_single_upload(input$fil_mzt_raw, paths_data_source)
+  fil_sir_raw <- .stage_single_upload(
+    input$fil_ann_raw_sir,
+    paths_data_interim_annotations
+  )
 
   # If mzTab is provided, derive missing core inputs so launch is possible.
   if (
-    !is.null(prefil_mzt_raw_1) &&
-      (is.null(prefil_fea_raw_1) ||
-        is.null(prefil_spe_raw_1) ||
-        is.null(prefil_met_raw_1))
+    !is.null(fil_mzt_raw) &&
+      (is.null(fil_fea_raw) ||
+        is.null(fil_spe_raw) ||
+        is.null(fil_met_raw))
   ) {
     mztab_plan <- .plan_mztab_app_outputs(
-      mztab_path = prefil_mzt_raw_1,
+      mztab_path = fil_mzt_raw,
       data_source_path = paths_data_source,
-      features_path = prefil_fea_raw_1,
-      spectra_path = prefil_spe_raw_1,
-      metadata_path = prefil_met_raw_1
+      features_path = fil_fea_raw,
+      spectra_path = fil_spe_raw,
+      metadata_path = fil_met_raw
     )
 
-    prefil_fea_raw_1 <- mztab_plan$resolved$features
-    prefil_spe_raw_1 <- mztab_plan$resolved$spectra
-    prefil_met_raw_1 <- mztab_plan$resolved$metadata
+    fil_fea_raw <- mztab_plan$resolved$features
+    fil_spe_raw <- mztab_plan$resolved$spectra
+    fil_met_raw <- mztab_plan$resolved$metadata
 
     if (mztab_plan$needs_read) {
       .log_trace("Rebuilding missing mzTab-derived source files ...")
       mztab_outputs <- tima::read_mztab(
-        input = prefil_mzt_raw_1,
+        input = fil_mzt_raw,
         output_features = mztab_plan$write$features,
         output_spectra = mztab_plan$write$spectra,
         output_metadata = mztab_plan$write$metadata
       )
 
-      if (is.null(prefil_fea_raw_1)) {
-        prefil_fea_raw_1 <- mztab_outputs$features
+      if (is.null(fil_fea_raw)) {
+        fil_fea_raw <- mztab_outputs$features
       }
-      if (is.null(prefil_spe_raw_1)) {
-        prefil_spe_raw_1 <- mztab_outputs$spectra
+      if (is.null(fil_spe_raw)) {
+        fil_spe_raw <- mztab_outputs$spectra
       }
-      if (is.null(prefil_met_raw_1)) {
-        prefil_met_raw_1 <- mztab_outputs$metadata
+      if (is.null(fil_met_raw)) {
+        fil_met_raw <- mztab_outputs$metadata
       }
     } else {
       .log_trace("Reusing cached mzTab-derived source files")
     }
   }
   lib_tmp_exp_csv <- .stage_multi_upload(
-    upload_df = lib_tmp_exp_csv,
+    upload_df = input$lib_tmp_exp_csv,
     dest_dir = file.path(paths_data_source, "libraries", "temporal", "exp")
   )
   lib_tmp_is_csv <- .stage_multi_upload(
-    upload_df = lib_tmp_is_csv,
+    upload_df = input$lib_tmp_is_csv,
     dest_dir = file.path(paths_data_source, "libraries", "temporal", "is")
   )
 
-  fil_fea_raw <- prefil_fea_raw_1
-  fil_spe_raw <- prefil_spe_raw_1
-  fil_met_raw <- prefil_met_raw_1
-  fil_mzm_raw <- prefil_mzm_raw_1
-  fil_mzt_raw <- prefil_mzt_raw_1
-  fil_sir_raw <- prefil_sir_raw_1
-
   fil_pat <- input$fil_pat
 
-  gnps_job_id <- input$gnps_id
-  if (gnps_job_id == "") {
-    gnps_job_id <- NULL
-  }
+  gnps_job_id <- .empty_to_null(input$gnps_id)
   if (!is.null(gnps_job_id) && is.null(fil_met_raw)) {
     fil_met_raw <- file.path(
       paths_data_source,
@@ -207,10 +174,7 @@
     )
   }
 
-  org_tax <- input$org_tax
-  if (org_tax == "") {
-    org_tax <- NULL
-  }
+  org_tax <- .empty_to_null(input$org_tax)
   hig_evi <- input$high_evidence
   ms_pol <- input$ms_pol
   summarize <- input$summarize
@@ -232,8 +196,18 @@
   .create_dir("params")
   yaml::write_yaml(
     x = yaml_small,
-    file = .get_default_paths()$params$prepare_params
+    file = default_paths$params$prepare_params
   )
+
+  par_small <- .get_params(step = "prepare_params")
+  replace_path <- function(x) {
+    .replace_id(
+      x = x,
+      user_filename = par_small$files$pattern,
+      user_gnps = par_small$gnps$id,
+      example_gnps = default_paths$gnps$example
+    )
+  }
 
   .log_trace("... Advanced")
   yaml_advanced <- yamls_params[["prepare_params_advanced"]]
@@ -259,40 +233,30 @@
     input$ann_thr_ms1_con
   yaml_advanced$files$pattern <- fil_pat
   yaml_advanced$files$annotations$raw$spectral$gnps <-
-    yaml_advanced$files$annotations$raw$spectral$gnps |>
-    .replace_id()
+    replace_path(yaml_advanced$files$annotations$raw$spectral$gnps)
   yaml_advanced$files$annotations$raw$spectral$mzmine <- fil_mzm_raw
   yaml_advanced$files$annotations$raw$spectral$spectral <-
-    yaml_advanced$files$annotations$raw$spectral$spectral |>
-    .replace_id()
+    replace_path(yaml_advanced$files$annotations$raw$spectral$spectral)
   yaml_advanced$files$mztab$raw <- fil_mzt_raw
   yaml_advanced$files$annotations$raw$sirius <- fil_sir_raw
   yaml_advanced$files$annotations$prepared$canopus <-
-    yaml_advanced$files$annotations$prepared$canopus |>
-    .replace_id()
+    replace_path(yaml_advanced$files$annotations$prepared$canopus)
   yaml_advanced$files$annotations$prepared$formula <-
-    yaml_advanced$files$annotations$prepared$formula |>
-    .replace_id()
+    replace_path(yaml_advanced$files$annotations$prepared$formula)
   yaml_advanced$files$annotations$prepared$structural$gnps <-
-    yaml_advanced$files$annotations$prepared$structural$gnps |>
-    .replace_id()
+    replace_path(yaml_advanced$files$annotations$prepared$structural$gnps)
   yaml_advanced$files$annotations$prepared$structural$ms1 <-
-    yaml_advanced$files$annotations$prepared$structural$ms1 |>
-    .replace_id()
+    replace_path(yaml_advanced$files$annotations$prepared$structural$ms1)
   yaml_advanced$files$annotations$prepared$structural$sirius <-
-    yaml_advanced$files$annotations$prepared$structural$sirius |>
-    .replace_id()
+    replace_path(yaml_advanced$files$annotations$prepared$structural$sirius)
   yaml_advanced$files$annotations$prepared$structural$spectral <-
-    yaml_advanced$files$annotations$prepared$structural$spectral |>
-    .replace_id()
+    replace_path(yaml_advanced$files$annotations$prepared$structural$spectral)
   yaml_advanced$files$annotations$filtered <-
-    yaml_advanced$files$annotations$filtered |>
-    .replace_id()
+    replace_path(yaml_advanced$files$annotations$filtered)
   yaml_advanced$files$features$raw <-
     fil_fea_raw
   yaml_advanced$files$features$prepared <-
-    yaml_advanced$files$features$prepared |>
-    .replace_id()
+    replace_path(yaml_advanced$files$features$prepared)
   yaml_advanced$files$libraries$spectral$raw <- .stage_multi_upload(
     upload_df = input$lib_spe_mgf,
     dest_dir = file.path(paths_data_source, "libraries", "spectra", "exp"),
@@ -301,24 +265,18 @@
   yaml_advanced$files$libraries$temporal$exp$csv <- lib_tmp_exp_csv
   yaml_advanced$files$libraries$temporal$is$csv <- lib_tmp_is_csv
   yaml_advanced$files$networks$spectral$edges$raw$ms1 <-
-    yaml_advanced$files$networks$spectral$edges$raw$ms1 |>
-    .replace_id()
+    replace_path(yaml_advanced$files$networks$spectral$edges$raw$ms1)
   yaml_advanced$files$networks$spectral$edges$raw$spectral <-
-    yaml_advanced$files$networks$spectral$edges$raw$spectral |>
-    .replace_id()
+    replace_path(yaml_advanced$files$networks$spectral$edges$raw$spectral)
   yaml_advanced$files$networks$spectral$edges$prepared <-
-    yaml_advanced$files$networks$spectral$edges$prepared |>
-    .replace_id()
+    replace_path(yaml_advanced$files$networks$spectral$edges$prepared)
   yaml_advanced$files$networks$spectral$components$raw <-
-    yaml_advanced$files$networks$spectral$components$raw |>
-    .replace_id()
+    replace_path(yaml_advanced$files$networks$spectral$components$raw)
   yaml_advanced$files$networks$spectral$components$prepared <-
-    yaml_advanced$files$networks$spectral$components$prepared |>
-    .replace_id()
+    replace_path(yaml_advanced$files$networks$spectral$components$prepared)
   yaml_advanced$files$metadata$raw <- fil_met_raw
   yaml_advanced$files$metadata$prepared <-
-    yaml_advanced$files$metadata$prepared |>
-    .replace_id()
+    replace_path(yaml_advanced$files$metadata$prepared)
   yaml_advanced$files$spectral$raw <- fil_spe_raw
   yaml_advanced$gnps$id <- gnps_job_id
   yaml_advanced$gnps$workflow <-
@@ -362,36 +320,26 @@
     input$names_inchikey
   yaml_advanced$names$libraries <-
     input$names_libraries
-  yaml_advanced$names$mgf$adduct <-
-    input$names_mgf_ad
-  yaml_advanced$names$mgf$collision_energy <-
-    input$names_mgf_ce
-  yaml_advanced$names$mgf$compound_id <-
-    input$names_mgf_ci
-  yaml_advanced$names$mgf$inchi <-
-    input$names_mgf_in
-  yaml_advanced$names$mgf$inchi_no_stereo <-
-    input$names_mgf_io
-  yaml_advanced$names$mgf$inchikey <-
-    input$names_mgf_ik
-  yaml_advanced$names$mgf$inchikey_connectivity_layer <-
-    input$names_mgf_il
-  yaml_advanced$names$mgf$name <-
-    input$names_mgf_na
-  yaml_advanced$names$mgf$polarity <-
-    input$names_mgf_po
-  yaml_advanced$names$mgf$retention_time <-
-    input$names_mgf_rt
-  yaml_advanced$names$mgf$smiles <-
-    input$names_mgf_sm
-  yaml_advanced$names$mgf$smiles_no_stereo <-
-    input$names_mgf_sn
-  yaml_advanced$names$mgf$spectrum_id <-
-    input$names_mgf_si
-  yaml_advanced$names$mgf$splash <-
-    input$names_mgf_sp
-  yaml_advanced$names$mgf$synonyms <-
-    input$names_mgf_sy
+  mgf_map <- c(
+    adduct = "names_mgf_ad",
+    collision_energy = "names_mgf_ce",
+    compound_id = "names_mgf_ci",
+    inchi = "names_mgf_in",
+    inchi_no_stereo = "names_mgf_io",
+    inchikey = "names_mgf_ik",
+    inchikey_connectivity_layer = "names_mgf_il",
+    name = "names_mgf_na",
+    polarity = "names_mgf_po",
+    retention_time = "names_mgf_rt",
+    smiles = "names_mgf_sm",
+    smiles_no_stereo = "names_mgf_sn",
+    spectrum_id = "names_mgf_si",
+    splash = "names_mgf_sp",
+    synonyms = "names_mgf_sy"
+  )
+  for (nm in names(mgf_map)) {
+    yaml_advanced$names$mgf[[nm]] <- input[[mgf_map[[nm]]]]
+  }
   yaml_advanced$names$precursor <-
     input$names_precursor
   yaml_advanced$names$rt$features <-
@@ -432,52 +380,45 @@
     input$wei_glo_che
   yaml_advanced$weights$global$spectral <-
     input$wei_glo_spe
-  yaml_advanced$weights$biological$domain <-
-    input$wei_bio_01
-  yaml_advanced$weights$biological$kingdom <-
-    input$wei_bio_02
-  yaml_advanced$weights$biological$phylum <-
-    input$wei_bio_03
-  yaml_advanced$weights$biological$class <-
-    input$wei_bio_04
-  yaml_advanced$weights$biological$order <-
-    input$wei_bio_05
-  yaml_advanced$weights$biological$infraorder <-
-    input$wei_bio_06
-  yaml_advanced$weights$biological$family <-
-    input$wei_bio_07
-  yaml_advanced$weights$biological$subfamily <-
-    input$wei_bio_08
-  yaml_advanced$weights$biological$tribe <-
-    input$wei_bio_09
-  yaml_advanced$weights$biological$subtribe <-
-    input$wei_bio_10
-  yaml_advanced$weights$biological$genus <-
-    input$wei_bio_11
-  yaml_advanced$weights$biological$subgenus <-
-    input$wei_bio_12
-  yaml_advanced$weights$biological$species <-
-    input$wei_bio_13
-  yaml_advanced$weights$biological$subspecies <-
-    input$wei_bio_14
-  yaml_advanced$weights$biological$variety <-
-    input$wei_bio_15
-  yaml_advanced$weights$biological$biota <-
-    input$wei_bio_16
-  yaml_advanced$weights$chemical$cla$kingdom <-
-    input$wei_che_11
-  yaml_advanced$weights$chemical$npc$pathway <-
-    input$wei_che_21
-  yaml_advanced$weights$chemical$cla$superclass <-
-    input$wei_che_12
-  yaml_advanced$weights$chemical$npc$superclass <-
-    input$wei_che_22
-  yaml_advanced$weights$chemical$cla$class <-
-    input$wei_che_13
-  yaml_advanced$weights$chemical$npc$class <-
-    input$wei_che_23
-  yaml_advanced$weights$chemical$cla$parent <-
-    input$wei_che_14
+  bio_ranks <- c(
+    "domain",
+    "kingdom",
+    "phylum",
+    "class",
+    "order",
+    "infraorder",
+    "family",
+    "subfamily",
+    "tribe",
+    "subtribe",
+    "genus",
+    "subgenus",
+    "species",
+    "subspecies",
+    "variety",
+    "biota"
+  )
+  for (i in seq_along(bio_ranks)) {
+    yaml_advanced$weights$biological[[bio_ranks[[i]]]] <-
+      input[[sprintf("wei_bio_%02d", i)]]
+  }
+  che_cla_map <- c(
+    kingdom = "wei_che_11",
+    superclass = "wei_che_12",
+    class = "wei_che_13",
+    parent = "wei_che_14"
+  )
+  for (nm in names(che_cla_map)) {
+    yaml_advanced$weights$chemical$cla[[nm]] <- input[[che_cla_map[[nm]]]]
+  }
+  che_npc_map <- c(
+    pathway = "wei_che_21",
+    superclass = "wei_che_22",
+    class = "wei_che_23"
+  )
+  for (nm in names(che_npc_map)) {
+    yaml_advanced$weights$chemical$npc[[nm]] <- input[[che_npc_map[[nm]]]]
+  }
   yaml_advanced$options$compounds_names <-
     input$compounds_names
   yaml_advanced$options$high_evidence <- hig_evi
@@ -488,7 +429,7 @@
   yaml_advanced$options$summarize <- summarize
   yaml::write_yaml(
     x = yaml_advanced,
-    file = .get_default_paths()$params$prepare_params_advanced
+    file = default_paths$params$prepare_params_advanced
   )
 }
 
@@ -496,44 +437,18 @@ server <- function(input, output) {
   ## Observe helpers
   shinyhelper::observe_helpers()
 
-  output$demo_spe <- shiny::downloadHandler(
-    filename = basename(.get_default_paths()$urls$examples$spectra),
-    content = function(file) {
-      writeLines(
-        readLines(.get_default_paths()$urls$examples$spectra_mini),
-        file
-      )
-    }
+  example_urls <- .get_default_paths()$urls$examples
+  output$demo_spe <- .make_url_download(
+    example_urls$spectra,
+    example_urls$spectra_mini
   )
-
-  output$demo_fea <- shiny::downloadHandler(
-    filename = basename(.get_default_paths()$urls$examples$features),
-    content = function(file) {
-      writeLines(
-        readLines(.get_default_paths()$urls$examples$features),
-        file
-      )
-    }
-  )
-
-  output$demo_met <- shiny::downloadHandler(
-    filename = basename(.get_default_paths()$urls$examples$metadata),
-    content = function(file) {
-      writeLines(
-        readLines(.get_default_paths()$urls$examples$metadata),
-        file
-      )
-    }
-  )
+  output$demo_fea <- .make_url_download(example_urls$features)
+  output$demo_met <- .make_url_download(example_urls$metadata)
 
   ## Enable Save/Launch depending on input mode:
   ## - classic mode: features + spectra (+ metadata or taxon)
   ## - mzTab mode: mzTab alone is enough; other files are optional overlays
   shiny::observe(x = {
-    .has_upload <- function(upload) {
-      !is.null(upload) && length(upload[[1L]]) > 0L && nzchar(upload[[1L]])
-    }
-
     has_mztab <- .has_upload(input[["fil_mzt_raw"]])
     has_features <- .has_upload(input[["fil_fea_raw"]])
     has_spectra <- .has_upload(input[["fil_spe_raw"]])
@@ -598,15 +513,7 @@ server <- function(input, output) {
     shinyjs::show("save_msg")
     shinyjs::disable("save")
     shinyjs::disable("launch")
-    shinyjs::hide("thankyou_msg")
-    shinyjs::hide("error")
-    shinyjs::hide("job_msg")
-    shinyjs::hide("job_end")
-    shinyjs::hide("results_mini")
-    shinyjs::hide("results_filtered")
-    shinyjs::hide("results_full")
-    shinyjs::hide("results_mztab")
-    shinyjs::hide("close")
+    .hide_ids(c("job_msg", .RESULT_AND_STATUS_IDS))
 
     ## Save the data (show an error message in case of error)
     saved_ok <- FALSE
@@ -636,16 +543,7 @@ server <- function(input, output) {
 
   shiny::observeEvent(eventExpr = input$launch, handlerExpr = {
     shinyjs::show("job_msg")
-    shinyjs::hide("thankyou_msg")
-    shinyjs::hide("error")
-    shinyjs::hide("params")
-    shinyjs::hide("form")
-    shinyjs::hide("job_end")
-    shinyjs::hide("results_mini")
-    shinyjs::hide("results_filtered")
-    shinyjs::hide("results_full")
-    shinyjs::hide("results_mztab")
-    shinyjs::hide("close")
+    .hide_ids(c("params", "form", .RESULT_AND_STATUS_IDS))
     ## For shinylive, see
     ## https://github.com/taxonomicallyinformedannotation/tima-shinylive/pull/7
     if (R.Version()$os != "emscripten") {
@@ -676,41 +574,23 @@ server <- function(input, output) {
     results_mztab <- targets::tar_read(exp_mzt)
     shinyjs::hide("job_msg")
     shinyjs::show("job_end")
-    lapply(names(results), function(name) {
-      output[[paste0("results_", name)]] <- shiny::downloadHandler(
-        filename = basename(results[[name]]),
-        content = function(file) {
-          ok <- file.copy(results[[name]], file, overwrite = TRUE)
-          if (!ok) {
-            cli::cli_abort(
-              "failed to copy result file {.file {results[[name]]}}",
-              class = c("tima_runtime_error", "tima_error"),
-              call = NULL
-            )
-          }
-        }
+    for (name in names(results)) {
+      .register_result_download(
+        output = output,
+        output_id = paste0("results_", name),
+        src_path = results[[name]]
       )
-      shinyjs::show(paste0("results_", name))
-    })
+    }
     if (
       is.character(results_mztab) &&
         length(results_mztab) == 1L &&
         file.exists(results_mztab)
     ) {
-      output[["results_mztab"]] <- shiny::downloadHandler(
-        filename = basename(results_mztab),
-        content = function(file) {
-          ok <- file.copy(results_mztab, file, overwrite = TRUE)
-          if (!ok) {
-            cli::cli_abort(
-              "failed to copy result file {.file {results_mztab}}",
-              class = c("tima_runtime_error", "tima_error"),
-              call = NULL
-            )
-          }
-        }
+      .register_result_download(
+        output = output,
+        output_id = "results_mztab",
+        src_path = results_mztab
       )
-      shinyjs::show("results_mztab")
     }
     shinyjs::show("close")
   })
