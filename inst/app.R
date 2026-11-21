@@ -12,9 +12,10 @@
     )
     hit <- dirs[file.exists(file.path(dirs, "app_ui.R"))]
     if (length(hit) > 0L) {
-      return(hit[[1L]])
+      hit[[1L]]
+    } else {
+      system.file(package = "tima")
     }
-    system.file(package = "tima")
   },
   error = function(e) system.file(package = "tima")
 )

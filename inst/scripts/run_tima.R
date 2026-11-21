@@ -1,3 +1,3 @@
-library("tima")
+library(tima)
 
 run_tima()

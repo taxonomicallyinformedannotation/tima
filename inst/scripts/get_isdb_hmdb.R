@@ -14,15 +14,10 @@ library(tima)
 ## TODO check md5 if possible
 ## (see https://twitter.com/Adafede/status/1592543895094788096)
 .log_trace("Downloading HMDB (might be long)")
+paths <- getFromNamespace("get_default_paths", "tima")()
 get_file(
-  url = getFromNamespace(
-    "get_default_paths",
-    "tima"
-  )()$urls$hmdb$spectra$predicted,
-  export = getFromNamespace(
-    "get_default_paths",
-    "tima"
-  )()$data$source$libraries$spectra$is$hmdb
+  url = paths$urls$hmdb$spectra$predicted,
+  export = paths$data$source$libraries$spectra$is$hmdb
 )
 
 end <- Sys.time()

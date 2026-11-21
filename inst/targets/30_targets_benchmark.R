@@ -28,111 +28,69 @@ targets_section_benchmark <- function() {
           Spectra::filterEmptySpectra(sp),
           file = "data/interim/benchmark/benchmark_spectra.rds"
         )
-        return("data/interim/benchmark/benchmark_spectra.rds")
+        "data/interim/benchmark/benchmark_spectra.rds"
       },
       format = "file"
     ),
     tar_target(
       name = benchmark_prepared,
       command = {
+        .ik_short <- function(x) sub("-.*", "", x)
         sp <- import_spectra(benchmark_converted, sanitize = FALSE)
         sp@backend@spectraData$precursorMz <- as.numeric(
           sp@backend@spectraData$precursor_mz
         )
         getFromNamespace("log_trace", "tima")("Imported")
-        sp_clean <- sp
         getFromNamespace("log_trace", "tima")("Cleaned")
-        df_meta <- tidytable::mutate(
-          tidytable::tidytable(
-            adduct = sp_clean$adduct,
-            inchikey = sp_clean$inchikey,
-            fragments = lengths(sp_clean@backend@peaksData) / 2,
-            precursorMz = sp_clean$precursorMz,
-            smiles = sp_clean$smiles,
-            ccmslib = sp_clean$spectrum_id,
-            charge = sp_clean$precursorCharge,
-            name = sp_clean$name
-          ),
-          tidytable::across(
-            .cols = tidyselect::everything(),
-            .fns = function(x) {
-              tidytable::na_if(x, "")
-            }
-          )
-        )
-        getFromNamespace("log_trace", "tima")("Framed")
-        df_clean <- tidytable::mutate(
+        df_meta <- tidytable::tidytable(
+          adduct = sp$adduct,
+          inchikey = sp$inchikey,
+          fragments = lengths(sp@backend@peaksData) / 2,
+          precursorMz = sp$precursorMz,
+          smiles = sp$smiles,
+          ccmslib = sp$spectrum_id,
+          charge = sp$precursorCharge,
+          name = sp$name
+        ) |>
           tidytable::mutate(
-            tidytable::distinct(
-              tidytable::mutate(
-                tidytable::select(
-                  tidytable::filter(
-                    tidytable::filter(
-                      tidytable::separate(
-                        tidytable::mutate(
-                          tidytable::select(
-                            tidytable::filter(
-                              tidytable::filter(
-                                tidytable::filter(
-                                  tidytable::filter(
-                                    tidytable::filter(
-                                      tidytable::filter(
-                                        df_meta,
-                                        !is.na(inchikey)
-                                      ),
-                                      fragments >= 5
-                                    ),
-                                    fragments <= 250
-                                  ),
-                                  !grepl(
-                                    pattern = "ReSpect",
-                                    x = name,
-                                    fixed = TRUE
-                                  )
-                                ),
-                                !grepl(
-                                  pattern = "Spectral Match to",
-                                  x = name,
-                                  fixed = TRUE
-                                )
-                              ),
-                              !grepl(
-                                pattern = "putative",
-                                x = name,
-                                fixed = TRUE
-                              )
-                            ),
-                            -name
-                          ),
-                          mass = precursorMz
-                        ),
-                        col = mass,
-                        sep = "\\.",
-                        into = c("a", "b")
-                      ),
-                      !is.na(b)
-                    ),
-                    nchar(as.character(as.numeric(b))) > 1L
-                  ),
-                  -a,
-                  -b
-                ),
-                inchikey_connectivity_layer = gsub(
-                  pattern = "-.*",
-                  replacement = "",
-                  x = inchikey,
-                  perl = TRUE
-                )
-              ),
-              inchikey_connectivity_layer,
-              adduct,
-              .keep_all = TRUE
-            ),
-            mz = precursorMz
-          ),
-          rt = tidytable::cur_group_id(),
-          .by = "inchikey_connectivity_layer"
-        )
+            tidytable::across(
+              .cols = tidyselect::everything(),
+              .fns = function(x) tidytable::na_if(x, "")
+            )
+          )
+        getFromNamespace("log_trace", "tima")("Framed")
+        df_clean <- df_meta |>
+          tidytable::filter(
+            !is.na(inchikey),
+            fragments >= 5,
+            fragments <= 250,
+            !grepl(pattern = "ReSpect", x = name, fixed = TRUE),
+            !grepl(pattern = "Spectral Match to", x = name, fixed = TRUE),
+            !grepl(pattern = "putative", x = name, fixed = TRUE)
+          ) |>
+          tidytable::select(-name) |>
+          tidytable::mutate(mass = precursorMz) |>
+          tidytable::separate(
+            col = mass,
+            sep = "\\.",
+            into = c("a", "b")
+          ) |>
+          tidytable::filter(!is.na(b)) |>
+          tidytable::filter(nchar(as.character(as.numeric(b))) > 1L) |>
+          tidytable::select(-a, -b) |>
+          tidytable::mutate(
+            inchikey_connectivity_layer = .ik_short(inchikey)
+          ) |>
+          tidytable::distinct(
+            inchikey_connectivity_layer,
+            adduct,
+            .keep_all = TRUE
+          ) |>
+          tidytable::mutate(mz = precursorMz) |>
+          tidytable::mutate(
+            rt = tidytable::cur_group_id(),
+            .by = "inchikey_connectivity_layer"
+          )
         df_clean_neg <- tidytable::filter(
           df_clean,
           grepl(pattern = "]-", x = adduct, fixed = TRUE)
@@ -141,55 +99,40 @@ targets_section_benchmark <- function() {
           df_clean,
           grepl(pattern = "]+", x = adduct, fixed = TRUE)
         )
-        sp_pos <- sp_clean[sp_clean$spectrum_id %in% df_clean_pos$ccmslib]
-        sp_neg <- sp_clean[sp_clean$spectrum_id %in% df_clean_neg$ccmslib]
+        sp_pos <- sp[sp$spectrum_id %in% df_clean_pos$ccmslib]
+        sp_neg <- sp[sp$spectrum_id %in% df_clean_neg$ccmslib]
         extract_benchmark_spectra <- function(x, mode) {
-          df <- data.frame(tidytable::select(
+          getFromNamespace("extract_spectra", "tima")(x) |>
+            tidytable::mutate(acquisitionNum = tidytable::row_number()) |>
+            tidytable::mutate(spectrum_id = acquisitionNum) |>
             tidytable::mutate(
-              tidytable::mutate(
-                tidytable::mutate(
-                  tidytable::mutate(
-                    tidytable::mutate(
-                      tidytable::mutate(
-                        getFromNamespace("extract_spectra", "tima")(x),
-                        acquisitionNum = tidytable::row_number()
-                      ),
-                      spectrum_id = acquisitionNum
-                    ),
-                    short_ik = gsub(
-                      pattern = "-.*",
-                      replacement = "",
-                      inchikey,
-                      perl = TRUE
-                    )
-                  ),
-                  rtime = tidytable::cur_group_id(),
-                  .by = "short_ik"
-                ),
-                precursorCharge = tidytable::if_else(
-                  condition = mode == "pos",
-                  true = as.integer(1),
-                  false = as.integer(-1)
-                )
-              ),
+              short_ik = .ik_short(inchikey)
+            ) |>
+            tidytable::mutate(
+              rtime = tidytable::cur_group_id(),
+              .by = "short_ik"
+            ) |>
+            tidytable::mutate(
+              precursorCharge = if (mode == "pos") 1L else -1L,
               MS_LEVEL = 2L
-            ),
-            acquisitionNum,
-            precursorCharge,
-            precursorMz,
-            MS_LEVEL,
-            rtime,
-            name = name,
-            smiles = smiles,
-            inchi = inchi,
-            inchikey = inchikey,
-            adduct = adduct,
-            ccmslib = spectrum_id,
-            spectrum_id = acquisitionNum,
-            mz,
-            intensity
-          ))
-          df
+            ) |>
+            tidytable::select(
+              acquisitionNum,
+              precursorCharge,
+              precursorMz,
+              MS_LEVEL,
+              rtime,
+              name,
+              smiles,
+              inchi,
+              inchikey,
+              adduct,
+              ccmslib = spectrum_id,
+              spectrum_id = acquisitionNum,
+              mz,
+              intensity
+            ) |>
+            data.frame()
         }
         spectra_harmonized_pos <- extract_benchmark_spectra(
           sp_pos,
@@ -200,9 +143,8 @@ targets_section_benchmark <- function() {
           mode = "neg"
         )
         select_benchmark_columns <- function(x) {
-          df <- data.frame(tidytable::mutate(
+          x |>
             tidytable::select(
-              x,
               adduct,
               inchikey,
               smiles,
@@ -211,15 +153,11 @@ targets_section_benchmark <- function() {
               mz = precursorMz,
               rt = rtime,
               feature_id = spectrum_id
-            ),
-            inchikey_connectivity_layer = gsub(
-              pattern = "-.*",
-              replacement = "",
-              x = inchikey,
-              perl = TRUE
-            )
-          ))
-          df
+            ) |>
+            tidytable::mutate(
+              inchikey_connectivity_layer = .ik_short(inchikey)
+            ) |>
+            data.frame()
         }
         df_clean_pos <- select_benchmark_columns(spectra_harmonized_pos)
         df_clean_neg <- select_benchmark_columns(spectra_harmonized_neg)
@@ -241,12 +179,12 @@ targets_section_benchmark <- function() {
           df_clean_neg,
           "data/interim/benchmark/benchmark_meta_neg.tsv"
         )
-        return(c(
+        c(
           spectra_pos = benchmark_path_mgf_pos,
           spectra_neg = benchmark_path_mgf_neg,
           meta_pos = "data/interim/benchmark/benchmark_meta_pos.tsv",
           meta_neg = "data/interim/benchmark/benchmark_meta_neg.tsv"
-        ))
+        )
       },
       format = "file"
     ),
