@@ -122,8 +122,6 @@ test_that("prepare_features_edges checks file existence", {
 })
 
 test_that("prepare_features_edges combines ms1 and spectral edges", {
-  local_test_project(copy = TRUE)
-
   # Create MS1 edges file
   temp_ms1 <- withr::local_tempfile(fileext = ".tsv")
   ms1_data <- data.frame(
@@ -172,8 +170,6 @@ test_that("prepare_features_edges combines ms1 and spectral edges", {
 })
 
 test_that("prepare_features_edges extracts entropy information", {
-  local_test_project(copy = TRUE)
-
   # Create MS1 edges file (minimal)
   temp_ms1 <- withr::local_tempfile(fileext = ".tsv")
   ms1_data <- data.frame(
@@ -217,8 +213,6 @@ test_that("prepare_features_edges extracts entropy information", {
 })
 
 test_that("prepare_features_edges standardizes column names", {
-  local_test_project(copy = TRUE)
-
   temp_ms1 <- withr::local_tempfile(fileext = ".tsv")
   temp_spectral <- withr::local_tempfile(fileext = ".tsv")
 
@@ -262,8 +256,6 @@ test_that("prepare_features_edges standardizes column names", {
 })
 
 test_that("prepare_features_edges standardizes legacy similarity columns", {
-  local_test_project(copy = TRUE)
-
   temp_ms1 <- withr::local_tempfile(fileext = ".tsv")
   temp_spectral <- withr::local_tempfile(fileext = ".tsv")
 
@@ -315,8 +307,6 @@ test_that("prepare_features_edges standardizes legacy similarity columns", {
 })
 
 test_that("prepare_features_edges handles empty input files", {
-  local_test_project(copy = TRUE)
-
   # Create empty MS1 edges
   temp_ms1 <- withr::local_tempfile(fileext = ".tsv")
   ms1_empty <- data.frame(
@@ -355,8 +345,6 @@ test_that("prepare_features_edges handles empty input files", {
 })
 
 test_that("prepare_features_edges fills missing target with source", {
-  local_test_project(copy = TRUE)
-
   temp_ms1 <- withr::local_tempfile(fileext = ".tsv")
   temp_spectral <- withr::local_tempfile(fileext = ".tsv")
 
@@ -393,8 +381,6 @@ test_that("prepare_features_edges fills missing target with source", {
 })
 
 test_that("prepare_features_edges merges shared (source, target) edges and retains unmatched entropy self-loops", {
-  local_test_project(copy = TRUE)
-
   temp_ms1 <- withr::local_tempfile(fileext = ".tsv")
   temp_spectral <- withr::local_tempfile(fileext = ".tsv")
   temp_output <- withr::local_tempfile(fileext = ".tsv")

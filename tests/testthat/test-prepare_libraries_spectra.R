@@ -155,8 +155,6 @@ test_that("prepare_libraries_spectra returns cached outputs when files already e
 
 test_that("prepare_libraries_spectra creates empty templates when input is missing", {
   withr::local_dir(new = temp_test_dir("prepare_libraries_empty"))
-  local_test_project(copy = TRUE)
-
   out <- prepare_libraries_spectra(
     input = NULL,
     nam_lib = "EMPTYLIB"

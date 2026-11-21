@@ -150,9 +150,9 @@ generate_fake_inchikey <- function(n = 1L, seed = NULL) {
 #'   paths <- local_test_project()
 #'   # Test code here
 #' })
-local_test_project <- function(copy = TRUE) {
+local_test_project <- function(copy = TRUE, .local_envir = parent.frame()) {
   # Suppress logs during tests for cleaner output
-  local_quiet_logging()
+  local_quiet_logging(.local_envir = .local_envir)
 
   get_default_paths()
 }
@@ -173,7 +173,15 @@ local_test_project <- function(copy = TRUE) {
 #'   local_quiet_logging("ERROR")
 #'   # Only errors will be logged
 #' })
-local_quiet_logging <- function(threshold = "ERROR") {
+local_quiet_logging <- function(
+  threshold = "ERROR",
+  .local_envir = parent.frame()
+) {
+  old_thresh <- lgr::lgr$threshold
+  withr::defer(
+    lgr::lgr$set_threshold(level = old_thresh),
+    envir = .local_envir
+  )
   # Convert character to numeric level if needed
   level_map <- list(
     TRACE = 600,
@@ -189,6 +197,26 @@ local_quiet_logging <- function(threshold = "ERROR") {
     threshold
   }
   lgr::lgr$set_threshold(level = lvl)
+  invisible(NULL)
+}
+
+#' Restore Global `lgr` Logger State on Scope Exit
+#'
+#' @param .local_envir Environment whose exit restores logger state.
+#' @return NULL invisibly.
+#' @noRd
+local_restore_lgr <- function(.local_envir = parent.frame()) {
+  old_thresh <- lgr::lgr$threshold
+  old_appenders <- lgr::lgr$appenders
+  old_prop <- lgr::lgr$propagate
+  withr::defer(
+    {
+      lgr::lgr$set_appenders(old_appenders)
+      lgr::lgr$set_propagate(old_prop)
+      lgr::lgr$set_threshold(level = old_thresh)
+    },
+    envir = .local_envir
+  )
   invisible(NULL)
 }
 

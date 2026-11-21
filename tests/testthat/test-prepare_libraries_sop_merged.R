@@ -528,9 +528,7 @@ test_that("test-apply_taxonomic_filter preserves core columns", {
 
 test_that("prepare_libraries_sop_merged() runs without filtering", {
   # Create minimal library data
-  tmpdir <- tempfile()
-  dir.create(tmpdir, recursive = TRUE)
-  on.exit(unlink(tmpdir, recursive = TRUE))
+  tmpdir <- withr::local_tempdir()
 
   # Minimal structure-organism-pair data
   sop_data <- tidytable::tidytable(
@@ -590,9 +588,7 @@ test_that("prepare_libraries_sop_merged() runs without filtering", {
 })
 
 test_that("prepare_libraries_sop_merged() filters by taxonomy", {
-  tmpdir <- tempfile()
-  dir.create(tmpdir, recursive = TRUE)
-  on.exit(unlink(tmpdir, recursive = TRUE))
+  tmpdir <- withr::local_tempdir()
 
   # Data with different families
   sop_data <- tidytable::tidytable(
@@ -648,9 +644,7 @@ test_that("prepare_libraries_sop_merged() filters by taxonomy", {
 })
 
 test_that("prepare_libraries_sop_merged() merges multiple input files", {
-  tmpdir <- tempfile()
-  dir.create(tmpdir, recursive = TRUE)
-  on.exit(unlink(tmpdir, recursive = TRUE))
+  tmpdir <- withr::local_tempdir()
 
   # Create two separate library files
   minimal_cols <- c(
@@ -784,9 +778,7 @@ test_that("enrich_taxonomy_from_cache returns taxonomy_table when cache file doe
 })
 
 test_that("enrich_taxonomy_from_cache enriches NPC taxonomy from cache with internal column names", {
-  tmpdir <- tempfile()
-  dir.create(tmpdir, recursive = TRUE)
-  on.exit(unlink(tmpdir, recursive = TRUE))
+  tmpdir <- withr::local_tempdir()
 
   taxonomy <- tidytable::tidytable(
     structure_smiles = "C",
@@ -818,9 +810,7 @@ test_that("enrich_taxonomy_from_cache enriches NPC taxonomy from cache with inte
 })
 
 test_that("enrich_taxonomy_from_cache applies column mapping for external format", {
-  tmpdir <- tempfile()
-  dir.create(tmpdir, recursive = TRUE)
-  on.exit(unlink(tmpdir, recursive = TRUE))
+  tmpdir <- withr::local_tempdir()
 
   taxonomy <- tidytable::tidytable(
     structure_smiles = "C",
@@ -858,9 +848,7 @@ test_that("enrich_taxonomy_from_cache applies column mapping for external format
 })
 
 test_that("enrich_taxonomy_from_cache does not duplicate existing entries", {
-  tmpdir <- tempfile()
-  dir.create(tmpdir, recursive = TRUE)
-  on.exit(unlink(tmpdir, recursive = TRUE))
+  tmpdir <- withr::local_tempdir()
 
   taxonomy <- tidytable::tidytable(
     structure_smiles = c("C", "CC"),
@@ -892,9 +880,7 @@ test_that("enrich_taxonomy_from_cache does not duplicate existing entries", {
 })
 
 test_that("enrich_taxonomy_from_cache enriches ClassyFire taxonomy", {
-  tmpdir <- tempfile()
-  dir.create(tmpdir, recursive = TRUE)
-  on.exit(unlink(tmpdir, recursive = TRUE))
+  tmpdir <- withr::local_tempdir()
 
   taxonomy <- tidytable::tidytable(
     structure_inchikey = "AAAAA",
@@ -928,9 +914,7 @@ test_that("enrich_taxonomy_from_cache enriches ClassyFire taxonomy", {
 })
 
 test_that("prepare_libraries_sop_merged() enriches taxonomy from additional caches", {
-  tmpdir <- tempfile()
-  dir.create(tmpdir, recursive = TRUE)
-  on.exit(unlink(tmpdir, recursive = TRUE))
+  tmpdir <- withr::local_tempdir()
 
   # Library data with some structures missing taxonomy
   sop_data <- tidytable::tidytable(
@@ -1010,9 +994,7 @@ test_that("prepare_libraries_sop_merged() enriches taxonomy from additional cach
 })
 
 test_that("enrich_taxonomy_from_cache writes back library entries to cache for persistence", {
-  tmpdir <- tempfile()
-  dir.create(tmpdir, recursive = TRUE)
-  on.exit(unlink(tmpdir, recursive = TRUE))
+  tmpdir <- withr::local_tempdir()
 
   # Library already has taxonomy for "C"
   taxonomy <- tidytable::tidytable(
@@ -1052,9 +1034,7 @@ test_that("enrich_taxonomy_from_cache writes back library entries to cache for p
 })
 
 test_that("enrich_taxonomy_from_cache handles classy_magic long-name NPC format", {
-  tmpdir <- tempfile()
-  dir.create(tmpdir, recursive = TRUE)
-  on.exit(unlink(tmpdir, recursive = TRUE))
+  tmpdir <- withr::local_tempdir()
 
   taxonomy <- tidytable::tidytable(
     structure_smiles = "C",
@@ -1101,9 +1081,7 @@ test_that("enrich_taxonomy_from_cache handles classy_magic long-name NPC format"
 })
 
 test_that("enrich_taxonomy_from_cache handles marimo CSV format (smiles key column)", {
-  tmpdir <- tempfile()
-  dir.create(tmpdir, recursive = TRUE)
-  on.exit(unlink(tmpdir, recursive = TRUE))
+  tmpdir <- withr::local_tempdir()
 
   taxonomy <- tidytable::tidytable(
     structure_smiles = "C",
@@ -1152,9 +1130,7 @@ test_that("enrich_taxonomy_from_cache handles marimo CSV format (smiles key colu
 })
 
 test_that("enrich_taxonomy_from_cache parses headerless TSV ClassyFire cache (.csv extension)", {
-  tmpdir <- tempfile()
-  dir.create(tmpdir, recursive = TRUE)
-  on.exit(unlink(tmpdir, recursive = TRUE))
+  tmpdir <- withr::local_tempdir()
 
   taxonomy <- tidytable::tidytable(
     structure_inchikey = "EXISTINGIK00001-UHFFFAOYSA-N",
@@ -1260,9 +1236,7 @@ test_that("apply_taxonomic_filter matches organisms without expanding non-matchi
 })
 
 test_that("enrich_taxonomy_from_cache skips disk rewrite when cache is already normalized and complete", {
-  tmpdir <- tempfile()
-  dir.create(tmpdir, recursive = TRUE)
-  on.exit(unlink(tmpdir, recursive = TRUE))
+  tmpdir <- withr::local_tempdir()
 
   taxonomy <- tidytable::tidytable(
     structure_smiles = "C",

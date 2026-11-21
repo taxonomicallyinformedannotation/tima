@@ -607,8 +607,6 @@ test_that("read_mztab_tables supports rmzTabM-style JSON object layout", {
 })
 
 test_that("rmzTabM-style JSON round-trips through read_mztab and write_mztab JSON", {
-  local_test_project(copy = TRUE)
-
   tmp_in <- withr::local_tempfile(fileext = ".json")
   tmp_features <- withr::local_tempfile(fileext = ".tsv")
   tmp_out <- withr::local_tempfile(fileext = ".json")

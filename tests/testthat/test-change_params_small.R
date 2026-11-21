@@ -130,7 +130,6 @@ test_that("change_params_small validates ms_pol parameter", {
 
 test_that("change_params_small handles NULL ms_pol", {
   tmpdir <- make_small_cache_dir()
-  on.exit(unlink(tmpdir, recursive = TRUE))
   expect_no_error(
     change_params_small(ms_pol = NULL, cache_dir = tmpdir)
   )
@@ -140,7 +139,6 @@ test_that("change_params_small handles NULL ms_pol", {
 
 test_that("change_params_small errors on missing features file", {
   tmpdir <- make_small_cache_dir()
-  on.exit(unlink(tmpdir, recursive = TRUE))
   expect_error(
     change_params_small(
       fil_fea_raw = "nonexistent_features.csv",
@@ -152,7 +150,6 @@ test_that("change_params_small errors on missing features file", {
 
 test_that("change_params_small errors on missing metadata file", {
   tmpdir <- make_small_cache_dir()
-  on.exit(unlink(tmpdir, recursive = TRUE))
   expect_error(
     change_params_small(
       fil_met_raw = "nonexistent_metadata.tsv",
@@ -164,7 +161,6 @@ test_that("change_params_small errors on missing metadata file", {
 
 test_that("change_params_small errors on missing SIRIUS file", {
   tmpdir <- make_small_cache_dir()
-  on.exit(unlink(tmpdir, recursive = TRUE))
   expect_error(
     change_params_small(
       fil_sir_raw = "nonexistent_sirius.zip",
@@ -176,7 +172,6 @@ test_that("change_params_small errors on missing SIRIUS file", {
 
 test_that("change_params_small errors on missing spectra file", {
   tmpdir <- make_small_cache_dir()
-  on.exit(unlink(tmpdir, recursive = TRUE))
   expect_error(
     change_params_small(
       fil_spe_raw = "nonexistent_spectra.mgf",
@@ -188,7 +183,6 @@ test_that("change_params_small errors on missing spectra file", {
 
 test_that("change_params_small errors on missing mzTab file", {
   tmpdir <- make_small_cache_dir()
-  on.exit(unlink(tmpdir, recursive = TRUE))
   expect_error(
     change_params_small(
       fil_mzt_raw = "nonexistent_annotations.mztab",
@@ -379,9 +373,7 @@ test_that("validate_params_small_inputs errors on invalid polarity", {
 })
 
 test_that("copy_file_to_target copies file successfully", {
-  tmpdir <- tempfile()
-  dir.create(tmpdir, recursive = TRUE)
-  on.exit(unlink(tmpdir, recursive = TRUE))
+  tmpdir <- withr::local_tempdir()
 
   # Create source file
   source_file <- file.path(tmpdir, "source.txt")
@@ -404,9 +396,7 @@ test_that("copy_file_to_target copies file successfully", {
 })
 
 test_that("copy_file_to_target errors on missing file", {
-  tmpdir <- tempfile()
-  dir.create(tmpdir, recursive = TRUE)
-  on.exit(unlink(tmpdir, recursive = TRUE))
+  tmpdir <- withr::local_tempdir()
 
   expect_error(
     copy_file_to_target(
@@ -419,9 +409,7 @@ test_that("copy_file_to_target errors on missing file", {
 })
 
 test_that("copy_file_to_target overwrites existing file", {
-  tmpdir <- tempfile()
-  dir.create(tmpdir, recursive = TRUE)
-  on.exit(unlink(tmpdir, recursive = TRUE))
+  tmpdir <- withr::local_tempdir()
 
   # Create source file
   source_file <- file.path(tmpdir, "source.txt")
@@ -604,9 +592,7 @@ test_that("validate_params_small_inputs validates polarity", {
 })
 
 test_that("copy_file_to_target copies files correctly", {
-  tmpdir <- tempfile()
-  dir.create(tmpdir, recursive = TRUE)
-  on.exit(unlink(tmpdir, recursive = TRUE))
+  tmpdir <- withr::local_tempdir()
   tmpdir <- normalizePath(tmpdir, winslash = "/", mustWork = TRUE)
 
   # Create source file
@@ -630,9 +616,7 @@ test_that("copy_file_to_target copies files correctly", {
 })
 
 test_that("copy_file_to_target errors on missing file", {
-  tmpdir <- tempfile()
-  dir.create(tmpdir, recursive = TRUE)
-  on.exit(unlink(tmpdir, recursive = TRUE))
+  tmpdir <- withr::local_tempdir()
 
   expect_error(
     copy_file_to_target(

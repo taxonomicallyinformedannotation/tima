@@ -289,7 +289,7 @@ test_that("create_edges_spectra completes downstream edge-building from parsed s
     fid2 = "F2"
   )
 
-  output_file <- tempfile(fileext = ".tsv")
+  output_file <- withr::local_tempfile(fileext = ".tsv")
 
   out <- create_edges_spectra(
     input = input_file,

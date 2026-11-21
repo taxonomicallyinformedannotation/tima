@@ -475,7 +475,8 @@ test_that("prepare_libraries_rt keeps MGF entries without peaks or precursor", {
 })
 
 test_that("read_mgf_metadata reads every block's fields", {
-  mgf <- file.path(tempdir(), "meta.mgf")
+  dir <- withr::local_tempdir()
+  mgf <- file.path(dir, "meta.mgf")
   write_test_mgf(
     c(
       format_mgf_block(
@@ -493,7 +494,7 @@ test_that("read_mgf_metadata reads every block's fields", {
   expect_equal(meta$RTINSECONDS, c("1", NA))
 
   # Predicted MGF as list, missing rt/smiles columns, and unparseable SMILES without InChIKey
-  mgf_is_file <- file.path(tempdir(), "is_rt.mgf")
+  mgf_is_file <- file.path(dir, "is_rt.mgf")
   write_test_mgf(
     format_mgf_block(
       peaks = character(0),
@@ -502,10 +503,10 @@ test_that("read_mgf_metadata reads every block's fields", {
     ),
     mgf_is_file
   )
-  csv_no_rt <- file.path(tempdir(), "no_rt_col.csv")
+  csv_no_rt <- file.path(dir, "no_rt_col.csv")
   writeLines("other_col\n1", csv_no_rt)
-  out_rt_edge <- file.path(tempdir(), "rt_edge.tsv")
-  out_sop_edge <- file.path(tempdir(), "sop_edge.tsv")
+  out_rt_edge <- file.path(dir, "rt_edge.tsv")
+  out_sop_edge <- file.path(dir, "sop_edge.tsv")
   res_edge <- call_prepare_libraries_rt(
     mgf_is = list(mgf_is_file),
     temp_exp = list(csv_no_rt),

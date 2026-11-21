@@ -77,13 +77,12 @@ test_that("sanitize_csv returns invalid for missing file", {
 })
 
 test_that("sanitize_csv validates a simple CSV file", {
-  csv <- tempfile(pattern = "tima-csv-", fileext = ".csv")
+  csv <- withr::local_tempfile(pattern = "tima-csv-", fileext = ".csv")
   write.csv(
     data.frame(feature_id = 1:3, mz = c(100, 200, 300)),
     csv,
     row.names = FALSE
   )
-  on.exit(unlink(csv))
 
   result <- sanitize_csv(csv, required_cols = c("feature_id", "mz"))
   expect_true(result$valid)
@@ -92,9 +91,8 @@ test_that("sanitize_csv validates a simple CSV file", {
 })
 
 test_that("sanitize_csv detects missing required columns", {
-  csv <- tempfile(pattern = "tima-csv-nocol-", fileext = ".csv")
+  csv <- withr::local_tempfile(pattern = "tima-csv-nocol-", fileext = ".csv")
   write.csv(data.frame(x = 1:3), csv, row.names = FALSE)
-  on.exit(unlink(csv))
 
   result <- sanitize_csv(csv, required_cols = c("feature_id", "mz"))
   expect_false(result$valid)
@@ -102,9 +100,8 @@ test_that("sanitize_csv detects missing required columns", {
 })
 
 test_that("sanitize_csv detects empty CSV", {
-  csv <- tempfile(pattern = "tima-csv-empty-", fileext = ".csv")
+  csv <- withr::local_tempfile(pattern = "tima-csv-empty-", fileext = ".csv")
   write.csv(data.frame(feature_id = character(0)), csv, row.names = FALSE)
-  on.exit(unlink(csv))
 
   result <- sanitize_csv(csv)
   expect_false(result$valid)
@@ -112,13 +109,15 @@ test_that("sanitize_csv detects empty CSV", {
 })
 
 test_that("sanitize_csv remaps feature_id requirement to custom feature column", {
-  csv <- tempfile(pattern = "tima-csv-feature-col-", fileext = ".csv")
+  csv <- withr::local_tempfile(
+    pattern = "tima-csv-feature-col-",
+    fileext = ".csv"
+  )
   write.csv(
     data.frame(my_feature = c("f1", "f2"), mz = c("100", "200")),
     csv,
     row.names = FALSE
   )
-  on.exit(unlink(csv))
 
   result <- sanitize_csv(
     file = csv,
@@ -132,9 +131,11 @@ test_that("sanitize_csv remaps feature_id requirement to custom feature column",
 })
 
 test_that("sanitize_csv reports read errors from safe_fread", {
-  csv <- tempfile(pattern = "tima-csv-read-error-", fileext = ".csv")
+  csv <- withr::local_tempfile(
+    pattern = "tima-csv-read-error-",
+    fileext = ".csv"
+  )
   writeLines("x\n1", csv)
-  on.exit(unlink(csv))
 
   testthat::with_mocked_bindings(
     safe_fread = function(...) {
@@ -158,7 +159,7 @@ test_that("sanitize_metadata returns invalid for missing file", {
 })
 
 test_that("sanitize_metadata validates a minimal metadata file", {
-  meta <- tempfile(pattern = "tima-meta-", fileext = ".tsv")
+  meta <- withr::local_tempfile(pattern = "tima-meta-", fileext = ".tsv")
   write.table(
     data.frame(
       filename = c("sample1.mzML", "sample2.mzML"),
@@ -169,7 +170,6 @@ test_that("sanitize_metadata validates a minimal metadata file", {
     row.names = FALSE,
     quote = FALSE
   )
-  on.exit(unlink(meta))
 
   result <- sanitize_metadata(meta)
   expect_true(result$valid)
@@ -178,7 +178,10 @@ test_that("sanitize_metadata validates a minimal metadata file", {
 })
 
 test_that("sanitize_metadata flags missing filename column", {
-  meta <- tempfile(pattern = "tima-meta-nofilename-", fileext = ".tsv")
+  meta <- withr::local_tempfile(
+    pattern = "tima-meta-nofilename-",
+    fileext = ".tsv"
+  )
   write.table(
     data.frame(organism = c("OrgA", "OrgB")),
     meta,
@@ -186,7 +189,6 @@ test_that("sanitize_metadata flags missing filename column", {
     row.names = FALSE,
     quote = FALSE
   )
-  on.exit(unlink(meta))
 
   result <- sanitize_metadata(meta)
   expect_false(result$valid)
@@ -194,7 +196,10 @@ test_that("sanitize_metadata flags missing filename column", {
 })
 
 test_that("sanitize_metadata flags organism column with only empty values", {
-  meta <- tempfile(pattern = "tima-meta-empty-org-", fileext = ".tsv")
+  meta <- withr::local_tempfile(
+    pattern = "tima-meta-empty-org-",
+    fileext = ".tsv"
+  )
   write.table(
     data.frame(
       filename = c("s1.mzML", "s2.mzML"),
@@ -205,7 +210,6 @@ test_that("sanitize_metadata flags organism column with only empty values", {
     row.names = FALSE,
     quote = FALSE
   )
-  on.exit(unlink(meta))
 
   result <- sanitize_metadata(meta)
   expect_false(result$valid)
@@ -214,8 +218,14 @@ test_that("sanitize_metadata flags organism column with only empty values", {
 })
 
 test_that("sanitize_metadata reports partial filename matches against features", {
-  meta <- tempfile(pattern = "tima-meta-partial-", fileext = ".tsv")
-  features <- tempfile(pattern = "tima-features-partial-", fileext = ".tsv")
+  meta <- withr::local_tempfile(
+    pattern = "tima-meta-partial-",
+    fileext = ".tsv"
+  )
+  features <- withr::local_tempfile(
+    pattern = "tima-features-partial-",
+    fileext = ".tsv"
+  )
 
   write.table(
     data.frame(
@@ -240,11 +250,6 @@ test_that("sanitize_metadata reports partial filename matches against features",
     quote = FALSE
   )
 
-  on.exit({
-    unlink(meta)
-    unlink(features)
-  })
-
   result <- sanitize_metadata(meta, features_file = features)
   expect_true(result$filenames_match)
   expect_equal(result$n_matched, 2L)
@@ -253,8 +258,14 @@ test_that("sanitize_metadata reports partial filename matches against features",
 })
 
 test_that("sanitize_metadata fails when no metadata filenames match features", {
-  meta <- tempfile(pattern = "tima-meta-nomatch-", fileext = ".tsv")
-  features <- tempfile(pattern = "tima-features-nomatch-", fileext = ".tsv")
+  meta <- withr::local_tempfile(
+    pattern = "tima-meta-nomatch-",
+    fileext = ".tsv"
+  )
+  features <- withr::local_tempfile(
+    pattern = "tima-features-nomatch-",
+    fileext = ".tsv"
+  )
 
   write.table(
     data.frame(
@@ -275,11 +286,6 @@ test_that("sanitize_metadata fails when no metadata filenames match features", {
     quote = FALSE
   )
 
-  on.exit({
-    unlink(meta)
-    unlink(features)
-  })
-
   result <- sanitize_metadata(meta, features_file = features)
   expect_false(result$valid)
   expect_false(result$filenames_match)
@@ -295,9 +301,8 @@ test_that("sanitize_sirius returns invalid for missing path", {
 })
 
 test_that("sanitize_sirius returns invalid for non-directory non-ZIP file", {
-  f <- tempfile(pattern = "tima-sirius-", fileext = ".txt")
+  f <- withr::local_tempfile(pattern = "tima-sirius-", fileext = ".txt")
   writeLines("hello", f)
-  on.exit(unlink(f))
 
   result <- sanitize_sirius(f)
   expect_false(result$valid)
@@ -309,9 +314,7 @@ test_that("sanitize_sirius returns invalid for non-directory non-ZIP file", {
 })
 
 test_that("sanitize_sirius detects missing required files in directory", {
-  d <- tempfile(pattern = "tima-sirius-dir-")
-  dir.create(d)
-  on.exit(unlink(d, recursive = TRUE))
+  d <- withr::local_tempdir(pattern = "tima-sirius-dir-")
 
   result <- sanitize_sirius(d)
   expect_false(result$valid)
@@ -323,9 +326,7 @@ test_that("sanitize_sirius detects missing required files in directory", {
 })
 
 test_that("sanitize_sirius validates a complete SIRIUS v5 directory", {
-  d <- tempfile(pattern = "tima-sirius-v5-")
-  dir.create(d)
-  on.exit(unlink(d, recursive = TRUE))
+  d <- withr::local_tempdir(pattern = "tima-sirius-v5-")
 
   # Write minimal v5 files
   writeLines(
@@ -348,9 +349,7 @@ test_that("sanitize_sirius validates a complete SIRIUS v5 directory", {
 })
 
 test_that("sanitize_sirius detects SIRIUS v6 naming convention", {
-  d <- tempfile(pattern = "tima-sirius-v6-")
-  dir.create(d)
-  on.exit(unlink(d, recursive = TRUE))
+  d <- withr::local_tempdir(pattern = "tima-sirius-v6-")
 
   writeLines(
     "id\tformula\n1\tC6H12O6",
@@ -371,9 +370,11 @@ test_that("sanitize_sirius detects SIRIUS v6 naming convention", {
 })
 
 test_that("sanitize_sirius reports ZIP extraction failures", {
-  fake_zip <- tempfile(pattern = "tima-bad-zip-", fileext = ".zip")
+  fake_zip <- withr::local_tempfile(
+    pattern = "tima-bad-zip-",
+    fileext = ".zip"
+  )
   writeLines("not a real zip", fake_zip)
-  on.exit(unlink(fake_zip))
 
   result <- suppressWarnings(sanitize_sirius(fake_zip))
   expect_false(result$valid)
@@ -385,9 +386,7 @@ test_that("sanitize_sirius reports ZIP extraction failures", {
 })
 
 test_that("sanitize_sirius counts structure annotations when present", {
-  d <- tempfile(pattern = "tima-sirius-v6-count-")
-  dir.create(d)
-  on.exit(unlink(d, recursive = TRUE))
+  d <- withr::local_tempdir(pattern = "tima-sirius-v6-count-")
 
   writeLines(
     "id\tformula\n1\tC6H12O6",
@@ -408,9 +407,7 @@ test_that("sanitize_sirius counts structure annotations when present", {
 })
 
 test_that("sanitize_sirius keeps validation status when structure count read fails", {
-  d <- tempfile(pattern = "tima-sirius-v6-readfail-")
-  dir.create(d)
-  on.exit(unlink(d, recursive = TRUE))
+  d <- withr::local_tempdir(pattern = "tima-sirius-v6-readfail-")
 
   structure_file <- file.path(d, "structure_identifications_all.tsv")
   writeLines("id\tInChIKey\n1\tAAAAA", structure_file)

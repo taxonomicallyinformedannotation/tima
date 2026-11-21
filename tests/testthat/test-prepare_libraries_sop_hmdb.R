@@ -56,9 +56,7 @@ write_hmdb_zip <- function(
 # ---- caching behaviour -------------------------------------------------------
 
 test_that("prepare_libraries_sop_hmdb returns path to existing large output without re-parsing", {
-  td <- tempfile()
-  dir.create(td)
-  on.exit(unlink(td, recursive = TRUE))
+  td <- withr::local_tempdir()
   out <- file.path(td, "hmdb.tsv")
 
   # Create a file that is truly above the cache-size threshold used by the function.
@@ -81,9 +79,7 @@ test_that("prepare_libraries_sop_hmdb returns path to existing large output with
 })
 
 test_that("prepare_libraries_sop_hmdb creates empty output when input is missing", {
-  td <- tempfile()
-  dir.create(td)
-  on.exit(unlink(td, recursive = TRUE))
+  td <- withr::local_tempdir()
   out <- file.path(td, "hmdb.tsv")
   prepare_libraries_sop_hmdb(input = file.path(td, "ghost.zip"), output = out)
   expect_true(file.exists(out))
@@ -94,9 +90,7 @@ test_that("prepare_libraries_sop_hmdb creates empty output when input is missing
 # ---- parsing -----------------------------------------------------------------
 
 test_that("prepare_libraries_sop_hmdb parses a single-compound SDF zip", {
-  td <- tempfile()
-  dir.create(td)
-  on.exit(unlink(td, recursive = TRUE))
+  td <- withr::local_tempdir()
   zip <- write_hmdb_zip(td, compounds = 1L)
   out <- file.path(td, "hmdb.tsv")
   prepare_libraries_sop_hmdb(input = zip, output = out)
@@ -107,9 +101,7 @@ test_that("prepare_libraries_sop_hmdb parses a single-compound SDF zip", {
 })
 
 test_that("prepare_libraries_sop_hmdb parses multiple compounds", {
-  td <- tempfile()
-  dir.create(td)
-  on.exit(unlink(td, recursive = TRUE))
+  td <- withr::local_tempdir()
   zip <- write_hmdb_zip(td, compounds = 5L)
   out <- file.path(td, "hmdb.tsv")
   prepare_libraries_sop_hmdb(input = zip, output = out)
@@ -118,9 +110,7 @@ test_that("prepare_libraries_sop_hmdb parses multiple compounds", {
 })
 
 test_that("prepare_libraries_sop_hmdb drops compounds without SMILES", {
-  td <- tempfile()
-  dir.create(td)
-  on.exit(unlink(td, recursive = TRUE))
+  td <- withr::local_tempdir()
   zip <- write_hmdb_zip(td, compounds = 3L, include_smiles = FALSE)
   out <- file.path(td, "hmdb.tsv")
   prepare_libraries_sop_hmdb(input = zip, output = out)
@@ -129,9 +119,7 @@ test_that("prepare_libraries_sop_hmdb drops compounds without SMILES", {
 })
 
 test_that("prepare_libraries_sop_hmdb keeps compounds with SMILES but without InChIKey", {
-  td <- tempfile()
-  dir.create(td)
-  on.exit(unlink(td, recursive = TRUE))
+  td <- withr::local_tempdir()
   zip <- write_hmdb_zip(
     td,
     compounds = 3L,
@@ -147,9 +135,7 @@ test_that("prepare_libraries_sop_hmdb keeps compounds with SMILES but without In
 # ---- default organism taxonomy -----------------------------------------------
 
 test_that("prepare_libraries_sop_hmdb attaches full human taxonomy by default", {
-  td <- tempfile()
-  dir.create(td)
-  on.exit(unlink(td, recursive = TRUE))
+  td <- withr::local_tempdir()
   zip <- write_hmdb_zip(td, compounds = 1L)
   out <- file.path(td, "hmdb.tsv")
   prepare_libraries_sop_hmdb(input = zip, output = out)
@@ -190,9 +176,7 @@ test_that("parse_hmdb_like_input rejects unsupported input extensions", {
 })
 
 test_that("parse_hmdb_like_input rejects zip archives without sdf entries", {
-  td <- tempfile()
-  dir.create(td)
-  on.exit(unlink(td, recursive = TRUE))
+  td <- withr::local_tempdir()
 
   txt_file <- file.path(td, "readme.txt")
   writeLines("not an sdf", txt_file)
@@ -207,9 +191,7 @@ test_that("parse_hmdb_like_input rejects zip archives without sdf entries", {
 })
 
 test_that("parse_hmdb_like_input parses multi-SDF zip archives ignoring non-SDF files", {
-  td <- tempfile()
-  dir.create(td)
-  on.exit(unlink(td, recursive = TRUE))
+  td <- withr::local_tempdir()
 
   sdf1 <- file.path(td, "mol1.sdf")
   sdf2 <- file.path(td, "mol2.sdf")

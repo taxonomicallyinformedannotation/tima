@@ -176,7 +176,8 @@ test_that("setup_logger validates filename parameter", {
 })
 
 test_that("setup_logger creates log file", {
-  log_file <- tempfile(fileext = ".log")
+  local_restore_lgr()
+  log_file <- withr::local_tempfile(fileext = ".log")
 
   expect_silent(setup_logger(filename = log_file))
 
@@ -188,7 +189,8 @@ test_that("setup_logger creates log file", {
 })
 
 test_that("setup_logger can silence console output", {
-  log_file <- tempfile(fileext = ".log")
+  local_restore_lgr()
+  log_file <- withr::local_tempfile(fileext = ".log")
 
   withr::local_envvar(TIMA_LOG_CONSOLE = "FALSE")
   expect_silent(setup_logger(filename = log_file, threshold = 400))
@@ -212,7 +214,8 @@ test_that("setup_logger can silence console output", {
 })
 
 test_that("setup_logger sets threshold correctly", {
-  log_file <- tempfile(fileext = ".log")
+  local_restore_lgr()
+  log_file <- withr::local_tempfile(fileext = ".log")
 
   # Test different thresholds
   expect_silent(setup_logger(filename = log_file, threshold = 400))
@@ -223,7 +226,8 @@ test_that("setup_logger sets threshold correctly", {
 })
 
 test_that("setup_logger returns invisibly", {
-  log_file <- tempfile(fileext = ".log")
+  local_restore_lgr()
+  log_file <- withr::local_tempfile(fileext = ".log")
 
   result <- withVisible(setup_logger(filename = log_file))
 
@@ -232,15 +236,17 @@ test_that("setup_logger returns invisibly", {
 })
 
 test_that("setup_logger can be called multiple times", {
-  log_file1 <- tempfile("log1", fileext = ".log")
-  log_file2 <- tempfile("log2", fileext = ".log")
+  local_restore_lgr()
+  log_file1 <- withr::local_tempfile(pattern = "log1", fileext = ".log")
+  log_file2 <- withr::local_tempfile(pattern = "log2", fileext = ".log")
 
   expect_silent(setup_logger(filename = log_file1))
   expect_silent(setup_logger(filename = log_file2))
 })
 
 test_that("setup_logger writes to file with correct format", {
-  log_file <- tempfile(fileext = ".log")
+  local_restore_lgr()
+  log_file <- withr::local_tempfile(fileext = ".log")
 
   setup_logger(filename = log_file, threshold = 400)
   log_info("Test info message")
@@ -264,7 +270,8 @@ test_that("setup_logger writes to file with correct format", {
 })
 
 test_that("setup_logger respects threshold levels", {
-  log_file <- tempfile(fileext = ".log")
+  local_restore_lgr()
+  log_file <- withr::local_tempfile(fileext = ".log")
 
   # Set threshold to WARN (should not log INFO)
   setup_logger(filename = log_file, threshold = 300)
@@ -286,6 +293,7 @@ test_that("setup_logger respects threshold levels", {
 ## init_logging tests ----
 
 test_that("init_logging uses default values when env vars not set", {
+  local_restore_lgr()
   # Clear env vars
   withr::local_envvar(TIMA_LOG_FILE = NA, TIMA_LOG_LEVEL = NA)
 
@@ -293,7 +301,8 @@ test_that("init_logging uses default values when env vars not set", {
 })
 
 test_that("init_logging reads TIMA_LOG_FILE from environment", {
-  log_file <- tempfile(fileext = ".log")
+  local_restore_lgr()
+  log_file <- withr::local_tempfile(fileext = ".log")
 
   withr::local_envvar(TIMA_LOG_FILE = log_file)
 
@@ -306,7 +315,8 @@ test_that("init_logging reads TIMA_LOG_FILE from environment", {
 })
 
 test_that("init_logging reads TIMA_LOG_LEVEL from environment", {
-  log_file <- tempfile(fileext = ".log")
+  local_restore_lgr()
+  log_file <- withr::local_tempfile(fileext = ".log")
 
   withr::local_envvar(
     TIMA_LOG_FILE = log_file,
@@ -325,7 +335,8 @@ test_that("init_logging reads TIMA_LOG_LEVEL from environment", {
 })
 
 test_that("init_logging handles invalid log level gracefully", {
-  log_file <- tempfile(fileext = ".log")
+  local_restore_lgr()
+  log_file <- withr::local_tempfile(fileext = ".log")
 
   withr::local_envvar(
     TIMA_LOG_FILE = log_file,
@@ -339,7 +350,8 @@ test_that("init_logging handles invalid log level gracefully", {
 })
 
 test_that("init_logging supports all valid log levels", {
-  log_file <- tempfile(fileext = ".log")
+  local_restore_lgr()
+  log_file <- withr::local_tempfile(fileext = ".log")
 
   levels <- c("TRACE", "DEBUG", "INFO", "WARN", "ERROR")
 
@@ -358,7 +370,8 @@ test_that("init_logging supports all valid log levels", {
 })
 
 test_that("init_logging is case-insensitive for log level", {
-  log_file <- tempfile(fileext = ".log")
+  local_restore_lgr()
+  log_file <- withr::local_tempfile(fileext = ".log")
 
   # Test lowercase
   withr::local_envvar(
@@ -408,10 +421,10 @@ test_that("logging does not create file on package load", {
 
 test_that("logging functions use sprintf-style formatting", {
   # Test that our logging wrappers exist and work with sprintf format
+  local_restore_lgr()
 
   # Test with temp log file
-  temp_log <- tempfile(fileext = ".log")
-  on.exit(unlink(temp_log), add = TRUE)
+  temp_log <- withr::local_tempfile(fileext = ".log")
 
   # Setup logger
   setup_logger(temp_log, 400)
@@ -713,6 +726,7 @@ test_that("log_operation records start time", {
 })
 
 test_that("log_operation returns tima_log_context class", {
+  local_restore_lgr()
   ctx <- log_operation("op")
   expect_s3_class(ctx, "tima_log_context")
 
@@ -728,8 +742,6 @@ test_that("log_operation returns tima_log_context class", {
   )
 
   # is_logging_initialized and ensure_logging_initialized when appenders empty
-  old_apps <- lgr::lgr$appenders
-  on.exit(lgr::lgr$set_appenders(old_apps), add = TRUE)
   lgr::lgr$set_appenders(list())
   expect_false(is_logging_initialized())
   expect_invisible(ensure_logging_initialized())

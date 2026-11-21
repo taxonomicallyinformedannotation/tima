@@ -6,7 +6,6 @@ test_that("get_gnps_tables works with valid GNPS job ID", {
   skip_if_no_network("https://github.com")
   skip_if_no_network("https://gnps.ucsd.edu")
   withr::local_dir(new = temp_test_dir("get_gnps_tables_valid"))
-  local_test_project(copy = TRUE)
   paths <- get_default_paths()
   params <- get_params(step = "prepare_params_advanced")
 
@@ -34,7 +33,6 @@ test_that("get_gnps_tables handles missing metadata", {
   skip_if_no_network("https://github.com")
   skip_if_no_network("https://gnps.ucsd.edu")
   withr::local_dir(new = temp_test_dir("get_gnps_tables_nometa"))
-  local_test_project(copy = TRUE)
   paths <- get_default_paths()
 
   get_file(
@@ -57,7 +55,6 @@ test_that("get_gnps_tables works with example GNPS ID", {
   skip_if_no_network("https://github.com")
   skip_if_no_network("https://gnps.ucsd.edu")
   withr::local_dir(new = temp_test_dir("get_gnps_tables_example"))
-  local_test_project(copy = TRUE)
   paths <- get_default_paths()
 
   get_file(
@@ -81,7 +78,6 @@ test_that("get_gnps_tables works with example GNPS ID", {
 
 test_that("get_gnps_tables handles NULL GNPS job ID", {
   withr::local_dir(new = temp_test_dir("get_gnps_tables_null"))
-  local_test_project(copy = TRUE)
   paths <- get_default_paths()
 
   dir.create(
@@ -107,7 +103,6 @@ test_that("get_gnps_tables handles NULL GNPS job ID", {
 
 test_that("get_gnps_tables handles empty GNPS job ID", {
   withr::local_dir(new = temp_test_dir("get_gnps_tables_empty"))
-  local_test_project(copy = TRUE)
   paths <- get_default_paths()
 
   dir.create(

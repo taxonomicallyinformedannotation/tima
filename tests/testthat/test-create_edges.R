@@ -346,7 +346,7 @@ test_that("create_edges ensures feature_id < target_id", {
 test_that("create_edges integrates with extract_spectra output", {
   skip_if_no_network("https://github.com")
   withr::local_dir(new = temp_test_dir("create_edges_integration"))
-  paths <- local_test_project(copy = TRUE)
+  paths <- get_default_paths()
 
   # Ensure clean state - remove any existing spectra file
   if (file.exists(paths$data$source$spectra)) {
@@ -381,7 +381,7 @@ test_that("create_edges integrates with extract_spectra output", {
 
 test_that("create_edges_spectra degrades gracefully on MS1-only MGF", {
   withr::local_dir(new = temp_test_dir("create_edges_ms1"))
-  paths <- local_test_project(copy = TRUE)
+  paths <- get_default_paths()
 
   # Library with one MS2 feature (used internally for polarity filtering etc.)
   lib_mgf <- file.path(

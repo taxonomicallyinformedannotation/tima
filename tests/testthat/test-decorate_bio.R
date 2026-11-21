@@ -87,6 +87,7 @@ test_that("decorate_bio logs both candidate and unique structure counts", {
     candidate_structure_inchikey_connectivity_layer = c("AAAAA", "AAAAA")
   )
 
+  local_restore_lgr()
   log_file <- withr::local_tempfile(fileext = ".log")
   setup_logger(filename = log_file, threshold = 400)
 
@@ -139,6 +140,7 @@ test_that("decorate_bio ignores below-minimum rows when counting unique structur
     )
   )
 
+  local_restore_lgr()
   log_file <- withr::local_tempfile(fileext = ".log")
   setup_logger(filename = log_file, threshold = 400)
 

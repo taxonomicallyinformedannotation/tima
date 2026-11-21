@@ -91,8 +91,6 @@ library(testthat)
 
 test_that("MS1-only MGF emits a single warning and empty template", {
   withr::local_dir(new = temp_test_dir("ms1_only"))
-  local_test_project(copy = TRUE)
-
   lib_path <- file.path(
     "data",
     "interim",
@@ -153,8 +151,6 @@ test_that("MS1-only MGF emits a single warning and empty template", {
 
 test_that("empty MGF emits a clear warning and empty template", {
   withr::local_dir(new = temp_test_dir("empty_mgf"))
-  local_test_project(copy = TRUE)
-
   lib_path <- file.path(
     "data",
     "interim",
@@ -197,8 +193,6 @@ test_that("empty MGF emits a clear warning and empty template", {
 
 test_that("mixed MS1/MS2 MGF warns once with skip count and annotates MS2", {
   withr::local_dir(new = temp_test_dir("mixed_mgf"))
-  local_test_project(copy = TRUE)
-
   lib_path <- file.path(
     "data",
     "interim",
@@ -259,8 +253,6 @@ test_that("mixed MS1/MS2 MGF warns once with skip count and annotates MS2", {
 
 test_that("valid MS2 input still annotates with no MS1 warnings", {
   withr::local_dir(new = temp_test_dir("ms2_regression"))
-  local_test_project(copy = TRUE)
-
   lib_path <- file.path(
     "data",
     "interim",
@@ -302,8 +294,6 @@ test_that("valid MS2 input still annotates with no MS1 warnings", {
 
 test_that("malformed MGF (mismatched BEGIN/END IONS) still errors", {
   withr::local_dir(new = temp_test_dir("malformed_mgf"))
-  local_test_project(copy = TRUE)
-
   lib_path <- file.path(
     "data",
     "interim",

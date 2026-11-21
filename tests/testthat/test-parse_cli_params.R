@@ -3,7 +3,6 @@
 library(testthat)
 
 test_that("parse_cli_params merges CLI arguments into parameters", {
-  local_test_project(copy = TRUE)
   params <- get_params(step = "prepare_params_advanced")
 
   arguments <- list()
@@ -20,7 +19,6 @@ test_that("parse_cli_params merges CLI arguments into parameters", {
 })
 
 test_that("parse_cli_params handles empty arguments list", {
-  local_test_project(copy = TRUE)
   params <- get_params(step = "prepare_params_advanced")
 
   result <- parse_cli_params(arguments = list(), parameters = params)
@@ -34,7 +32,6 @@ test_that("parse_cli_params handles empty arguments list", {
 })
 
 test_that("parse_cli_params preserves unmodified parameters", {
-  local_test_project(copy = TRUE)
   params <- get_params(step = "prepare_params_advanced")
 
   # Modify only one parameter
@@ -48,7 +45,6 @@ test_that("parse_cli_params preserves unmodified parameters", {
 })
 
 test_that("parse_cli_params maps SIRIUS analog mz-error CLI argument", {
-  local_test_project(copy = TRUE)
   params <- get_params(step = "prepare_params_advanced")
 
   result <- parse_cli_params(

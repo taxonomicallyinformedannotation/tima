@@ -41,7 +41,7 @@ test_that("copy_backbone validates cache_dir must be scalar", {
 })
 
 test_that("copy_backbone validates package must be non-NULL character", {
-  test_cache <- tempdir()
+  test_cache <- withr::local_tempdir()
 
   expect_error(
     copy_backbone(cache_dir = test_cache, package = NULL),
@@ -52,7 +52,7 @@ test_that("copy_backbone validates package must be non-NULL character", {
 })
 
 test_that("copy_backbone validates package must be non-empty", {
-  test_cache <- tempdir()
+  test_cache <- withr::local_tempdir()
 
   expect_error(
     copy_backbone(cache_dir = test_cache, package = ""),
@@ -63,7 +63,7 @@ test_that("copy_backbone validates package must be non-empty", {
 })
 
 test_that("copy_backbone validates package must be character type", {
-  test_cache <- tempdir()
+  test_cache <- withr::local_tempdir()
 
   expect_error(
     copy_backbone(cache_dir = test_cache, package = 123),
@@ -74,7 +74,7 @@ test_that("copy_backbone validates package must be character type", {
 })
 
 test_that("copy_backbone rejects non-existent package names", {
-  test_cache <- tempdir()
+  test_cache <- withr::local_tempdir()
 
   expect_error(
     copy_backbone(
@@ -90,7 +90,7 @@ test_that("copy_backbone rejects non-existent package names", {
 ## Directory Creation ----
 
 test_that("copy_backbone creates cache directory when it doesn't exist", {
-  cache_path <- tempdir()
+  cache_path <- withr::local_tempdir()
 
   expect_false(
     dir.exists(file.path(cache_path, "nonexistent_subdir")),
@@ -103,7 +103,7 @@ test_that("copy_backbone creates cache directory when it doesn't exist", {
 })
 
 test_that("copy_backbone handles existing cache directory gracefully", {
-  test_cache <- tempdir()
+  test_cache <- withr::local_tempdir()
 
   # First copy
   expect_no_error(copy_backbone(cache_dir = test_cache))
@@ -115,7 +115,7 @@ test_that("copy_backbone handles existing cache directory gracefully", {
 ## Content Verification ----
 
 test_that("copy_backbone copies package structure to cache directory", {
-  test_cache <- tempdir()
+  test_cache <- withr::local_tempdir()
 
   copy_backbone(cache_dir = test_cache)
 
@@ -131,7 +131,7 @@ test_that("copy_backbone copies package structure to cache directory", {
 })
 
 test_that("copy_backbone creates expected directory structure", {
-  test_cache <- tempdir()
+  test_cache <- withr::local_tempdir()
 
   copy_backbone(cache_dir = test_cache)
 
@@ -147,7 +147,7 @@ test_that("copy_backbone creates expected directory structure", {
 
 test_that("copy_backbone works with relative-style temp paths", {
   # Use a temp directory (not actual current directory)
-  cache_path <- tempdir()
+  cache_path <- withr::local_tempdir()
 
   expect_no_error(copy_backbone(cache_dir = cache_path))
 
@@ -156,7 +156,7 @@ test_that("copy_backbone works with relative-style temp paths", {
 })
 
 test_that("copy_backbone works with absolute paths", {
-  cache_path <- tempdir()
+  cache_path <- withr::local_tempdir()
 
   expect_no_error(copy_backbone(cache_dir = cache_path))
 
@@ -170,7 +170,7 @@ test_that("copy_backbone works with absolute paths", {
 
 test_that("copy_backbone integrates with get_default_paths", {
   # Use temp directory, not current directory
-  cache_path <- tempdir()
+  cache_path <- withr::local_tempdir()
   copy_backbone(cache_dir = cache_path)
 
   # Should be able to get paths after copying backbone
@@ -187,7 +187,7 @@ test_that("copy_backbone supports local_test_project workflow", {
 ## Return Value ----
 
 test_that("copy_backbone returns invisibly", {
-  test_cache <- tempdir()
+  test_cache <- withr::local_tempdir()
 
   result <- withVisible(copy_backbone(cache_dir = test_cache))
 
@@ -198,7 +198,7 @@ test_that("copy_backbone returns invisibly", {
 ## Edge Cases and Special Scenarios ----
 
 test_that("copy_backbone handles nested cache directory paths", {
-  nested_path <- tempdir()
+  nested_path <- withr::local_tempdir()
 
   expect_no_error(copy_backbone(cache_dir = nested_path))
 
@@ -209,7 +209,7 @@ test_that("copy_backbone handles nested cache directory paths", {
 })
 
 test_that("copy_backbone can be called multiple times with different paths", {
-  base_dir <- tempdir()
+  base_dir <- withr::local_tempdir()
 
   cache1 <- file.path(base_dir, "cache1")
   cache2 <- file.path(base_dir, "cache2")
@@ -227,7 +227,7 @@ test_that("copy_backbone surfaces cache directory creation failures", {
       .copy_backbone_dir_create = function(path) stop("mkdir failed"),
       log_info = function(...) invisible(NULL),
       log_error = function(...) invisible(NULL),
-      copy_backbone(cache_dir = tempdir())
+      copy_backbone(cache_dir = withr::local_tempdir())
     ),
     class = "tima_runtime_error"
   )
@@ -241,7 +241,7 @@ test_that("copy_backbone surfaces package copy failures", {
       },
       log_info = function(...) invisible(NULL),
       log_error = function(...) invisible(NULL),
-      copy_backbone(cache_dir = tempdir())
+      copy_backbone(cache_dir = withr::local_tempdir())
     ),
     class = "tima_runtime_error"
   )

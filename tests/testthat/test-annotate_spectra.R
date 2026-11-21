@@ -31,7 +31,6 @@ write_minimal_mgf <- function(path, precursors, charge = "1+") {
 
 test_that("annotate_spectra validates parameters", {
   withr::local_dir(new = temp_test_dir("ann_spe_validate"))
-  local_test_project(copy = TRUE)
   paths <- get_default_paths()
   write_minimal_mgf(paths$data$source$spectra, precursors = c(150))
   lib_path <- file.path(
@@ -81,7 +80,6 @@ test_that("annotate_spectra validates parameters", {
 test_that("annotate_spectra produces output file and columns", {
   skip_if_no_network("https://github.com")
   withr::local_dir(new = temp_test_dir("ann_spe_basic"))
-  local_test_project(copy = TRUE)
   paths <- get_default_paths()
   get_file(
     url = paths$urls$examples$spectra_mini,
@@ -121,7 +119,6 @@ test_that("annotate_spectra produces output file and columns", {
 test_that("threshold filtering removes low similarity candidates", {
   skip_if_no_network("https://github.com")
   withr::local_dir(new = temp_test_dir("ann_spe_threshold"))
-  local_test_project(copy = TRUE)
   paths <- get_default_paths()
   get_file(
     url = paths$urls$examples$spectra_mini,
@@ -160,7 +157,6 @@ test_that("threshold filtering removes low similarity candidates", {
 
 test_that("approx mode keeps more library spectra than strict mode", {
   withr::local_dir(new = temp_test_dir("ann_spe_approx"))
-  local_test_project(copy = TRUE)
   # Build query with specific precursor values
   query_path <- get_params(step = "annotate_spectra")$files$spectral$raw[1]
   dir.create(dirname(query_path), recursive = TRUE, showWarnings = FALSE)
@@ -202,7 +198,6 @@ test_that("approx mode keeps more library spectra than strict mode", {
 
 test_that("empty result exports template", {
   withr::local_dir(new = temp_test_dir("ann_spe_empty"))
-  local_test_project(copy = TRUE)
   # Query precursors far from library (strict reduction eliminates all)
   query_path <- get_params(step = "annotate_spectra")$files$spectral$raw[1]
   dir.create(dirname(query_path), recursive = TRUE, showWarnings = FALSE)
@@ -234,7 +229,6 @@ test_that("empty result exports template", {
 test_that("polarity filtering drops non-matching libraries and handles none left", {
   skip_if_no_network("https://github.com")
   withr::local_dir(new = temp_test_dir("ann_spe_polarity_filter"))
-  local_test_project(copy = TRUE)
   paths <- get_default_paths()
   get_file(
     url = paths$urls$examples$spectra_mini,
@@ -273,7 +267,6 @@ test_that("polarity filtering drops non-matching libraries and handles none left
 test_that("library spectra with empty peaks are removed before concatenation", {
   skip_if_no_network("https://github.com")
   withr::local_dir(new = temp_test_dir("ann_spe_empty_peaks"))
-  local_test_project(copy = TRUE)
   paths <- get_default_paths()
   get_file(
     url = paths$urls$examples$spectra_mini,
@@ -322,7 +315,6 @@ test_that("library spectra with empty peaks are removed before concatenation", {
 
 test_that("high cutoff removes all query peaks leading to empty template", {
   withr::local_dir(new = temp_test_dir("ann_spe_high_cutoff"))
-  local_test_project(copy = TRUE)
   paths <- get_default_paths()
   # Place query in expected path
   query_path <- get_params(step = "annotate_spectra")$files$spectral$raw[1]
@@ -353,7 +345,6 @@ test_that("high cutoff removes all query peaks leading to empty template", {
 test_that("duplicate candidates collapsed by SMILES are unique", {
   skip_if_no_network("https://github.com")
   withr::local_dir(new = temp_test_dir("ann_spe_dedupe"))
-  local_test_project(copy = TRUE)
   paths <- get_default_paths()
   get_file(
     url = paths$urls$examples$spectra_mini,
@@ -387,7 +378,6 @@ test_that("duplicate candidates collapsed by SMILES are unique", {
 test_that("NA fallback for smiles is applied", {
   skip_if_no_network("https://github.com")
   withr::local_dir(new = temp_test_dir("ann_spe_na_fallback"))
-  local_test_project(copy = TRUE)
   paths <- get_default_paths()
   get_file(
     url = paths$urls$examples$spectra_mini,
@@ -553,8 +543,6 @@ test_that("annotate_spectra handles empty library error", {
   skip_if_no_network("https://github.com")
   skip_on_cran()
   withr::local_dir(new = temp_test_dir("ann_spe_empty_lib"))
-  local_test_project(copy = TRUE)
-
   paths <- get_default_paths()
   get_file(
     url = paths$urls$examples$spectra_mini,
@@ -577,8 +565,6 @@ test_that("annotate_spectra applies intensity cutoff", {
   skip_if_no_network("https://github.com")
   skip_on_cran()
   withr::local_dir(new = temp_test_dir("ann_spe_cutoff"))
-  local_test_project(copy = TRUE)
-
   paths <- get_default_paths()
   get_file(
     url = paths$urls$examples$spectra_mini,
@@ -612,8 +598,6 @@ test_that("annotate_spectra handles different similarity methods", {
   skip_if_no_network("https://github.com")
   skip_on_cran()
   withr::local_dir(new = temp_test_dir("ann_spe_methods"))
-  local_test_project(copy = TRUE)
-
   paths <- get_default_paths()
   get_file(
     url = paths$urls$examples$spectra_mini,
@@ -646,8 +630,6 @@ test_that("annotate_spectra handles different similarity methods", {
 test_that("annotate_spectra validates method parameter", {
   skip_on_cran()
   withr::local_dir(new = temp_test_dir("ann_spe_method_invalid"))
-  local_test_project(copy = TRUE)
-
   lib_path <- file.path(
     "data",
     "interim",
@@ -670,8 +652,6 @@ test_that("annotate_spectra validates method parameter", {
 test_that("annotate_spectra validates approx parameter", {
   skip_on_cran()
   withr::local_dir(new = temp_test_dir("ann_spe_approx_invalid"))
-  local_test_project(copy = TRUE)
-
   lib_path <- file.path(
     "data",
     "interim",
@@ -1059,8 +1039,6 @@ test_that("finalize_results returns empty tidytable for empty similarity input",
 
 test_that("compute_similarity_safe returns empty table on calculation error", {
   withr::local_dir(new = temp_test_dir("ann_spe_compute_safe"))
-  local_test_project(copy = TRUE)
-
   query_path <- tempfile(fileext = ".mgf")
   lib_path <- tempfile(fileext = ".mgf")
   write_minimal_mgf(query_path, precursors = c(200))

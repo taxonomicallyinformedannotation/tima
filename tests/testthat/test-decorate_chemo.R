@@ -69,6 +69,7 @@ test_that("decorate_chemo logs both candidate and unique structure counts", {
     feature_pred_tax_npc_03cla_val = c("NPC1", "NPC1")
   )
 
+  local_restore_lgr()
   log_file <- withr::local_tempfile(fileext = ".log")
   setup_logger(filename = log_file, threshold = 400)
 
@@ -117,6 +118,7 @@ test_that("decorate_chemo cascades ClassyFire and NPClassifier filters independe
     feature_pred_tax_npc_03cla_val = c("NPC1", "NPC1", "NPC1", NA_character_)
   )
 
+  local_restore_lgr()
   log_file <- withr::local_tempfile(fileext = ".log")
   setup_logger(filename = log_file, threshold = 400)
 

@@ -90,8 +90,6 @@ test_that("write_mztab validates output parameter", {
 })
 
 test_that("write_mztab coerces vector-valued scalar parameters", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- .make_mztab_test_dir()
   results <- .make_tima_results(tmpdir, n_features = 1L, n_candidates = 1L)
   out <- file.path(tmpdir, "vector_params.mztab")
@@ -107,8 +105,6 @@ test_that("write_mztab coerces vector-valued scalar parameters", {
 })
 
 test_that("write_mztab writes output in the same folder as input", {
-  local_test_project(copy = TRUE)
-
   input_dir <- withr::local_tempdir()
   other_dir <- withr::local_tempdir()
   results <- .make_tima_results(input_dir, n_features = 1L, n_candidates = 1L)
@@ -125,8 +121,6 @@ test_that("write_mztab writes output in the same folder as input", {
 # ── Core behaviour tests ──────────────────────────────────────────────────────
 
 test_that("write_mztab produces a file for a typical TIMA results table", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- .make_mztab_test_dir()
   results <- .make_tima_results(tmpdir)
   out <- file.path(tmpdir, "out.mztab")
@@ -139,8 +133,6 @@ test_that("write_mztab produces a file for a typical TIMA results table", {
 })
 
 test_that("write_mztab produces valid MTD section", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   results <- .make_tima_results(tmpdir)
   out <- file.path(tmpdir, "annotations.mztab")
@@ -171,8 +163,6 @@ test_that("write_mztab produces valid MTD section", {
 })
 
 test_that("write_mztab emits ontology-aligned experiment metadata defaults", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   results <- .make_tima_results(tmpdir)
   out <- file.path(tmpdir, "metadata_defaults.mztab")
@@ -230,8 +220,6 @@ test_that("write_mztab emits ontology-aligned experiment metadata defaults", {
 })
 
 test_that("write_mztab writes SMF evidence references and ambiguity code", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   in_path <- file.path(tmpdir, "ambiguity.tsv")
   out <- file.path(tmpdir, "ambiguity.mztab")
@@ -272,8 +260,6 @@ test_that("write_mztab writes SMF evidence references and ambiguity code", {
 })
 
 test_that("write_mztab emits publication and instrument metadata when provided", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   results <- .make_tima_results(tmpdir)
   out <- file.path(tmpdir, "metadata_custom.mztab")
@@ -298,8 +284,6 @@ test_that("write_mztab emits publication and instrument metadata when provided",
 })
 
 test_that("write_mztab omits publication metadata for empty-like publication inputs", {
-  local_test_project(copy = TRUE)
-
   for (pub in list(NULL, "null")) {
     tmpdir <- withr::local_tempdir()
     results <- .make_tima_results(tmpdir)
@@ -322,8 +306,6 @@ test_that("write_mztab omits publication metadata for empty-like publication inp
 })
 
 test_that("write_mztab retains TIMA result columns as canonical or opt_global fields", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   in_path <- file.path(tmpdir, "coverage.tsv")
   out <- file.path(tmpdir, "coverage.mztab")
@@ -445,8 +427,6 @@ test_that("write_mztab retains TIMA result columns as canonical or opt_global fi
 })
 
 test_that("write_mztab covers full final-results schema and emits provenance COM comments", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   in_path <- file.path(tmpdir, "final_schema.tsv")
   out <- file.path(tmpdir, "final_schema.mztab")
@@ -615,8 +595,6 @@ test_that("write_mztab covers full final-results schema and emits provenance COM
 })
 
 test_that("write_mztab embeds optional edges table as COM extension lines", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   results <- .make_tima_results(tmpdir, n_features = 2L, n_candidates = 1L)
   edges_path <- file.path(tmpdir, "edges.tsv")
@@ -645,8 +623,6 @@ test_that("write_mztab embeds optional edges table as COM extension lines", {
 })
 
 test_that("write_mztab emits COM ambiguity cardinality summary", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   results <- .make_tima_results(tmpdir, n_features = 2L, n_candidates = 2L)
   out <- file.path(tmpdir, "ambiguity_com.mztab")
@@ -669,8 +645,6 @@ test_that("write_mztab emits COM ambiguity cardinality summary", {
 })
 
 test_that("write_mztab embeds optional edges table in JSON exports", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   results <- .make_tima_results(tmpdir, n_features = 2L, n_candidates = 1L)
   edges_path <- file.path(tmpdir, "edges_json.tsv")
@@ -695,8 +669,6 @@ test_that("write_mztab embeds optional edges table in JSON exports", {
 })
 
 test_that("write_mztab produces SMF section with one row per feature", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   n_feat <- 4L
   results <- .make_tima_results(tmpdir, n_features = n_feat)
@@ -713,8 +685,6 @@ test_that("write_mztab produces SMF section with one row per feature", {
 })
 
 test_that("write_mztab produces SME section with one row per annotation", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   n_feat <- 3L
   n_cand <- 2L
@@ -736,8 +706,6 @@ test_that("write_mztab produces SME section with one row per annotation", {
 })
 
 test_that("write_mztab produces SML section with feature-level ambiguity grouping", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   # 2 features, each with 2 candidates -> 2 ambiguity-aware SML rows.
   results <- .make_tima_results(tmpdir, n_features = 2L, n_candidates = 2L)
@@ -754,8 +722,6 @@ test_that("write_mztab produces SML section with feature-level ambiguity groupin
 })
 
 test_that("write_mztab encodes aligned multi-candidate SML identifier fields", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   in_path <- file.path(tmpdir, "sml_multicandidate.tsv")
   out <- file.path(tmpdir, "sml_multicandidate.mztab")
@@ -807,8 +773,6 @@ test_that("write_mztab encodes aligned multi-candidate SML identifier fields", {
 })
 
 test_that("write_mztab uses 'null' for missing optional fields", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   # Minimal results without score columns
   minimal_path <- file.path(tmpdir, "minimal.tsv")
@@ -832,8 +796,6 @@ test_that("write_mztab uses 'null' for missing optional fields", {
 })
 
 test_that("write_mztab MTD references custom title and description", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   results <- .make_tima_results(tmpdir)
   out <- file.path(tmpdir, "custom_title.mztab")
@@ -888,8 +850,6 @@ test_that(".mztab_library_to_identification_method returns proper Param syntax",
 # ── New ontology/CV-alignment tests ──────────────────────────────────────────
 
 test_that("write_mztab uses TIMA:004 (not PSM-specific MS:1001143) for spectral similarity", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   in_path <- file.path(tmpdir, "with_sim.tsv")
   out <- file.path(tmpdir, "with_sim.mztab")
@@ -926,8 +886,6 @@ test_that("write_mztab uses TIMA:004 (not PSM-specific MS:1001143) for spectral 
 })
 
 test_that("write_mztab spectra_ref is formatted as 'ms_run[1]:{id}'", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   in_path <- file.path(tmpdir, "spectraref.tsv")
   out <- file.path(tmpdir, "spectraref.mztab")
@@ -964,8 +922,6 @@ test_that("write_mztab spectra_ref is formatted as 'ms_run[1]:{id}'", {
 })
 
 test_that("write_mztab emits ms_run[1]-scan_polarity with PSI-MS CV term", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- .make_mztab_test_dir()
   results <- .make_tima_results(tmpdir, n_features = 1L, n_candidates = 1L)
   out_pos <- file.path(tmpdir, "pos.mztab")
@@ -993,8 +949,6 @@ test_that("write_mztab emits ms_run[1]-scan_polarity with PSI-MS CV term", {
 })
 
 test_that("write_mztab polarity abbreviations are accepted", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- .make_mztab_test_dir()
   results <- .make_tima_results(tmpdir, n_features = 1L, n_candidates = 1L)
   out <- file.path(tmpdir, "abbr.mztab")
@@ -1007,8 +961,6 @@ test_that("write_mztab polarity abbreviations are accepted", {
 })
 
 test_that("write_mztab emits software[1]-setting[1] with TIMA repository URL", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- .make_mztab_test_dir()
   results <- .make_tima_results(tmpdir, n_features = 1L, n_candidates = 1L)
   out <- file.path(tmpdir, "sw.mztab")
@@ -1025,8 +977,6 @@ test_that("write_mztab emits software[1]-setting[1] with TIMA repository URL", {
 })
 
 test_that("write_mztab emits colunit-small_molecule for neutral mass (UO:0000221)", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- .make_mztab_test_dir()
   results <- .make_tima_results(tmpdir, n_features = 1L, n_candidates = 1L)
   out <- file.path(tmpdir, "colunit.mztab")
@@ -1039,8 +989,6 @@ test_that("write_mztab emits colunit-small_molecule for neutral mass (UO:0000221
 })
 
 test_that("write_mztab emits colunit-small_molecule_evidence for id_confidence_measure[1]", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- .make_mztab_test_dir()
   results <- .make_tima_results(tmpdir, n_features = 1L, n_candidates = 1L)
   out <- file.path(tmpdir, "colunit_ev.mztab")
@@ -1054,8 +1002,6 @@ test_that("write_mztab emits colunit-small_molecule_evidence for id_confidence_m
 })
 
 test_that("write_mztab contact info is emitted when provided", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- .make_mztab_test_dir()
   results <- .make_tima_results(tmpdir, n_features = 1L, n_candidates = 1L)
   out <- file.path(tmpdir, "contact.mztab")
@@ -1078,8 +1024,6 @@ test_that("write_mztab contact info is emitted when provided", {
 })
 
 test_that("write_mztab xrefs enrichment populates uri from Wikidata", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   in_path <- file.path(tmpdir, "xrefs_ann.tsv")
   out <- file.path(tmpdir, "xrefs.mztab")
@@ -1130,8 +1074,6 @@ test_that("write_mztab xrefs enrichment populates uri from Wikidata", {
 })
 
 test_that("write_mztab xrefs adds additional database[n] blocks for ChEBI", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   in_path <- file.path(tmpdir, "db_ann.tsv")
   out <- file.path(tmpdir, "db_extra.mztab")
@@ -1173,8 +1115,6 @@ test_that("write_mztab xrefs adds additional database[n] blocks for ChEBI", {
 })
 
 test_that("write_mztab prefers prefixed database_identifier from xrefs and preserves source InChIKey", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   in_path <- file.path(tmpdir, "dbid_ann.tsv")
   out <- file.path(tmpdir, "dbid_prefixed.mztab")
@@ -1248,8 +1188,6 @@ test_that(".mztab_pick_best_uri handles single row correctly", {
 })
 
 test_that("write_mztab ms_run_format and ms_run_id_format are emitted when set", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- .make_mztab_test_dir()
   results <- .make_tima_results(tmpdir, n_features = 1L, n_candidates = 1L)
   out <- file.path(tmpdir, "format.mztab")
@@ -1269,8 +1207,6 @@ test_that("write_mztab ms_run_format and ms_run_id_format are emitted when set",
 })
 
 test_that("write_mztab theoretical_neutral_mass is rounded to 6 decimal places when available", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   in_path <- file.path(tmpdir, "mass.tsv")
   out <- file.path(tmpdir, "mass.mztab")
@@ -1309,8 +1245,6 @@ test_that("write_mztab theoretical_neutral_mass is rounded to 6 decimal places w
 })
 
 test_that("write_mztab SMF exp_mass_to_charge matches feature_mz", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   results <- .make_tima_results(tmpdir, n_features = 2L, n_candidates = 1L)
   out <- file.path(tmpdir, "out.mztab")
@@ -1330,8 +1264,6 @@ test_that("write_mztab SMF exp_mass_to_charge matches feature_mz", {
 })
 
 test_that("write_mztab complements an existing mzTab without erasing unmanaged lines", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   results <- .make_tima_results(tmpdir, n_features = 2L, n_candidates = 1L)
 
@@ -1358,8 +1290,6 @@ test_that("write_mztab complements an existing mzTab without erasing unmanaged l
 })
 
 test_that("write_mztab merge mode is idempotent and does not duplicate existing rows", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   results <- .make_tima_results(tmpdir, n_features = 2L, n_candidates = 1L)
   base <- file.path(tmpdir, "seed.mztab")
@@ -1384,8 +1314,6 @@ test_that("write_mztab merge unions all SMF/SME refs for repeated compounds", {
   # must fold *every* new feature's reference into the base SML row — not just
   # the last one. A previous mapply()-over-duplicated-indices implementation
   # kept only the last write and silently dropped intermediate references.
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   make_one_compound_rows <- function(features) {
     ik <- "ABCDEFGHIJKLMN01"
@@ -1445,8 +1373,6 @@ test_that("write_mztab merge unions all SMF/SME refs for repeated compounds", {
 })
 
 test_that("write_mztab writes JSON mzTab output that round-trips through the parser", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   results <- .make_tima_results(tmpdir, n_features = 2L, n_candidates = 2L)
   out <- file.path(tmpdir, "out.json")
@@ -1469,8 +1395,6 @@ test_that("write_mztab writes JSON mzTab output that round-trips through the par
 })
 
 test_that("write_mztab JSON merge mode is idempotent and avoids duplicate rows", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   results <- .make_tima_results(tmpdir, n_features = 2L, n_candidates = 1L)
   base <- file.path(tmpdir, "seed.json")
@@ -1520,8 +1444,6 @@ test_that("write_mztab JSON merge mode is idempotent and avoids duplicate rows",
 })
 
 test_that("write_mztab JSON round-trip with TIMA annotation fixture preserves SME semantics", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   results <- .make_tima_results(tmpdir, n_features = 2L, n_candidates = 2L)
   out1 <- file.path(tmpdir, "roundtrip_1.json")
@@ -1575,8 +1497,6 @@ test_that("write_mztab JSON round-trip with TIMA annotation fixture preserves SM
 })
 
 test_that("write_mztab SME identification_method is valid Param syntax", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   results <- .make_tima_results(tmpdir, n_features = 2L, n_candidates = 2L)
   out <- file.path(tmpdir, "out.mztab")
@@ -1602,8 +1522,6 @@ test_that("write_mztab SME identification_method is valid Param syntax", {
 })
 
 test_that("write_mztab merge mode preserves COM lines from after managed sections", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- .make_mztab_test_dir()
   results <- .make_tima_results(tmpdir, n_features = 1L, n_candidates = 1L)
   base <- file.path(tmpdir, "base_com.mztab")
@@ -1630,8 +1548,6 @@ test_that("write_mztab merge mode preserves COM lines from after managed section
 })
 
 test_that("write_mztab merge mode preserves optional columns from base tables", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- .make_mztab_test_dir()
   results <- .make_tima_results(tmpdir, n_features = 1L, n_candidates = 1L)
   base <- file.path(tmpdir, "base_opt.mztab")
@@ -1659,8 +1575,6 @@ test_that("write_mztab merge mode preserves optional columns from base tables", 
 })
 
 test_that("write_mztab exports extra filtered-result columns as opt_global fields", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   in_path <- file.path(tmpdir, "ann_extra.tsv")
   out <- file.path(tmpdir, "out_extra.mztab")
@@ -1699,8 +1613,6 @@ test_that("write_mztab exports extra filtered-result columns as opt_global field
 })
 
 test_that("write_mztab maps InChI and derives charge from adduct", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   in_path <- file.path(tmpdir, "ann.tsv")
   out <- file.path(tmpdir, "out.mztab")
@@ -1739,8 +1651,6 @@ test_that("write_mztab maps InChI and derives charge from adduct", {
 })
 
 test_that("write_mztab expands summarized pipe-separated candidates into separate SME rows", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   in_path <- file.path(tmpdir, "summarized.tsv")
   out <- file.path(tmpdir, "summarized.mztab")
@@ -1771,8 +1681,6 @@ test_that("write_mztab expands summarized pipe-separated candidates into separat
 })
 
 test_that("write_mztab exports id_confidence_measure[4] only when spectral similarity exists", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   in_yes <- file.path(tmpdir, "with_similarity.tsv")
   out_yes <- file.path(tmpdir, "with_similarity.mztab")
@@ -1814,8 +1722,6 @@ test_that("write_mztab exports id_confidence_measure[4] only when spectral simil
 })
 
 test_that("write_mztab keeps feature_* optional columns in SMF, not SME", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   in_path <- file.path(tmpdir, "feature_opt.tsv")
   out <- file.path(tmpdir, "feature_opt.mztab")
@@ -1848,8 +1754,6 @@ test_that("write_mztab keeps feature_* optional columns in SMF, not SME", {
 })
 
 test_that("write_mztab expands summarized rows even when score_final is absent", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   in_path <- file.path(tmpdir, "summarized_no_score_final.tsv")
   out <- file.path(tmpdir, "summarized_no_score_final.mztab")
@@ -1871,8 +1775,6 @@ test_that("write_mztab expands summarized rows even when score_final is absent",
 })
 
 test_that("write_mztab merge mode preserves unmanaged non-COM lines after managed sections", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- .make_mztab_test_dir()
   results <- .make_tima_results(tmpdir, n_features = 1L, n_candidates = 1L)
   base <- file.path(tmpdir, "base_unmanaged_tail.mztab")
@@ -1895,8 +1797,6 @@ test_that("write_mztab merge mode preserves unmanaged non-COM lines after manage
 })
 
 test_that("write_mztab creates SME rows from sparse annotation signals beyond name and InChIKey", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   in_path <- file.path(tmpdir, "sparse_annotation.tsv")
   out <- file.path(tmpdir, "sparse_annotation.mztab")
@@ -1920,8 +1820,6 @@ test_that("write_mztab creates SME rows from sparse annotation signals beyond na
 })
 
 test_that("write_mztab merge mode avoids false SMF dedup when only opt columns differ", {
-  local_test_project(copy = TRUE)
-
   tmpdir <- withr::local_tempdir()
   in_path <- file.path(tmpdir, "feature_tag.tsv")
   base <- file.path(tmpdir, "base_smf_key.mztab")

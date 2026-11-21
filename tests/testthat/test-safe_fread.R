@@ -3,8 +3,8 @@
 
 library(testthat)
 
-write_tsv <- function(df) {
-  tf <- tempfile(fileext = ".tsv")
+write_tsv <- function(df, .local_envir = parent.frame()) {
+  tf <- withr::local_tempfile(fileext = ".tsv", .local_envir = .local_envir)
   tidytable::fwrite(x = df, file = tf, sep = "\t")
   tf
 }
@@ -12,7 +12,6 @@ write_tsv <- function(df) {
 test_that("safe_fread reads a valid TSV file", {
   df <- data.frame(a = 1:3, b = c("x", "y", "z"))
   tf <- write_tsv(df)
-  on.exit(unlink(tf))
 
   result <- safe_fread(file = tf)
   expect_s3_class(result, "data.frame")
@@ -33,7 +32,6 @@ test_that("safe_fread errors with actionable message on missing file", {
 test_that("safe_fread validates required_cols after reading", {
   df <- data.frame(feature_id = 1:3, mz = c(100, 200, 300))
   tf <- write_tsv(df)
-  on.exit(unlink(tf))
 
   # Should pass when all required columns present
   expect_no_error(safe_fread(tf, required_cols = c("feature_id", "mz")))
@@ -47,9 +45,8 @@ test_that("safe_fread validates required_cols after reading", {
 
 test_that("safe_fread passes extra arguments to fread", {
   # Write a semicolon-delimited file
-  tf <- tempfile(fileext = ".csv")
+  tf <- withr::local_tempfile(fileext = ".csv")
   writeLines(c("a;b", "1;x", "2;y"), tf)
-  on.exit(unlink(tf))
 
   result <- safe_fread(file = tf, sep = ";")
   expect_equal(nrow(result), 2L)
@@ -58,7 +55,6 @@ test_that("safe_fread passes extra arguments to fread", {
 
 test_that("safe_fread maps malformed-row errors to formatting guidance", {
   tf <- write_tsv(data.frame(a = 1L))
-  on.exit(unlink(tf))
 
   expect_error(
     safe_fread(
@@ -74,7 +70,6 @@ test_that("safe_fread maps malformed-row errors to formatting guidance", {
 
 test_that("safe_fread handles empty files by warning and returning empty table", {
   tf <- write_tsv(data.frame(a = 1L))
-  on.exit(unlink(tf))
 
   expect_error(
     safe_fread(
@@ -90,7 +85,6 @@ test_that("safe_fread handles empty files by warning and returning empty table",
 
 test_that("safe_fread maps permission/open failures when unreadable file is encountered", {
   tf <- write_tsv(data.frame(a = 1L))
-  on.exit(unlink(tf))
 
   expect_error(
     safe_fread(
@@ -105,9 +99,7 @@ test_that("safe_fread maps permission/open failures when unreadable file is enco
 })
 
 test_that("safe_fread uses generic fallback guidance for non-specific fread errors", {
-  d <- tempfile(pattern = "sfread-dir-")
-  dir.create(d)
-  on.exit(unlink(d, recursive = TRUE))
+  d <- withr::local_tempdir(pattern = "sfread-dir-")
 
   expect_error(
     safe_fread(file = d, file_type = "test table"),
@@ -116,8 +108,7 @@ test_that("safe_fread uses generic fallback guidance for non-specific fread erro
 })
 
 test_that("safe_fread reads .gz files and nrows=0 headers without R.utils", {
-  tf <- tempfile(fileext = ".tsv.gz")
-  on.exit(unlink(tf))
+  tf <- withr::local_tempfile(fileext = ".tsv.gz")
   con <- gzfile(tf, open = "wt")
   writeLines(c("col1\tcol2", "1\ta", "2\tb"), con)
   close(con)
@@ -131,8 +122,7 @@ test_that("safe_fread reads .gz files and nrows=0 headers without R.utils", {
   expect_equal(names(full), c("col1", "col2"))
   expect_equal(as.character(full$col2), c("a", "b"))
 
-  tf_empty <- tempfile(fileext = ".tsv.gz")
-  on.exit(unlink(tf_empty), add = TRUE)
+  tf_empty <- withr::local_tempfile(fileext = ".tsv.gz")
   con_e <- gzfile(tf_empty, open = "wt")
   close(con_e)
   expect_equal(nrow(safe_fread(file = tf_empty, nrows = 0L)), 0L)

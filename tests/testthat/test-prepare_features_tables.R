@@ -28,7 +28,7 @@ test_that("prepare_features_tables validates features parameter", {
 
 test_that("prepare_features_tables validates output parameter", {
   withr::local_dir(new = temp_test_dir("prep_feat_tables_output"))
-  paths <- local_test_project(copy = TRUE)
+  paths <- get_default_paths()
 
   dir.create("data/source", recursive = TRUE, showWarnings = FALSE)
   test_features <- file.path("data", "source", "test_features.csv")
@@ -58,7 +58,7 @@ test_that("prepare_features_tables validates output parameter", {
 
 test_that("prepare_features_tables validates candidates parameter", {
   withr::local_dir(new = temp_test_dir("prep_feat_tables_cand"))
-  paths <- local_test_project(copy = TRUE)
+  paths <- get_default_paths()
 
   dir.create("data/source", recursive = TRUE, showWarnings = FALSE)
   test_features <- file.path("data", "source", "test_features.csv")
@@ -92,7 +92,7 @@ test_that("prepare_features_tables validates candidates parameter", {
 
 test_that("prepare_features_tables handles mzmine format (Peak area)", {
   withr::local_dir(new = temp_test_dir("prep_feat_tables_mzmine"))
-  paths <- local_test_project(copy = TRUE)
+  paths <- get_default_paths()
 
   mzmine_features <- tidytable::tidytable(
     "row ID" = 1:3,
@@ -124,7 +124,7 @@ test_that("prepare_features_tables handles mzmine format (Peak area)", {
 
 test_that("prepare_features_tables handles missing RT column", {
   withr::local_dir(new = temp_test_dir("prep_feat_tables_no_rt"))
-  paths <- local_test_project(copy = TRUE)
+  paths <- get_default_paths()
 
   no_rt_features <- tidytable::tidytable(
     "row ID" = 1:2,
@@ -148,7 +148,7 @@ test_that("prepare_features_tables handles missing RT column", {
 
 test_that("prepare_features_tables resolves mzTab-style core column names", {
   withr::local_dir(new = temp_test_dir("prep_feat_tables_mztab"))
-  paths <- local_test_project(copy = TRUE)
+  paths <- get_default_paths()
 
   mztab_features <- tidytable::tidytable(
     feature_id = c("101", "102"),
@@ -184,7 +184,7 @@ test_that("prepare_features_tables resolves mzTab-style core column names", {
 
 test_that("prepare_features_tables retains top intensity samples", {
   withr::local_dir(new = temp_test_dir("prep_feat_tables_samples"))
-  paths <- local_test_project(copy = TRUE)
+  paths <- get_default_paths()
 
   n_samples <- 10
   sample_cols <- as.list(seq_len(n_samples) * 100)
@@ -215,7 +215,7 @@ test_that("prepare_features_tables retains top intensity samples", {
 
 test_that("prepare_features_tables skips rows without usable intensities", {
   withr::local_dir(new = temp_test_dir("prep_feat_tables_invalid_vals"))
-  paths <- local_test_project(copy = TRUE)
+  paths <- get_default_paths()
 
   features_data <- tidytable::tidytable(
     "row ID" = 1:2,
@@ -246,7 +246,7 @@ test_that("prepare_features_tables skips rows without usable intensities", {
 
 test_that("prepare_features_tables handles both Peak area and Peak height", {
   withr::local_dir(new = temp_test_dir("prep_feat_tables_area_height"))
-  paths <- local_test_project(copy = TRUE)
+  paths <- get_default_paths()
 
   both_features <- tidytable::tidytable(
     "row ID" = 1:2,
@@ -279,7 +279,7 @@ test_that("prepare_features_tables handles both Peak area and Peak height", {
 
 test_that("prepare_features_tables handles empty file", {
   withr::local_dir(new = temp_test_dir("prep_feat_tables_empty"))
-  paths <- local_test_project(copy = TRUE)
+  paths <- get_default_paths()
 
   dir.create("data/source", recursive = TRUE, showWarnings = FALSE)
   test_file <- file.path("data", "source", "empty.csv")

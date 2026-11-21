@@ -597,6 +597,7 @@ test_that("log_annotation_stats logs distinct feature-library-inchikey counts", 
       NA_character_
     )
   )
+  local_restore_lgr()
   log_file <- withr::local_tempfile(fileext = ".log")
   setup_logger(filename = log_file, threshold = 400)
 
