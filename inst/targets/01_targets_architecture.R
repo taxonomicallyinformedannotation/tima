@@ -1,7 +1,7 @@
 # Architecture targets section.
 
 targets_section_architecture <- function() {
-  list(list(
+  list(
     tar_target(
       name = yaml_paths,
       command = {
@@ -16,5 +16,5 @@ targets_section_architecture <- function() {
       },
       format = "rds"
     )
-  ))
+  )
 }

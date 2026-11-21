@@ -1,221 +1,52 @@
 # Libraries targets section.
 
 targets_section_libraries <- function() {
+  spe_download_specs <- list(
+    list("is", "nor", "nor"),
+    list("is", "wik", "isdb"),
+    list("exp", "env", "enveda"),
+    list("exp", "gnp", "gnps"),
+    list("exp", "mb", "massbank"),
+    list("exp", "mer", "merlin"),
+    list("exp", "mul", "multims2")
+  )
   list(
-    list(
-      tar_target(
-        name = lib_spe_is_nor_pre_pos,
-        command = {
-          get_file(
-            url = paths$urls$spectra$pos$nor,
-            export = paths$data$interim$libraries$spectra$is$pos$nor
+    lapply(spe_download_specs, function(s) {
+      grp <- s[[1L]]
+      abbr <- s[[2L]]
+      key <- s[[3L]]
+      prefix <- sprintf("lib_spe_%s_%s_pre", grp, abbr)
+      c(
+        lapply(c("pos", "neg"), function(pol) {
+          tar_target_raw(
+            name = paste0(prefix, "_", pol),
+            command = substitute(
+              get_file(
+                url = paths$urls$spectra[[pol]][[key]],
+                export = paths$data$interim$libraries$spectra[[grp]][[pol]][[
+                  key
+                ]]
+              ),
+              list(grp = grp, pol = pol, key = key)
+            ),
+            format = "file"
           )
-        },
-        format = "file"
-      ),
-      tar_target(
-        name = lib_spe_is_nor_pre_neg,
-        command = {
-          get_file(
-            url = paths$urls$spectra$neg$nor,
-            export = paths$data$interim$libraries$spectra$is$neg$nor
+        }),
+        list(
+          tar_target_raw(
+            name = paste0(prefix, "_sop"),
+            command = substitute(
+              get_file(
+                url = paths$urls$sop[[key]],
+                export = paths$data$interim$libraries$sop[[key]]
+              ),
+              list(key = key)
+            ),
+            format = "file"
           )
-        },
-        format = "file"
-      ),
-      tar_target(
-        name = lib_spe_is_nor_pre_sop,
-        command = {
-          get_file(
-            url = paths$urls$sop$nor,
-            export = paths$data$interim$libraries$sop$nor
-          )
-        },
-        format = "file"
-      ),
-      tar_target(
-        name = lib_spe_is_wik_pre_pos,
-        command = {
-          get_file(
-            url = paths$urls$spectra$pos$isdb,
-            export = paths$data$interim$libraries$spectra$is$pos$isdb
-          )
-        },
-        format = "file"
-      ),
-      tar_target(
-        name = lib_spe_is_wik_pre_neg,
-        command = {
-          get_file(
-            url = paths$urls$spectra$neg$isdb,
-            export = paths$data$interim$libraries$spectra$is$neg$isdb
-          )
-        },
-        format = "file"
-      ),
-      tar_target(
-        name = lib_spe_is_wik_pre_sop,
-        command = {
-          get_file(
-            url = paths$urls$sop$isdb,
-            export = paths$data$interim$libraries$sop$isdb
-          )
-        },
-        format = "file"
+        )
       )
-    ),
-    list(
-      tar_target(
-        name = lib_spe_exp_env_pre_pos,
-        command = {
-          get_file(
-            url = paths$urls$spectra$pos$enveda,
-            export = paths$data$interim$libraries$spectra$exp$pos$enveda
-          )
-        },
-        format = "file"
-      ),
-      tar_target(
-        name = lib_spe_exp_env_pre_neg,
-        command = {
-          get_file(
-            url = paths$urls$spectra$neg$enveda,
-            export = paths$data$interim$libraries$spectra$exp$neg$enveda
-          )
-        },
-        format = "file"
-      ),
-      tar_target(
-        name = lib_spe_exp_env_pre_sop,
-        command = {
-          get_file(
-            url = paths$urls$sop$enveda,
-            export = paths$data$interim$libraries$sop$enveda
-          )
-        },
-        format = "file"
-      ),
-      tar_target(
-        name = lib_spe_exp_gnp_pre_pos,
-        command = {
-          get_file(
-            url = paths$urls$spectra$pos$gnps,
-            export = paths$data$interim$libraries$spectra$exp$pos$gnps
-          )
-        },
-        format = "file"
-      ),
-      tar_target(
-        name = lib_spe_exp_gnp_pre_neg,
-        command = {
-          get_file(
-            url = paths$urls$spectra$neg$gnps,
-            export = paths$data$interim$libraries$spectra$exp$neg$gnps
-          )
-        },
-        format = "file"
-      ),
-      tar_target(
-        name = lib_spe_exp_gnp_pre_sop,
-        command = {
-          get_file(
-            url = paths$urls$sop$gnps,
-            export = paths$data$interim$libraries$sop$gnps
-          )
-        },
-        format = "file"
-      ),
-      tar_target(
-        name = lib_spe_exp_mb_pre_pos,
-        command = {
-          get_file(
-            url = paths$urls$spectra$pos$massbank,
-            export = paths$data$interim$libraries$spectra$exp$pos$massbank
-          )
-        },
-        format = "file"
-      ),
-      tar_target(
-        name = lib_spe_exp_mb_pre_neg,
-        command = {
-          get_file(
-            url = paths$urls$spectra$neg$massbank,
-            export = paths$data$interim$libraries$spectra$exp$neg$massbank
-          )
-        },
-        format = "file"
-      ),
-      tar_target(
-        name = lib_spe_exp_mb_pre_sop,
-        command = {
-          get_file(
-            url = paths$urls$sop$massbank,
-            export = paths$data$interim$libraries$sop$massbank
-          )
-        },
-        format = "file"
-      ),
-      tar_target(
-        name = lib_spe_exp_mer_pre_pos,
-        command = {
-          get_file(
-            url = paths$urls$spectra$pos$merlin,
-            export = paths$data$interim$libraries$spectra$exp$pos$merlin
-          )
-        },
-        format = "file"
-      ),
-      tar_target(
-        name = lib_spe_exp_mer_pre_neg,
-        command = {
-          get_file(
-            url = paths$urls$spectra$neg$merlin,
-            export = paths$data$interim$libraries$spectra$exp$neg$merlin
-          )
-        },
-        format = "file"
-      ),
-      tar_target(
-        name = lib_spe_exp_mer_pre_sop,
-        command = {
-          get_file(
-            url = paths$urls$sop$merlin,
-            export = paths$data$interim$libraries$sop$merlin
-          )
-        },
-        format = "file"
-      ),
-      tar_target(
-        name = lib_spe_exp_mul_pre_pos,
-        command = {
-          get_file(
-            url = paths$urls$spectra$pos$multims2,
-            export = paths$data$interim$libraries$spectra$exp$pos$multims2
-          )
-        },
-        format = "file"
-      ),
-      tar_target(
-        name = lib_spe_exp_mul_pre_neg,
-        command = {
-          get_file(
-            url = paths$urls$spectra$neg$multims2,
-            export = paths$data$interim$libraries$spectra$exp$neg$multims2
-          )
-        },
-        format = "file"
-      ),
-      tar_target(
-        name = lib_spe_exp_mul_pre_sop,
-        command = {
-          get_file(
-            url = paths$urls$sop$multims2,
-            export = paths$data$interim$libraries$sop$multims2
-          )
-        },
-        format = "file"
-      )
-    ),
+    }),
     list(
       tar_target(
         name = lib_spe_exp_int_pre,
@@ -242,26 +73,13 @@ targets_section_libraries <- function() {
         },
         format = "file"
       ),
-      tar_target(
-        name = lib_spe_exp_int_pre_pos,
-        command = {
-          lib_spe_exp_int_pre[[1L]]
-        },
-        format = "file"
-      ),
-      tar_target(
-        name = lib_spe_exp_int_pre_neg,
-        command = {
-          lib_spe_exp_int_pre[[2L]]
-        },
-        format = "file"
-      ),
-      tar_target(
-        name = lib_spe_exp_int_pre_sop,
-        command = {
-          lib_spe_exp_int_pre[[3L]]
-        },
-        format = "file"
+      .tar_file_slice(
+        "lib_spe_exp_int_pre",
+        c(
+          lib_spe_exp_int_pre_pos = 1L,
+          lib_spe_exp_int_pre_neg = 2L,
+          lib_spe_exp_int_pre_sop = 3L
+        )
       ),
       tar_target(
         name = lib_rt,
@@ -284,25 +102,12 @@ targets_section_libraries <- function() {
         },
         format = "file"
       ),
-      tar_target(
-        name = lib_rt_rts,
-        command = {
-          lib_rt[[1L]]
-        },
-        format = "file"
-      ),
-      tar_target(
-        name = lib_rt_sop,
-        command = {
-          lib_rt[[2L]]
-        },
-        format = "file"
-      ),
+      .tar_file_slice("lib_rt", c(lib_rt_rts = 1L, lib_rt_sop = 2L)),
       list(
         tar_target(
           name = lib_sop_ecm,
           command = {
-            lib_sop_ecm <- tryCatch(
+            tryCatch(
               expr = {
                 get_file(
                   url = paths$urls$ecmdb$metabolites,
@@ -522,7 +327,6 @@ targets_section_libraries <- function() {
             pub_prepared <- tryCatch(
               par_pre_lib_sop_pub$files$libraries$sop$prepared$pubchemlite,
               error = function(e) {
-                invisible(e)
                 "data/interim/libraries/sop/pubchemlite_prepared.tsv.gz"
               }
             )
@@ -566,45 +370,56 @@ targets_section_libraries <- function() {
               ymdb = "Saccharomyces cerevisiae",
               cannabisdatabase = "Cannabis"
             )
-            human_list <- list(
-              organism_taxonomy_ottid = "770315",
-              organism_taxonomy_01domain = "Eukaryota",
-              organism_taxonomy_02kingdom = "Metazoa",
-              organism_taxonomy_03phylum = "Chordata",
-              organism_taxonomy_04class = "Mammalia",
-              organism_taxonomy_05order = "Primates",
-              organism_taxonomy_06family = "Hominidae",
-              organism_taxonomy_07tribe = NA_character_,
-              organism_taxonomy_08genus = "Homo",
-              organism_taxonomy_09species = "Homo sapiens",
-              organism_taxonomy_10varietas = NA_character_
+            .make_taxonomy <- function(
+              ottid = "",
+              domain = NA_character_,
+              kingdom = NA_character_,
+              phylum = NA_character_,
+              class = NA_character_,
+              order = NA_character_,
+              family = NA_character_,
+              tribe = NA_character_,
+              genus = NA_character_,
+              species = NA_character_,
+              varietas = NA_character_
+            ) {
+              list(
+                organism_taxonomy_ottid = ottid,
+                organism_taxonomy_01domain = domain,
+                organism_taxonomy_02kingdom = kingdom,
+                organism_taxonomy_03phylum = phylum,
+                organism_taxonomy_04class = class,
+                organism_taxonomy_05order = order,
+                organism_taxonomy_06family = family,
+                organism_taxonomy_07tribe = tribe,
+                organism_taxonomy_08genus = genus,
+                organism_taxonomy_09species = species,
+                organism_taxonomy_10varietas = varietas
+              )
+            }
+            human_list <- .make_taxonomy(
+              ottid = "770315",
+              domain = "Eukaryota",
+              kingdom = "Metazoa",
+              phylum = "Chordata",
+              class = "Mammalia",
+              order = "Primates",
+              family = "Hominidae",
+              genus = "Homo",
+              species = "Homo sapiens"
             )
-            cow_list <- list(
-              organism_taxonomy_ottid = "490099",
-              organism_taxonomy_01domain = "Eukaryota",
-              organism_taxonomy_02kingdom = "Metazoa",
-              organism_taxonomy_03phylum = "Chordata",
-              organism_taxonomy_04class = "Mammalia",
-              organism_taxonomy_05order = "Artiodactyla",
-              organism_taxonomy_06family = "Bovidae",
-              organism_taxonomy_07tribe = NA_character_,
-              organism_taxonomy_08genus = "Bos",
-              organism_taxonomy_09species = "Bos taurus",
-              organism_taxonomy_10varietas = NA_character_
+            cow_list <- .make_taxonomy(
+              ottid = "490099",
+              domain = "Eukaryota",
+              kingdom = "Metazoa",
+              phylum = "Chordata",
+              class = "Mammalia",
+              order = "Artiodactyla",
+              family = "Bovidae",
+              genus = "Bos",
+              species = "Bos taurus"
             )
-            empty_list <- list(
-              organism_taxonomy_ottid = "",
-              organism_taxonomy_01domain = NA_character_,
-              organism_taxonomy_02kingdom = NA_character_,
-              organism_taxonomy_03phylum = NA_character_,
-              organism_taxonomy_04class = NA_character_,
-              organism_taxonomy_05order = NA_character_,
-              organism_taxonomy_06family = NA_character_,
-              organism_taxonomy_07tribe = NA_character_,
-              organism_taxonomy_08genus = NA_character_,
-              organism_taxonomy_09species = NA_character_,
-              organism_taxonomy_10varietas = NA_character_
-            )
+            empty_list <- .make_taxonomy()
             hmdb_family_taxonomy <- list(
               csfmetabolome = human_list,
               fecalmetabolome = human_list,
@@ -617,31 +432,25 @@ targets_section_libraries <- function() {
               mimedb = empty_list,
               t3db = empty_list,
               bovinedb = cow_list,
-              ymdb = list(
-                organism_taxonomy_ottid = "356221",
-                organism_taxonomy_01domain = "Eukaryota",
-                organism_taxonomy_02kingdom = "Fungi",
-                organism_taxonomy_03phylum = "Ascomycota",
-                organism_taxonomy_04class = NA_character_,
-                organism_taxonomy_05order = "Saccharomycetales",
-                organism_taxonomy_06family = "Saccharomycetaceae",
-                organism_taxonomy_07tribe = NA_character_,
-                organism_taxonomy_08genus = "Saccharomyces",
-                organism_taxonomy_09species = "Saccharomyces cerevisiae",
-                organism_taxonomy_10varietas = NA_character_
+              ymdb = .make_taxonomy(
+                ottid = "356221",
+                domain = "Eukaryota",
+                kingdom = "Fungi",
+                phylum = "Ascomycota",
+                order = "Saccharomycetales",
+                family = "Saccharomycetaceae",
+                genus = "Saccharomyces",
+                species = "Saccharomyces cerevisiae"
               ),
-              cannabisdatabase = list(
-                organism_taxonomy_ottid = "84008",
-                organism_taxonomy_01domain = "Eukaryota",
-                organism_taxonomy_02kingdom = "Archaeplastida",
-                organism_taxonomy_03phylum = "Streptophyta",
-                organism_taxonomy_04class = "Magnoliopsida",
-                organism_taxonomy_05order = "Rosales",
-                organism_taxonomy_06family = "Cannabaceae",
-                organism_taxonomy_07tribe = NA_character_,
-                organism_taxonomy_08genus = "Cannabis",
-                organism_taxonomy_09species = NA_character_,
-                organism_taxonomy_10varietas = NA_character_
+              cannabisdatabase = .make_taxonomy(
+                ottid = "84008",
+                domain = "Eukaryota",
+                kingdom = "Archaeplastida",
+                phylum = "Streptophyta",
+                class = "Magnoliopsida",
+                order = "Rosales",
+                family = "Cannabaceae",
+                genus = "Cannabis"
               )
             )
             hmdb_family_names <- names(hmdb_family_tags)
@@ -784,54 +593,16 @@ targets_section_libraries <- function() {
           },
           format = "file"
         ),
-        tar_target(
-          name = lib_mer_key,
-          command = {
-            lib_sop_mer[[1L]]
-          },
-          format = "file"
-        ),
-        tar_target(
-          name = lib_mer_org_tax_ott,
-          command = {
-            lib_sop_mer[[2L]]
-          },
-          format = "file"
-        ),
-        # tar_target(
-        #   name = lib_mer_str_can,
-        #   command = {
-        #     lib_sop_mer[[3L]]
-        #   },
-        #   format = "file"
-        # ),
-        tar_target(
-          name = lib_mer_str_stereo,
-          command = {
-            lib_sop_mer[[4L]]
-          },
-          format = "file"
-        ),
-        tar_target(
-          name = lib_mer_str_met,
-          command = {
-            lib_sop_mer[[5L]]
-          },
-          format = "file"
-        ),
-        tar_target(
-          name = lib_mer_str_tax_cla,
-          command = {
-            lib_sop_mer[[6L]]
-          },
-          format = "file"
-        ),
-        tar_target(
-          name = lib_mer_str_tax_npc,
-          command = {
-            lib_sop_mer[[7L]]
-          },
-          format = "file"
+        .tar_file_slice(
+          "lib_sop_mer",
+          c(
+            lib_mer_key = 1L,
+            lib_mer_org_tax_ott = 2L,
+            lib_mer_str_stereo = 4L,
+            lib_mer_str_met = 5L,
+            lib_mer_str_tax_cla = 6L,
+            lib_mer_str_tax_npc = 7L
+          )
         )
       )
     )

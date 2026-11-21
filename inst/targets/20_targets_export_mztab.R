@@ -17,8 +17,14 @@ targets_section_export_mztab <- function() {
         }
         x
       }
-      .null_or <- function(x, default) {
-        .scalar_chr_or(x, default = default)
+      .get_cfg <- function(cfg, ..., default = NULL) {
+        for (k in list(...)) {
+          if (!is.list(cfg)) {
+            return(default)
+          }
+          cfg <- cfg[[k]]
+        }
+        .scalar_chr_or(cfg, default = default)
       }
       .output_in_input_dir <- function(input_path, configured_output) {
         if (is.null(input_path) || !nzchar(input_path)) {
@@ -35,32 +41,20 @@ targets_section_export_mztab <- function() {
         }
         file.path(dirname(input_path), out_name)
       }
-      mzt_xrefs <- tryCatch(par_exp_mzt$files$xrefs, error = function(e) NULL)
-      if (is.null(mzt_xrefs) || !nzchar(.null_or(mzt_xrefs, ""))) {
-        mzt_xrefs <- lib_xrefs
-      }
-      mzt_contact <- tryCatch(par_exp_mzt$contact, error = function(e) NULL)
+      mzt_xrefs <- .get_cfg(par_exp_mzt, "files", "xrefs", default = lib_xrefs)
+      mzt_contact <- if (is.list(par_exp_mzt)) par_exp_mzt$contact
       if (
         !is.null(mzt_contact) &&
           all(vapply(
             mzt_contact,
-            function(x) !nzchar(.null_or(x, "")),
+            function(x) !nzchar(.scalar_chr_or(x, "")),
             logical(1L)
           ))
       ) {
         mzt_contact <- NULL
       }
-      base_mzt <- if (!is.null(par_exp_mzt$files$mztab$raw)) {
-        raw_path <- par_exp_mzt$files$mztab$raw
-        raw_path <- .scalar_chr_or(raw_path, default = NULL)
-        if (!is.null(raw_path) && file.exists(raw_path)) {
-          raw_path
-        } else {
-          NULL
-        }
-      } else {
-        NULL
-      }
+      raw_path <- .get_cfg(par_exp_mzt, "files", "mztab", "raw")
+      base_mzt <- if (!is.null(raw_path) && file.exists(raw_path)) raw_path
       mzt_input <- .scalar_chr_or(ann_wei, default = ann_wei)
       mzt_output_cfg <- .scalar_chr_or(
         par_exp_mzt$files$output$mztab,
@@ -72,48 +66,48 @@ targets_section_export_mztab <- function() {
           input_path = mzt_input,
           configured_output = mzt_output_cfg
         ),
-        ms_run_location = .null_or(
-          tryCatch(par_exp_mzt$ms$run_location, error = function(e) NULL),
-          "null"
+        ms_run_location = .get_cfg(
+          par_exp_mzt,
+          "ms",
+          "run_location",
+          default = "null"
         ),
-        ms_run_format = .null_or(
-          tryCatch(par_exp_mzt$ms$run_format, error = function(e) NULL),
-          "null"
+        ms_run_format = .get_cfg(
+          par_exp_mzt,
+          "ms",
+          "run_format",
+          default = "null"
         ),
-        ms_run_id_format = .null_or(
-          tryCatch(par_exp_mzt$ms$run_id_format, error = function(e) NULL),
-          "null"
+        ms_run_id_format = .get_cfg(
+          par_exp_mzt,
+          "ms",
+          "run_id_format",
+          default = "null"
         ),
-        polarity = tryCatch(par_exp_mzt$ms$polarity, error = function(e) NULL),
-        instrument = .null_or(
-          tryCatch(par_exp_mzt$ms$instrument, error = function(e) NULL),
-          NULL
+        polarity = if (is.list(par_exp_mzt) && is.list(par_exp_mzt$ms)) {
+          par_exp_mzt$ms$polarity
+        },
+        instrument = .get_cfg(par_exp_mzt, "ms", "instrument"),
+        title = .get_cfg(
+          par_exp_mzt,
+          "study",
+          "title",
+          default = "TIMA annotation results"
         ),
-        title = .null_or(
-          tryCatch(par_exp_mzt$study$title, error = function(e) NULL),
-          "TIMA annotation results"
-        ),
-        description = .null_or(
-          tryCatch(par_exp_mzt$study$description, error = function(e) NULL),
-          paste0(
+        description = .get_cfg(
+          par_exp_mzt,
+          "study",
+          "description",
+          default = paste0(
             "Annotation results produced by Taxonomically Informed ",
             "Metabolomics Annotation (TIMA)."
           )
         ),
-        sample_name = .null_or(
-          tryCatch(par_exp_mzt$study$sample_name, error = function(e) NULL),
-          NULL
-        ),
-        publication = .null_or(
-          tryCatch(par_exp_mzt$study$publication, error = function(e) NULL),
-          NULL
-        ),
+        sample_name = .get_cfg(par_exp_mzt, "study", "sample_name"),
+        publication = .get_cfg(par_exp_mzt, "study", "publication"),
         contact = mzt_contact,
         xrefs_file = mzt_xrefs,
-        edges_file = .null_or(
-          tryCatch(par_exp_mzt$files$edges, error = function(e) NULL),
-          NULL
-        ),
+        edges_file = .get_cfg(par_exp_mzt, "files", "edges"),
         base_mztab = base_mzt
       )
     },

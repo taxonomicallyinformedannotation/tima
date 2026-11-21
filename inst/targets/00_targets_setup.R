@@ -39,3 +39,17 @@ PARAM_STEPS <- c(
   pre_tax = "prepare_taxa",
   wei_ann = "weight_annotations"
 )
+
+.tar_file_slice <- function(parent_name, slices) {
+  parent_sym <- as.symbol(parent_name)
+  lapply(names(slices), function(target_name) {
+    tar_target_raw(
+      name = target_name,
+      command = substitute(
+        parent[[idx]],
+        list(parent = parent_sym, idx = as.integer(slices[[target_name]]))
+      ),
+      format = "file"
+    )
+  })
+}
