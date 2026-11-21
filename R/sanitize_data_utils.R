@@ -730,17 +730,16 @@ sanitize_sirius <- function(sirius_dir) {
           temp_dir <- tempfile(pattern = "sirius_check_")
           dir.create(temp_dir, recursive = TRUE)
           on.exit(unlink(temp_dir, recursive = TRUE), add = TRUE)
-          extracted_path <- utils::unzip(
+          utils::unzip(
             sirius_dir,
             files = target_in_zip,
             exdir = temp_dir
           )
-          if (length(extracted_path) == 1L) extracted_path[[1L]] else NULL
         } else {
           file.path(sirius_dir, target_bname)
         }
 
-        if (!is.null(structure_file) && file.exists(structure_file)) {
+        if (length(structure_file) == 1L && file.exists(structure_file)) {
           # Read first column of structure identifications to count rows
           structure_data <- safe_fread(
             file = structure_file,
