@@ -67,7 +67,7 @@ ADDUCT_MASSES <- list(
 )
 # Positive-carrier ion mass offsets include electron removal.
 H_MASS <- ADDUCT_MASSES$H - ELECTRON_MASS_DALTONS
-Na_MASS <- ADDUCT_MASSES$Na - ELECTRON_MASS_DALTONS # nolint: object_name_linter.
+Na_MASS <- ADDUCT_MASSES$Na - ELECTRON_MASS_DALTONS
 K_MASS <- ADDUCT_MASSES$K - ELECTRON_MASS_DALTONS
 NH4_MASS <- ADDUCT_MASSES$H4N - ELECTRON_MASS_DALTONS
 H2O_LOSS <- 18.010565 # Water loss (exact)
@@ -137,13 +137,6 @@ test_that("calculate_mass_of_m rejects NA m/z", {
   )
 })
 
-# test_that("calculate_mass_of_m rejects Inf m/z", {
-#   expect_error(
-#     calculate_mass_of_m(mz = Inf, adduct_string = "[M+H]+"),
-#     "finite"
-#   )
-# })
-
 test_that("calculate_mass_of_m rejects non-numeric m/z", {
   expect_error(
     calculate_mass_of_m(mz = "100", adduct_string = "[M+H]+"),
@@ -157,13 +150,6 @@ test_that("calculate_mass_of_m rejects multiple m/z values", {
     "Invalid type for mz"
   )
 })
-
-# test_that("calculate_mass_of_m warns about very high m/z", {
-#   expect_warning(
-#     calculate_mass_of_m(mz = 10000, adduct_string = "[M+H]+"),
-#     "exceeds typical"
-#   )
-# })
 
 ## Invalid adduct handling ----
 
@@ -226,17 +212,6 @@ test_that("calculate_mass_of_m rejects non-numeric electron mass", {
   )
 })
 
-# test_that("calculate_mass_of_m warns about non-standard electron mass", {
-#   expect_warning(
-#     calculate_mass_of_m(
-#       mz = 100,
-#       adduct_string = "[M+H]+",
-#       electron_mass = 0.001
-#     ),
-#     "differs from standard"
-#   )
-# })
-
 ## Multimer handling ----
 
 test_that("calculate_mass_of_m handles dimer correctly", {
@@ -275,22 +250,6 @@ test_that("calculate_mass_of_m handles triply charged ions", {
 })
 
 ## Isotopologues ----
-
-# test_that("calculate_mass_of_m handles M+1 isotopologue", {
-#   neutral_mass <- 200.0
-#   mz_m1 <- neutral_mass + 1 + 1.007 # M+1 plus proton
-#
-#   mass <- calculate_mass_of_m(mz = mz_m1, adduct_string = "[M1+H]+")
-#   expect_true(abs(mass - neutral_mass) < 1)
-# })
-
-# test_that("calculate_mass_of_m handles M+2 isotopologue", {
-#   neutral_mass <- 200.0
-#   mz_m2 <- neutral_mass + 2 + 1.007
-#
-#   mass <- calculate_mass_of_m(mz = mz_m2, adduct_string = "[M2+H]+")
-#   expect_true(abs(mass - neutral_mass) < 1)
-# })
 
 ## Complex modifications ----
 

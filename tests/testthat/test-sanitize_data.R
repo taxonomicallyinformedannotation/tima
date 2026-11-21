@@ -537,41 +537,6 @@ test_that("sanitize_sirius reports unzip extraction failures", {
   expect_true(any(grepl("Failed to extract ZIP", result$issues)))
 })
 
-# test_that("sanitize_sirius detects SIRIUS v5 format", {
-#   sirius_dir <- temp_test_path("sirius_v5")
-#   dir.create(sirius_dir, recursive = TRUE)
-#
-#   # Create v5 files (without _all suffix)
-#   write.table(
-#     data.frame(id = 1:3, formula = c("C6H12O6", "C10H15N", "C8H10N4O2")),
-#     file.path(sirius_dir, "formula_identifications.tsv"),
-#     sep = "\t",
-#     row.names = FALSE
-#   )
-#   write.table(
-#     data.frame(id = 1:3, class = c("A", "B", "C")),
-#     file.path(sirius_dir, "canopus_formula_summary.tsv"),
-#     sep = "\t",
-#     row.names = FALSE
-#   )
-#   write.table(
-#     data.frame(id = 1:3, structure = c("STR1", "STR2", "STR3")),
-#     file.path(sirius_dir, "structure_identifications.tsv"),
-#     sep = "\t",
-#     row.names = FALSE
-#   )
-#
-#   result <- sanitize_sirius(sirius_dir = sirius_dir)
-#
-#   # Debug output if failing
-#   if (!result$valid) {
-#     message("SIRIUS v5 validation issues: ", paste(result$issues, collapse = "; "))
-#   }
-#
-#   expect_true(result$valid)
-#   expect_equal(result$sirius_version, "5")
-# })
-
 ## sanitize_all_inputs Tests ----
 
 test_that("sanitize_all_inputs validates all inputs together", {

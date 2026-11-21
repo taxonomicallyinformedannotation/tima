@@ -131,7 +131,6 @@ test_that("export_output handles special characters in data", {
     "try quote=\"\" to avoid this warning.",
     fixed = TRUE
   )
-  # expect_equal(nrow(loaded), 3)
 })
 
 test_that("export_output overwrites existing files", {

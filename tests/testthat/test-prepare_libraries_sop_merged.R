@@ -872,7 +872,6 @@ test_that("prepare_libraries_sop_merged() merges multiple input files", {
   # Verify merged output
   keys <- tidytable::fread(output_key)
   expect_equal(nrow(keys), 2)
-  # expect_true(all(c("AAAAA", "BBBBB") %in% keys$structure_inchikey))
 })
 
 ## enrich_taxonomy_from_cache ----

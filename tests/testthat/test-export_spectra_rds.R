@@ -55,37 +55,6 @@ test_that("export_spectra_rds validates spectra parameter", {
   )
 })
 
-# test_that("export_spectra_rds handles empty spectra with no valid compound_id", {
-#   temp_file <- tempfile(fileext = ".rds")
-#
-#   # Create Spectra without compound_id
-#   spectra <- Spectra::Spectra()
-#
-#   expect_silent(result <- export_spectra_rds(file = temp_file, spectra = spectra))
-#   expect_null(result)
-#
-#   # File should not be created if no valid spectra
-#   expect_false(file.exists(temp_file))
-# })
-
-# test_that("export_spectra_rds handles spectra with NA compound_id", {
-#   temp_file <- tempfile(fileext = ".rds")
-#
-#   # Create Spectra with NA compound_id
-#   df <- data.frame(
-#     msLevel = 2L,
-#     precursorMz = 100.0,
-#     compound_id = NA_character_
-#   )
-#   spectra <- Spectra::Spectra(df)
-#
-#   expect_silent(result <- export_spectra_rds(file = temp_file, spectra = spectra))
-#   expect_null(result)
-#
-#   # File should not be created if no valid spectra
-#   expect_false(file.exists(temp_file))
-# })
-
 test_that("export_spectra_rds exports spectra with valid compound_id", {
   temp_file <- tempfile(fileext = ".rds")
 

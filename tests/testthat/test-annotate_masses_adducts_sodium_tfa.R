@@ -4,7 +4,6 @@
 # with correct adducts ([M-H2+Na]- and [M-H+C2HF3O2]-).
 
 library(testthat)
-library(tima)
 
 # Helper: Create features with specified m/z values and RT
 create_test_features <- function(

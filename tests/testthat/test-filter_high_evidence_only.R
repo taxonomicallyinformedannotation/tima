@@ -2,7 +2,6 @@
 
 library(testthat)
 
-filter_high_evidence_only <- filter_high_evidence_only
 test_that("filter_high_evidence_only handles empty input", {
   empty <- tidytable::tidytable()
   result <- filter_high_evidence_only(empty)

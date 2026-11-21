@@ -70,14 +70,6 @@ copy_fixture_to <- function(filename, dest) {
   new.env(parent = emptyenv())
 })
 
-log_helpers_path <- file.path("R", "logging_helpers.R")
-if (
-  file.exists(log_helpers_path) &&
-    !exists("log_info", envir = globalenv(), mode = "function")
-) {
-  sys.source(log_helpers_path, envir = globalenv())
-}
-
 get_test_root <- function() {
   # Prefer option set during setup; fall back to cached value or tempdir()
   root <- getOption("tima.test_root")
@@ -161,10 +153,6 @@ generate_fake_inchikey <- function(n = 1L, seed = NULL) {
 local_test_project <- function(copy = TRUE) {
   # Suppress logs during tests for cleaner output
   local_quiet_logging()
-
-  # if (isTRUE(copy)) {
-  #   copy_backbone(cache_dir = ".")
-  # }
 
   get_default_paths()
 }
@@ -340,189 +328,7 @@ create_similar_spectra <- function(
 
 ### Features and Annotations ----
 
-#' Create minimal features table for testing
-#'
-#' @description
-#' Generates a simple features table with required columns.
-#'
-#' @param n_features Integer. Number of features. Default: 10
-#' @param mz_range Numeric vector of length 2. m/z range. Default: c(100, 500)
-#' @param rt_range Numeric vector of length 2. RT range in minutes. Default: c(0, 10)
-#' @param include_rt Logical. If TRUE, includes a rt column with retention times.
-#'   Default: TRUE
-#' @param include_intensity Logical. If TRUE, includes an intensity column with random
-#'   intensity values. Default: TRUE
-#' @param include_adduct Logical. If TRUE, includes a column for adducts. Default: FALSE
-#' @param seed Integer. Random seed for reproducibility. Default: NULL
-#'
-#' @return data.frame with feature_id, mz, rt columns
-#'
-#' @examples
-#' features <- create_test_features(n_features = 100)
-create_test_features <- function(
-  n_features = 10L,
-  mz_range = c(100, 500),
-  rt_range = c(0, 10),
-  include_rt = TRUE,
-  include_intensity = TRUE,
-  include_adduct = FALSE,
-  seed = NULL
-) {
-  .with_seed(seed, {
-    df <- tidytable::tidytable(
-      feature_id = sprintf("FT%04d", seq_len(n_features)),
-      mz = runif(n_features, mz_range[1], mz_range[2])
-    )
-    if (include_rt) {
-      df$rt <- runif(n_features, rt_range[1], rt_range[2])
-    }
-    if (include_intensity) {
-      df$intensity <- runif(n_features, 1e3, 1e5)
-    }
-    if (include_adduct) {
-      df$adduct <- sample(c("[M+H]+", "[M+Na]+", "[M-H]-"), n_features, TRUE)
-    }
-    df
-  })
-}
-
-#' Create minimal annotations table for testing
-#'
-#' @description
-#' Generates a simple annotations table for testing weighting and filtering.
-#'
-#' @param n_annotations Integer. Number of annotation rows. Default: 20
-#' @param n_features Integer. Number of unique features. Default: 5
-#' @param seed Integer. Random seed for reproducibility. Default: NULL
-#'
-#' @return data.frame with annotation columns
-#'
-#' @examples
-#' annotations <- create_test_annotations(n_annotations = 50)
-create_test_annotations <- function(
-  n_annotations = 20L,
-  n_features = 5L,
-  seed = NULL
-) {
-  stopifnot(n_annotations >= n_features)
-  .with_seed(seed, {
-    tidytable::tidytable(
-      feature_id = sample(
-        sprintf("FT%04d", seq_len(n_features)),
-        n_annotations,
-        TRUE
-      ),
-      candidate_structure_inchikey = generate_fake_inchikey(n_annotations),
-      candidate_structure_smiles = replicate(
-        n_annotations,
-        paste(
-          sample(c("C", "O", "N", "=", "-", "(", ")"), 10, TRUE),
-          collapse = ""
-        )
-      ),
-      candidate_score_similarity = runif(n_annotations, 0, 1),
-      candidate_mass_error_ppm = runif(n_annotations, -10, 10)
-    )
-  })
-}
-
-#' Create minimal taxonomy table for testing
-#'
-#' @description
-#' Generates a simple taxonomy table for testing biological annotations.
-#'
-#' @param n_taxa Integer. Number of taxa. Default: 5
-#' @param seed Integer. Random seed for reproducibility. Default: NULL
-#'
-#' @return data.frame with organism and taxonomy columns
-#'
-#' @examples
-#' taxonomy <- create_test_taxonomy(n_taxa = 10)
-create_test_taxonomy <- function(n_taxa = 5L, seed = NULL) {
-  .with_seed(seed, {
-    genera <- c("Gentiana", "Arabidopsis", "Solanum", "Coffea", "Nicotiana")
-    species <- c("lutea", "thaliana", "tuberosum", "arabica", "tabacum")
-    tidytable::tidytable(
-      organism_name = paste(
-        sample(genera, n_taxa, TRUE),
-        sample(species, n_taxa, TRUE)
-      ),
-      organism_taxonomy_ottid = sample(100000:999999, n_taxa),
-      organism_taxonomy_01domain = "Eukaryota",
-      organism_taxonomy_02kingdom = "Plantae",
-      organism_taxonomy_03phylum = sample(
-        c("Tracheophyta", "Chlorophyta"),
-        n_taxa,
-        TRUE
-      ),
-      organism_taxonomy_06family = sample(
-        c("Gentianaceae", "Brassicaceae", "Solanaceae"),
-        n_taxa,
-        TRUE
-      )
-    )
-  })
-}
-
-### Integration Test Setup ----
-
-#' Setup complete test workflow with features, libraries, and metadata
-#'
-#' @description
-#' Creates a complete test environment with all necessary files for integration
-#' testing of the full annotation workflow.
-#'
-#' @param paths Named list. Default paths from local_test_project()
-#' @param download_examples Logical. Whether to download example files. Default: FALSE
-#'
-#' @return Invisible NULL (files are created in the test environment)
-#'
-#' @examples
-#' test_that("integration test", {
-#'   paths <- local_test_project()
-#'   setup_integration_workflow(paths)
-#'   # Run integration tests
-#' })
-setup_integration_workflow <- function(paths, download_examples = FALSE) {
-  if (download_examples) {
-    # Download example files
-    get_file(
-      url = paths$urls$examples$features,
-      export = paths$data$source$features
-    )
-    get_file(
-      url = paths$urls$examples$metadata,
-      export = paths$data$source$metadata
-    )
-  }
-
-  # Create fake libraries for faster testing
-  fake_lotus(export = paths$data$source$libraries$sop$lotus)
-  prepare_libraries_sop_lotus()
-
-  invisible(NULL)
-}
-
-
 ## Assertion Helpers ----
-
-#' Expect a valid InChIKey format
-#'
-#' @description
-#' Tests whether a string matches the InChIKey format pattern.
-#'
-#' @param inchikey Character vector to test
-#'
-#' @examples
-#' expect_valid_inchikey("LFQSCWFLJHTTHZ-UHFFFAOYSA-N")
-expect_valid_inchikey <- function(inchikey) {
-  pattern <- "^[A-Z]{14}-[A-Z]{10}-[A-Z]$"
-  testthat::expect_match(
-    object = inchikey,
-    regexp = pattern,
-    info = "Invalid InChIKey format"
-  )
-}
 
 #' Expect a data frame with required columns
 #'
@@ -597,64 +403,6 @@ load_fixture <- function(fixture_name, cache = TRUE) {
   fixture_data
 }
 
-#' Load MGF fixture
-#'
-#' @description
-#' Load a test MGF file from fixtures directory.
-#'
-#' @param fixture_name Character. Name of MGF file (with or without .mgf extension).
-#'   Available: "spectra_query.mgf", "spectra_library.mgf"
-#'
-#' @return Character path to the fixture file (read-only)
-#'
-#' @examples
-#' query_mgf <- load_mgf_fixture("spectra_query.mgf")
-#' lib_mgf <- load_mgf_fixture("spectra_library")
-load_mgf_fixture <- function(fixture_name) {
-  if (!grepl("\\.mgf$", fixture_name)) {
-    fixture_name <- paste0(fixture_name, ".mgf")
-  }
-
-  resolve_fixture_path(
-    fixture_name,
-    missing_msg = paste0(
-      "MGF fixture '",
-      fixture_name,
-      "' not found."
-    )
-  )
-}
-
-#' Copy MGF fixture to temp location for modification
-#'
-#' @description
-#' Copies an MGF fixture to a temporary location where it can be modified
-#' during tests without affecting the original fixture.
-#'
-#' @param fixture_name Character. Name of MGF file
-#' @param dest_name Character. Optional destination name. Default: same as source
-#'
-#' @return Character path to the copied file in temp directory
-#'
-#' @examples
-#' temp_mgf <- copy_mgf_fixture("spectra_query.mgf")
-copy_mgf_fixture <- function(fixture_name, dest_name = NULL) {
-  if (!grepl("\\.mgf$", fixture_name)) {
-    fixture_name <- paste0(fixture_name, ".mgf")
-  }
-
-  src <- load_mgf_fixture(fixture_name)
-
-  if (is.null(dest_name)) {
-    dest_name <- basename(fixture_name)
-  }
-
-  dest <- file.path(tempfile(), dest_name)
-  dir.create(dirname(dest), recursive = TRUE, showWarnings = FALSE)
-  file.copy(src, dest, overwrite = TRUE)
-  dest
-}
-
 ## CSV Fixture Loaders (Continued) ----
 
 #' Find package root directory
@@ -681,89 +429,6 @@ find_package_root <- function() {
     current_dir <- parent_dir
   }
 }
-
-#' Load all available fixtures
-#'
-#' @description
-#' Loads all CSV fixtures into a named list for convenient access.
-#'
-#' @return Named list of fixtures
-#'
-#' @examples
-#' fixtures <- load_all_fixtures()
-#' features <- fixtures$features
-#' annotations <- fixtures$annotations
-load_all_fixtures <- function() {
-  fixture_names <- c(
-    "annotations",
-    "features",
-    "edges",
-    "components",
-    "metadata",
-    "names",
-    "stereo",
-    "structure_organism_pairs",
-    "structure_taxonomy_cla",
-    "structure_taxonomy_npc"
-  )
-
-  fixtures <- lapply(
-    stats::setNames(object = fixture_names, nm = fixture_names),
-    load_fixture
-  )
-
-  fixtures
-}
-
-#' Create a test features table with edge connections
-#'
-#' @description
-#' Creates features and edges tables that are consistent with each other.
-#' Ensures edges reference existing features.
-#'
-#' @param n_features Integer. Number of features to create. Default: 10
-#' @param edge_density Numeric. Proportion of possible edges to create (0-1).
-#'   Default: 0.3
-#' @param seed Integer. Random seed. Default: NULL
-#'
-#' @return List with 'features' and 'edges' data frames
-#'
-#' @examples
-#' data <- create_features_with_edges(n_features = 20, edge_density = 0.2)
-#' features <- data$features
-#' edges <- data$edges
-create_features_with_edges <- function(
-  n_features = 10L,
-  edge_density = 0.3,
-  seed = NULL
-) {
-  .with_seed(seed, {
-    # Create features
-    features <- create_test_features(n_features = n_features, seed = seed)
-
-    # Create edges between features
-    feature_ids <- features$feature_id
-    n_possible_edges <- n_features * (n_features - 1) / 2
-    n_edges <- max(1L, round(n_possible_edges * edge_density))
-
-    # Generate unique pairs
-    pairs <- utils::combn(feature_ids, 2, simplify = FALSE)
-    selected_pairs <- sample(pairs, min(n_edges, length(pairs)))
-
-    edges <- tidytable::tidytable(
-      feature_source = vapply(selected_pairs, `[`, character(1), 1),
-      feature_target = vapply(selected_pairs, `[`, character(1), 2),
-      feature_spectrum_entropy = runif(length(selected_pairs), 0.5, 1.0),
-      cosine_similarity = runif(length(selected_pairs), 0.6, 0.99)
-    )
-
-    list(
-      features = features,
-      edges = edges
-    )
-  })
-}
-
 
 ## Extended Fixtures ----
 
@@ -901,22 +566,6 @@ create_fixture_yamls_params <- function(id = "TESTID") {
     )
   )
 }
-
-##  Usage Guide ----
-
-# Use create_empty_table() when:
-# - Testing input validation
-# - Need proper column structure but no data
-# Example: empty_annot <- create_empty_table("annotation")
-# Use create_minimal_data() when:
-# - Need 2-3 rows for simple logic tests
-# - Testing basic functionality
-# Example: features <- create_minimal_data("features", n_rows = 3)
-# Use create_test_*() functions when:
-# - Need programmatically generated data with optional deterministic seeding
-# - Testing with varying sizes/scenarios
-# Example: features <- create_test_features(n_features = 100, seed = 123)
-# Example: spectrum <- create_test_spectrum(n_peaks = 20, seed = 456)
 
 prepare_annotation_fixture_env <- function(
   feature_fixture,

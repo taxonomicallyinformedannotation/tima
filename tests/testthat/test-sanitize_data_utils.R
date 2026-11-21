@@ -1,10 +1,5 @@
 library(testthat)
 
-sanitize_mgf <- sanitize_mgf
-sanitize_csv <- sanitize_csv
-sanitize_metadata <- sanitize_metadata
-sanitize_sirius <- sanitize_sirius
-
 # ── sanitize_mgf ──────────────────────────────────────────────────────────────
 
 test_that("sanitize_mgf returns invalid for missing file", {

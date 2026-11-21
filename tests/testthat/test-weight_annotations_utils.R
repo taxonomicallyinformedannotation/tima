@@ -1,11 +1,5 @@
 library(testthat)
 
-validate_weight_annotations_inputs <- validate_weight_annotations_inputs
-load_annotation_tables <- load_annotation_tables
-load_edges_table <- load_edges_table
-load_structure_organism_pairs <- load_structure_organism_pairs
-log_annotation_stats <- log_annotation_stats
-
 # Helper: write a minimal TSV file and return its path
 make_tsv <- function(df, ...) {
   f <- tempfile(...)

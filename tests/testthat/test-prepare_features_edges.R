@@ -60,9 +60,6 @@ test_that("prepare_features_edges validates output parameter", {
     "must be a single character string",
     class = "tima_validation_error"
   )
-
-  # unlink(temp_ms1)
-  # unlink(temp_spectral)
 })
 
 test_that("prepare_features_edges validates column name parameters", {
@@ -94,9 +91,6 @@ test_that("prepare_features_edges validates column name parameters", {
     "Fix: Ensure the parameter is a length-1 character value",
     fixed = TRUE
   )
-
-  # unlink(temp_ms1)
-  # unlink(temp_spectral)
 })
 
 test_that("prepare_features_edges checks file existence", {
@@ -125,8 +119,6 @@ test_that("prepare_features_edges checks file existence", {
     "not found",
     class = "tima_validation_error"
   )
-
-  # unlink(temp_ms1)
 })
 
 test_that("prepare_features_edges combines ms1 and spectral edges", {
@@ -177,10 +169,6 @@ test_that("prepare_features_edges combines ms1 and spectral edges", {
   expect_gt(nrow(output_data), 0)
   expect_true("feature_source" %in% colnames(output_data))
   expect_true("feature_target" %in% colnames(output_data))
-
-  # unlink(temp_ms1)
-  # unlink(temp_spectral)
-  # unlink(temp_output)
 })
 
 test_that("prepare_features_edges extracts entropy information", {
@@ -226,10 +214,6 @@ test_that("prepare_features_edges extracts entropy information", {
   output_data <- tidytable::fread(temp_output)
   expect_true("feature_spectrum_entropy" %in% colnames(output_data))
   expect_true("feature_spectrum_peaks" %in% colnames(output_data))
-
-  # unlink(temp_ms1)
-  # unlink(temp_spectral)
-  # unlink(temp_output)
 })
 
 test_that("prepare_features_edges standardizes column names", {
@@ -275,10 +259,6 @@ test_that("prepare_features_edges standardizes column names", {
   expect_true("feature_target" %in% colnames(output_data))
   expect_false("SourceID" %in% colnames(output_data))
   expect_false("TargetID" %in% colnames(output_data))
-
-  # unlink(temp_ms1)
-  # unlink(temp_spectral)
-  # unlink(temp_output)
 })
 
 test_that("prepare_features_edges standardizes legacy similarity columns", {
@@ -372,10 +352,6 @@ test_that("prepare_features_edges handles empty input files", {
 
   expect_equal(result, temp_output)
   expect_true(file.exists(temp_output))
-
-  # unlink(temp_ms1)
-  # unlink(temp_spectral)
-  # unlink(temp_output)
 })
 
 test_that("prepare_features_edges fills missing target with source", {
@@ -414,10 +390,6 @@ test_that("prepare_features_edges fills missing target with source", {
   # Verify missing targets were filled
   output_data <- tidytable::fread(temp_output, na.strings = c("", "NA"))
   expect_true(!anyNA(output_data$feature_target))
-
-  # unlink(temp_ms1)
-  # unlink(temp_spectral)
-  # unlink(temp_output)
 })
 
 test_that("prepare_features_edges merges shared (source, target) edges and retains unmatched entropy self-loops", {

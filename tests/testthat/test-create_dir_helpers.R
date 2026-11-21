@@ -1,10 +1,5 @@
 library(testthat)
 
-extract_directory_path <- extract_directory_path
-ensure_directory_exists <- ensure_directory_exists
-verify_directory_writable <- verify_directory_writable
-
-
 test_that("extract_directory_path handles file and directory paths", {
   expect_equal(extract_directory_path("a/b/file.tsv"), "a/b")
   expect_equal(extract_directory_path("file.tsv"), ".")

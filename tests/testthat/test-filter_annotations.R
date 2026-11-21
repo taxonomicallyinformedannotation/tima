@@ -146,26 +146,6 @@ test_that("filter_annotations() skips RT filtering when features lack rt column"
   expect_true(file.exists(res))
 })
 
-# test_that("filter_annotations() runs with RT library and multiple annotation files", {
-#   ann1 <- tempfile(fileext = ".tsv")
-#   .make_ann(ann1)
-#   ann2 <- tempfile(fileext = ".tsv")
-#   .make_ann(ann2)
-#   feat <- tempfile(fileext = ".tsv")
-#   .make_feat(feat)
-#   rts <- tempfile(fileext = ".tsv")
-#   .make_rt(rts)
-#   out <- tempfile(fileext = ".tsv")
-#   res <- filter_annotations(
-#     annotations = c(ann1, ann2),
-#     features = feat,
-#     rts = rts,
-#     output = out,
-#     tolerance_rt = 0.1
-#   )
-#   expect_true(file.exists(res))
-# })
-
 test_that("filter_annotations() errors on invalid tolerance_rt with RT library", {
   ann <- tempfile(fileext = ".tsv")
   .make_ann(ann)
@@ -388,20 +368,6 @@ test_that("filter_ms1_redundancy handles no MS1 annotations", {
   expect_equal(nrow(result), 2)
   expect_true(all(result$candidate_library == "spectral"))
 })
-
-# test_that("filter_ms1_redundancy handles only MS1 annotations", {
-#   ms1_data <- tidytable::tidytable(
-#     feature_id = c("F1", "F2"),
-#     candidate_structure_inchikey_connectivity_layer = c("A", "B"),
-#     candidate_library = c("ms1", "ms1")
-#   )
-#
-#   ann_list <- list(ms1 = ms1_data)
-#
-#   result <- filter_ms1_redundancy(ann_list)
-#   expect_equal(nrow(result), 2)
-#   expect_true(all(result$candidate_library == "ms1"))
-# })
 
 test_that("apply_rt_filter computes RT errors without hard cutoff", {
   features_ann <- tidytable::tidytable(

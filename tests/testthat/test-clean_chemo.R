@@ -485,16 +485,6 @@ test_that("apply_percentile_filter handles multiple features independently", {
   expect_equal(nrow(result), 2)
 })
 
-# test_that("apply_percentile_filter with percentile = 1.0 keeps all", {
-#   df <- tidytable::tidytable(
-#     feature_id = c("F1", "F1", "F1"),
-#     score_weighted_chemo = c("1.0", "0.5", "0.1")
-#   )
-#
-#   result <- apply_percentile_filter(df, best_percentile = 1.0)
-#   expect_equal(nrow(result), 3)
-# })
-
 test_that("apply_percentile_filter with percentile = 0.0 keeps all", {
   df <- tidytable::tidytable(
     feature_id = c("F1", "F1", "F1"),
@@ -816,56 +806,6 @@ test_that("remove_compound_names keeps names when compounds_names=TRUE", {
   expect_true("candidate_structure_name" %in% names(result$mini))
 })
 # Integration Tests ----
-# test_that("clean_chemo handles empty annotation table", {
-#
-#   # Create proper fixture with empty tables that have the right structure
-#   components_table <- tidytable::tidytable(
-#     feature_id = character(),
-#     component_id = integer()
-#   )
-#
-#   features_table <- tidytable::tidytable(
-#     feature_id = character(),
-#     rt = numeric(),
-#     mz = numeric()
-#   )
-#
-#   structure_organism_pairs_table <- tidytable::tidytable(
-#     structure_inchikey_connectivity_layer = character(),
-#     organism_name = character()
-#   )
-#
-#   empty <- tidytable::tidytable()
-#
-#   result <- suppressWarnings(
-#     clean_chemo(
-#       annot_table_wei_chemo = empty,
-#       components_table = components_table,
-#       features_table = features_table,
-#       structure_organism_pairs_table = structure_organism_pairs_table,
-#       candidates_final = 5,
-#       best_percentile = 0.9,
-#       minimal_ms1_bio = 0.1,
-#       minimal_ms1_chemo = 0.1,
-#       minimal_ms1_condition = "OR",
-#       compounds_names = TRUE,
-#       high_evidence = FALSE,
-#       remove_ties = FALSE,
-#       summarize = FALSE,
-#       max_per_score = 7L,
-#       score_chemical_cla_kingdom = 0.1,
-#       score_chemical_cla_superclass = 0.2,
-#       score_chemical_cla_class = 0.3,
-#       score_chemical_cla_parent = 0.4,
-#       score_chemical_npc_pathway = 0.1,
-#       score_chemical_npc_superclass = 0.2,
-#       score_chemical_npc_class = 0.3
-#     )
-#   )
-#
-#   expect_s3_class(result, "data.frame")
-#   expect_equal(nrow(result), 0)
-# })
 
 test_that("clean_chemo normal", {
   fixture <- make_clean_chemo_fixture()

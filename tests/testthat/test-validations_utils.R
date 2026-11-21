@@ -15,24 +15,6 @@ with_temp_files <- function(n = 2L, expr) {
 }
 
 # validate_file_existence ----
-validate_file_existence <- validate_file_existence
-validate_ms_mode <- validate_ms_mode
-validate_tolerances <- validate_tolerances
-validate_dataframe <- validate_dataframe
-validate_numeric_range <- validate_numeric_range
-validate_weights <- validate_weights
-validate_choice <- validate_choice
-validate_adduct_list <- validate_adduct_list
-validate_character <- validate_character
-validate_logical <- validate_logical
-validate_list_or_vector <- validate_list_or_vector
-assert_flag <- assert_flag
-assert_positive_integer <- assert_positive_integer
-assert_scalar_numeric <- assert_scalar_numeric
-MAX_TOLERANCE_PPM <- MAX_TOLERANCE_PPM
-MAX_TOLERANCE_RT_ADDUCTS <- MAX_TOLERANCE_RT_ADDUCTS
-
-# validate_file_existence ----
 test_that("validate_file_existence errors on non-list and empty list", {
   expect_error(validate_file_existence("not a list"), "must be a named list")
   expect_error(validate_file_existence(list()), "cannot be empty")
@@ -74,7 +56,6 @@ test_that("validate_ms_mode accepts valid modes and rejects invalid", {
 test_that("validate_tolerances validates ranges and warns when exceeding", {
   expect_invisible(validate_tolerances(tolerance_ppm = 10, tolerance_rt = 0.05))
   expect_error(validate_tolerances(tolerance_ppm = 0), "must be positive")
-  # expect_error(validate_tolerances(tolerance_rt = 0), "must be positive")
   expect_warning(
     validate_tolerances(tolerance_ppm = MAX_TOLERANCE_PPM + 1),
     "exceeds recommended maximum"

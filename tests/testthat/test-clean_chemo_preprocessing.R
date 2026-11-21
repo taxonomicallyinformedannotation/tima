@@ -1,14 +1,5 @@
 library(testthat)
 
-validate_clean_chemo_inputs <- validate_clean_chemo_inputs
-filter_ms1_annotations <- filter_ms1_annotations
-rank_and_deduplicate <- rank_and_deduplicate
-apply_percentile_filter <- apply_percentile_filter
-count_candidates <- count_candidates
-compute_classyfire_taxonomy <- compute_classyfire_taxonomy
-compute_npclassifier_taxonomy <- compute_npclassifier_taxonomy
-compute_candidate_M <- compute_candidate_M
-
 base_annot <- function() {
   tidytable::tidytable(
     feature_id = c("F1", "F1", "F2"),

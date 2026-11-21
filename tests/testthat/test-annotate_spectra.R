@@ -562,42 +562,6 @@ test_that("filter_library_paths_by_polarity filters correctly", {
   expect_equal(length(result), 0)
 })
 
-# test_that("annotate_spectra handles multiple input files", {
-#   skip_on_cran()
-#   withr::local_dir(new = temp_test_dir("ann_spe_multi"))
-#   local_test_project(copy = TRUE)
-#
-#   # Create multiple query files
-#   query_dir <- dirname(get_params(step = "annotate_spectra")$files$spectral$raw[
-#     1
-#   ])
-#   dir.create(query_dir, recursive = TRUE, showWarnings = FALSE)
-#   query1 <- file.path(query_dir, "query1.mgf")
-#   query2 <- file.path(query_dir, "query2.mgf")
-#   write_minimal_mgf(query1, precursors = c(150))
-#   write_minimal_mgf(query2, precursors = c(200))
-#
-#   lib_path <- file.path(
-#     "data",
-#     "interim",
-#     "libraries",
-#     "spectra",
-#     "lib_pos.mgf"
-#   )
-#   write_minimal_mgf(lib_path, precursors = c(150, 200))
-#
-#   out <- annotate_spectra(
-#     input = c(query1, query2),
-#     libraries = list(pos = lib_path),
-#     polarity = "pos",
-#     threshold = 0
-#   )
-#
-#   expect_true(file.exists(out))
-#   df <- tidytable::fread(out)
-#   expect_true(nrow(df) >= 0)
-# })
-
 test_that("annotate_spectra handles empty library error", {
   skip_if_no_network("https://github.com")
   skip_on_cran()

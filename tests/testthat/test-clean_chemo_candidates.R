@@ -1,9 +1,4 @@
 library(testthat)
-sample_candidates_per_group <- sample_candidates_per_group
-remove_compound_names <- remove_compound_names
-coerce_score_columns <- coerce_score_columns
-enforce_cluster_entity_consensus <- enforce_cluster_entity_consensus
-prepare_ranked_candidates <- prepare_ranked_candidates
 
 # ── sample_candidates_per_group ───────────────────────────────────────────────
 

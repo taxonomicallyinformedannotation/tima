@@ -1,8 +1,5 @@
 library(testthat)
 
-validate_sop_merged_inputs <- validate_sop_merged_inputs
-apply_taxonomic_filter <- apply_taxonomic_filter
-
 # Helper: standard output paths
 std_outputs <- function() {
   list(

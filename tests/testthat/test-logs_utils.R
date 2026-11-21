@@ -397,10 +397,10 @@ test_that("logging does not create file on package load", {
   skip_if_not(exists(".onLoad", inherits = TRUE))
 
   # Get the .onLoad function
-  onLoad <- get(".onLoad") # nolint: object_name_linter.
+  onLoad <- get(".onLoad")
 
   # Convert to character to check it doesn't contain init_logging call
-  onLoad_body <- deparse(body(onLoad)) # nolint: object_name_linter.
+  onLoad_body <- deparse(body(onLoad))
 
   # Should NOT contain init_logging() call
   expect_false(any(grepl("init_logging\\(\\)", onLoad_body, fixed = FALSE)))

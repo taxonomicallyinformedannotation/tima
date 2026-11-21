@@ -1,10 +1,5 @@
 library(testthat)
 
-build_feature_pairs_within_rt <- build_feature_pairs_within_rt
-build_adduct_pair_differences <- build_adduct_pair_differences
-join_couples_with_neutral_losses <- join_couples_with_neutral_losses
-join_multi_with_addlossed <- join_multi_with_addlossed
-
 # ── build_feature_pairs_within_rt ─────────────────────────────────────────────
 
 test_that("build_feature_pairs_within_rt returns empty for no RT overlaps", {
