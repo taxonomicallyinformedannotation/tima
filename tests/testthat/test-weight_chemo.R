@@ -6,18 +6,34 @@ library(testthat)
 
 # Default parameters for weight_chemo to reduce duplication
 default_weight_chemo_params <- function() {
-  list(
-    weight_spectral = 0.33,
-    weight_biological = 0.33,
-    weight_chemical = 0.34,
-    score_chemical_cla_kingdom = 0.1,
-    score_chemical_cla_superclass = 0.2,
-    score_chemical_cla_class = 0.3,
-    score_chemical_cla_parent = 0.4,
-    score_chemical_npc_pathway = 0.5,
-    score_chemical_npc_superclass = 0.6,
-    score_chemical_npc_class = 0.7
+  c(
+    list(
+      weight_spectral = 0.33,
+      weight_biological = 0.33,
+      weight_chemical = 0.34
+    ),
+    default_chemo_scores(
+      score_chemical_cla_kingdom = 0.1,
+      score_chemical_cla_superclass = 0.2,
+      score_chemical_cla_class = 0.3,
+      score_chemical_cla_parent = 0.4,
+      score_chemical_npc_pathway = 0.5,
+      score_chemical_npc_superclass = 0.6,
+      score_chemical_npc_class = 0.7
+    )
   )
+}
+
+call_weight_chemo <- function(annot, ...) {
+  args <- c(
+    list(annot_table_wei_bio_clean = annot),
+    default_weight_chemo_params()
+  )
+  overrides <- list(...)
+  if (length(overrides) > 0L) {
+    args[names(overrides)] <- overrides
+  }
+  do.call(weight_chemo, args)
 }
 
 ## Input Validation ----
@@ -112,37 +128,13 @@ test_that("weight_chemo validates score ranges", {
 
   # Negative score
   expect_error(
-    weight_chemo(
-      annot_table_wei_bio_clean = annot_table,
-      weight_spectral = 0.33,
-      weight_biological = 0.33,
-      weight_chemical = 0.34,
-      score_chemical_cla_kingdom = -0.1,
-      score_chemical_cla_superclass = 0.2,
-      score_chemical_cla_class = 0.3,
-      score_chemical_cla_parent = 0.4,
-      score_chemical_npc_pathway = 0.5,
-      score_chemical_npc_superclass = 0.6,
-      score_chemical_npc_class = 0.7
-    ),
+    call_weight_chemo(annot_table, score_chemical_cla_kingdom = -0.1),
     "between 0 and 1"
   )
 
   # Score > 1
   expect_error(
-    weight_chemo(
-      annot_table_wei_bio_clean = annot_table,
-      weight_spectral = 0.33,
-      weight_biological = 0.33,
-      weight_chemical = 0.34,
-      score_chemical_cla_kingdom = 0.1,
-      score_chemical_cla_superclass = 1.5,
-      score_chemical_cla_class = 0.3,
-      score_chemical_cla_parent = 0.4,
-      score_chemical_npc_pathway = 0.5,
-      score_chemical_npc_superclass = 0.6,
-      score_chemical_npc_class = 0.7
-    ),
+    call_weight_chemo(annot_table, score_chemical_cla_superclass = 1.5),
     "between 0 and 1"
   )
 })
@@ -178,18 +170,11 @@ test_that("weight_chemo preserves per-level chemical scores", {
     score_biological = 0
   )
 
-  res <- weight_chemo(
-    annot_table_wei_bio_clean = annot_table,
+  res <- call_weight_chemo(
+    annot_table,
     weight_spectral = 0,
     weight_biological = 0,
-    weight_chemical = 1,
-    score_chemical_cla_kingdom = 0.1,
-    score_chemical_cla_superclass = 0.2,
-    score_chemical_cla_class = 0.3,
-    score_chemical_cla_parent = 0.4,
-    score_chemical_npc_pathway = 0.5,
-    score_chemical_npc_superclass = 0.6,
-    score_chemical_npc_class = 0.7
+    weight_chemical = 1
   )
 
   expect_true("score_chemical_1" %in% names(res))
@@ -233,19 +218,7 @@ test_that("weight_chemo penalizes missing evidence", {
     score_biological = c(0.9, NA_real_)
   )
 
-  res <- weight_chemo(
-    annot_table_wei_bio_clean = annot_table,
-    weight_spectral = 0.33,
-    weight_biological = 0.33,
-    weight_chemical = 0.34,
-    score_chemical_cla_kingdom = 0.1,
-    score_chemical_cla_superclass = 0.2,
-    score_chemical_cla_class = 0.3,
-    score_chemical_cla_parent = 0.4,
-    score_chemical_npc_pathway = 0.5,
-    score_chemical_npc_superclass = 0.6,
-    score_chemical_npc_class = 0.7
-  )
+  res <- call_weight_chemo(annot_table)
 
   scored <- res[order(res$score_weighted_chemo, decreasing = TRUE), ]
   expect_equal(scored$feature_id[1L], "F1")
@@ -285,13 +258,11 @@ test_that("weight_chemo assigns chemical scores from taxonomy matches", {
     score_biological = 0
   )
 
-  res <- weight_chemo(
-    annot_table_wei_bio_clean = annot_table,
+  res <- call_weight_chemo(
+    annot_table,
     weight_spectral = 0,
     weight_biological = 0,
     weight_chemical = 1,
-    score_chemical_cla_kingdom = 0.1,
-    score_chemical_cla_superclass = 0.2,
     score_chemical_cla_class = 0.7,
     score_chemical_cla_parent = 0.9,
     score_chemical_npc_pathway = 0.15,
@@ -423,15 +394,11 @@ test_that("weight_chemo combines ClassyFire and NPClassifier scores", {
     feature_target = character(0)
   )
 
-  res <- weight_chemo(
-    annot_table_wei_bio_clean = annot,
+  res <- call_weight_chemo(
+    annot,
     weight_spectral = 0,
     weight_biological = 0,
     weight_chemical = 1,
-    score_chemical_cla_kingdom = 0.1,
-    score_chemical_cla_superclass = 0.2,
-    score_chemical_cla_class = 0.3,
-    score_chemical_cla_parent = 0.4,
     score_chemical_npc_pathway = 0.1,
     score_chemical_npc_superclass = 0.2,
     score_chemical_npc_class = 0.3
@@ -500,15 +467,11 @@ test_that("weight_chemo matches $-delimited multi-token predictions without subs
     feature_pred_tax_npc_03cla_score = NA_real_
   )
 
-  res <- weight_chemo(
-    annot_table_wei_bio_clean = annot,
+  res <- call_weight_chemo(
+    annot,
     weight_spectral = 0,
     weight_biological = 0,
     weight_chemical = 1,
-    score_chemical_cla_kingdom = 0.1,
-    score_chemical_cla_superclass = 0.2,
-    score_chemical_cla_class = 0.3,
-    score_chemical_cla_parent = 0.4,
     score_chemical_npc_pathway = 0.15,
     score_chemical_npc_superclass = 0.25,
     score_chemical_npc_class = 0.35
@@ -538,15 +501,11 @@ test_that("weight_chemo matches $-delimited multi-token predictions without subs
 
   # Validation: negative weight summing to 1.0, invalid score_chemical_*, and weight_by_pred_score = TRUE
   expect_error(
-    weight_chemo(
-      annot_table_wei_bio_clean = annot,
+    call_weight_chemo(
+      annot,
       weight_spectral = -0.2,
       weight_biological = 0.6,
       weight_chemical = 0.6,
-      score_chemical_cla_kingdom = 0.1,
-      score_chemical_cla_superclass = 0.2,
-      score_chemical_cla_class = 0.3,
-      score_chemical_cla_parent = 0.4,
       score_chemical_npc_pathway = 0.1,
       score_chemical_npc_superclass = 0.2,
       score_chemical_npc_class = 0.3
@@ -555,15 +514,12 @@ test_that("weight_chemo matches $-delimited multi-token predictions without subs
     class = "tima_validation_error"
   )
   expect_error(
-    weight_chemo(
-      annot_table_wei_bio_clean = annot,
+    call_weight_chemo(
+      annot,
       weight_spectral = 0.2,
       weight_biological = 0.4,
       weight_chemical = 0.4,
       score_chemical_cla_kingdom = 1.5,
-      score_chemical_cla_superclass = 0.2,
-      score_chemical_cla_class = 0.3,
-      score_chemical_cla_parent = 0.4,
       score_chemical_npc_pathway = 0.1,
       score_chemical_npc_superclass = 0.2,
       score_chemical_npc_class = 0.3
@@ -572,14 +528,11 @@ test_that("weight_chemo matches $-delimited multi-token predictions without subs
     class = "tima_validation_error"
   )
   annot$feature_pred_tax_cla_04dirpar_score <- c(0.5, 0.5, 0.5)
-  res_pred <- weight_chemo(
-    annot_table_wei_bio_clean = annot,
+  res_pred <- call_weight_chemo(
+    annot,
     weight_spectral = 0,
     weight_biological = 0,
     weight_chemical = 1,
-    score_chemical_cla_kingdom = 0.1,
-    score_chemical_cla_superclass = 0.2,
-    score_chemical_cla_class = 0.3,
     score_chemical_cla_parent = 0.8,
     score_chemical_npc_pathway = 0.1,
     score_chemical_npc_superclass = 0.2,

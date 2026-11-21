@@ -8,108 +8,83 @@
 
 library(testthat)
 
+.tri_peaks <- function(mz) {
+  c(
+    paste0(round(mz * 0.5), " 50"),
+    paste0(round(mz * 0.75), " 200"),
+    paste0(round(mz), " 300")
+  )
+}
+
 # Helper: write a valid MS2 library MGF used as the matching target.
 .write_lib_mgf <- function(path, precursors) {
-  dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
-  lines <- unlist(
-    lapply(seq_along(precursors), function(i) {
-      mz <- precursors[[i]]
-      c(
-        "BEGIN IONS",
-        paste0("TITLE=Lib_", i),
-        paste0("PEPMASS=", mz),
-        "CHARGE=1+",
-        "MSLEVEL=2",
-        "SMILES=CCO",
-        paste0(round(mz * 0.5), " 50"),
-        paste0(round(mz * 0.75), " 200"),
-        paste0(round(mz), " 300"),
-        "END IONS",
-        ""
-      )
-    }),
-    use.names = FALSE
-  )
-  writeLines(lines, path)
-  invisible(path)
+  lines <- lapply(seq_along(precursors), function(i) {
+    mz <- precursors[[i]]
+    format_mgf_block(
+      pepmass = mz,
+      peaks = .tri_peaks(mz),
+      title = paste0("Lib_", i),
+      mslevel = "2",
+      extra_headers = "SMILES=CCO",
+      trailing_blank = TRUE
+    )
+  })
+  write_test_mgf(lines, path)
 }
 
 # Helper: write an MS1-only MGF (MSLEVEL=1, peak lines present but MS1)
 .write_ms1_only_mgf <- function(path, n = 2L) {
-  dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
-  lines <- unlist(
-    lapply(seq_len(n), function(i) {
-      mz <- 100 + i * 50
-      c(
-        "BEGIN IONS",
-        paste0("TITLE=id:", i, ", mz:", mz),
-        paste0("PEPMASS=", mz),
-        "CHARGE=1+",
-        "MSLEVEL=1",
-        paste0(round(mz * 0.5), " 100"),
-        paste0(round(mz), " 500"),
-        "END IONS",
-        ""
-      )
-    }),
-    use.names = FALSE
-  )
-  writeLines(lines, path)
-  invisible(path)
+  lines <- lapply(seq_len(n), function(i) {
+    mz <- 100 + i * 50
+    format_mgf_block(
+      pepmass = mz,
+      peaks = c(paste0(round(mz * 0.5), " 100"), paste0(round(mz), " 500")),
+      title = paste0("id:", i, ", mz:", mz),
+      mslevel = "1",
+      trailing_blank = TRUE
+    )
+  })
+  write_test_mgf(lines, path)
 }
 
 # Helper: write a mixed MGF (one MS1 + one MS2 sharing a precursor with lib)
 .write_mixed_mgf <- function(path, ms1_mz, ms2_mz) {
-  dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
-  lines <- c(
-    "BEGIN IONS",
-    paste0("TITLE=id:1, mz:", ms1_mz),
-    paste0("PEPMASS=", ms1_mz),
-    "CHARGE=1+",
-    "MSLEVEL=1",
-    paste0(round(ms1_mz * 0.5), " 100"),
-    "END IONS",
-    "",
-    "BEGIN IONS",
-    paste0("TITLE=id:2, mz:", ms2_mz),
-    paste0("PEPMASS=", ms2_mz),
-    "CHARGE=1+",
-    "MSLEVEL=2",
-    paste0(round(ms2_mz * 0.5), " 50"),
-    paste0(round(ms2_mz * 0.75), " 200"),
-    paste0(round(ms2_mz), " 300"),
-    "END IONS",
-    ""
+  write_test_mgf(
+    c(
+      format_mgf_block(
+        pepmass = ms1_mz,
+        peaks = paste0(round(ms1_mz * 0.5), " 100"),
+        title = paste0("id:1, mz:", ms1_mz),
+        mslevel = "1",
+        trailing_blank = TRUE
+      ),
+      format_mgf_block(
+        pepmass = ms2_mz,
+        peaks = .tri_peaks(ms2_mz),
+        title = paste0("id:2, mz:", ms2_mz),
+        mslevel = "2",
+        trailing_blank = TRUE
+      )
+    ),
+    path
   )
-  writeLines(lines, path)
-  invisible(path)
 }
 
 # Helper: a tiny well-formed MS2 query MGF for regression checks.
 # Uses the same peak pattern as the library so identical spectra yield
 # a similarity of 1 (after precursor-peak filtering).
 .write_ms2_mgf <- function(path, precursors) {
-  dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
-  lines <- unlist(
-    lapply(seq_along(precursors), function(i) {
-      mz <- precursors[[i]]
-      c(
-        "BEGIN IONS",
-        paste0("TITLE=id:", i),
-        paste0("PEPMASS=", mz),
-        "CHARGE=1+",
-        "MSLEVEL=2",
-        paste0(round(mz * 0.5), " 50"),
-        paste0(round(mz * 0.75), " 200"),
-        paste0(round(mz), " 300"),
-        "END IONS",
-        ""
-      )
-    }),
-    use.names = FALSE
-  )
-  writeLines(lines, path)
-  invisible(path)
+  lines <- lapply(seq_along(precursors), function(i) {
+    mz <- precursors[[i]]
+    format_mgf_block(
+      pepmass = mz,
+      peaks = .tri_peaks(mz),
+      title = paste0("id:", i),
+      mslevel = "2",
+      trailing_blank = TRUE
+    )
+  })
+  write_test_mgf(lines, path)
 }
 
 # ── MS1-only MGF ──────────────────────────────────────────────────────────────

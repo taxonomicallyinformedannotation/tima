@@ -2,50 +2,10 @@
 
 library(testthat)
 
-## Internal Utility Helpers ----
-
-#' Stage structure fixtures for mzmine annotation tests
-#'
-#' @param root Root directory for staging
-#' @return Named list of structure file paths
-stage_mzmine_structure_fixtures <- function(
-  root = temp_test_dir("prep_mzmine_structures")
-) {
-  # Create directory structure
-  dir.create(
-    file.path(root, "structures", "taxonomies"),
-    recursive = TRUE,
-    showWarnings = FALSE
-  )
-
-  # Define target paths
-  stereo <- file.path(root, "structures", "stereo.tsv")
-  met <- file.path(root, "structures", "metadata.tsv")
-  nam <- file.path(root, "structures", "names.tsv")
-  cla <- file.path(root, "structures", "taxonomies", "classyfire.tsv")
-  npc <- file.path(root, "structures", "taxonomies", "npc.tsv")
-
-  # Copy fixtures
-  copy_fixture_to("structures_stereo.csv", stereo)
-  copy_fixture_to("structures_metadata.csv", met)
-  copy_fixture_to("structures_names.csv", nam)
-  copy_fixture_to("structures_taxonomy_cla.csv", cla)
-  copy_fixture_to("structures_taxonomy_npc.csv", npc)
-
-  list(
-    root = root,
-    stereo = stereo,
-    met = met,
-    nam = nam,
-    cla = cla,
-    npc = npc
-  )
-}
-
 ## Validation ----
 
 test_that("test-prepare_annotations_mzmine validates output path", {
-  s <- stage_mzmine_structure_fixtures()
+  s <- stage_structure_fixtures("prep_mzmine_structures")
   withr::local_dir(new = as.character(s$root))
 
   expect_error(
@@ -82,7 +42,7 @@ test_that("test-prepare_annotations_mzmine validates structure file paths", {
 ## Behavior ----
 
 test_that("test-prepare_annotations_mzmine handles missing input files by creating empty output", {
-  s <- stage_mzmine_structure_fixtures()
+  s <- stage_structure_fixtures("prep_mzmine_structures")
   withr::local_dir(new = as.character(s$root))
 
   out <- temp_test_path("mzmine_empty.tsv")
@@ -101,7 +61,7 @@ test_that("test-prepare_annotations_mzmine handles missing input files by creati
 })
 
 test_that("test-prepare_annotations_mzmine processes minimal valid mzmine file", {
-  s <- stage_mzmine_structure_fixtures()
+  s <- stage_structure_fixtures("prep_mzmine_structures")
   withr::local_dir(new = as.character(s$root))
   out <- temp_test_path("mzmine_valid.tsv")
 
@@ -135,7 +95,7 @@ test_that("test-prepare_annotations_mzmine processes minimal valid mzmine file",
 })
 
 test_that("test-prepare_annotations_mzmine handles empty input vector", {
-  s <- stage_mzmine_structure_fixtures()
+  s <- stage_structure_fixtures("prep_mzmine_structures")
   withr::local_dir(new = as.character(s$root))
   out <- temp_test_path("mzmine_empty_vec.tsv")
 
@@ -154,7 +114,7 @@ test_that("test-prepare_annotations_mzmine handles empty input vector", {
 })
 
 test_that("test-prepare_annotations_mzmine handles multiple input files", {
-  s <- stage_mzmine_structure_fixtures()
+  s <- stage_structure_fixtures("prep_mzmine_structures")
   withr::local_dir(new = as.character(s$root))
   out <- temp_test_path("mzmine_multi.tsv")
 

@@ -391,49 +391,36 @@ test_that("create_edges_spectra degrades gracefully on MS1-only MGF", {
     "spectra",
     "lib_pos.mgf"
   )
-  dir.create(dirname(lib_mgf), recursive = TRUE, showWarnings = FALSE)
-  writeLines(
-    c(
-      "BEGIN IONS",
-      "TITLE=Lib_1",
-      "PEPMASS=200",
-      "CHARGE=1+",
-      "MSLEVEL=2",
-      "SMILES=CCO",
-      "100 50",
-      "150 200",
-      "200 300",
-      "END IONS",
-      ""
+  write_test_mgf(
+    format_mgf_block(
+      pepmass = 200,
+      peaks = c("100 50", "150 200", "200 300"),
+      title = "Lib_1",
+      mslevel = "2",
+      extra_headers = "SMILES=CCO",
+      trailing_blank = TRUE
     ),
     lib_mgf
   )
 
   # Query: a pure MS1-only MGF (MSLEVEL=1, no MS2)
-  query_mgf <- file.path(
-    paths$data$source$spectra
-  )
-  dir.create(dirname(query_mgf), recursive = TRUE, showWarnings = FALSE)
-  writeLines(
+  query_mgf <- file.path(paths$data$source$spectra)
+  write_test_mgf(
     c(
-      "BEGIN IONS",
-      "TITLE=peak1",
-      "PEPMASS=251.0",
-      "CHARGE=1+",
-      "MSLEVEL=1",
-      "125.5 100",
-      "251 500",
-      "END IONS",
-      "",
-      "BEGIN IONS",
-      "TITLE=peak2",
-      "PEPMASS=300.0",
-      "CHARGE=1+",
-      "MSLEVEL=1",
-      "150 100",
-      "300 500",
-      "END IONS",
-      ""
+      format_mgf_block(
+        pepmass = "251.0",
+        peaks = c("125.5 100", "251 500"),
+        title = "peak1",
+        mslevel = "1",
+        trailing_blank = TRUE
+      ),
+      format_mgf_block(
+        pepmass = "300.0",
+        peaks = c("150 100", "300 500"),
+        title = "peak2",
+        mslevel = "1",
+        trailing_blank = TRUE
+      )
     ),
     query_mgf
   )

@@ -2,20 +2,37 @@
 
 library(testthat)
 
-test_that("prepare_libraries_spectra() validates nam_lib parameter", {
-  tmpfile <- tempfile(fileext = ".mgf")
-  # Create a minimal valid MGF file
-  writeLines(
-    c(
-      "BEGIN IONS",
-      "TITLE=Spectrum1",
-      "PEPMASS=100.0",
-      "50.0 100",
-      "60.0 200",
-      "END IONS"
+.make_lib_spec_mgf <- function(
+  title = "Spec1",
+  peaks = c("50 200", "150 200", "250 200"),
+  .local_envir = parent.frame()
+) {
+  local_test_mgf(
+    format_mgf_block(
+      pepmass = "150.05",
+      peaks = peaks,
+      title = title,
+      extra_headers = c(
+        "IONMODE=pos",
+        "EXACTMASS=149.05",
+        "SPECTRUMID=CCMSLIB0123456789",
+        "FILENAME=Compound1",
+        "NAME=Compound1",
+        "INCHIKEY=AAAAAA-BBBBBB-N",
+        "SMILES=CCC"
+      )
     ),
-    tmpfile
+    .local_envir = .local_envir
   )
+}
+
+test_that("prepare_libraries_spectra() validates nam_lib parameter", {
+  tmpfile <- local_test_mgf(format_mgf_block(
+    pepmass = "100.0",
+    peaks = c("50.0 100", "60.0 200"),
+    title = "Spectrum1",
+    charge = NULL
+  ))
 
   expect_error(
     prepare_libraries_spectra(
@@ -26,19 +43,12 @@ test_that("prepare_libraries_spectra() validates nam_lib parameter", {
 })
 
 test_that("prepare_libraries_spectra() validates column name parameters", {
-  tmpfile <- tempfile(fileext = ".mgf")
-  writeLines(
-    c(
-      "BEGIN IONS",
-      "TITLE=Spectrum1",
-      "PEPMASS=100.0",
-      "50.0 100",
-      "100.0 100",
-      "150.0 100",
-      "END IONS"
-    ),
-    tmpfile
-  )
+  tmpfile <- local_test_mgf(format_mgf_block(
+    pepmass = "100.0",
+    peaks = c("50.0 100", "100.0 100", "150.0 100"),
+    title = "Spectrum1",
+    charge = NULL
+  ))
 
   expect_error(
     prepare_libraries_spectra(
@@ -50,74 +60,17 @@ test_that("prepare_libraries_spectra() validates column name parameters", {
 
 test_that("prepare_libraries_spectra() prepares a single library MGF successfully", {
   withr::local_dir(new = temp_test_dir("prepare_libraries_spectra_1"))
-  mgf <- tempfile(fileext = ".mgf")
-  writeLines(
-    c(
-      "BEGIN IONS",
-      "TITLE=Spec1",
-      "PEPMASS=150.05",
-      "CHARGE=1+",
-      "IONMODE=pos",
-      "EXACTMASS=149.05",
-      "SPECTRUMID=CCMSLIB0123456789",
-      "FILENAME=Compound1",
-      "NAME=Compound1",
-      "INCHIKEY=AAAAAA-BBBBBB-N",
-      "SMILES=CCC",
-      "50 200",
-      "150 200",
-      "250 200",
-      "END IONS"
-    ),
-    mgf
-  )
+  mgf <- .make_lib_spec_mgf()
   res <- prepare_libraries_spectra(input = mgf, nam_lib = "TEST_LIB")
   expect_type(res, "character")
 })
 
 test_that("prepare_libraries_spectra() handles multiple input files", {
   withr::local_dir(new = temp_test_dir("prepare_libraries_spectra_2"))
-  mgf1 <- tempfile(fileext = ".mgf")
-  mgf2 <- tempfile(fileext = ".mgf")
-  writeLines(
-    c(
-      "BEGIN IONS",
-      "TITLE=Spec1",
-      "PEPMASS=150.05",
-      "CHARGE=1+",
-      "IONMODE=pos",
-      "EXACTMASS=149.05",
-      "SPECTRUMID=CCMSLIB0123456789",
-      "FILENAME=Compound1",
-      "NAME=Compound1",
-      "INCHIKEY=AAAAAA-BBBBBB-N",
-      "SMILES=CCC",
-      "50 200",
-      "150 200",
-      "250 200",
-      "END IONS"
-    ),
-    mgf1
-  )
-  writeLines(
-    c(
-      "BEGIN IONS",
-      "TITLE=Spec2",
-      "PEPMASS=150.05",
-      "CHARGE=1+",
-      "IONMODE=pos",
-      "EXACTMASS=149.05",
-      "SPECTRUMID=CCMSLIB0123456789",
-      "FILENAME=Compound1",
-      "NAME=Compound1",
-      "INCHIKEY=AAAAAA-BBBBBB-N",
-      "SMILES=CCC",
-      "51 200",
-      "151 200",
-      "251 200",
-      "END IONS"
-    ),
-    mgf2
+  mgf1 <- .make_lib_spec_mgf(title = "Spec1")
+  mgf2 <- .make_lib_spec_mgf(
+    title = "Spec2",
+    peaks = c("51 200", "151 200", "251 200")
   )
   res <- prepare_libraries_spectra(input = c(mgf1, mgf2), nam_lib = "MULTI")
   expect_type(res, "character")
@@ -125,27 +78,7 @@ test_that("prepare_libraries_spectra() handles multiple input files", {
 
 test_that("prepare_libraries_spectra() runs when optional columns are absent", {
   withr::local_dir(new = temp_test_dir("prepare_libraries_spectra_3"))
-  mgf <- tempfile(fileext = ".mgf")
-  writeLines(
-    c(
-      "BEGIN IONS",
-      "TITLE=Spec1",
-      "PEPMASS=150.05",
-      "CHARGE=1+",
-      "IONMODE=pos",
-      "EXACTMASS=149.05",
-      "SPECTRUMID=CCMSLIB0123456789",
-      "FILENAME=Compound1",
-      "NAME=Compound1",
-      "INCHIKEY=AAAAAA-BBBBBB-N",
-      "SMILES=CCC",
-      "50 200",
-      "150 200",
-      "250 200",
-      "END IONS"
-    ),
-    mgf
-  )
+  mgf <- .make_lib_spec_mgf()
   res <- prepare_libraries_spectra(input = mgf, nam_lib = "NO_META")
   expect_type(res, "character")
 })

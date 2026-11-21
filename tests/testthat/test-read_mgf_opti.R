@@ -4,25 +4,17 @@
 
 library(testthat)
 
-write_mgf <- function(blocks) {
-  tf <- tempfile(fileext = ".mgf")
-  writeLines(unlist(blocks), tf)
-  tf
-}
-
 minimal_block <- function(
   title = "Spec1",
   pepmass = "100 123",
   charge = "2+",
   peaks = c("100 10", "101 20")
 ) {
-  c(
-    "BEGIN IONS",
-    paste0("TITLE=", title),
-    paste0("PEPMASS=", pepmass),
-    paste0("CHARGE=", charge),
-    peaks,
-    "END IONS"
+  format_mgf_block(
+    pepmass = pepmass,
+    peaks = peaks,
+    title = title,
+    charge = charge
   )
 }
 
@@ -43,8 +35,7 @@ test_that("read_mgf_opti errors on empty path", {
 # ---- single spectrum ---------------------------------------------------------
 
 test_that("read_mgf_opti reads a minimal single-spectrum MGF", {
-  tf <- write_mgf(minimal_block())
-  on.exit(unlink(tf))
+  tf <- local_test_mgf(minimal_block())
 
   res <- read_mgf_opti(f = tf, msLevel = 2L)
   expect_s4_class(res, "DataFrame")
@@ -57,24 +48,21 @@ test_that("read_mgf_opti reads a minimal single-spectrum MGF", {
 # ---- charge formatting -------------------------------------------------------
 
 test_that("read_mgf_opti strips trailing + from charge", {
-  tf <- write_mgf(minimal_block(charge = "2+"))
-  on.exit(unlink(tf))
+  tf <- local_test_mgf(minimal_block(charge = "2+"))
 
   res <- read_mgf_opti(f = tf)
   expect_equal(as.character(res$precursorCharge[[1L]]), "2")
 })
 
 test_that("read_mgf_opti prefixes negative charge with minus", {
-  tf <- write_mgf(minimal_block(charge = "1-"))
-  on.exit(unlink(tf))
+  tf <- local_test_mgf(minimal_block(charge = "1-"))
 
   res <- read_mgf_opti(f = tf)
   expect_equal(as.character(res$precursorCharge[[1L]]), "-1")
 })
 
 test_that("read_mgf_opti handles leading-minus charge convention", {
-  tf <- write_mgf(minimal_block(charge = "-1"))
-  on.exit(unlink(tf))
+  tf <- local_test_mgf(minimal_block(charge = "-1"))
 
   res <- read_mgf_opti(f = tf)
   expect_equal(as.character(res$precursorCharge[[1L]]), "-1")
@@ -83,8 +71,7 @@ test_that("read_mgf_opti handles leading-minus charge convention", {
 # ---- PEPMASS without intensity -----------------------------------------------
 
 test_that("read_mgf_opti handles PEPMASS without intensity column", {
-  tf <- write_mgf(minimal_block(pepmass = "123.456"))
-  on.exit(unlink(tf))
+  tf <- local_test_mgf(minimal_block(pepmass = "123.456"))
 
   res <- read_mgf_opti(f = tf)
   expect_s4_class(res, "DataFrame")
@@ -94,8 +81,7 @@ test_that("read_mgf_opti handles PEPMASS without intensity column", {
 # ---- unsorted peaks ----------------------------------------------------------
 
 test_that("read_mgf_opti sorts peaks by m/z", {
-  tf <- write_mgf(minimal_block(peaks = c("200 5", "50 10", "100 20")))
-  on.exit(unlink(tf))
+  tf <- local_test_mgf(minimal_block(peaks = c("200 5", "50 10", "100 20")))
 
   res <- read_mgf_opti(f = tf)
   mz_vals <- as.numeric(unlist(res$mz[[1L]]))
@@ -105,7 +91,7 @@ test_that("read_mgf_opti sorts peaks by m/z", {
 # ---- multi-spectrum ----------------------------------------------------------
 
 test_that("read_mgf_opti reads multiple spectra in order", {
-  tf <- write_mgf(c(
+  tf <- local_test_mgf(c(
     minimal_block(
       title = "Spec1",
       pepmass = "100 10",
@@ -117,7 +103,6 @@ test_that("read_mgf_opti reads multiple spectra in order", {
       peaks = c("90 3", "110 4")
     )
   ))
-  on.exit(unlink(tf))
 
   res <- read_mgf_opti(f = tf)
   expect_equal(nrow(res), 2L)
@@ -126,11 +111,10 @@ test_that("read_mgf_opti reads multiple spectra in order", {
 # ---- msLevel is propagated ---------------------------------------------------
 
 test_that("read_mgf_opti assigns the msLevel argument to all rows", {
-  tf <- write_mgf(c(
+  tf <- local_test_mgf(c(
     minimal_block(title = "A"),
     minimal_block(title = "B")
   ))
-  on.exit(unlink(tf))
 
   res <- read_mgf_opti(f = tf, msLevel = 2L)
   expect_true(all(res$msLevel == 2L))
@@ -139,8 +123,7 @@ test_that("read_mgf_opti assigns the msLevel argument to all rows", {
 # ---- dataOrigin is set -------------------------------------------------------
 
 test_that("read_mgf_opti sets dataOrigin to the file path", {
-  tf <- write_mgf(minimal_block())
-  on.exit(unlink(tf))
+  tf <- local_test_mgf(minimal_block())
 
   res <- read_mgf_opti(f = tf)
   expect_equal(as.character(res$dataOrigin[[1L]]), tf)
@@ -150,27 +133,25 @@ test_that("read_mgf_opti sets dataOrigin to the file path", {
 
 test_that("read_mgf_opti silently skips spectra with no fragment peaks", {
   # Mix of spectra: one with peaks, one empty, one with peaks
-  tf <- write_mgf(c(
+  tf <- local_test_mgf(c(
     minimal_block(
       title = "Spectrum_1_with_peaks",
       peaks = c("100 10", "101 20")
     ),
     # Empty spectrum: only headers, no peak lines
-    c(
-      "BEGIN IONS",
-      "TITLE=id:6, rt:89.22, mz:85.0293, energy:nan, sample_id:61, scan_id:1306",
-      "FEATURE_ID=7",
-      "PEPMASS=85.0293",
-      "RTINSECONDS=89.22",
-      "MSLEVEL=2",
-      "END IONS"
+    format_mgf_block(
+      title = "id:6, rt:89.22, mz:85.0293, energy:nan, sample_id:61, scan_id:1306",
+      pepmass = "85.0293",
+      charge = NULL,
+      mslevel = "2",
+      extra_headers = c("FEATURE_ID=7", "RTINSECONDS=89.22"),
+      peaks = character(0)
     ),
     minimal_block(
       title = "Spectrum_3_with_peaks",
       peaks = c("150 30", "151 40")
     )
   ))
-  on.exit(unlink(tf))
 
   res <- read_mgf_opti(f = tf)
   # Should have 2 spectra (empty one skipped), not 3
@@ -182,23 +163,22 @@ test_that("read_mgf_opti silently skips spectra with no fragment peaks", {
 })
 
 test_that("read_mgf_opti returns an empty DataFrame when all spectra are empty", {
-  tf <- write_mgf(c(
-    c(
-      "BEGIN IONS",
-      "TITLE=Empty1",
-      "PEPMASS=101.0",
-      "MSLEVEL=2",
-      "END IONS"
+  tf <- local_test_mgf(c(
+    format_mgf_block(
+      title = "Empty1",
+      pepmass = "101.0",
+      charge = NULL,
+      mslevel = "2",
+      peaks = character(0)
     ),
-    c(
-      "BEGIN IONS",
-      "TITLE=Empty2",
-      "PEPMASS=202.0",
-      "MSLEVEL=2",
-      "END IONS"
+    format_mgf_block(
+      title = "Empty2",
+      pepmass = "202.0",
+      charge = NULL,
+      mslevel = "2",
+      peaks = character(0)
     )
   ))
-  on.exit(unlink(tf))
 
   res <- read_mgf_opti(f = tf)
   expect_s4_class(res, "DataFrame")
@@ -209,7 +189,7 @@ test_that("read_mgf_opti returns an empty DataFrame when all spectra are empty",
 })
 
 test_that("read_mgf_opti handles tabs, extra peak columns, comments, and duplicate keys", {
-  tf <- write_mgf(list(
+  tf <- local_test_mgf(list(
     c(
       "  BEGIN IONS  ",
       "# comment line inside block",
@@ -223,7 +203,6 @@ test_that("read_mgf_opti handles tabs, extra peak columns, comments, and duplica
       "END IONS"
     )
   ))
-  on.exit(unlink(tf))
 
   res <- read_mgf_opti(f = tf)
   expect_equal(nrow(res), 1L)
@@ -236,7 +215,7 @@ test_that("read_mgf_opti handles tabs, extra peak columns, comments, and duplica
 })
 
 test_that("read_mgf_metadata parses fields without peaks and keeps first duplicate key", {
-  tf <- write_mgf(list(
+  tf <- local_test_mgf(list(
     c(
       "BEGIN IONS",
       "  title = SpecA  ",
@@ -253,7 +232,6 @@ test_that("read_mgf_metadata parses fields without peaks and keeps first duplica
       "END IONS"
     )
   ))
-  on.exit(unlink(tf))
 
   meta <- read_mgf_metadata(tf)
   expect_equal(nrow(meta), 2L)
@@ -269,27 +247,27 @@ test_that("read_mgf_metadata parses fields without peaks and keeps first duplica
     "MGF file not found"
   )
 
-  tf_comment_only <- write_mgf(list(c("BEGIN IONS", "# comment", "END IONS")))
-  on.exit(unlink(tf_comment_only), add = TRUE)
+  tf_comment_only <- local_test_mgf(list(c(
+    "BEGIN IONS",
+    "# comment",
+    "END IONS"
+  )))
   expect_equal(nrow(read_mgf_opti(tf_comment_only)), 0L)
   expect_equal(nrow(read_mgf_metadata(tf_comment_only)), 0L)
 
-  tf_bad_peaks <- write_mgf(list(c("BEGIN IONS", "100.0", "END IONS")))
-  on.exit(unlink(tf_bad_peaks), add = TRUE)
+  tf_bad_peaks <- local_test_mgf(list(c("BEGIN IONS", "100.0", "END IONS")))
   expect_equal(nrow(read_mgf_opti(tf_bad_peaks)), 0L)
 
-  tf_no_desc <- write_mgf(list(
+  tf_no_desc <- local_test_mgf(list(
     c("BEGIN IONS", "bad_peak_line", "100.0 50.0", "END IONS")
   ))
-  on.exit(unlink(tf_no_desc), add = TRUE)
   res_no_desc <- read_mgf_opti(tf_no_desc)
   expect_equal(nrow(res_no_desc), 1L)
   expect_true(is.na(res_no_desc$precursorMz[[1L]]))
 
-  tf_pm_extra <- write_mgf(list(
+  tf_pm_extra <- local_test_mgf(list(
     c("BEGIN IONS", "PEPMASS=150.0 200.0 2", "100.0 50.0", "END IONS")
   ))
-  on.exit(unlink(tf_pm_extra), add = TRUE)
   res_pm_extra <- read_mgf_opti(tf_pm_extra)
   expect_equal(res_pm_extra$precursorMz[[1L]], 150.0)
   expect_equal(res_pm_extra$precursorIntensity[[1L]], 200.0)

@@ -2,50 +2,10 @@
 
 library(testthat)
 
-## Internal Utility Helpers ----
-
-#' Stage structure fixtures for SIRIUS annotation tests
-#'
-#' @param root Root directory for staging
-#' @return Named list of structure file paths
-stage_structure_fixtures <- function(
-  root = temp_test_dir("prep_sirius_structures")
-) {
-  # Create directory structure
-  dir.create(
-    file.path(root, "structures", "taxonomies"),
-    recursive = TRUE,
-    showWarnings = FALSE
-  )
-
-  # Define target paths
-  stereo <- file.path(root, "structures", "stereo.tsv")
-  met <- file.path(root, "structures", "metadata.tsv")
-  nam <- file.path(root, "structures", "names.tsv")
-  cla <- file.path(root, "structures", "taxonomies", "classyfire.tsv")
-  npc <- file.path(root, "structures", "taxonomies", "npc.tsv")
-
-  # Copy fixtures using the helper that handles path resolution
-  copy_fixture_to("structures_stereo.csv", stereo)
-  copy_fixture_to("structures_metadata.csv", met)
-  copy_fixture_to("structures_names.csv", nam)
-  copy_fixture_to("structures_taxonomy_cla.csv", cla)
-  copy_fixture_to("structures_taxonomy_npc.csv", npc)
-
-  list(
-    root = root,
-    stereo = stereo,
-    met = met,
-    nam = nam,
-    cla = cla,
-    npc = npc
-  )
-}
-
 ## Validation ----
 
 test_that("test-prepare_annotations_sirius validates sirius_version", {
-  s <- stage_structure_fixtures()
+  s <- stage_structure_fixtures("prep_sirius_structures")
   tmp <- tempdir()
   out_ann <- file.path(tmp, "ann.tsv")
   out_can <- file.path(tmp, "can.tsv")
@@ -68,7 +28,7 @@ test_that("test-prepare_annotations_sirius validates sirius_version", {
 })
 
 test_that("test-prepare_annotations_sirius validates output parameters and structure files", {
-  s <- stage_structure_fixtures()
+  s <- stage_structure_fixtures("prep_sirius_structures")
   expect_error(
     prepare_annotations_sirius(
       input_directory = temp_test_path("missing.zip"),
@@ -104,7 +64,7 @@ test_that("test-prepare_annotations_sirius validates output parameters and struc
 ## Behavior ----
 
 test_that("test-prepare_annotations_sirius handles missing input by producing empty outputs", {
-  s <- stage_structure_fixtures()
+  s <- stage_structure_fixtures("prep_sirius_structures")
   tmp <- tempdir()
   out_ann <- file.path(tmp, "ann.tsv")
   out_can <- file.path(tmp, "can.tsv")
@@ -127,7 +87,7 @@ test_that("test-prepare_annotations_sirius handles missing input by producing em
 })
 
 test_that("test-prepare_annotations_sirius handles version 6", {
-  s <- stage_structure_fixtures()
+  s <- stage_structure_fixtures("prep_sirius_structures")
   tmp <- tempdir()
   out_ann <- file.path(tmp, "ann_v6.tsv")
   out_can <- file.path(tmp, "can_v6.tsv")
@@ -149,7 +109,7 @@ test_that("test-prepare_annotations_sirius handles version 6", {
 })
 
 test_that("test-prepare_annotations_sirius validates numeric version", {
-  s <- stage_structure_fixtures()
+  s <- stage_structure_fixtures("prep_sirius_structures")
   tmp <- tempdir()
   out_ann <- file.path(tmp, "ann_numeric.tsv")
   out_can <- file.path(tmp, "can_numeric.tsv")
@@ -172,7 +132,7 @@ test_that("test-prepare_annotations_sirius validates numeric version", {
 })
 
 test_that("test-prepare_annotations_sirius uses populated input branch when directory exists", {
-  s <- stage_structure_fixtures()
+  s <- stage_structure_fixtures("prep_sirius_structures")
   input_dir <- temp_test_dir("sirius_present")
   out_ann <- file.path(input_dir, "ann.tsv")
   out_can <- file.path(input_dir, "can.tsv")
@@ -330,7 +290,7 @@ test_that("prepare_sirius_annotations_table orchestrates joins and metadata sele
 ## Internal Helper Tests ----
 
 test_that("validate_sirius_inputs validates version correctly", {
-  s <- stage_structure_fixtures()
+  s <- stage_structure_fixtures("prep_sirius_structures")
   tmp <- tempdir()
 
   expect_error(
@@ -368,7 +328,7 @@ test_that("validate_sirius_inputs validates version correctly", {
 })
 
 test_that("validate_sirius_inputs validates output paths", {
-  s <- stage_structure_fixtures()
+  s <- stage_structure_fixtures("prep_sirius_structures")
 
   expect_error(
     validate_sirius_inputs(
@@ -420,7 +380,7 @@ test_that("validate_sirius_inputs validates output paths", {
 })
 
 test_that("validate_sirius_inputs checks structure file existence", {
-  s <- stage_structure_fixtures()
+  s <- stage_structure_fixtures("prep_sirius_structures")
   tmp <- tempdir()
 
   expect_error(
@@ -455,7 +415,7 @@ test_that("validate_sirius_inputs checks structure file existence", {
 })
 
 test_that("validate_sirius_inputs validates max_analog_abs_mz_error", {
-  s <- stage_structure_fixtures()
+  s <- stage_structure_fixtures("prep_sirius_structures")
   tmp <- tempdir()
 
   expect_error(
@@ -1150,51 +1110,43 @@ test_that("load_sirius_tables filters formulaRank and loads denovo/spectral when
   tmp <- temp_test_dir("sirius_tables_v6_full")
   zip_path <- file.path(tmp, "sirius.zip")
 
-  write_tsv <- function(path, x) {
-    utils::write.table(x, path, sep = "\t", row.names = FALSE, quote = FALSE)
-  }
-
-  write_tsv(
-    file.path(tmp, "canopus_formula_summary_all.tsv"),
+  write_test_tsv(
     data.frame(
       mappingFeatureId = c("F1", "F2"),
       formulaRank = c(1L, 2L)
-    )
+    ),
+    file.path(tmp, "canopus_formula_summary_all.tsv")
   )
-  write_tsv(
-    file.path(tmp, "formula_identifications_all.tsv"),
+  write_test_tsv(
     data.frame(
       mappingFeatureId = c("F1", "F2"),
       formulaRank = c(1L, 3L)
-    )
+    ),
+    file.path(tmp, "formula_identifications_all.tsv")
   )
-  write_tsv(
-    file.path(tmp, "structure_identifications_all.tsv"),
-    data.frame(
-      mappingFeatureId = c("F1", "F2")
-    )
+  write_test_tsv(
+    data.frame(mappingFeatureId = c("F1", "F2")),
+    file.path(tmp, "structure_identifications_all.tsv")
   )
-  write_tsv(
-    file.path(tmp, "denovo_structure_identifications_all.tsv"),
-    data.frame(
-      mappingFeatureId = c("F1", "F2")
-    )
+  write_test_tsv(
+    data.frame(mappingFeatureId = c("F1", "F2")),
+    file.path(tmp, "denovo_structure_identifications_all.tsv")
   )
-  write_tsv(
-    file.path(tmp, "spectral_matches_all.tsv"),
+  write_test_tsv(
     data.frame(
       mappingFeatureId = "F1",
       similarity = "0.8",
       sharedPeaks = "10"
-    )
+    ),
+    file.path(tmp, "spectral_matches_all.tsv")
   )
-  write_tsv(
-    file.path(tmp, "spectral_matches_analog_all.tsv"),
+  write_test_tsv(
     data.frame(
       mappingFeatureId = "F2",
       similarity = "0.7",
       sharedPeaks = "8"
-    )
+    ),
+    file.path(tmp, "spectral_matches_analog_all.tsv")
   )
 
   old <- getwd()
@@ -1226,29 +1178,17 @@ test_that("load_sirius_tables v6 leaves spectral template when no spectral files
   tmp <- temp_test_dir("sirius_tables_v6_no_spectral")
   zip_path <- file.path(tmp, "sirius.zip")
 
-  write_tsv <- function(path, x) {
-    utils::write.table(x, path, sep = "\t", row.names = FALSE, quote = FALSE)
-  }
-
-  write_tsv(
-    file.path(tmp, "canopus_formula_summary_all.tsv"),
-    data.frame(
-      mappingFeatureId = "F1",
-      formulaRank = 1L
-    )
+  write_test_tsv(
+    data.frame(mappingFeatureId = "F1", formulaRank = 1L),
+    file.path(tmp, "canopus_formula_summary_all.tsv")
   )
-  write_tsv(
-    file.path(tmp, "formula_identifications_all.tsv"),
-    data.frame(
-      mappingFeatureId = "F1",
-      formulaRank = 1L
-    )
+  write_test_tsv(
+    data.frame(mappingFeatureId = "F1", formulaRank = 1L),
+    file.path(tmp, "formula_identifications_all.tsv")
   )
-  write_tsv(
-    file.path(tmp, "structure_identifications_all.tsv"),
-    data.frame(
-      mappingFeatureId = "F1"
-    )
+  write_test_tsv(
+    data.frame(mappingFeatureId = "F1"),
+    file.path(tmp, "structure_identifications_all.tsv")
   )
 
   old <- getwd()
@@ -1290,19 +1230,13 @@ test_that("load_sirius_summaries loads and binds discovered summary files", {
   dir.create(file.path(tmp, "feat2"), recursive = TRUE, showWarnings = FALSE)
   zip_path <- file.path(tmp, "sirius.zip")
 
-  utils::write.table(
+  write_test_tsv(
     data.frame(score = 0.9),
-    file.path(tmp, "feat1", "structure_candidates.tsv"),
-    sep = "\t",
-    row.names = FALSE,
-    quote = FALSE
+    file.path(tmp, "feat1", "structure_candidates.tsv")
   )
-  utils::write.table(
+  write_test_tsv(
     data.frame(score = 0.8),
-    file.path(tmp, "feat2", "structure_candidates.tsv"),
-    sep = "\t",
-    row.names = FALSE,
-    quote = FALSE
+    file.path(tmp, "feat2", "structure_candidates.tsv")
   )
 
   old <- getwd()
@@ -1380,27 +1314,9 @@ test_that("load_sirius_tables v6 keeps only formulaRank 1 when ranks are charact
     check.names = FALSE
   )
 
-  utils::write.table(
-    can_df,
-    can_path,
-    sep = "\t",
-    quote = FALSE,
-    row.names = FALSE
-  )
-  utils::write.table(
-    for_df,
-    for_path,
-    sep = "\t",
-    quote = FALSE,
-    row.names = FALSE
-  )
-  utils::write.table(
-    str_df,
-    str_path,
-    sep = "\t",
-    quote = FALSE,
-    row.names = FALSE
-  )
+  write_test_tsv(can_df, can_path)
+  write_test_tsv(for_df, for_path)
+  write_test_tsv(str_df, str_path)
 
   old_wd <- getwd()
   setwd(tmp)

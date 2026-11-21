@@ -61,6 +61,75 @@ stage_weight_annotations_fixtures <- function(
   )
 }
 
+call_weight_annotations <- function(f, ..., include_scores = FALSE) {
+  args <- list(
+    library = f$library,
+    annotations = f$annotations,
+    components = f$components,
+    edges = f$edges,
+    taxa = f$taxa,
+    canopus = f$canopus,
+    formula = f$formula,
+    org_tax_ott = f$org_tax_ott,
+    output = f$output,
+    pattern = "test"
+  )
+  if (include_scores) {
+    args <- c(
+      args,
+      list(
+        candidates_neighbors = 3L,
+        candidates_final = 1L,
+        best_percentile = 0.9,
+        weight_spectral = 0.2,
+        weight_chemical = 0.3,
+        weight_biological = 0.5,
+        minimal_consistency = 0.6,
+        minimal_ms1_bio = 0.6,
+        minimal_ms1_chemo = 0.6,
+        minimal_ms1_condition = "AND",
+        ms1_only = FALSE,
+        compounds_names = FALSE,
+        high_evidence = FALSE,
+        remove_ties = TRUE,
+        summarize = FALSE,
+        force = FALSE
+      ),
+      default_bio_scores(),
+      default_chemo_scores()
+    )
+  }
+  overrides <- list(...)
+  if (length(overrides) > 0L) {
+    args[names(overrides)] <- overrides
+  }
+  do.call(weight_annotations, args)
+}
+
+setup_weight_annotations_env <- function(.local_envir = parent.frame()) {
+  fixtures <- stage_weight_annotations_fixtures()
+  withr::local_dir(new = fixtures$tmpdir, .local_envir = .local_envir)
+  local_mocked_bindings(
+    get_default_paths = function() {
+      list(
+        data = list(
+          processed = list(path = file.path(fixtures$tmpdir, "processed"))
+        )
+      )
+    },
+    get_params = function(step) list(step = "prepare_params"),
+    export_params = function(...) invisible(NULL),
+    .package = "tima",
+    .env = .local_envir
+  )
+  dir.create(
+    file.path(fixtures$tmpdir, "processed"),
+    recursive = TRUE,
+    showWarnings = FALSE
+  )
+  fixtures
+}
+
 # Validation ----
 
 test_that("weight_annotations() validates required file existence", {
@@ -85,20 +154,11 @@ test_that("weight_annotations() validates weight sum", {
   fixtures <- stage_weight_annotations_fixtures()
 
   expect_error(
-    weight_annotations(
-      library = fixtures$library,
-      annotations = fixtures$annotations,
-      components = fixtures$components,
-      edges = fixtures$edges,
-      taxa = fixtures$taxa,
-      canopus = fixtures$canopus,
-      formula = fixtures$formula,
-      org_tax_ott = fixtures$org_tax_ott,
-      output = fixtures$output,
+    call_weight_annotations(
+      fixtures,
       weight_spectral = 0.5,
       weight_chemical = 0.5,
-      weight_biological = 0.5, # Sum = 1.5, invalid
-      pattern = "test"
+      weight_biological = 0.5 # Sum = 1.5, invalid
     ),
     "Weights must sum to 1",
     class = "tima_validation_error"
@@ -109,21 +169,12 @@ test_that("weight_annotations() validates minimal_ms1_condition", {
   fixtures <- stage_weight_annotations_fixtures()
 
   expect_error(
-    weight_annotations(
-      library = fixtures$library,
-      annotations = fixtures$annotations,
-      components = fixtures$components,
-      edges = fixtures$edges,
-      taxa = fixtures$taxa,
-      canopus = fixtures$canopus,
-      formula = fixtures$formula,
-      org_tax_ott = fixtures$org_tax_ott,
-      output = fixtures$output,
+    call_weight_annotations(
+      fixtures,
       weight_spectral = 0.5,
       weight_chemical = 0.3,
       weight_biological = 0.2,
-      minimal_ms1_condition = "INVALID",
-      pattern = "test"
+      minimal_ms1_condition = "INVALID"
     ),
     "Must be one of: OR, AND"
   )
@@ -133,20 +184,11 @@ test_that("weight_annotations() rejects negative weights", {
   fixtures <- stage_weight_annotations_fixtures()
 
   expect_error(
-    weight_annotations(
-      library = fixtures$library,
-      annotations = fixtures$annotations,
-      components = fixtures$components,
-      edges = fixtures$edges,
-      taxa = fixtures$taxa,
-      canopus = fixtures$canopus,
-      formula = fixtures$formula,
-      org_tax_ott = fixtures$org_tax_ott,
-      output = fixtures$output,
+    call_weight_annotations(
+      fixtures,
       weight_spectral = -0.1,
       weight_chemical = 0.6,
-      weight_biological = 0.5,
-      pattern = "test"
+      weight_biological = 0.5
     ),
     "must be non-negative",
     class = "tima_validation_error"
@@ -157,21 +199,12 @@ test_that("weight_annotations() rejects invalid logical parameters", {
   fixtures <- stage_weight_annotations_fixtures()
 
   expect_error(
-    weight_annotations(
-      library = fixtures$library,
-      annotations = fixtures$annotations,
-      components = fixtures$components,
-      edges = fixtures$edges,
-      taxa = fixtures$taxa,
-      canopus = fixtures$canopus,
-      formula = fixtures$formula,
-      org_tax_ott = fixtures$org_tax_ott,
-      output = fixtures$output,
+    call_weight_annotations(
+      fixtures,
       weight_spectral = 0.5,
       weight_chemical = 0.3,
       weight_biological = 0.2,
-      ms1_only = "yes", # Should be logical
-      pattern = "test"
+      ms1_only = "yes" # Should be logical
     ),
     "ms1_only must be a single TRUE or FALSE"
   )
@@ -181,21 +214,12 @@ test_that("weight_annotations() rejects invalid candidate counts", {
   fixtures <- stage_weight_annotations_fixtures()
 
   expect_error(
-    weight_annotations(
-      library = fixtures$library,
-      annotations = fixtures$annotations,
-      components = fixtures$components,
-      edges = fixtures$edges,
-      taxa = fixtures$taxa,
-      canopus = fixtures$canopus,
-      formula = fixtures$formula,
-      org_tax_ott = fixtures$org_tax_ott,
-      output = fixtures$output,
+    call_weight_annotations(
+      fixtures,
       weight_spectral = 0.5,
       weight_chemical = 0.3,
       weight_biological = 0.2,
-      candidates_neighbors = 0, # Invalid: must be > 0
-      pattern = "test"
+      candidates_neighbors = 0 # Invalid: must be > 0
     ),
     "candidates_neighbors must be > 0"
   )
@@ -204,82 +228,16 @@ test_that("weight_annotations() rejects invalid candidate counts", {
 # Other paths ----
 
 test_that("weight_annotations() runs successfully with minimal inputs", {
-  fixtures <- stage_weight_annotations_fixtures()
-  withr::local_dir(new = fixtures$tmpdir)
-
-  # Mock get_default_paths to return our temp dir
-  local_mocked_bindings(
-    get_default_paths = function() {
-      list(
-        data = list(
-          processed = list(path = file.path(fixtures$tmpdir, "processed"))
-        )
-      )
-    },
-    get_params = function(step) {
-      list(step = "prepare_params")
-    },
-    export_params = function(...) invisible(NULL),
-    .package = "tima"
-  )
-
-  dir.create(
-    file.path(fixtures$tmpdir, "processed"),
-    recursive = TRUE,
-    showWarnings = FALSE
-  )
+  fixtures <- setup_weight_annotations_env()
 
   warnings <- testthat::capture_warnings({
-    result <- weight_annotations(
-      library = fixtures$library,
-      annotations = fixtures$annotations,
-      components = fixtures$components,
-      edges = fixtures$edges,
-      taxa = fixtures$taxa,
-      canopus = fixtures$canopus,
-      formula = fixtures$formula,
-      org_tax_ott = fixtures$org_tax_ott,
-      output = fixtures$output,
-      candidates_neighbors = 3L,
-      candidates_final = 1L,
-      best_percentile = 0.9,
-      weight_spectral = 0.2,
-      weight_chemical = 0.3,
-      weight_biological = 0.5,
-      score_biological_domain = 0.1,
-      score_biological_kingdom = 0.2,
-      score_biological_phylum = 0.3,
-      score_biological_class = 0.4,
-      score_biological_order = 0.5,
-      score_biological_infraorder = 0.55,
-      score_biological_family = 0.6,
-      score_biological_subfamily = 0.65,
-      score_biological_tribe = 0.7,
-      score_biological_subtribe = 0.75,
-      score_biological_genus = 0.8,
-      score_biological_subgenus = 0.85,
-      score_biological_species = 0.9,
-      score_biological_subspecies = 0.95,
-      score_biological_variety = 1.0,
-      score_biological_biota = 1.007276,
-      score_chemical_cla_kingdom = 0.25,
-      score_chemical_cla_superclass = 0.5,
-      score_chemical_cla_class = 0.75,
-      score_chemical_cla_parent = 1.0,
-      score_chemical_npc_pathway = 0.33,
-      score_chemical_npc_superclass = 0.66,
-      score_chemical_npc_class = 1.0,
-      minimal_consistency = 0.6,
-      minimal_ms1_bio = 0.6,
-      minimal_ms1_chemo = 0.6,
-      minimal_ms1_condition = "AND",
+    result <- call_weight_annotations(
+      fixtures,
+      include_scores = TRUE,
       ms1_only = TRUE,
       compounds_names = TRUE,
-      high_evidence = FALSE,
       remove_ties = FALSE,
-      summarize = TRUE,
-      pattern = "test",
-      force = FALSE
+      summarize = TRUE
     )
   })
 
@@ -294,184 +252,20 @@ test_that("weight_annotations() runs successfully with minimal inputs", {
 })
 
 test_that("weight_annotations() processes MS1-only annotations", {
-  fixtures <- stage_weight_annotations_fixtures()
-  withr::local_dir(new = fixtures$tmpdir)
-
-  local_mocked_bindings(
-    get_default_paths = function() {
-      list(
-        data = list(
-          processed = list(path = file.path(fixtures$tmpdir, "processed"))
-        )
-      )
-    },
-    get_params = function(step) list(step = "prepare_params"),
-    export_params = function(...) invisible(NULL),
-    .package = "tima"
-  )
-
-  dir.create(
-    file.path(fixtures$tmpdir, "processed"),
-    recursive = TRUE,
-    showWarnings = FALSE
-  )
-
-  result <- weight_annotations(
-    library = fixtures$library,
-    annotations = fixtures$annotations,
-    components = fixtures$components,
-    edges = fixtures$edges,
-    taxa = fixtures$taxa,
-    canopus = fixtures$canopus,
-    formula = fixtures$formula,
-    org_tax_ott = fixtures$org_tax_ott,
-    output = fixtures$output,
-    candidates_neighbors = 3L,
-    candidates_final = 1L,
-    best_percentile = 0.9,
-    weight_spectral = 0.2,
-    weight_chemical = 0.3,
-    weight_biological = 0.5,
-    score_biological_domain = 0.1,
-    score_biological_kingdom = 0.2,
-    score_biological_phylum = 0.3,
-    score_biological_class = 0.4,
-    score_biological_order = 0.5,
-    score_biological_infraorder = 0.55,
-    score_biological_family = 0.6,
-    score_biological_subfamily = 0.65,
-    score_biological_tribe = 0.7,
-    score_biological_subtribe = 0.75,
-    score_biological_genus = 0.8,
-    score_biological_subgenus = 0.85,
-    score_biological_species = 0.9,
-    score_biological_subspecies = 0.95,
-    score_biological_variety = 1.0,
-    score_biological_biota = 1.007276,
-    score_chemical_cla_kingdom = 0.25,
-    score_chemical_cla_superclass = 0.5,
-    score_chemical_cla_class = 0.75,
-    score_chemical_cla_parent = 1.0,
-    score_chemical_npc_pathway = 0.33,
-    score_chemical_npc_superclass = 0.66,
-    score_chemical_npc_class = 1.0,
-    minimal_consistency = 0.6,
-    minimal_ms1_bio = 0.6,
-    minimal_ms1_chemo = 0.6,
-    minimal_ms1_condition = "AND",
-    ms1_only = FALSE,
-    compounds_names = FALSE,
-    high_evidence = FALSE,
-    remove_ties = TRUE,
-    summarize = FALSE,
-    pattern = "test",
-    force = FALSE
-  )
-
+  fixtures <- setup_weight_annotations_env()
+  result <- call_weight_annotations(fixtures, include_scores = TRUE)
   expect_type(result, "character")
 })
 
 test_that("weight_annotations() handles different weight combinations", {
-  fixtures <- stage_weight_annotations_fixtures()
-  withr::local_dir(new = fixtures$tmpdir)
-
-  local_mocked_bindings(
-    get_default_paths = function() {
-      list(
-        data = list(
-          processed = list(path = file.path(fixtures$tmpdir, "processed"))
-        )
-      )
-    },
-    get_params = function(step) list(step = "prepare_params"),
-    export_params = function(...) invisible(NULL),
-    .package = "tima"
-  )
-
-  dir.create(
-    file.path(fixtures$tmpdir, "processed"),
-    recursive = TRUE,
-    showWarnings = FALSE
-  )
-
+  fixtures <- setup_weight_annotations_env()
   # All weight on biological
-  result <- weight_annotations(
-    library = fixtures$library,
-    annotations = fixtures$annotations,
-    components = fixtures$components,
-    edges = fixtures$edges,
-    taxa = fixtures$taxa,
-    canopus = fixtures$canopus,
-    formula = fixtures$formula,
-    org_tax_ott = fixtures$org_tax_ott,
-    output = fixtures$output,
-    candidates_neighbors = 3L,
-    candidates_final = 1L,
-    best_percentile = 0.9,
-    weight_spectral = 0.2,
-    weight_chemical = 0.3,
-    weight_biological = 0.5,
-    score_biological_domain = 0.1,
-    score_biological_kingdom = 0.2,
-    score_biological_phylum = 0.3,
-    score_biological_class = 0.4,
-    score_biological_order = 0.5,
-    score_biological_infraorder = 0.55,
-    score_biological_family = 0.6,
-    score_biological_subfamily = 0.65,
-    score_biological_tribe = 0.7,
-    score_biological_subtribe = 0.75,
-    score_biological_genus = 0.8,
-    score_biological_subgenus = 0.85,
-    score_biological_species = 0.9,
-    score_biological_subspecies = 0.95,
-    score_biological_variety = 1.0,
-    score_biological_biota = 1.007276,
-    score_chemical_cla_kingdom = 0.25,
-    score_chemical_cla_superclass = 0.5,
-    score_chemical_cla_class = 0.75,
-    score_chemical_cla_parent = 1.0,
-    score_chemical_npc_pathway = 0.33,
-    score_chemical_npc_superclass = 0.66,
-    score_chemical_npc_class = 1.0,
-    minimal_consistency = 0.6,
-    minimal_ms1_bio = 0.6,
-    minimal_ms1_chemo = 0.6,
-    minimal_ms1_condition = "AND",
-    ms1_only = FALSE,
-    compounds_names = FALSE,
-    high_evidence = FALSE,
-    remove_ties = TRUE,
-    summarize = FALSE,
-    pattern = "test",
-    force = FALSE
-  )
-
+  result <- call_weight_annotations(fixtures, include_scores = TRUE)
   expect_type(result, "character")
 })
 
 test_that("weight_annotations() covers xrefs_file, duplicate/NA taxa feature_id, and missing needed_structures", {
-  fixtures <- stage_weight_annotations_fixtures()
-  withr::local_dir(new = fixtures$tmpdir)
-
-  local_mocked_bindings(
-    get_default_paths = function() {
-      list(
-        data = list(
-          processed = list(path = file.path(fixtures$tmpdir, "processed"))
-        )
-      )
-    },
-    get_params = function(step) list(step = "prepare_params"),
-    export_params = function(...) invisible(NULL),
-    .package = "tima"
-  )
-
-  dir.create(
-    file.path(fixtures$tmpdir, "processed"),
-    recursive = TRUE,
-    showWarnings = FALSE
-  )
+  fixtures <- setup_weight_annotations_env()
 
   # 1. With NA feature_id in taxa_table and xrefs_file provided
   taxa_na <- file.path(fixtures$tmpdir, "taxa_na.tsv")
@@ -494,57 +288,12 @@ test_that("weight_annotations() covers xrefs_file, duplicate/NA taxa feature_id,
     sep = "\t"
   )
 
-  res_na_xref <- weight_annotations(
-    library = fixtures$library,
-    annotations = fixtures$annotations,
-    components = fixtures$components,
-    edges = fixtures$edges,
+  res_na_xref <- call_weight_annotations(
+    fixtures,
+    include_scores = TRUE,
     taxa = taxa_na,
-    canopus = fixtures$canopus,
-    formula = fixtures$formula,
-    org_tax_ott = fixtures$org_tax_ott,
     xrefs_file = xrefs_path,
-    output = fixtures$output,
-    candidates_neighbors = 3L,
-    candidates_final = 1L,
-    best_percentile = 0.9,
-    weight_spectral = 0.2,
-    weight_chemical = 0.3,
-    weight_biological = 0.5,
-    score_biological_domain = 0.1,
-    score_biological_kingdom = 0.2,
-    score_biological_phylum = 0.3,
-    score_biological_class = 0.4,
-    score_biological_order = 0.5,
-    score_biological_infraorder = 0.55,
-    score_biological_family = 0.6,
-    score_biological_subfamily = 0.65,
-    score_biological_tribe = 0.7,
-    score_biological_subtribe = 0.75,
-    score_biological_genus = 0.8,
-    score_biological_subgenus = 0.85,
-    score_biological_species = 0.9,
-    score_biological_subspecies = 0.95,
-    score_biological_variety = 1.0,
-    score_biological_biota = 1.007276,
-    score_chemical_cla_kingdom = 0.25,
-    score_chemical_cla_superclass = 0.5,
-    score_chemical_cla_class = 0.75,
-    score_chemical_cla_parent = 1.0,
-    score_chemical_npc_pathway = 0.33,
-    score_chemical_npc_superclass = 0.66,
-    score_chemical_npc_class = 1.0,
-    minimal_consistency = 0.6,
-    minimal_ms1_bio = 0.6,
-    minimal_ms1_chemo = 0.6,
-    minimal_ms1_condition = "AND",
-    ms1_only = FALSE,
-    compounds_names = FALSE,
-    high_evidence = FALSE,
-    remove_ties = TRUE,
-    summarize = FALSE,
-    pattern = "test_na",
-    force = FALSE
+    pattern = "test_na"
   )
   expect_type(res_na_xref, "character")
 
@@ -555,211 +304,29 @@ test_that("weight_annotations() covers xrefs_file, duplicate/NA taxa feature_id,
     taxa_dup,
     sep = "\t"
   )
-  res_dup <- weight_annotations(
-    library = fixtures$library,
-    annotations = fixtures$annotations,
-    components = fixtures$components,
-    edges = fixtures$edges,
+  res_dup <- call_weight_annotations(
+    fixtures,
+    include_scores = TRUE,
     taxa = taxa_dup,
-    canopus = fixtures$canopus,
-    formula = fixtures$formula,
-    org_tax_ott = fixtures$org_tax_ott,
-    output = fixtures$output,
-    candidates_neighbors = 3L,
-    candidates_final = 1L,
-    best_percentile = 0.9,
-    weight_spectral = 0.2,
-    weight_chemical = 0.3,
-    weight_biological = 0.5,
-    score_biological_domain = 0.1,
-    score_biological_kingdom = 0.2,
-    score_biological_phylum = 0.3,
-    score_biological_class = 0.4,
-    score_biological_order = 0.5,
-    score_biological_infraorder = 0.55,
-    score_biological_family = 0.6,
-    score_biological_subfamily = 0.65,
-    score_biological_tribe = 0.7,
-    score_biological_subtribe = 0.75,
-    score_biological_genus = 0.8,
-    score_biological_subgenus = 0.85,
-    score_biological_species = 0.9,
-    score_biological_subspecies = 0.95,
-    score_biological_variety = 1.0,
-    score_biological_biota = 1.007276,
-    score_chemical_cla_kingdom = 0.25,
-    score_chemical_cla_superclass = 0.5,
-    score_chemical_cla_class = 0.75,
-    score_chemical_cla_parent = 1.0,
-    score_chemical_npc_pathway = 0.33,
-    score_chemical_npc_superclass = 0.66,
-    score_chemical_npc_class = 1.0,
-    minimal_consistency = 0.6,
-    minimal_ms1_bio = 0.6,
-    minimal_ms1_chemo = 0.6,
-    minimal_ms1_condition = "AND",
-    ms1_only = FALSE,
-    compounds_names = FALSE,
-    high_evidence = FALSE,
-    remove_ties = TRUE,
-    summarize = FALSE,
-    pattern = "test_dup",
-    force = FALSE
+    pattern = "test_dup"
   )
   expect_type(res_dup, "character")
 })
 
 test_that("weight_annotations() handles boolean flags", {
-  fixtures <- stage_weight_annotations_fixtures()
-  withr::local_dir(new = fixtures$tmpdir)
-
-  local_mocked_bindings(
-    get_default_paths = function() {
-      list(
-        data = list(
-          processed = list(path = file.path(fixtures$tmpdir, "processed"))
-        )
-      )
-    },
-    get_params = function(step) list(step = "prepare_params"),
-    export_params = function(...) invisible(NULL),
-    .package = "tima"
-  )
-
-  dir.create(
-    file.path(fixtures$tmpdir, "processed"),
-    recursive = TRUE,
-    showWarnings = FALSE
-  )
-
-  result <- weight_annotations(
-    library = fixtures$library,
-    annotations = fixtures$annotations,
-    components = fixtures$components,
-    edges = fixtures$edges,
-    taxa = fixtures$taxa,
-    canopus = fixtures$canopus,
-    formula = fixtures$formula,
-    org_tax_ott = fixtures$org_tax_ott,
-    output = fixtures$output,
-    candidates_neighbors = 3L,
-    candidates_final = 1L,
-    best_percentile = 0.9,
-    weight_spectral = 0.2,
-    weight_chemical = 0.3,
-    weight_biological = 0.5,
-    score_biological_domain = 0.1,
-    score_biological_kingdom = 0.2,
-    score_biological_phylum = 0.3,
-    score_biological_class = 0.4,
-    score_biological_order = 0.5,
-    score_biological_infraorder = 0.55,
-    score_biological_family = 0.6,
-    score_biological_subfamily = 0.65,
-    score_biological_tribe = 0.7,
-    score_biological_subtribe = 0.75,
-    score_biological_genus = 0.8,
-    score_biological_subgenus = 0.85,
-    score_biological_species = 0.9,
-    score_biological_subspecies = 0.95,
-    score_biological_variety = 1.0,
-    score_biological_biota = 1.007276,
-    score_chemical_cla_kingdom = 0.25,
-    score_chemical_cla_superclass = 0.5,
-    score_chemical_cla_class = 0.75,
-    score_chemical_cla_parent = 1.0,
-    score_chemical_npc_pathway = 0.33,
-    score_chemical_npc_superclass = 0.66,
-    score_chemical_npc_class = 1.0,
-    minimal_consistency = 0.6,
-    minimal_ms1_bio = 0.6,
-    minimal_ms1_chemo = 0.6,
-    minimal_ms1_condition = "AND",
-    ms1_only = FALSE,
-    compounds_names = FALSE,
-    high_evidence = FALSE,
-    remove_ties = TRUE,
-    summarize = FALSE,
-    pattern = "test",
-    force = FALSE
-  )
-
+  fixtures <- setup_weight_annotations_env()
+  result <- call_weight_annotations(fixtures, include_scores = TRUE)
   expect_type(result, "character")
 })
 
 test_that("weight_annotations() exports propagated tag columns", {
-  fixtures <- stage_weight_annotations_fixtures()
-  withr::local_dir(new = fixtures$tmpdir)
-
-  local_mocked_bindings(
-    get_default_paths = function() {
-      list(
-        data = list(
-          processed = list(path = file.path(fixtures$tmpdir, "processed"))
-        )
-      )
-    },
-    get_params = function(step) list(step = "prepare_params"),
-    export_params = function(...) invisible(NULL),
-    .package = "tima"
-  )
-
-  dir.create(
-    file.path(fixtures$tmpdir, "processed"),
-    recursive = TRUE,
-    showWarnings = FALSE
-  )
-
-  result <- weight_annotations(
-    library = fixtures$library,
-    annotations = fixtures$annotations,
-    components = fixtures$components,
-    edges = fixtures$edges,
-    taxa = fixtures$taxa,
-    canopus = fixtures$canopus,
-    formula = fixtures$formula,
-    org_tax_ott = fixtures$org_tax_ott,
-    output = fixtures$output,
-    candidates_neighbors = 3L,
-    candidates_final = 1L,
-    best_percentile = 0.9,
-    weight_spectral = 0.2,
-    weight_chemical = 0.3,
-    weight_biological = 0.5,
-    score_biological_domain = 0.1,
-    score_biological_kingdom = 0.2,
-    score_biological_phylum = 0.3,
-    score_biological_class = 0.4,
-    score_biological_order = 0.5,
-    score_biological_infraorder = 0.55,
-    score_biological_family = 0.6,
-    score_biological_subfamily = 0.65,
-    score_biological_tribe = 0.7,
-    score_biological_subtribe = 0.75,
-    score_biological_genus = 0.8,
-    score_biological_subgenus = 0.85,
-    score_biological_species = 0.9,
-    score_biological_subspecies = 0.95,
-    score_biological_variety = 1.0,
-    score_biological_biota = 1.007276,
-    score_chemical_cla_kingdom = 0.25,
-    score_chemical_cla_superclass = 0.5,
-    score_chemical_cla_class = 0.75,
-    score_chemical_cla_parent = 1.0,
-    score_chemical_npc_pathway = 0.33,
-    score_chemical_npc_superclass = 0.66,
-    score_chemical_npc_class = 1.0,
-    minimal_consistency = 0.6,
-    minimal_ms1_bio = 0.6,
-    minimal_ms1_chemo = 0.6,
-    minimal_ms1_condition = "AND",
-    ms1_only = FALSE,
+  fixtures <- setup_weight_annotations_env()
+  result <- call_weight_annotations(
+    fixtures,
+    include_scores = TRUE,
     compounds_names = TRUE,
-    high_evidence = FALSE,
     remove_ties = FALSE,
-    summarize = FALSE,
-    pattern = "tagtest",
-    force = FALSE
+    pattern = "tagtest"
   )
 
   full_path <- unname(result[["full"]])

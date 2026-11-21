@@ -7,20 +7,9 @@ library(testthat)
 # ---- shared helpers ----------------------------------------------------------
 
 # Default weight_bio score parameters (avoid repeating 11 args everywhere)
-DEFAULT_BIO_SCORES <- list(
-  weight_spectral = 0.5,
-  weight_biological = 0.5,
-  score_biological_domain = 0.1,
-  score_biological_kingdom = 0.2,
-  score_biological_phylum = 0.3,
-  score_biological_class = 0.4,
-  score_biological_order = 0.5,
-  score_biological_family = 0.6,
-  score_biological_tribe = 0.7,
-  score_biological_genus = 0.8,
-  score_biological_species = 0.9,
-  score_biological_variety = 1.0,
-  score_biological_biota = 1.007276
+DEFAULT_BIO_SCORES <- c(
+  list(weight_spectral = 0.5, weight_biological = 0.5),
+  default_bio_scores(include_subranks = FALSE)
 )
 
 # Build a minimal SOP row for the given inchikey and organism taxonomy

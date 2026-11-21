@@ -231,30 +231,51 @@ make_clean_chemo_fixture <- function(
 
 # Unit Tests: Helper Functions ----
 
+call_build_mini_taxonomy <- function(df, ...) {
+  scores <- default_chemo_scores(
+    score_chemical_cla_kingdom = 0.1,
+    score_chemical_cla_superclass = 0.2,
+    score_chemical_cla_class = 0.3,
+    score_chemical_cla_parent = 0.4,
+    score_chemical_npc_pathway = 0.3,
+    score_chemical_npc_superclass = 0.2,
+    score_chemical_npc_class = 0.1,
+    ...
+  )
+  do.call(build_mini_taxonomy_table, c(list(df_percentile = df), scores))
+}
+
 # Validation Tests ----
 test_that("validate_clean_chemo_inputs works", {
   fixture <- make_clean_chemo_fixture()
 
   expect_silent(
-    validate_clean_chemo_inputs(
-      annot_table_wei_chemo = fixture$annot_table_wei_chemo,
-      candidates_final = 5,
-      best_percentile = 0.9,
-      minimal_ms1_bio = 0.1,
-      minimal_ms1_chemo = 0.1,
-      minimal_ms1_condition = "OR",
-      compounds_names = TRUE,
-      high_evidence = FALSE,
-      remove_ties = FALSE,
-      summarize = FALSE,
-      max_per_score = 7L,
-      score_chemical_cla_kingdom = 0.1,
-      score_chemical_cla_superclass = 0.2,
-      score_chemical_cla_class = 0.3,
-      score_chemical_cla_parent = 0.4,
-      score_chemical_npc_pathway = 0.1,
-      score_chemical_npc_superclass = 0.2,
-      score_chemical_npc_class = 0.3
+    do.call(
+      validate_clean_chemo_inputs,
+      c(
+        list(
+          annot_table_wei_chemo = fixture$annot_table_wei_chemo,
+          candidates_final = 5,
+          best_percentile = 0.9,
+          minimal_ms1_bio = 0.1,
+          minimal_ms1_chemo = 0.1,
+          minimal_ms1_condition = "OR",
+          compounds_names = TRUE,
+          high_evidence = FALSE,
+          remove_ties = FALSE,
+          summarize = FALSE,
+          max_per_score = 7L
+        ),
+        default_chemo_scores(
+          score_chemical_cla_kingdom = 0.1,
+          score_chemical_cla_superclass = 0.2,
+          score_chemical_cla_class = 0.3,
+          score_chemical_cla_parent = 0.4,
+          score_chemical_npc_pathway = 0.1,
+          score_chemical_npc_superclass = 0.2,
+          score_chemical_npc_class = 0.3
+        )
+      )
     )
   )
 
@@ -810,28 +831,35 @@ test_that("remove_compound_names keeps names when compounds_names=TRUE", {
 test_that("clean_chemo normal", {
   fixture <- make_clean_chemo_fixture()
 
-  result <- clean_chemo(
-    annot_table_wei_chemo = fixture$annot_table_wei_chemo,
-    components_table = fixture$components_table,
-    features_table = fixture$features_table,
-    structure_organism_pairs_table = fixture$structure_organism_pairs_table,
-    candidates_final = 5,
-    best_percentile = 0.9,
-    minimal_ms1_bio = 0.1,
-    minimal_ms1_chemo = 0.1,
-    minimal_ms1_condition = "OR",
-    compounds_names = TRUE,
-    high_evidence = FALSE,
-    remove_ties = FALSE,
-    summarize = FALSE,
-    score_chemical_cla_kingdom = 0.1,
-    score_chemical_cla_superclass = 0.2,
-    score_chemical_cla_class = 0.3,
-    score_chemical_cla_parent = 0.4,
-    score_chemical_npc_pathway = 0.3,
-    score_chemical_npc_superclass = 0.2,
-    score_chemical_npc_class = 0.1,
-    max_per_score = 7L
+  result <- do.call(
+    clean_chemo,
+    c(
+      list(
+        annot_table_wei_chemo = fixture$annot_table_wei_chemo,
+        components_table = fixture$components_table,
+        features_table = fixture$features_table,
+        structure_organism_pairs_table = fixture$structure_organism_pairs_table,
+        candidates_final = 5,
+        best_percentile = 0.9,
+        minimal_ms1_bio = 0.1,
+        minimal_ms1_chemo = 0.1,
+        minimal_ms1_condition = "OR",
+        compounds_names = TRUE,
+        high_evidence = FALSE,
+        remove_ties = FALSE,
+        summarize = FALSE,
+        max_per_score = 7L
+      ),
+      default_chemo_scores(
+        score_chemical_cla_kingdom = 0.1,
+        score_chemical_cla_superclass = 0.2,
+        score_chemical_cla_class = 0.3,
+        score_chemical_cla_parent = 0.4,
+        score_chemical_npc_pathway = 0.3,
+        score_chemical_npc_superclass = 0.2,
+        score_chemical_npc_class = 0.1
+      )
+    )
   )
 
   # Verify result structure
@@ -899,14 +927,6 @@ test_that("clean_chemo filters MS1-only annotations correctly with OR condition"
       candidate_score_similarity = NA_real_,
       candidate_score_sirius_csi = NA_real_
     )
-  # Mock environment weights
-  score_chemical_cla_kingdom <- 0.1
-  score_chemical_cla_superclass <- 0.2
-  score_chemical_cla_class <- 0.3
-  score_chemical_cla_parent <- 0.4
-  score_chemical_npc_pathway <- 0.3
-  score_chemical_npc_superclass <- 0.2
-  score_chemical_npc_class <- 0.1
   result_df <- filter_ms1_annotations(
     annot_table_wei_chemo = fixture$annot_table_wei_chemo,
     minimal_ms1_bio = 0.5,
@@ -963,14 +983,6 @@ test_that("clean_chemo handles character score columns", {
   # Convert scores to character (as they might be when loaded from TSV)
   fixture$annot_table_wei_chemo <- fixture$annot_table_wei_chemo |>
     tidytable::mutate(across(starts_with("score_"), as.character))
-  # Mock environment weights
-  score_chemical_cla_kingdom <- 0.1
-  score_chemical_cla_superclass <- 0.2
-  score_chemical_cla_class <- 0.3
-  score_chemical_cla_parent <- 0.4
-  score_chemical_npc_pathway <- 0.3
-  score_chemical_npc_superclass <- 0.2
-  score_chemical_npc_class <- 0.1
   # Should not error - function should convert to numeric internally
   expect_no_error({
     result_df <- filter_ms1_annotations(
@@ -1147,16 +1159,7 @@ test_that("build_mini_taxonomy_table returns mini taxonomy columns", {
     max_per_score = 7L
   )
 
-  out <- build_mini_taxonomy_table(
-    df_percentile = ranked$df_percentile,
-    score_chemical_cla_kingdom = 0.1,
-    score_chemical_cla_superclass = 0.2,
-    score_chemical_cla_class = 0.3,
-    score_chemical_cla_parent = 0.4,
-    score_chemical_npc_pathway = 0.3,
-    score_chemical_npc_superclass = 0.2,
-    score_chemical_npc_class = 0.1
-  )
+  out <- call_build_mini_taxonomy(ranked$df_percentile)
 
   expect_true(is.data.frame(out))
   expect_true(all(
@@ -1600,16 +1603,7 @@ test_that("build_mini_taxonomy_table falls back to predicted labels when structu
     feature_pred_tax_npc_03cla_score = NA_character_
   )
 
-  out <- build_mini_taxonomy_table(
-    df_percentile = df_percentile,
-    score_chemical_cla_kingdom = 0.1,
-    score_chemical_cla_superclass = 0.2,
-    score_chemical_cla_class = 0.3,
-    score_chemical_cla_parent = 0.4,
-    score_chemical_npc_pathway = 0.3,
-    score_chemical_npc_superclass = 0.2,
-    score_chemical_npc_class = 0.1
-  )
+  out <- call_build_mini_taxonomy(df_percentile)
 
   expect_equal(out$label_classyfire[[1L]], "Organic compounds")
   expect_equal(out$label_npclassifier[[1L]], "Alkaloids")
@@ -1647,16 +1641,7 @@ test_that("build_mini_taxonomy_table keeps labels from highest-scoring structure
     feature_pred_tax_npc_03cla_score = c(NA_character_, NA_character_)
   )
 
-  out <- build_mini_taxonomy_table(
-    df_percentile = df_percentile,
-    score_chemical_cla_kingdom = 0.1,
-    score_chemical_cla_superclass = 0.2,
-    score_chemical_cla_class = 0.3,
-    score_chemical_cla_parent = 0.4,
-    score_chemical_npc_pathway = 0.3,
-    score_chemical_npc_superclass = 0.2,
-    score_chemical_npc_class = 0.1
-  )
+  out <- call_build_mini_taxonomy(df_percentile)
 
   expect_equal(out$label_classyfire[[1L]], "ParentGood")
   expect_equal(out$label_npclassifier[[1L]], "NpcClaGood")
@@ -1695,8 +1680,8 @@ test_that("build_mini_taxonomy_table predicted label beats low-scoring structure
     feature_pred_tax_npc_03cla_score = NA_character_
   )
 
-  out <- build_mini_taxonomy_table(
-    df_percentile = df_percentile,
+  out <- call_build_mini_taxonomy(
+    df_percentile,
     score_chemical_cla_kingdom = 0.2,
     score_chemical_cla_superclass = 0.4,
     score_chemical_cla_class = 0.6,

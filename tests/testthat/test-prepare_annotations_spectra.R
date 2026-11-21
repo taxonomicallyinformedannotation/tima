@@ -2,50 +2,10 @@
 
 library(testthat)
 
-## Internal Utility Helpers ----
-
-#' Stage structure fixtures for spectral annotation tests
-#'
-#' @param root Root directory for staging
-#' @return Named list of structure file paths
-stage_structure_fixtures <- function(
-  root = temp_test_dir("prep_spectra_structures")
-) {
-  # Create directory structure
-  dir.create(
-    file.path(root, "structures", "taxonomies"),
-    recursive = TRUE,
-    showWarnings = FALSE
-  )
-
-  # Define target paths
-  stereo <- file.path(root, "structures", "stereo.tsv")
-  met <- file.path(root, "structures", "metadata.tsv")
-  nam <- file.path(root, "structures", "names.tsv")
-  cla <- file.path(root, "structures", "taxonomies", "classyfire.tsv")
-  npc <- file.path(root, "structures", "taxonomies", "npc.tsv")
-
-  # Copy fixtures using the helper that handles path resolution
-  copy_fixture_to("structures_stereo.csv", stereo)
-  copy_fixture_to("structures_metadata.csv", met)
-  copy_fixture_to("structures_names.csv", nam)
-  copy_fixture_to("structures_taxonomy_cla.csv", cla)
-  copy_fixture_to("structures_taxonomy_npc.csv", npc)
-
-  list(
-    root = root,
-    stereo = stereo,
-    met = met,
-    nam = nam,
-    cla = cla,
-    npc = npc
-  )
-}
-
 ## Validation ----
 
 test_that("test-prepare_annotations_spectra validates input vector and files", {
-  s <- stage_structure_fixtures()
+  s <- stage_structure_fixtures("prep_spectra_structures")
   out <- temp_test_path("spectra.tsv")
   expect_error(
     prepare_annotations_spectra(
@@ -97,7 +57,7 @@ test_that("test-prepare_annotations_spectra validates structure files", {
 ## Behavior ----
 
 test_that("test-prepare_annotations_spectra processes minimal formatted input", {
-  s <- stage_structure_fixtures()
+  s <- stage_structure_fixtures("prep_spectra_structures")
   out <- temp_test_path("spectra.tsv")
 
   tbl <- tidytable::tidytable(
@@ -134,7 +94,7 @@ test_that("test-prepare_annotations_spectra processes minimal formatted input", 
 })
 
 test_that("test-prepare_annotations_spectra deduplicates repeated rows across inputs", {
-  s <- stage_structure_fixtures()
+  s <- stage_structure_fixtures("prep_spectra_structures")
   out <- temp_test_path("spectra_dupes.tsv")
 
   tbl <- tidytable::tidytable(
@@ -178,7 +138,7 @@ test_that("test-prepare_annotations_spectra deduplicates repeated rows across in
 })
 
 test_that("test-prepare_annotations_spectra preserves spectral rescue provenance columns", {
-  s <- stage_structure_fixtures()
+  s <- stage_structure_fixtures("prep_spectra_structures")
   out <- temp_test_path("spectra_provenance.tsv")
 
   tbl <- tidytable::tidytable(
@@ -234,7 +194,7 @@ test_that(".ensure_expected_annotation_cols adds missing columns and enforces co
   expect_identical(out$annotation_note, NA_character_)
 
   # Validation error for invalid output, 0-row input chunk, NA feature_id filtering, and setcolorder when all cols present
-  s <- stage_structure_fixtures()
+  s <- stage_structure_fixtures("prep_spectra_structures")
   ann_empty <- temp_test_path("ann_empty_chunk.tsv")
   writeLines("feature_id\tcandidate_adduct\n\t[M+H]+", ann_empty)
   expect_error(

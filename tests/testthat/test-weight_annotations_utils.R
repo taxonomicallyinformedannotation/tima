@@ -1,233 +1,85 @@
 library(testthat)
 
-# Helper: write a minimal TSV file and return its path
-make_tsv <- function(df, ...) {
-  f <- tempfile(...)
-  tidytable::fwrite(x = df, file = f, sep = "\t")
-  f
+make_weight_inputs <- function(.local_envir = parent.frame()) {
+  f <- local_test_tsv(data.frame(a = 1), .local_envir = .local_envir)
+  list(library = f, components = f, edges = f, taxa = f, annotations = f)
+}
+
+call_validate_weight_inputs <- function(inputs = make_weight_inputs(), ...) {
+  args <- list(
+    library = inputs$library,
+    components = inputs$components,
+    edges = inputs$edges,
+    taxa = inputs$taxa,
+    annotations = inputs$annotations,
+    minimal_ms1_condition = "OR",
+    weight_spectral = 1 / 3,
+    weight_chemical = 1 / 3,
+    weight_biological = 1 / 3,
+    minimal_consistency = 0.2,
+    minimal_ms1_bio = 0.5,
+    minimal_ms1_chemo = 0.5,
+    ms1_only = FALSE,
+    compounds_names = TRUE,
+    high_evidence = FALSE,
+    remove_ties = FALSE,
+    summarize = TRUE,
+    force = FALSE,
+    candidates_neighbors = 5L,
+    candidates_final = 1L
+  )
+  overrides <- list(...)
+  if (length(overrides) > 0L) {
+    args[names(overrides)] <- overrides
+  }
+  do.call(validate_weight_annotations_inputs, args)
 }
 
 # ── validate_weight_annotations_inputs ────────────────────────────────────────
 
 test_that("validate_weight_annotations_inputs passes with valid inputs", {
-  lib <- make_tsv(data.frame(a = 1))
-  com <- make_tsv(data.frame(a = 1))
-  edg <- make_tsv(data.frame(a = 1))
-  tax <- make_tsv(data.frame(a = 1))
-  ann <- make_tsv(data.frame(a = 1))
-  on.exit(unlink(c(lib, com, edg, tax, ann)))
-
-  expect_invisible(validate_weight_annotations_inputs(
-    library = lib,
-    components = com,
-    edges = edg,
-    taxa = tax,
-    annotations = ann,
-    minimal_ms1_condition = "OR",
-    weight_spectral = 1 / 3,
-    weight_chemical = 1 / 3,
-    weight_biological = 1 / 3,
-    minimal_consistency = 0.2,
-    minimal_ms1_bio = 0.5,
-    minimal_ms1_chemo = 0.5,
-    ms1_only = FALSE,
-    compounds_names = TRUE,
-    high_evidence = FALSE,
-    remove_ties = FALSE,
-    summarize = TRUE,
-    force = FALSE,
-    candidates_neighbors = 5L,
-    candidates_final = 1L
-  ))
+  expect_invisible(call_validate_weight_inputs())
 })
 
 test_that("validate_weight_annotations_inputs errors on missing required file", {
-  on.exit(unlink(c(lib, com, edg, tax, ann)))
-  lib <- make_tsv(data.frame(a = 1))
-  com <- make_tsv(data.frame(a = 1))
-  edg <- make_tsv(data.frame(a = 1))
-  tax <- make_tsv(data.frame(a = 1))
-  ann <- make_tsv(data.frame(a = 1))
-
-  expect_error(
-    validate_weight_annotations_inputs(
-      library = "/nonexistent/library.tsv",
-      components = com,
-      edges = edg,
-      taxa = tax,
-      annotations = ann,
-      minimal_ms1_condition = "OR",
-      weight_spectral = 1 / 3,
-      weight_chemical = 1 / 3,
-      weight_biological = 1 / 3,
-      minimal_consistency = 0.2,
-      minimal_ms1_bio = 0.5,
-      minimal_ms1_chemo = 0.5,
-      ms1_only = FALSE,
-      compounds_names = TRUE,
-      high_evidence = FALSE,
-      remove_ties = FALSE,
-      summarize = TRUE,
-      force = FALSE,
-      candidates_neighbors = 5L,
-      candidates_final = 1L
-    )
-  )
-})
-
-test_that("validate_weight_annotations_inputs errors on bad ms1_condition", {
-  lib <- make_tsv(data.frame(a = 1))
-  com <- make_tsv(data.frame(a = 1))
-  edg <- make_tsv(data.frame(a = 1))
-  tax <- make_tsv(data.frame(a = 1))
-  ann <- make_tsv(data.frame(a = 1))
-  on.exit(unlink(c(lib, com, edg, tax, ann)))
-
-  expect_error(validate_weight_annotations_inputs(
-    library = lib,
-    components = com,
-    edges = edg,
-    taxa = tax,
-    annotations = ann,
-    minimal_ms1_condition = "BAD",
-    weight_spectral = 1 / 3,
-    weight_chemical = 1 / 3,
-    weight_biological = 1 / 3,
-    minimal_consistency = 0.2,
-    minimal_ms1_bio = 0.5,
-    minimal_ms1_chemo = 0.5,
-    ms1_only = FALSE,
-    compounds_names = TRUE,
-    high_evidence = FALSE,
-    remove_ties = FALSE,
-    summarize = TRUE,
-    force = FALSE,
-    candidates_neighbors = 5L,
-    candidates_final = 1L
+  expect_error(call_validate_weight_inputs(
+    library = "/nonexistent/library.tsv"
   ))
 })
 
-test_that("validate_weight_annotations_inputs errors when weights do not sum to 1", {
-  lib <- make_tsv(data.frame(a = 1))
-  com <- make_tsv(data.frame(a = 1))
-  edg <- make_tsv(data.frame(a = 1))
-  tax <- make_tsv(data.frame(a = 1))
-  ann <- make_tsv(data.frame(a = 1))
-  on.exit(unlink(c(lib, com, edg, tax, ann)))
+test_that("validate_weight_annotations_inputs errors on bad ms1_condition", {
+  expect_error(call_validate_weight_inputs(minimal_ms1_condition = "BAD"))
+})
 
-  expect_error(validate_weight_annotations_inputs(
-    library = lib,
-    components = com,
-    edges = edg,
-    taxa = tax,
-    annotations = ann,
-    minimal_ms1_condition = "OR",
+test_that("validate_weight_annotations_inputs errors when weights do not sum to 1", {
+  expect_error(call_validate_weight_inputs(
     weight_spectral = 0.5,
     weight_chemical = 0.5,
-    weight_biological = 0.5, # sum = 1.5
-    minimal_consistency = 0.2,
-    minimal_ms1_bio = 0.5,
-    minimal_ms1_chemo = 0.5,
-    ms1_only = FALSE,
-    compounds_names = TRUE,
-    high_evidence = FALSE,
-    remove_ties = FALSE,
-    summarize = TRUE,
-    force = FALSE,
-    candidates_neighbors = 5L,
-    candidates_final = 1L
+    weight_biological = 0.5 # sum = 1.5
   ))
 })
 
 test_that("validate_weight_annotations_inputs errors on negative weight", {
-  lib <- make_tsv(data.frame(a = 1))
-  com <- make_tsv(data.frame(a = 1))
-  edg <- make_tsv(data.frame(a = 1))
-  tax <- make_tsv(data.frame(a = 1))
-  ann <- make_tsv(data.frame(a = 1))
-  on.exit(unlink(c(lib, com, edg, tax, ann)))
-
-  expect_error(validate_weight_annotations_inputs(
-    library = lib,
-    components = com,
-    edges = edg,
-    taxa = tax,
-    annotations = ann,
-    minimal_ms1_condition = "OR",
+  expect_error(call_validate_weight_inputs(
     weight_spectral = -0.1,
     weight_chemical = 0.6,
-    weight_biological = 0.5,
-    minimal_consistency = 0.2,
-    minimal_ms1_bio = 0.5,
-    minimal_ms1_chemo = 0.5,
-    ms1_only = FALSE,
-    compounds_names = TRUE,
-    high_evidence = FALSE,
-    remove_ties = FALSE,
-    summarize = TRUE,
-    force = FALSE,
-    candidates_neighbors = 5L,
-    candidates_final = 1L
+    weight_biological = 0.5
   ))
 })
 
 test_that("validate_weight_annotations_inputs rejects invalid weights and thresholds", {
-  lib <- make_tsv(data.frame(a = 1))
-  com <- make_tsv(data.frame(a = 1))
-  edg <- make_tsv(data.frame(a = 1))
-  tax <- make_tsv(data.frame(a = 1))
-  ann <- make_tsv(data.frame(a = 1))
-  on.exit(unlink(c(lib, com, edg, tax, ann)))
-
   expect_error(
-    validate_weight_annotations_inputs(
-      library = lib,
-      components = com,
-      edges = edg,
-      taxa = tax,
-      annotations = ann,
-      minimal_ms1_condition = "OR",
-      weight_spectral = "bad",
-      weight_chemical = 1 / 3,
-      weight_biological = 1 / 3,
-      minimal_consistency = 0.2,
-      minimal_ms1_bio = 0.5,
-      minimal_ms1_chemo = 0.5,
-      ms1_only = FALSE,
-      compounds_names = TRUE,
-      high_evidence = FALSE,
-      remove_ties = FALSE,
-      summarize = TRUE,
-      force = FALSE,
-      candidates_neighbors = 5L,
-      candidates_final = 1L
-    ),
+    call_validate_weight_inputs(weight_spectral = "bad"),
     "must be numeric",
     class = "tima_validation_error"
   )
 
   expect_error(
-    validate_weight_annotations_inputs(
-      library = lib,
-      components = com,
-      edges = edg,
-      taxa = tax,
-      annotations = ann,
-      minimal_ms1_condition = "OR",
+    call_validate_weight_inputs(
       weight_spectral = -0.1,
       weight_chemical = 0.6,
       weight_biological = 0.5,
-      minimal_consistency = 1.2,
-      minimal_ms1_bio = 0.5,
-      minimal_ms1_chemo = 0.5,
-      ms1_only = FALSE,
-      compounds_names = TRUE,
-      high_evidence = FALSE,
-      remove_ties = FALSE,
-      summarize = TRUE,
-      force = FALSE,
-      candidates_neighbors = 5L,
-      candidates_final = 1L
+      minimal_consistency = 1.2
     ),
     "must be non-negative|sum to 1|minimal_consistency",
     class = "tima_validation_error"
@@ -235,70 +87,18 @@ test_that("validate_weight_annotations_inputs rejects invalid weights and thresh
 })
 
 test_that("validate_weight_annotations_inputs warns on missing optional files", {
-  lib <- make_tsv(data.frame(a = 1))
-  com <- make_tsv(data.frame(a = 1))
-  edg <- make_tsv(data.frame(a = 1))
-  tax <- make_tsv(data.frame(a = 1))
-  ann <- make_tsv(data.frame(a = 1))
-  on.exit(unlink(c(lib, com, edg, tax, ann)))
-
-  expect_no_error(validate_weight_annotations_inputs(
-    library = lib,
-    components = com,
-    edges = edg,
-    taxa = tax,
-    annotations = ann,
+  expect_no_error(call_validate_weight_inputs(
     str_stereo = "missing.tsv",
     org_tax_ott = "missing.tsv",
     canopus = "missing.tsv",
-    formula = "missing.tsv",
-    minimal_ms1_condition = "OR",
-    weight_spectral = 1 / 3,
-    weight_chemical = 1 / 3,
-    weight_biological = 1 / 3,
-    minimal_consistency = 0.2,
-    minimal_ms1_bio = 0.5,
-    minimal_ms1_chemo = 0.5,
-    ms1_only = FALSE,
-    compounds_names = TRUE,
-    high_evidence = FALSE,
-    remove_ties = FALSE,
-    summarize = TRUE,
-    force = FALSE,
-    candidates_neighbors = 5L,
-    candidates_final = 1L
+    formula = "missing.tsv"
   ))
 })
 
 test_that("validate_weight_annotations_inputs errors on missing annotation file", {
-  lib <- make_tsv(data.frame(a = 1))
-  com <- make_tsv(data.frame(a = 1))
-  edg <- make_tsv(data.frame(a = 1))
-  tax <- make_tsv(data.frame(a = 1))
-  on.exit(unlink(c(lib, com, edg, tax)))
-
   expect_error(
-    validate_weight_annotations_inputs(
-      library = lib,
-      components = com,
-      edges = edg,
-      taxa = tax,
-      annotations = c("missing-a.tsv", "missing-b.tsv"),
-      minimal_ms1_condition = "OR",
-      weight_spectral = 1 / 3,
-      weight_chemical = 1 / 3,
-      weight_biological = 1 / 3,
-      minimal_consistency = 0.2,
-      minimal_ms1_bio = 0.5,
-      minimal_ms1_chemo = 0.5,
-      ms1_only = FALSE,
-      compounds_names = TRUE,
-      high_evidence = FALSE,
-      remove_ties = FALSE,
-      summarize = TRUE,
-      force = FALSE,
-      candidates_neighbors = 5L,
-      candidates_final = 1L
+    call_validate_weight_inputs(
+      annotations = c("missing-a.tsv", "missing-b.tsv")
     ),
     "Annotation file\\(s\\) not found",
     class = "tima_validation_error"
@@ -310,9 +110,8 @@ test_that("validate_weight_annotations_inputs errors on missing annotation file"
 test_that("load_annotation_tables loads and binds multiple files", {
   df1 <- data.frame(feature_id = "F1", candidate_score_similarity = NA_real_)
   df2 <- data.frame(feature_id = "F2", candidate_score_similarity = NA_real_)
-  f1 <- make_tsv(df1)
-  f2 <- make_tsv(df2)
-  on.exit(unlink(c(f1, f2)))
+  f1 <- local_test_tsv(df1)
+  f2 <- local_test_tsv(df2)
 
   result <- load_annotation_tables(c(f1, f2), ms1_only = FALSE)
   expect_equal(nrow(result), 2L)
@@ -325,8 +124,7 @@ test_that("load_annotation_tables filters MS1-only when requested", {
     candidate_score_similarity = c(NA_real_, 0.9, NA_real_),
     candidate_score_sirius_csi = c(NA_real_, NA_real_, 0.8)
   )
-  f <- make_tsv(df)
-  on.exit(unlink(f))
+  f <- local_test_tsv(df)
 
   result_all <- load_annotation_tables(f, ms1_only = FALSE)
   result_ms1 <- load_annotation_tables(f, ms1_only = TRUE)
@@ -343,8 +141,7 @@ test_that("load_annotation_tables warns when MS1-only filtering removes all rows
     candidate_score_similarity = c(0.9, 0.8),
     candidate_score_sirius_csi = c(0.1, 0.2)
   )
-  f <- make_tsv(df)
-  on.exit(unlink(f))
+  f <- local_test_tsv(df)
 
   result <- load_annotation_tables(f, ms1_only = TRUE)
   expect_equal(nrow(result), 0L)
@@ -355,8 +152,7 @@ test_that("load_annotation_tables handles confidence-column absent and error pat
     feature_id = c("F1", "F2"),
     candidate_score_similarity = c(NA_real_, NA_real_)
   )
-  f <- make_tsv(df)
-  on.exit(unlink(f))
+  f <- local_test_tsv(df)
 
   result <- load_annotation_tables(f, ms1_only = TRUE)
   expect_equal(nrow(result), 2L)
@@ -376,8 +172,7 @@ test_that("load_edges_table loads and filters to top N neighbors", {
     feature_target = c("F2", "F3", "F4", "F1"),
     candidate_score_similarity = c(0.9, 0.7, 0.5, 0.8)
   )
-  f <- make_tsv(df)
-  on.exit(unlink(f))
+  f <- local_test_tsv(df)
 
   result <- load_edges_table(f, candidates_neighbors = 2L)
 
@@ -397,8 +192,7 @@ test_that("load_structure_organism_pairs loads library and joins optional files"
     ),
     candidate_structure_exact_mass = c(180.1, 200.2)
   )
-  lib <- make_tsv(lib_df)
-  on.exit(unlink(lib))
+  lib <- local_test_tsv(lib_df)
 
   result <- load_structure_organism_pairs(
     lib,
@@ -417,18 +211,17 @@ test_that("load_structure_organism_pairs joins optional stereo and taxonomy tabl
     structure_name = c("A", "B"),
     stringsAsFactors = FALSE
   )
-  lib <- make_tsv(lib_df)
-  stereo <- make_tsv(data.frame(
+  lib <- local_test_tsv(lib_df)
+  stereo <- local_test_tsv(data.frame(
     inchikey = "AAAAAAAAAAAAAA",
     stereo_name = "stereo-A",
     stringsAsFactors = FALSE
   ))
-  tax <- make_tsv(data.frame(
+  tax <- local_test_tsv(data.frame(
     inchikey = "BBBBBBBBBBBBBB",
     organism_name = "Org-B",
     stringsAsFactors = FALSE
   ))
-  on.exit(unlink(c(lib, stereo, tax)))
 
   result <- load_structure_organism_pairs(
     lib,
@@ -459,9 +252,8 @@ test_that("load_structure_organism_pairs handles 2-key stereo join and verifies 
     structure_name = c("Ethanol", "Propane"),
     stringsAsFactors = FALSE
   )
-  lib <- make_tsv(lib_df)
-  stereo <- make_tsv(stereo_df)
-  on.exit(unlink(c(lib, stereo)))
+  lib <- local_test_tsv(lib_df)
+  stereo <- local_test_tsv(stereo_df)
 
   result <- load_structure_organism_pairs(
     lib,
@@ -554,10 +346,9 @@ test_that("load_structure_organism_pairs filters to needed_structures before joi
     organism_taxonomy_01domain = c("Eukaryota", "Bacteria"),
     stringsAsFactors = FALSE
   )
-  lib <- make_tsv(lib_df)
-  stereo <- make_tsv(stereo_df)
-  tax <- make_tsv(tax_df)
-  on.exit(unlink(c(lib, stereo, tax)))
+  lib <- local_test_tsv(lib_df)
+  stereo <- local_test_tsv(stereo_df)
+  tax <- local_test_tsv(tax_df)
 
   res <- load_structure_organism_pairs(
     lib,

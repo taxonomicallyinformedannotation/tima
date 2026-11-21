@@ -14,34 +14,14 @@ base_annot <- function() {
   )
 }
 
-test_that("validate_clean_chemo_inputs accepts valid parameters", {
-  expect_invisible(validate_clean_chemo_inputs(
-    annot_table_wei_chemo = base_annot(),
-    candidates_final = 1,
-    best_percentile = 0.8,
-    minimal_ms1_bio = 0.5,
-    minimal_ms1_chemo = 0.5,
-    minimal_ms1_condition = "OR",
-    compounds_names = TRUE,
-    high_evidence = FALSE,
-    remove_ties = FALSE,
-    summarize = TRUE,
-    max_per_score = 10,
-    score_chemical_cla_kingdom = 0.1,
-    score_chemical_cla_superclass = 0.1,
-    score_chemical_cla_class = 0.1,
-    score_chemical_cla_parent = 0.1,
-    score_chemical_npc_pathway = 0.1,
-    score_chemical_npc_superclass = 0.1,
-    score_chemical_npc_class = 0.1
-  ))
-})
-
-test_that("validate_clean_chemo_inputs errors on missing required columns", {
-  bad <- tidytable::tidytable(feature_id = "F1")
-  expect_error(
-    validate_clean_chemo_inputs(
-      annot_table_wei_chemo = bad,
+call_validate_clean_chemo <- function(
+  annot = base_annot(),
+  ...,
+  .score_all = NULL
+) {
+  args <- c(
+    list(
+      annot_table_wei_chemo = annot,
       candidates_final = 1,
       best_percentile = 0.8,
       minimal_ms1_bio = 0.5,
@@ -51,15 +31,25 @@ test_that("validate_clean_chemo_inputs errors on missing required columns", {
       high_evidence = FALSE,
       remove_ties = FALSE,
       summarize = TRUE,
-      max_per_score = 10,
-      score_chemical_cla_kingdom = NULL,
-      score_chemical_cla_superclass = NULL,
-      score_chemical_cla_class = NULL,
-      score_chemical_cla_parent = NULL,
-      score_chemical_npc_pathway = NULL,
-      score_chemical_npc_superclass = NULL,
-      score_chemical_npc_class = NULL
+      max_per_score = 10
     ),
+    default_chemo_scores(.all = .score_all)
+  )
+  overrides <- list(...)
+  if (length(overrides) > 0L) {
+    args[names(overrides)] <- overrides
+  }
+  do.call(validate_clean_chemo_inputs, args)
+}
+
+test_that("validate_clean_chemo_inputs accepts valid parameters", {
+  expect_invisible(call_validate_clean_chemo(.score_all = 0.1))
+})
+
+test_that("validate_clean_chemo_inputs errors on missing required columns", {
+  bad <- tidytable::tidytable(feature_id = "F1")
+  expect_error(
+    call_validate_clean_chemo(annot = bad),
     class = "tima_validation_error"
   )
 })
@@ -268,176 +258,43 @@ test_that("compute_candidate_M returns numeric(0) for empty input", {
 
 test_that("validate_clean_chemo_inputs rejects invalid parameter branches", {
   expect_error(
-    validate_clean_chemo_inputs(
-      annot_table_wei_chemo = base_annot(),
-      candidates_final = 0,
-      best_percentile = 0.8,
-      minimal_ms1_bio = 0.5,
-      minimal_ms1_chemo = 0.5,
-      minimal_ms1_condition = "OR",
-      compounds_names = TRUE,
-      high_evidence = FALSE,
-      remove_ties = FALSE,
-      summarize = TRUE,
-      max_per_score = 10,
-      score_chemical_cla_kingdom = NULL,
-      score_chemical_cla_superclass = NULL,
-      score_chemical_cla_class = NULL,
-      score_chemical_cla_parent = NULL,
-      score_chemical_npc_pathway = NULL,
-      score_chemical_npc_superclass = NULL,
-      score_chemical_npc_class = NULL
-    ),
+    call_validate_clean_chemo(candidates_final = 0),
     "candidates_final must be a positive integer",
     class = "tima_validation_error"
   )
 
   expect_error(
-    validate_clean_chemo_inputs(
-      annot_table_wei_chemo = base_annot(),
-      candidates_final = 1,
-      best_percentile = 1.5,
-      minimal_ms1_bio = 0.5,
-      minimal_ms1_chemo = 0.5,
-      minimal_ms1_condition = "OR",
-      compounds_names = TRUE,
-      high_evidence = FALSE,
-      remove_ties = FALSE,
-      summarize = TRUE,
-      max_per_score = 10,
-      score_chemical_cla_kingdom = NULL,
-      score_chemical_cla_superclass = NULL,
-      score_chemical_cla_class = NULL,
-      score_chemical_cla_parent = NULL,
-      score_chemical_npc_pathway = NULL,
-      score_chemical_npc_superclass = NULL,
-      score_chemical_npc_class = NULL
-    ),
+    call_validate_clean_chemo(best_percentile = 1.5),
     "best_percentile must be between 0 and 1",
     class = "tima_validation_error"
   )
 
   expect_error(
-    validate_clean_chemo_inputs(
-      annot_table_wei_chemo = base_annot(),
-      candidates_final = 1,
-      best_percentile = 0.8,
-      minimal_ms1_bio = 0.5,
-      minimal_ms1_chemo = 0.5,
-      minimal_ms1_condition = "XOR",
-      compounds_names = TRUE,
-      high_evidence = FALSE,
-      remove_ties = FALSE,
-      summarize = TRUE,
-      max_per_score = 10,
-      score_chemical_cla_kingdom = NULL,
-      score_chemical_cla_superclass = NULL,
-      score_chemical_cla_class = NULL,
-      score_chemical_cla_parent = NULL,
-      score_chemical_npc_pathway = NULL,
-      score_chemical_npc_superclass = NULL,
-      score_chemical_npc_class = NULL
-    ),
+    call_validate_clean_chemo(minimal_ms1_condition = "XOR"),
     "minimal_ms1_condition must be 'OR' or 'AND'",
     class = "tima_validation_error"
   )
 
   expect_error(
-    validate_clean_chemo_inputs(
-      annot_table_wei_chemo = base_annot(),
-      candidates_final = 1,
-      best_percentile = 0.8,
-      minimal_ms1_bio = 0.5,
-      minimal_ms1_chemo = 0.5,
-      minimal_ms1_condition = "OR",
-      compounds_names = "TRUE",
-      high_evidence = FALSE,
-      remove_ties = FALSE,
-      summarize = TRUE,
-      max_per_score = 10,
-      score_chemical_cla_kingdom = NULL,
-      score_chemical_cla_superclass = NULL,
-      score_chemical_cla_class = NULL,
-      score_chemical_cla_parent = NULL,
-      score_chemical_npc_pathway = NULL,
-      score_chemical_npc_superclass = NULL,
-      score_chemical_npc_class = NULL
-    ),
+    call_validate_clean_chemo(compounds_names = "TRUE"),
     "must be logical",
     class = "tima_validation_error"
   )
 
   expect_error(
-    validate_clean_chemo_inputs(
-      annot_table_wei_chemo = base_annot(),
-      candidates_final = 1,
-      best_percentile = 0.8,
-      minimal_ms1_bio = 0.5,
-      minimal_ms1_chemo = 0.5,
-      minimal_ms1_condition = "OR",
-      compounds_names = TRUE,
-      high_evidence = FALSE,
-      remove_ties = FALSE,
-      summarize = TRUE,
-      max_per_score = 0,
-      score_chemical_cla_kingdom = NULL,
-      score_chemical_cla_superclass = NULL,
-      score_chemical_cla_class = NULL,
-      score_chemical_cla_parent = NULL,
-      score_chemical_npc_pathway = NULL,
-      score_chemical_npc_superclass = NULL,
-      score_chemical_npc_class = NULL
-    ),
+    call_validate_clean_chemo(max_per_score = 0),
     "max_per_score must be a positive integer",
     class = "tima_validation_error"
   )
 
   expect_error(
-    validate_clean_chemo_inputs(
-      annot_table_wei_chemo = base_annot(),
-      candidates_final = 1,
-      best_percentile = 0.8,
-      minimal_ms1_bio = 0.5,
-      minimal_ms1_chemo = 0.5,
-      minimal_ms1_condition = "OR",
-      compounds_names = TRUE,
-      high_evidence = FALSE,
-      remove_ties = FALSE,
-      summarize = TRUE,
-      max_per_score = 10,
-      score_chemical_cla_kingdom = "bad",
-      score_chemical_cla_superclass = NULL,
-      score_chemical_cla_class = NULL,
-      score_chemical_cla_parent = NULL,
-      score_chemical_npc_pathway = NULL,
-      score_chemical_npc_superclass = NULL,
-      score_chemical_npc_class = NULL
-    ),
+    call_validate_clean_chemo(score_chemical_cla_kingdom = "bad"),
     "taxonomy weight parameters must be numeric",
     class = "tima_validation_error"
   )
 
   expect_error(
-    validate_clean_chemo_inputs(
-      annot_table_wei_chemo = base_annot(),
-      candidates_final = 1,
-      best_percentile = 0.8,
-      minimal_ms1_bio = 0.5,
-      minimal_ms1_chemo = 0.5,
-      minimal_ms1_condition = "OR",
-      compounds_names = TRUE,
-      high_evidence = FALSE,
-      remove_ties = FALSE,
-      summarize = TRUE,
-      max_per_score = 10,
-      score_chemical_cla_kingdom = 1.2,
-      score_chemical_cla_superclass = NULL,
-      score_chemical_cla_class = NULL,
-      score_chemical_cla_parent = NULL,
-      score_chemical_npc_pathway = NULL,
-      score_chemical_npc_superclass = NULL,
-      score_chemical_npc_class = NULL
-    ),
+    call_validate_clean_chemo(score_chemical_cla_kingdom = 1.2),
     "taxonomy weights must be within \\[0,1\\]",
     class = "tima_validation_error"
   )
@@ -578,15 +435,9 @@ test_that("build_mini_taxonomy_table prefers structure label on score equality a
     feature_pred_tax_npc_03cla_val = c("PredNpc1", "PredNpc2"),
     feature_pred_tax_npc_03cla_score = c(0.85, 0.60)
   )
-  out <- build_mini_taxonomy_table(
-    df_percentile = df_perc,
-    score_chemical_cla_kingdom = 1,
-    score_chemical_cla_superclass = 1,
-    score_chemical_cla_class = 1,
-    score_chemical_cla_parent = 1,
-    score_chemical_npc_pathway = 1,
-    score_chemical_npc_superclass = 1,
-    score_chemical_npc_class = 1
+  out <- do.call(
+    build_mini_taxonomy_table,
+    c(list(df_percentile = df_perc), default_chemo_scores(.all = 1))
   )
   expect_identical(out$has_inchikey, c(TRUE, FALSE))
   # F1: cla structure score (0.80) == pred score (0.80) -> structure wins, score_classyfire is NA
@@ -608,49 +459,25 @@ test_that("build_mini_taxonomy_table prefers structure label on score equality a
     candidate_score_pseudo_initial = 0.5
   )
   expect_error(
-    validate_clean_chemo_inputs(
-      annot_table_wei_chemo = df_dummy,
-      candidates_final = 1L,
+    call_validate_clean_chemo(
+      annot = df_dummy,
       best_percentile = 0.5,
       minimal_ms1_bio = -0.1,
-      minimal_ms1_chemo = 0.5,
-      minimal_ms1_condition = "OR",
-      compounds_names = TRUE,
-      high_evidence = FALSE,
-      remove_ties = FALSE,
       summarize = FALSE,
       max_per_score = 1L,
-      score_chemical_cla_kingdom = 0.5,
-      score_chemical_cla_superclass = 0.5,
-      score_chemical_cla_class = 0.5,
-      score_chemical_cla_parent = 0.5,
-      score_chemical_npc_pathway = 0.5,
-      score_chemical_npc_superclass = 0.5,
-      score_chemical_npc_class = 0.5
+      .score_all = 0.5
     ),
     "minimal_ms1_bio",
     class = "tima_validation_error"
   )
   expect_error(
-    validate_clean_chemo_inputs(
-      annot_table_wei_chemo = df_dummy,
-      candidates_final = 1L,
+    call_validate_clean_chemo(
+      annot = df_dummy,
       best_percentile = 0.5,
-      minimal_ms1_bio = 0.5,
       minimal_ms1_chemo = 1.5,
-      minimal_ms1_condition = "OR",
-      compounds_names = TRUE,
-      high_evidence = FALSE,
-      remove_ties = FALSE,
       summarize = FALSE,
       max_per_score = 1L,
-      score_chemical_cla_kingdom = 0.5,
-      score_chemical_cla_superclass = 0.5,
-      score_chemical_cla_class = 0.5,
-      score_chemical_cla_parent = 0.5,
-      score_chemical_npc_pathway = 0.5,
-      score_chemical_npc_superclass = 0.5,
-      score_chemical_npc_class = 0.5
+      .score_all = 0.5
     ),
     "minimal_ms1_chemo",
     class = "tima_validation_error"

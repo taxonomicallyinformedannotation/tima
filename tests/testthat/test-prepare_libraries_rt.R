@@ -616,20 +616,27 @@ test_that("prepare_libraries_rt handles missing InChIKeys", {
 
 test_that("prepare_libraries_rt keeps MGF entries without peaks or precursor", {
   mgf_exp <- file.path(tempdir(), "exp_rt.mgf")
-  writeLines(
+  write_test_mgf(
     c(
-      "BEGIN IONS",
-      "PEPMASS=47.05",
-      "RTINSECONDS=312",
-      "SMILES=CCO",
-      "INCHIKEY=LFQSCWFLJHTTHZ-UHFFFAOYSA-N",
-      "END IONS",
-      "BEGIN IONS",
-      "RTINSECONDS=468",
-      "SMILES=CC(=O)O",
-      "INCHIKEY=QTBSBXVTEAMEQO-UHFFFAOYSA-N",
-      "43.0 100",
-      "END IONS"
+      format_mgf_block(
+        pepmass = "47.05",
+        peaks = character(0),
+        charge = NULL,
+        extra_headers = c(
+          "RTINSECONDS=312",
+          "SMILES=CCO",
+          "INCHIKEY=LFQSCWFLJHTTHZ-UHFFFAOYSA-N"
+        )
+      ),
+      format_mgf_block(
+        peaks = "43.0 100",
+        charge = NULL,
+        extra_headers = c(
+          "RTINSECONDS=468",
+          "SMILES=CC(=O)O",
+          "INCHIKEY=QTBSBXVTEAMEQO-UHFFFAOYSA-N"
+        )
+      )
     ),
     mgf_exp
   )
@@ -661,16 +668,15 @@ test_that("prepare_libraries_rt keeps MGF entries without peaks or precursor", {
 
 test_that("read_mgf_metadata reads every block's fields", {
   mgf <- file.path(tempdir(), "meta.mgf")
-  writeLines(
+  write_test_mgf(
     c(
-      "BEGIN IONS",
-      "TITLE=a",
-      "rtinseconds=1",
-      "END IONS",
-      "BEGIN IONS",
-      "TITLE=b",
-      "10.0 5",
-      "END IONS"
+      format_mgf_block(
+        title = "a",
+        peaks = character(0),
+        charge = NULL,
+        extra_headers = "rtinseconds=1"
+      ),
+      format_mgf_block(title = "b", peaks = "10.0 5", charge = NULL)
     ),
     mgf
   )
@@ -680,12 +686,11 @@ test_that("read_mgf_metadata reads every block's fields", {
 
   # Predicted MGF as list, missing rt/smiles columns, and unparseable SMILES without InChIKey
   mgf_is_file <- file.path(tempdir(), "is_rt.mgf")
-  writeLines(
-    c(
-      "BEGIN IONS",
-      "RTINSECONDS=120",
-      "SMILES=invalid_smiles_xyz",
-      "END IONS"
+  write_test_mgf(
+    format_mgf_block(
+      peaks = character(0),
+      charge = NULL,
+      extra_headers = c("RTINSECONDS=120", "SMILES=invalid_smiles_xyz")
     ),
     mgf_is_file
   )

@@ -9,18 +9,11 @@ test_that("sanitize_mgf returns invalid for missing file", {
 })
 
 test_that("sanitize_mgf validates a minimal well-formed MGF", {
-  mgf <- tempfile(pattern = "tima-mgf-", fileext = ".mgf")
-  writeLines(
-    c(
-      "BEGIN IONS",
-      "PEPMASS=200.123",
-      "100.0 0.5",
-      "150.0 1.0",
-      "END IONS"
-    ),
-    mgf
-  )
-  on.exit(unlink(mgf))
+  mgf <- local_test_mgf(format_mgf_block(
+    pepmass = "200.123",
+    peaks = c("100.0 0.5", "150.0 1.0"),
+    charge = NULL
+  ))
 
   result <- sanitize_mgf(mgf)
   expect_true(result$valid)
@@ -29,9 +22,7 @@ test_that("sanitize_mgf validates a minimal well-formed MGF", {
 })
 
 test_that("sanitize_mgf detects empty MGF (no BEGIN IONS)", {
-  mgf <- tempfile(pattern = "tima-mgf-empty-", fileext = ".mgf")
-  writeLines(c("# comment only"), mgf)
-  on.exit(unlink(mgf))
+  mgf <- local_test_mgf(c("# comment only"))
 
   result <- sanitize_mgf(mgf)
   expect_false(result$valid)
@@ -39,17 +30,12 @@ test_that("sanitize_mgf detects empty MGF (no BEGIN IONS)", {
 })
 
 test_that("sanitize_mgf detects mismatched BEGIN/END IONS", {
-  mgf <- tempfile(pattern = "tima-mgf-mismatch-", fileext = ".mgf")
-  writeLines(
-    c(
-      "BEGIN IONS",
-      "PEPMASS=200.123",
-      "100.0 0.5"
-      # Missing END IONS
-    ),
-    mgf
-  )
-  on.exit(unlink(mgf))
+  mgf <- local_test_mgf(c(
+    "BEGIN IONS",
+    "PEPMASS=200.123",
+    "100.0 0.5"
+    # Missing END IONS
+  ))
 
   result <- sanitize_mgf(mgf)
   expect_false(result$valid)
@@ -61,21 +47,10 @@ test_that("sanitize_mgf detects mismatched BEGIN/END IONS", {
 })
 
 test_that("sanitize_mgf counts multiple MS2 spectra", {
-  mgf <- tempfile(pattern = "tima-mgf-multi-", fileext = ".mgf")
-  writeLines(
-    c(
-      "BEGIN IONS",
-      "PEPMASS=100.0",
-      "50.0 1.0",
-      "END IONS",
-      "BEGIN IONS",
-      "PEPMASS=200.0",
-      "100.0 1.0",
-      "END IONS"
-    ),
-    mgf
-  )
-  on.exit(unlink(mgf))
+  mgf <- local_test_mgf(c(
+    format_mgf_block(pepmass = "100.0", peaks = "50.0 1.0", charge = NULL),
+    format_mgf_block(pepmass = "200.0", peaks = "100.0 1.0", charge = NULL)
+  ))
 
   result <- sanitize_mgf(mgf)
   expect_true(result$valid)
@@ -83,17 +58,11 @@ test_that("sanitize_mgf counts multiple MS2 spectra", {
 })
 
 test_that("sanitize_mgf detects missing PEPMASS in first MS2 spectrum", {
-  mgf <- tempfile(pattern = "tima-mgf-nopepmass-", fileext = ".mgf")
-  writeLines(
-    c(
-      "BEGIN IONS",
-      "TITLE=NoMass",
-      "100.0 0.5",
-      "END IONS"
-    ),
-    mgf
-  )
-  on.exit(unlink(mgf))
+  mgf <- local_test_mgf(format_mgf_block(
+    title = "NoMass",
+    peaks = "100.0 0.5",
+    charge = NULL
+  ))
 
   result <- sanitize_mgf(mgf)
   expect_true(any(grepl("PEPMASS", result$issues)))
@@ -471,18 +440,20 @@ test_that("sanitize_sirius keeps validation status when structure count read fai
   )
 
   # Additional edge cases across sanitize_mgf, sanitize_csv, sanitize_metadata, and sanitize_sirius
-  tf_mgf_ms1only <- withr::local_tempfile(fileext = ".mgf")
-  writeLines(
-    c("BEGIN IONS", "PEPMASS=100.0", "MSLEVEL=1", "END IONS"),
-    tf_mgf_ms1only
-  )
+  tf_mgf_ms1only <- local_test_mgf(format_mgf_block(
+    pepmass = "100.0",
+    peaks = character(0),
+    charge = NULL,
+    mslevel = "1"
+  ))
   expect_false(sanitize_mgf(tf_mgf_ms1only)$valid)
 
-  tf_mgf_nopeaks <- withr::local_tempfile(fileext = ".mgf")
-  writeLines(
-    c("BEGIN IONS", "PEPMASS=100.0", "MSLEVEL=2", "END IONS"),
-    tf_mgf_nopeaks
-  )
+  tf_mgf_nopeaks <- local_test_mgf(format_mgf_block(
+    pepmass = "100.0",
+    peaks = character(0),
+    charge = NULL,
+    mslevel = "2"
+  ))
   res_np <- sanitize_mgf(tf_mgf_nopeaks)
   expect_true(res_np$valid)
 

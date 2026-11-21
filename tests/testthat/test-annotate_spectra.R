@@ -4,30 +4,27 @@ library(testthat)
 
 # Helper to create minimal mgf with adjustable precursor masses & polarity
 write_minimal_mgf <- function(path, precursors, charge = "1+") {
-  dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
-  lines <- unlist(
-    lapply(seq_along(precursors), function(i) {
-      mz <- precursors[[i]]
-      c(
-        "BEGIN IONS",
-        paste0("TITLE=Spectrum_", i),
-        paste0("PEPMASS=", mz),
-        paste0("CHARGE=", charge),
-        paste0("NAME=Name_", i),
-        paste0("INCHIKEY=AAAAAAAAAAAAAA-BBBBBBBBBB-C"),
-        paste0("SMILES=CCC"),
-        "MSLEVEL=2",
+  lines <- lapply(seq_along(precursors), function(i) {
+    mz <- precursors[[i]]
+    format_mgf_block(
+      pepmass = mz,
+      peaks = c(
         paste0(round(mz * 0.5), " 100"),
         paste0(round(mz * 0.75), " 200"),
-        paste0(round(mz), " 300"),
-        "END IONS",
-        ""
-      )
-    }),
-    use.names = FALSE
-  )
-  writeLines(lines, path)
-  invisible(path)
+        paste0(round(mz), " 300")
+      ),
+      title = paste0("Spectrum_", i),
+      charge = charge,
+      mslevel = "2",
+      extra_headers = c(
+        paste0("NAME=Name_", i),
+        "INCHIKEY=AAAAAAAAAAAAAA-BBBBBBBBBB-C",
+        "SMILES=CCC"
+      ),
+      trailing_blank = TRUE
+    )
+  })
+  write_test_mgf(lines, path)
 }
 
 # Validation tests ----
@@ -298,16 +295,13 @@ test_that("library spectra with empty peaks are removed before concatenation", {
     "lib_empty_pos.mgf"
   )
   write_minimal_mgf(lib_ok, precursors = c(200))
-  dir.create(dirname(lib_empty), recursive = TRUE, showWarnings = FALSE)
-  writeLines(
-    c(
-      "BEGIN IONS",
-      "TITLE=EmptySpectrum",
-      "PEPMASS=300",
-      "CHARGE=1+",
-      "MSLEVEL=2",
-      "END IONS",
-      ""
+  write_test_mgf(
+    format_mgf_block(
+      pepmass = 300,
+      peaks = character(0),
+      title = "EmptySpectrum",
+      mslevel = "2",
+      trailing_blank = TRUE
     ),
     lib_empty
   )
@@ -407,21 +401,14 @@ test_that("NA fallback for smiles is applied", {
     "spectra",
     "lib_pos_missing_meta.mgf"
   )
-  dir.create(dirname(lib_path), recursive = TRUE, showWarnings = FALSE)
-  writeLines(
-    c(
-      "BEGIN IONS",
-      "TITLE=MetaMissing",
-      "PEPMASS=200",
-      "CHARGE=1+",
-      "NAME=Example",
-      "SMILES=CCO",
-      "MSLEVEL=2",
-      "100 100",
-      "150 200",
-      "200 300",
-      "END IONS",
-      ""
+  write_test_mgf(
+    format_mgf_block(
+      pepmass = 200,
+      peaks = c("100 100", "150 200", "200 300"),
+      title = "MetaMissing",
+      mslevel = "2",
+      extra_headers = c("NAME=Example", "SMILES=CCO"),
+      trailing_blank = TRUE
     ),
     lib_path
   )
@@ -772,11 +759,7 @@ test_that("annotate_spectra reports missing input files after pre-flight checks"
 
 test_that("annotate_spectra reports missing library files after pre-flight checks", {
   withr::local_dir(new = temp_test_dir("ann_spe_mock_missing_library"))
-  query_file <- tempfile(fileext = ".mgf")
-  writeLines(
-    c("BEGIN IONS", "PEPMASS=100", "CHARGE=1+", "100 10", "END IONS"),
-    query_file
-  )
+  query_file <- local_test_mgf(format_mgf_block(pepmass = 100))
 
   expect_error(
     annotate_spectra(
@@ -2009,40 +1992,43 @@ test_that("annotate_spectra and helpers cover validation, preflight, RDS librari
   lib_mgf <- file.path(td, "lib_pos.mgf")
   out_tsv <- file.path(td, "out.tsv")
 
-  writeLines(
-    c(
-      "BEGIN IONS",
-      "FEATURE_ID=Q1",
-      "PEPMASS=101.0073",
-      "CHARGE=1+",
-      "ADDUCT=[M+H]+",
-      "MSLEVEL=2",
-      "40.0 100",
-      "50.0 200",
-      "60.0 300",
-      "101.0073 1000",
-      "END IONS",
-      ""
-    ),
-    q_mgf
+  q1_block <- format_mgf_block(
+    pepmass = "101.0073",
+    peaks = c("40.0 100", "50.0 200", "60.0 300", "101.0073 1000"),
+    mslevel = "2",
+    extra_headers = c("FEATURE_ID=Q1", "ADDUCT=[M+H]+"),
+    trailing_blank = TRUE
   )
-  writeLines(
-    c(
-      "BEGIN IONS",
-      "SPECTRUM_ID=LIB1",
-      "PEPMASS=101.0073",
-      "CHARGE=1+",
-      "ADDUCT=[M+H]+",
-      "MSLEVEL=2",
-      "SMILES=CCO",
-      "NAME=Ethanol",
-      "LIBRARY=GNPS",
-      "40.0 100",
-      "50.0 200",
-      "60.0 300",
-      "101.0073 1000",
-      "END IONS",
-      ""
+  q2_block <- format_mgf_block(
+    pepmass = "101.0073",
+    peaks = c("70.0 100", "75.0 200", "80.0 300"),
+    mslevel = "2",
+    extra_headers = c("FEATURE_ID=Q2", "ADDUCT=[M+H]+"),
+    trailing_blank = TRUE
+  )
+  q_ms1_block <- format_mgf_block(
+    pepmass = "101.0073",
+    peaks = "101.0073 1000",
+    charge = NULL,
+    mslevel = "1",
+    extra_headers = "FEATURE_ID=Q_MS1",
+    trailing_blank = TRUE
+  )
+
+  write_test_mgf(q1_block, q_mgf)
+  write_test_mgf(
+    format_mgf_block(
+      pepmass = "101.0073",
+      peaks = c("40.0 100", "50.0 200", "60.0 300", "101.0073 1000"),
+      mslevel = "2",
+      extra_headers = c(
+        "SPECTRUM_ID=LIB1",
+        "ADDUCT=[M+H]+",
+        "SMILES=CCO",
+        "NAME=Ethanol",
+        "LIBRARY=GNPS"
+      ),
+      trailing_blank = TRUE
     ),
     lib_mgf
   )
@@ -2094,18 +2080,7 @@ test_that("annotate_spectra and helpers cover validation, preflight, RDS librari
   expect_true(file.exists(res_empty))
 
   ms1_only_mgf <- file.path(td, "ms1_only.mgf")
-  writeLines(
-    c(
-      "BEGIN IONS",
-      "FEATURE_ID=Q_MS1",
-      "PEPMASS=101.0073",
-      "MSLEVEL=1",
-      "101.0073 1000",
-      "END IONS",
-      ""
-    ),
-    ms1_only_mgf
-  )
+  write_test_mgf(q_ms1_block, ms1_only_mgf)
   expect_warning(
     res_ms1 <- annotate_spectra(
       input = ms1_only_mgf,
@@ -2119,43 +2094,9 @@ test_that("annotate_spectra and helpers cover validation, preflight, RDS librari
 
   # 4. Mixed MS1+MS2 query MGF + real match + ms1_annotations file (producing both positive match and 0.00 row)
   mixed_mgf <- file.path(td, "mixed.mgf")
-  writeLines(
-    c(
-      "BEGIN IONS",
-      "FEATURE_ID=Q_MS1",
-      "PEPMASS=101.0073",
-      "MSLEVEL=1",
-      "101.0073 1000",
-      "END IONS",
-      "",
-      "BEGIN IONS",
-      "FEATURE_ID=Q1",
-      "PEPMASS=101.0073",
-      "CHARGE=1+",
-      "ADDUCT=[M+H]+",
-      "MSLEVEL=2",
-      "40.0 100",
-      "50.0 200",
-      "60.0 300",
-      "101.0073 1000",
-      "END IONS",
-      "",
-      "BEGIN IONS",
-      "FEATURE_ID=Q2",
-      "PEPMASS=101.0073",
-      "CHARGE=1+",
-      "ADDUCT=[M+H]+",
-      "MSLEVEL=2",
-      "70.0 100",
-      "75.0 200",
-      "80.0 300",
-      "END IONS",
-      ""
-    ),
-    mixed_mgf
-  )
+  write_test_mgf(c(q_ms1_block, q1_block, q2_block), mixed_mgf)
   ms1_file <- file.path(td, "ms1_ann.tsv")
-  tidytable::fwrite(
+  write_test_tsv(
     tidytable::tidytable(
       feature_id = c("Q1", "Q2"),
       candidate_structure_smiles_no_stereo = c("CCO", "CCO"),
@@ -2163,8 +2104,7 @@ test_that("annotate_spectra and helpers cover validation, preflight, RDS librari
       candidate_structure_error_mz = c("0.0001", "0.0001"),
       candidate_structure_name = c("Ethanol", "Ethanol")
     ),
-    ms1_file,
-    sep = "\t"
+    ms1_file
   )
   expect_warning(
     res_mixed <- annotate_spectra(
@@ -2183,29 +2123,7 @@ test_that("annotate_spectra and helpers cover validation, preflight, RDS librari
 
   # 5. Also cover annotate_spectra when ONLY ms1_zero_rows are produced (no positive hits above threshold)
   zero_only_mgf <- file.path(td, "zero_only.mgf")
-  writeLines(
-    c(
-      "BEGIN IONS",
-      "FEATURE_ID=Q_MS1",
-      "PEPMASS=101.0073",
-      "MSLEVEL=1",
-      "101.0073 1000",
-      "END IONS",
-      "",
-      "BEGIN IONS",
-      "FEATURE_ID=Q2",
-      "PEPMASS=101.0073",
-      "CHARGE=1+",
-      "ADDUCT=[M+H]+",
-      "MSLEVEL=2",
-      "70.0 100",
-      "75.0 200",
-      "80.0 300",
-      "END IONS",
-      ""
-    ),
-    zero_only_mgf
-  )
+  write_test_mgf(c(q_ms1_block, q2_block), zero_only_mgf)
   expect_warning(
     res_zero_only <- annotate_spectra(
       input = zero_only_mgf,

@@ -619,3 +619,287 @@ copy_csv_fixture_to_dir <- function(fixture, dir, dest) {
   src <- if (grepl("\\.csv$", fixture)) fixture else paste0(fixture, ".csv")
   copy_fixture_to(src, file.path(dir, dest))
 }
+
+#' Stage structure fixtures for annotation tests
+#'
+#' @param subdir Subdirectory name under the test root when `root` is omitted.
+#' @param root Root directory for staging.
+#' @return Named list containing `root`, `stereo`, `met`, `nam`, `cla`, `npc`.
+stage_structure_fixtures <- function(
+  subdir = "structures",
+  root = temp_test_dir(subdir)
+) {
+  dir.create(
+    file.path(root, "structures", "taxonomies"),
+    recursive = TRUE,
+    showWarnings = FALSE
+  )
+
+  stereo <- file.path(root, "structures", "stereo.tsv")
+  met <- file.path(root, "structures", "metadata.tsv")
+  nam <- file.path(root, "structures", "names.tsv")
+  cla <- file.path(root, "structures", "taxonomies", "classyfire.tsv")
+  npc <- file.path(root, "structures", "taxonomies", "npc.tsv")
+
+  copy_fixture_to("structures_stereo.csv", stereo)
+  copy_fixture_to("structures_metadata.csv", met)
+  copy_fixture_to("structures_names.csv", nam)
+  copy_fixture_to("structures_taxonomy_cla.csv", cla)
+  copy_fixture_to("structures_taxonomy_npc.csv", npc)
+
+  list(
+    root = root,
+    stereo = stereo,
+    met = met,
+    nam = nam,
+    cla = cla,
+    npc = npc
+  )
+}
+
+#' Default biological taxonomy score list for annotation tests
+#'
+#' @param ... Named score overrides (NULL values are preserved).
+#' @param include_domain Include `score_biological_domain`.
+#' @param include_subranks Include the 5 biological sub-rank scores.
+#' @param .all Optional uniform value replacing all selected scores before
+#'   applying `...`.
+#' @return Named list of biological scores.
+default_bio_scores <- function(
+  ...,
+  include_domain = TRUE,
+  include_subranks = TRUE,
+  .all = NULL
+) {
+  defaults <- list(
+    score_biological_domain = 0.1,
+    score_biological_kingdom = 0.2,
+    score_biological_phylum = 0.3,
+    score_biological_class = 0.4,
+    score_biological_order = 0.5,
+    score_biological_infraorder = 0.55,
+    score_biological_family = 0.6,
+    score_biological_subfamily = 0.65,
+    score_biological_tribe = 0.7,
+    score_biological_subtribe = 0.75,
+    score_biological_genus = 0.8,
+    score_biological_subgenus = 0.85,
+    score_biological_species = 0.9,
+    score_biological_subspecies = 0.95,
+    score_biological_variety = 1.0,
+    score_biological_biota = 1.007276
+  )
+  if (!include_domain) {
+    defaults$score_biological_domain <- NULL
+  }
+  if (!include_subranks) {
+    defaults[c(
+      "score_biological_infraorder",
+      "score_biological_subfamily",
+      "score_biological_subtribe",
+      "score_biological_subgenus",
+      "score_biological_subspecies"
+    )] <- NULL
+  }
+  if (!missing(.all)) {
+    defaults[] <- list(.all)
+  }
+  overrides <- list(...)
+  if (length(overrides) > 0L) {
+    defaults[names(overrides)] <- overrides
+  }
+  defaults
+}
+
+#' Default chemical taxonomy score list for annotation tests
+#'
+#' @param ... Named score overrides (NULL values are preserved).
+#' @param .all Optional uniform value replacing all 7 scores before `...`.
+#' @return Named list of chemical scores.
+default_chemo_scores <- function(..., .all = NULL) {
+  defaults <- list(
+    score_chemical_cla_kingdom = 0.25,
+    score_chemical_cla_superclass = 0.5,
+    score_chemical_cla_class = 0.75,
+    score_chemical_cla_parent = 1.0,
+    score_chemical_npc_pathway = 0.33,
+    score_chemical_npc_superclass = 0.66,
+    score_chemical_npc_class = 1.0
+  )
+  if (!missing(.all)) {
+    defaults[] <- list(.all)
+  }
+  overrides <- list(...)
+  if (length(overrides) > 0L) {
+    defaults[names(overrides)] <- overrides
+  }
+  defaults
+}
+
+#' Write a tab-separated table to an explicit or scoped temp file
+#'
+#' @param df Data frame to write.
+#' @param path Output path.
+#' @param quote Logical or `"auto"` passed to `tidytable::fwrite()`.
+#' @param na String to write for `NA` values.
+#' @return Invisible file path.
+write_test_tsv <- function(df, path, quote = FALSE, na = "") {
+  dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
+  tidytable::fwrite(x = df, file = path, sep = "\t", quote = quote, na = na)
+  invisible(path)
+}
+
+#' Write a scoped temporary TSV file
+#'
+#' @inheritParams write_test_tsv
+#' @param fileext File extension for `withr::local_tempfile()`.
+#' @param .local_envir Environment scoping cleanup.
+#' @return Path to the temporary TSV file.
+local_test_tsv <- function(
+  df,
+  fileext = ".tsv",
+  quote = FALSE,
+  na = "",
+  .local_envir = parent.frame()
+) {
+  f <- withr::local_tempfile(fileext = fileext, .local_envir = .local_envir)
+  write_test_tsv(df = df, path = f, quote = quote, na = na)
+  f
+}
+
+#' Format a single MGF spectrum block
+#'
+#' @param pepmass Precursor m/z (and optional intensity).
+#' @param peaks Character vector of `"mz intensity"` lines.
+#' @param title Optional `TITLE=` value.
+#' @param charge Optional `CHARGE=` value (or NULL to omit).
+#' @param mslevel Optional `MSLEVEL=` value.
+#' @param extra_headers Extra header lines inserted after standard headers.
+#' @param trailing_blank Append an empty line after `END IONS`.
+#' @return Character vector of MGF lines.
+format_mgf_block <- function(
+  pepmass = NULL,
+  peaks = c("100 10"),
+  title = NULL,
+  charge = "1+",
+  mslevel = NULL,
+  extra_headers = character(),
+  trailing_blank = FALSE
+) {
+  c(
+    "BEGIN IONS",
+    if (!is.null(title)) paste0("TITLE=", title),
+    if (!is.null(pepmass)) paste0("PEPMASS=", pepmass),
+    if (!is.null(charge)) paste0("CHARGE=", charge),
+    if (!is.null(mslevel)) paste0("MSLEVEL=", mslevel),
+    extra_headers,
+    peaks,
+    "END IONS",
+    if (isTRUE(trailing_blank)) ""
+  )
+}
+
+#' Write MGF lines to an explicit path, creating parent directories if needed
+#'
+#' @param lines Character vector or list of character vectors of MGF lines.
+#' @param path Output MGF file path.
+#' @return Invisible file path.
+write_test_mgf <- function(lines, path) {
+  dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
+  writeLines(unlist(lines, use.names = FALSE), path)
+  invisible(path)
+}
+
+#' Write MGF lines to a scoped temporary MGF file
+#'
+#' @inheritParams write_test_mgf
+#' @param .local_envir Environment scoping cleanup.
+#' @return Path to the temporary MGF file.
+local_test_mgf <- function(lines, .local_envir = parent.frame()) {
+  f <- withr::local_tempfile(fileext = ".mgf", .local_envir = .local_envir)
+  write_test_mgf(lines = lines, path = f)
+  f
+}
+
+#' Build a minimal OTT organism taxonomy table for tests
+#'
+#' @param organism_name Vector of organism names.
+#' @param ottid Vector of OTT IDs.
+#' @param domain,kingdom,phylum,class,order,family,tribe,genus,species,varietas
+#'   Taxonomic rank vectors.
+#' @param include_subranks Include the 5 OTT sub-rank columns.
+#' @param infraorder,subfamily,subtribe,subgenus,subspecies Sub-rank vectors
+#'   used when `include_subranks = TRUE`.
+#' @return A `tidytable` matching OTT taxonomy schema.
+make_test_ott_taxonomy <- function(
+  organism_name = "Homo sapiens",
+  ottid = "770309",
+  domain = "Eukaryota",
+  kingdom = "Metazoa",
+  phylum = "Chordata",
+  class = "Mammalia",
+  order = "Primates",
+  family = "Hominidae",
+  tribe = NA_character_,
+  genus = "Homo",
+  species = organism_name,
+  varietas = NA_character_,
+  include_subranks = FALSE,
+  infraorder = NA_character_,
+  subfamily = NA_character_,
+  subtribe = NA_character_,
+  subgenus = NA_character_,
+  subspecies = NA_character_
+) {
+  tbl <- tidytable::tidytable(
+    organism_name = organism_name,
+    organism_taxonomy_ottid = ottid,
+    organism_taxonomy_01domain = domain,
+    organism_taxonomy_02kingdom = kingdom,
+    organism_taxonomy_03phylum = phylum,
+    organism_taxonomy_04class = class,
+    organism_taxonomy_05order = order,
+    organism_taxonomy_06family = family,
+    organism_taxonomy_07tribe = tribe,
+    organism_taxonomy_08genus = genus,
+    organism_taxonomy_09species = species,
+    organism_taxonomy_10varietas = varietas
+  )
+  if (!include_subranks) {
+    return(tbl)
+  }
+  tidytable::tidytable(
+    organism_name = organism_name,
+    organism_taxonomy_ottid = ottid,
+    organism_taxonomy_01domain = domain,
+    organism_taxonomy_02kingdom = kingdom,
+    organism_taxonomy_03phylum = phylum,
+    organism_taxonomy_04class = class,
+    organism_taxonomy_05order = order,
+    organism_taxonomy_05_1infraorder = infraorder,
+    organism_taxonomy_06family = family,
+    organism_taxonomy_06_1subfamily = subfamily,
+    organism_taxonomy_07tribe = tribe,
+    organism_taxonomy_07_1subtribe = subtribe,
+    organism_taxonomy_08genus = genus,
+    organism_taxonomy_08_1subgenus = subgenus,
+    organism_taxonomy_09species = species,
+    organism_taxonomy_09_1subspecies = subspecies,
+    organism_taxonomy_10varietas = varietas
+  )
+}
+
+#' Write an OTT organism taxonomy table as a TSV file
+#'
+#' @param df Data frame built by `make_test_ott_taxonomy()` (or equivalent).
+#' @param path Output path; defaults to a scoped temp TSV.
+#' @param .local_envir Environment scoping cleanup when `path` is omitted.
+#' @return Path to the TSV file.
+write_test_ott_tsv <- function(
+  df,
+  path = withr::local_tempfile(fileext = ".tsv", .local_envir = .local_envir),
+  .local_envir = parent.frame()
+) {
+  write_test_tsv(df = df, path = path, quote = FALSE, na = "NA")
+  path
+}

@@ -2,6 +2,54 @@
 
 library(testthat)
 
+write_arabidopsis_ott <- function(ott) {
+  write_test_ott_tsv(
+    make_test_ott_taxonomy(
+      organism_name = "Arabidopsis thaliana",
+      ottid = "309275",
+      kingdom = "Plantae",
+      phylum = "Streptophyta",
+      class = "Magnoliopsida",
+      order = "Brassicales",
+      family = "Brassicaceae",
+      genus = "Arabidopsis"
+    ),
+    path = ott
+  )
+}
+
+write_arabidopsis_oryza_ott <- function(ott) {
+  write_test_ott_tsv(
+    make_test_ott_taxonomy(
+      organism_name = c("Arabidopsis thaliana", "Oryza sativa"),
+      ottid = c("309275", "4530"),
+      kingdom = c("Plantae", "Plantae"),
+      phylum = c("Streptophyta", "Streptophyta"),
+      class = c("Magnoliopsida", "Magnoliopsida"),
+      order = c("Brassicales", "Poales"),
+      family = c("Brassicaceae", "Poaceae"),
+      genus = c("Arabidopsis", "Oryza")
+    ),
+    path = ott
+  )
+}
+
+write_two_org_ott <- function(ott) {
+  write_test_ott_tsv(
+    make_test_ott_taxonomy(
+      organism_name = c("Org1", "Org2"),
+      ottid = c("1001", "1002"),
+      kingdom = c("Plantae", "Plantae"),
+      phylum = NA_character_,
+      class = NA_character_,
+      order = NA_character_,
+      family = NA_character_,
+      genus = c("Genus1", "Genus2")
+    ),
+    path = ott
+  )
+}
+
 test_that("prepare_taxa validates input parameter", {
   # Test non-character input
   expect_error(
@@ -162,18 +210,9 @@ test_that("prepare_taxa works with single taxon assignment", {
 
   # Create minimal valid files
   writeLines("feature_id\trt\tmz\nFT001\t1.5\t200\nFT002\t2.0\t300", input)
-  writeLines(
-    paste0(
-      "organism_name\torganism_taxonomy_ottid\torganism_taxonomy_01domain\t",
-      "organism_taxonomy_02kingdom\torganism_taxonomy_03phylum\t",
-      "organism_taxonomy_04class\torganism_taxonomy_05order\t",
-      "organism_taxonomy_06family\torganism_taxonomy_07tribe\t",
-      "organism_taxonomy_08genus\torganism_taxonomy_09species\t",
-      "organism_taxonomy_10varietas\n",
-      "Homo sapiens\t770309\tEukaryota\tAnimalia\tChordata\t",
-      "Mammalia\tPrimates\tHominidae\tNA\tHomo\tHomo sapiens\tNA"
-    ),
-    ott
+  write_test_ott_tsv(
+    make_test_ott_taxonomy(kingdom = "Animalia"),
+    path = ott
   )
 
   result <- prepare_taxa(
@@ -222,23 +261,20 @@ test_that("prepare_taxa preserves all 5 sub-ranks and weights cleanly in weight_
   output <- temp_test_path("output_subranks.tsv")
 
   writeLines("feature_id\trt\tmz\nFT001\t1.5\t200", input)
-  writeLines(
-    paste0(
-      "organism_name\torganism_taxonomy_ottid\t",
-      "organism_taxonomy_01domain\torganism_taxonomy_02kingdom\t",
-      "organism_taxonomy_03phylum\torganism_taxonomy_04class\t",
-      "organism_taxonomy_05order\torganism_taxonomy_05_1infraorder\t",
-      "organism_taxonomy_06family\torganism_taxonomy_06_1subfamily\t",
-      "organism_taxonomy_07tribe\torganism_taxonomy_07_1subtribe\t",
-      "organism_taxonomy_08genus\torganism_taxonomy_08_1subgenus\t",
-      "organism_taxonomy_09species\torganism_taxonomy_09_1subspecies\t",
-      "organism_taxonomy_10varietas\n",
-      "Homo sapiens neanderthalensis\t990001\tEukaryota\tMetazoa\tChordata\t",
-      "Mammalia\tPrimates\tSimiiformes\tHominidae\tHomininae\tHominini\t",
-      "Hominina\tHomo\tHomo (subgenus)\tHomo sapiens\t",
-      "Homo sapiens neanderthalensis\tNA"
+  write_test_ott_tsv(
+    make_test_ott_taxonomy(
+      organism_name = "Homo sapiens neanderthalensis",
+      ottid = "990001",
+      species = "Homo sapiens",
+      include_subranks = TRUE,
+      infraorder = "Simiiformes",
+      subfamily = "Homininae",
+      tribe = "Hominini",
+      subtribe = "Hominina",
+      subgenus = "Homo (subgenus)",
+      subspecies = "Homo sapiens neanderthalensis"
     ),
-    ott
+    path = ott
   )
 
   prepare_taxa(
@@ -288,27 +324,17 @@ test_that("prepare_taxa preserves all 5 sub-ranks and weights cleanly in weight_
     organism_taxonomy_10varietas = "OtherVariety"
   )
 
-  weighted <- weight_bio(
-    annotation_table_taxed = annot_tbl,
-    structure_organism_pairs_table = sop_tbl,
-    weight_spectral = 0.5,
-    weight_biological = 0.5,
-    score_biological_domain = 0.1,
-    score_biological_kingdom = 0.2,
-    score_biological_phylum = 0.3,
-    score_biological_class = 0.4,
-    score_biological_order = 0.5,
-    score_biological_infraorder = 0.55,
-    score_biological_family = 0.6,
-    score_biological_subfamily = 0.65,
-    score_biological_tribe = 0.7,
-    score_biological_subtribe = 0.75,
-    score_biological_genus = 0.8,
-    score_biological_subgenus = 0.85,
-    score_biological_species = 0.9,
-    score_biological_subspecies = 0.95,
-    score_biological_variety = 1.0,
-    score_biological_biota = 1.0
+  weighted <- do.call(
+    weight_bio,
+    c(
+      list(
+        annotation_table_taxed = annot_tbl,
+        structure_organism_pairs_table = sop_tbl,
+        weight_spectral = 0.5,
+        weight_biological = 0.5
+      ),
+      default_bio_scores(score_biological_biota = 1.0)
+    )
   )
   expect_equal(weighted$score_biological, 0.55)
 })
@@ -321,20 +347,18 @@ test_that("prepare_taxa works with multiple taxon assignment", {
 
   # Create minimal valid files
   writeLines("feature_id\trt\tmz\nFT001\t1.5\t200\nFT002\t2.0\t300", input)
-  writeLines(
-    paste0(
-      "organism_name\torganism_taxonomy_ottid\torganism_taxonomy_01domain\t",
-      "organism_taxonomy_02kingdom\torganism_taxonomy_03phylum\t",
-      "organism_taxonomy_04class\torganism_taxonomy_05order\t",
-      "organism_taxonomy_06family\torganism_taxonomy_07tribe\t",
-      "organism_taxonomy_08genus\torganism_taxonomy_09species\t",
-      "organism_taxonomy_10varietas\n",
-      "Homo sapiens $ Arabidopsis thaliana\t770309 $ 309275\tEukaryota\t",
-      "Animalia $ Plantae\tChordata $ Streptophyta\tMammalia $ Magnoliopsida\t",
-      "Primates $ Brassicales\tHominidae $ Brassicaceae\tNA\tHomo $Arabidopsis\t",
-      "Homo sapiens $ Arabidopsis thaliana\tNA"
+  write_test_ott_tsv(
+    make_test_ott_taxonomy(
+      organism_name = "Homo sapiens $ Arabidopsis thaliana",
+      ottid = "770309 $ 309275",
+      kingdom = "Animalia $ Plantae",
+      phylum = "Chordata $ Streptophyta",
+      class = "Mammalia $ Magnoliopsida",
+      order = "Primates $ Brassicales",
+      family = "Hominidae $ Brassicaceae",
+      genus = "Homo $Arabidopsis"
     ),
-    ott
+    path = ott
   )
 
   result <- prepare_taxa(
@@ -370,21 +394,7 @@ test_that("prepare_taxa works with metadata-based assignment", {
   )
 
   # Create OTT taxonomy for two organisms
-  writeLines(
-    paste0(
-      "organism_name\torganism_taxonomy_ottid\torganism_taxonomy_01domain\t",
-      "organism_taxonomy_02kingdom\torganism_taxonomy_03phylum\t",
-      "organism_taxonomy_04class\torganism_taxonomy_05order\t",
-      "organism_taxonomy_06family\torganism_taxonomy_07tribe\t",
-      "organism_taxonomy_08genus\torganism_taxonomy_09species\t",
-      "organism_taxonomy_10varietas\n",
-      "Arabidopsis thaliana\t309275\tEukaryota\tPlantae\tStreptophyta\t",
-      "Magnoliopsida\tBrassicales\tBrassicaceae\tNA\tArabidopsis\tArabidopsis thaliana\tNA\n",
-      "Oryza sativa\t4530\tEukaryota\tPlantae\tStreptophyta\t",
-      "Magnoliopsida\tPoales\tPoaceae\tNA\tOryza\tOryza sativa\tNA"
-    ),
-    ott
-  )
+  write_arabidopsis_oryza_ott(ott)
 
   # Create metadata mapping files to organisms
   writeLines(
@@ -421,19 +431,7 @@ test_that("prepare_taxa handles pipe-separated organisms", {
 
   writeLines("feature_id\trt\tmz\tsample\nFT001\t1.5\t200\tfile1", input)
 
-  writeLines(
-    paste0(
-      "organism_name\torganism_taxonomy_ottid\torganism_taxonomy_01domain\t",
-      "organism_taxonomy_02kingdom\torganism_taxonomy_03phylum\t",
-      "organism_taxonomy_04class\torganism_taxonomy_05order\t",
-      "organism_taxonomy_06family\torganism_taxonomy_07tribe\t",
-      "organism_taxonomy_08genus\torganism_taxonomy_09species\t",
-      "organism_taxonomy_10varietas\n",
-      "Org1\t1001\tEukaryota\tPlantae\tNA\tNA\tNA\tNA\tNA\tGenus1\tOrg1\tNA\n",
-      "Org2\t1002\tEukaryota\tPlantae\tNA\tNA\tNA\tNA\tNA\tGenus2\tOrg2\tNA"
-    ),
-    ott
-  )
+  write_two_org_ott(ott)
 
   # Metadata with pipe-separated organisms
   writeLines("filename\torganism\nfile1\tOrg1|Org2", metadata)
@@ -467,21 +465,7 @@ test_that("prepare_taxa falls back to ATTRIBUTE_species when requested taxon col
     input
   )
 
-  writeLines(
-    paste0(
-      "organism_name\torganism_taxonomy_ottid\torganism_taxonomy_01domain\t",
-      "organism_taxonomy_02kingdom\torganism_taxonomy_03phylum\t",
-      "organism_taxonomy_04class\torganism_taxonomy_05order\t",
-      "organism_taxonomy_06family\torganism_taxonomy_07tribe\t",
-      "organism_taxonomy_08genus\torganism_taxonomy_09species\t",
-      "organism_taxonomy_10varietas\n",
-      "Arabidopsis thaliana\t309275\tEukaryota\tPlantae\tStreptophyta\t",
-      "Magnoliopsida\tBrassicales\tBrassicaceae\tNA\tArabidopsis\tArabidopsis thaliana\tNA\n",
-      "Oryza sativa\t4530\tEukaryota\tPlantae\tStreptophyta\t",
-      "Magnoliopsida\tPoales\tPoaceae\tNA\tOryza\tOryza sativa\tNA"
-    ),
-    ott
-  )
+  write_arabidopsis_oryza_ott(ott)
 
   # No 'organism' column on purpose, only ATTRIBUTE_species.
   writeLines(
@@ -520,17 +504,20 @@ test_that("prepare_taxa exports ND taxonomy when metadata lacks organism values"
   )
 
   # OTT file exists (validated early), but should not be required for ND fallback.
-  writeLines(
-    paste0(
-      "organism_name\torganism_taxonomy_ottid\torganism_taxonomy_01domain\t",
-      "organism_taxonomy_02kingdom\torganism_taxonomy_03phylum\t",
-      "organism_taxonomy_04class\torganism_taxonomy_05order\t",
-      "organism_taxonomy_06family\torganism_taxonomy_07tribe\t",
-      "organism_taxonomy_08genus\torganism_taxonomy_09species\t",
-      "organism_taxonomy_10varietas\n",
-      "dummy\t1\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA\tNA"
+  write_test_ott_tsv(
+    make_test_ott_taxonomy(
+      organism_name = "dummy",
+      ottid = "1",
+      domain = NA_character_,
+      kingdom = NA_character_,
+      phylum = NA_character_,
+      class = NA_character_,
+      order = NA_character_,
+      family = NA_character_,
+      genus = NA_character_,
+      species = NA_character_
     ),
-    ott
+    path = ott
   )
 
   # No organism-like columns at all.
@@ -566,19 +553,7 @@ test_that("prepare_taxa treats empty taxon string as metadata mode", {
     input
   )
 
-  writeLines(
-    paste0(
-      "organism_name\torganism_taxonomy_ottid\torganism_taxonomy_01domain\t",
-      "organism_taxonomy_02kingdom\torganism_taxonomy_03phylum\t",
-      "organism_taxonomy_04class\torganism_taxonomy_05order\t",
-      "organism_taxonomy_06family\torganism_taxonomy_07tribe\t",
-      "organism_taxonomy_08genus\torganism_taxonomy_09species\t",
-      "organism_taxonomy_10varietas\n",
-      "Arabidopsis thaliana\t309275\tEukaryota\tPlantae\tStreptophyta\t",
-      "Magnoliopsida\tBrassicales\tBrassicaceae\tNA\tArabidopsis\tArabidopsis thaliana\tNA"
-    ),
-    ott
-  )
+  write_arabidopsis_ott(ott)
 
   writeLines("filename\torganism\nfile1\tArabidopsis thaliana", metadata)
 
@@ -628,19 +603,7 @@ test_that("prepare_taxa errors when features sample column is missing", {
   metadata <- temp_test_path("metadata-no-sample.tsv")
 
   writeLines("feature_id\trt\tmz\nFT001\t1.5\t200", input)
-  writeLines(
-    paste0(
-      "organism_name\torganism_taxonomy_ottid\torganism_taxonomy_01domain\t",
-      "organism_taxonomy_02kingdom\torganism_taxonomy_03phylum\t",
-      "organism_taxonomy_04class\torganism_taxonomy_05order\t",
-      "organism_taxonomy_06family\torganism_taxonomy_07tribe\t",
-      "organism_taxonomy_08genus\torganism_taxonomy_09species\t",
-      "organism_taxonomy_10varietas\n",
-      "Arabidopsis thaliana\t309275\tEukaryota\tPlantae\tStreptophyta\t",
-      "Magnoliopsida\tBrassicales\tBrassicaceae\tNA\tArabidopsis\tArabidopsis thaliana\tNA"
-    ),
-    ott
-  )
+  write_arabidopsis_ott(ott)
   writeLines("filename\torganism\nfile1\tArabidopsis thaliana", metadata)
 
   expect_error(
@@ -665,19 +628,7 @@ test_that("prepare_taxa errors when metadata filename key is missing", {
   metadata <- temp_test_path("metadata-no-filename-key.tsv")
 
   writeLines("feature_id\trt\tmz\tsample\nFT001\t1.5\t200\tfile1", input)
-  writeLines(
-    paste0(
-      "organism_name\torganism_taxonomy_ottid\torganism_taxonomy_01domain\t",
-      "organism_taxonomy_02kingdom\torganism_taxonomy_03phylum\t",
-      "organism_taxonomy_04class\torganism_taxonomy_05order\t",
-      "organism_taxonomy_06family\torganism_taxonomy_07tribe\t",
-      "organism_taxonomy_08genus\torganism_taxonomy_09species\t",
-      "organism_taxonomy_10varietas\n",
-      "Arabidopsis thaliana\t309275\tEukaryota\tPlantae\tStreptophyta\t",
-      "Magnoliopsida\tBrassicales\tBrassicaceae\tNA\tArabidopsis\tArabidopsis thaliana\tNA"
-    ),
-    ott
-  )
+  write_arabidopsis_ott(ott)
   writeLines("wrong_key\torganism\nfile1\tArabidopsis thaliana", metadata)
 
   expect_error(
@@ -712,19 +663,7 @@ test_that("prepare_taxa strips known MS file extensions when extension is FALSE"
     input
   )
 
-  writeLines(
-    paste0(
-      "organism_name\torganism_taxonomy_ottid\torganism_taxonomy_01domain\t",
-      "organism_taxonomy_02kingdom\torganism_taxonomy_03phylum\t",
-      "organism_taxonomy_04class\torganism_taxonomy_05order\t",
-      "organism_taxonomy_06family\torganism_taxonomy_07tribe\t",
-      "organism_taxonomy_08genus\torganism_taxonomy_09species\t",
-      "organism_taxonomy_10varietas\n",
-      "Org1\t1001\tEukaryota\tPlantae\tNA\tNA\tNA\tNA\tNA\tGenus1\tOrg1\tNA\n",
-      "Org2\t1002\tEukaryota\tPlantae\tNA\tNA\tNA\tNA\tNA\tGenus2\tOrg2\tNA"
-    ),
-    ott
-  )
+  write_two_org_ott(ott)
 
   writeLines(
     paste(
@@ -770,19 +709,7 @@ test_that("prepare_taxa high-volume combination collapse (>256 rows) matches sma
   )
   tidytable::fwrite(feat_df, input, sep = "\t")
 
-  writeLines(
-    paste0(
-      "organism_name\torganism_taxonomy_ottid\torganism_taxonomy_01domain\t",
-      "organism_taxonomy_02kingdom\torganism_taxonomy_03phylum\t",
-      "organism_taxonomy_04class\torganism_taxonomy_05order\t",
-      "organism_taxonomy_06family\torganism_taxonomy_07tribe\t",
-      "organism_taxonomy_08genus\torganism_taxonomy_09species\t",
-      "organism_taxonomy_10varietas\n",
-      "Org1\t1001\tEukaryota\tPlantae\tNA\tNA\tNA\tNA\tNA\tGenus1\tOrg1\tNA\n",
-      "Org2\t1002\tEukaryota\tPlantae\tNA\tNA\tNA\tNA\tNA\tGenus2\tOrg2\tNA"
-    ),
-    ott
-  )
+  write_two_org_ott(ott)
 
   writeLines(
     paste(
@@ -842,19 +769,7 @@ test_that("prepare_taxa high-volume combination collapse (>256 rows) matches sma
 
 test_that("prepare_taxa covers intensity filtering, missing OTT lookups, missing columns, and >256 mixed batching", {
   ott <- temp_test_path("ott-cov.tsv")
-  writeLines(
-    paste0(
-      "organism_name\torganism_taxonomy_ottid\torganism_taxonomy_01domain\t",
-      "organism_taxonomy_02kingdom\torganism_taxonomy_03phylum\t",
-      "organism_taxonomy_04class\torganism_taxonomy_05order\t",
-      "organism_taxonomy_06family\torganism_taxonomy_07tribe\t",
-      "organism_taxonomy_08genus\torganism_taxonomy_09species\t",
-      "organism_taxonomy_10varietas\n",
-      "Org1\t1001\tEukaryota\tPlantae\tNA\tNA\tNA\tNA\tNA\tGenus1\tOrg1\tNA\n",
-      "Org2\t1002\tEukaryota\tPlantae\tNA\tNA\tNA\tNA\tNA\tGenus2\tOrg2\tNA"
-    ),
-    ott
-  )
+  write_two_org_ott(ott)
 
   # 1. Missing feature_id column in features file with single taxon -> hits wanted_feat_cols == 0,
   # else (!is.null(taxon)) branch, and missing_select_cols abort
@@ -895,19 +810,15 @@ test_that("prepare_taxa covers intensity filtering, missing OTT lookups, missing
   # 3. Missing organism in OTT triggers get_organism_taxonomy_ott
   local_mocked_bindings(
     get_organism_taxonomy_ott = function(df) {
-      tidytable::tidytable(
+      make_test_ott_taxonomy(
         organism_name = df$organism,
-        organism_taxonomy_ottid = "9999",
-        organism_taxonomy_01domain = "Eukaryota",
-        organism_taxonomy_02kingdom = "Plantae",
-        organism_taxonomy_03phylum = NA_character_,
-        organism_taxonomy_04class = NA_character_,
-        organism_taxonomy_05order = NA_character_,
-        organism_taxonomy_06family = NA_character_,
-        organism_taxonomy_07tribe = NA_character_,
-        organism_taxonomy_08genus = "Genus3",
-        organism_taxonomy_09species = df$organism,
-        organism_taxonomy_10varietas = NA_character_
+        ottid = "9999",
+        kingdom = "Plantae",
+        phylum = NA_character_,
+        class = NA_character_,
+        order = NA_character_,
+        family = NA_character_,
+        genus = "Genus3"
       )
     }
   )

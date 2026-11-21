@@ -2,52 +2,11 @@
 
 library(testthat)
 
-## Internal Utility Helpers ----
-
-#' Stage structure fixtures for GNPS annotation tests
-#'
-#' @param root Root directory for staging
-#' @return Named list of structure file paths
-stage_structure_fixtures <- function(
-  root = temp_test_dir("prep_gnps_structures")
-) {
-  # Create directory structure
-  dir.create(
-    file.path(root, "structures", "taxonomies"),
-    recursive = TRUE,
-    showWarnings = FALSE
-  )
-
-  # Define target paths
-  stereo <- file.path(root, "structures", "stereo.tsv")
-  met <- file.path(root, "structures", "metadata.tsv")
-  nam <- file.path(root, "structures", "names.tsv")
-  cla <- file.path(root, "structures", "taxonomies", "classyfire.tsv")
-  npc <- file.path(root, "structures", "taxonomies", "npc.tsv")
-
-  # Copy fixtures using the helper that handles path resolution
-  # This works because copy_fixture_to uses resolve_fixture_path before any directory changes
-  copy_fixture_to("structures_stereo.csv", stereo)
-  copy_fixture_to("structures_metadata.csv", met)
-  copy_fixture_to("structures_names.csv", nam)
-  copy_fixture_to("structures_taxonomy_cla.csv", cla)
-  copy_fixture_to("structures_taxonomy_npc.csv", npc)
-
-  list(
-    root = root,
-    stereo = stereo,
-    met = met,
-    nam = nam,
-    cla = cla,
-    npc = npc
-  )
-}
-
 ## Validation ----
 
 test_that("test-prepare_annotations_gnps validates output path", {
   # Stage fixtures BEFORE changing directory
-  s <- stage_structure_fixtures()
+  s <- stage_structure_fixtures("prep_gnps_structures")
   withr::local_dir(new = as.character(s$root))
 
   expect_error(
@@ -85,7 +44,7 @@ test_that("test-prepare_annotations_gnps validates structure file paths", {
 
 test_that("test-prepare_annotations_gnps handles missing input files by creating empty output", {
   # Stage fixtures BEFORE changing directory
-  s <- stage_structure_fixtures()
+  s <- stage_structure_fixtures("prep_gnps_structures")
   withr::local_dir(new = as.character(s$root))
 
   out <- temp_test_path("gnps.tsv")
@@ -105,7 +64,7 @@ test_that("test-prepare_annotations_gnps handles missing input files by creating
 
 test_that("test-prepare_annotations_gnps processes minimal valid GNPS file", {
   # Stage fixtures BEFORE changing directory
-  s <- stage_structure_fixtures()
+  s <- stage_structure_fixtures("prep_gnps_structures")
   withr::local_dir(new = as.character(s$root))
   out <- temp_test_path("gnps.tsv")
   gnps <- tidytable::tidytable(

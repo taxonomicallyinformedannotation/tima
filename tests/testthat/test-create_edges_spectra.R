@@ -2,6 +2,43 @@
 
 library(testthat)
 
+.write_two_spec_mgf <- function(
+  mz2 = 200,
+  peaks2 = c("50 15", "75 25", paste0(mz2, " 35")),
+  fid1 = "1",
+  fid2 = "2",
+  peaks1 = c("50 10", "75 20", "100 30"),
+  title1 = "Spectrum1",
+  title2 = "Spectrum2",
+  .local_envir = parent.frame()
+) {
+  local_test_mgf(
+    c(
+      format_mgf_block(
+        pepmass = 100,
+        peaks = peaks1,
+        title = title1,
+        extra_headers = paste0("FEATURE_ID=", fid1),
+        trailing_blank = TRUE
+      ),
+      format_mgf_block(
+        pepmass = mz2,
+        peaks = peaks2,
+        title = title2,
+        extra_headers = paste0("FEATURE_ID=", fid2)
+      )
+    ),
+    .local_envir = .local_envir
+  )
+}
+
+.write_minimal_mgf <- function(.local_envir = parent.frame()) {
+  local_test_mgf(
+    format_mgf_block(pepmass = 100, peaks = "100 10"),
+    .local_envir = .local_envir
+  )
+}
+
 test_that("create_edges_spectra validates input parameter", {
   expect_error(
     create_edges_spectra(input = NULL),
@@ -16,38 +53,17 @@ test_that("create_edges_spectra validates input parameter", {
 
 test_that("create_edges_spectra uses the full similarity graph by default", {
   withr::local_dir(new = temp_test_dir("create_edges_spectra_default"))
-  mgf_file <- tempfile(fileext = ".mgf")
-  mgf <- c(
-    "BEGIN IONS",
-    "TITLE=Spectrum1",
-    "FEATURE_ID=1",
-    "PEPMASS=100",
-    "CHARGE=1+",
-    "50 10",
-    "75 20",
-    "100 30",
-    "END IONS",
-    "",
-    "BEGIN IONS",
-    "TITLE=Spectrum2",
-    "FEATURE_ID=2",
-    "PEPMASS=101",
-    "CHARGE=1+",
-    "50 15",
-    "75 25",
-    "100 35",
-    "END IONS"
+  mgf_file <- .write_two_spec_mgf(
+    mz2 = 101,
+    peaks2 = c("50 15", "75 25", "100 35")
   )
-  writeLines(mgf, mgf_file)
 
   output <- create_edges_spectra(input = mgf_file)
   expect_true(file.exists(output))
 })
 
 test_that("create_edges_spectra validates ppm parameter", {
-  mgf_file <- tempfile(fileext = ".mgf")
-  mgf <- c("BEGIN IONS", "PEPMASS=100", "CHARGE=1+", "100 10", "END IONS")
-  writeLines(mgf, mgf_file)
+  mgf_file <- .write_minimal_mgf()
 
   expect_error(
     create_edges_spectra(input = mgf_file, ppm = -10),
@@ -56,9 +72,7 @@ test_that("create_edges_spectra validates ppm parameter", {
 })
 
 test_that("create_edges_spectra validates dalton parameter", {
-  mgf_file <- tempfile(fileext = ".mgf")
-  mgf <- c("BEGIN IONS", "PEPMASS=100", "CHARGE=1+", "100 10", "END IONS")
-  writeLines(mgf, mgf_file)
+  mgf_file <- .write_minimal_mgf()
 
   expect_error(
     create_edges_spectra(input = mgf_file, dalton = -0.01),
@@ -67,11 +81,7 @@ test_that("create_edges_spectra validates dalton parameter", {
 })
 
 test_that("create_edges_spectra validates method parameter", {
-  mgf_file <- tempfile(fileext = ".mgf")
-  writeLines(
-    c("BEGIN IONS", "PEPMASS=100", "CHARGE=1+", "100 10", "END IONS"),
-    mgf_file
-  )
+  mgf_file <- .write_minimal_mgf()
 
   expect_error(
     create_edges_spectra(input = mgf_file, method = "unknown_method"),
@@ -80,11 +90,7 @@ test_that("create_edges_spectra validates method parameter", {
 })
 
 test_that("create_edges_spectra validates cutoff parameter", {
-  mgf_file <- tempfile(fileext = ".mgf")
-  writeLines(
-    c("BEGIN IONS", "PEPMASS=100", "CHARGE=1+", "100 10", "END IONS"),
-    mgf_file
-  )
+  mgf_file <- .write_minimal_mgf()
 
   expect_error(
     create_edges_spectra(input = mgf_file, cutoff = -0.5),
@@ -93,11 +99,7 @@ test_that("create_edges_spectra validates cutoff parameter", {
 })
 
 test_that("create_edges_spectra validates output parameter", {
-  mgf_file <- tempfile(fileext = ".mgf")
-  writeLines(
-    c("BEGIN IONS", "PEPMASS=100", "CHARGE=1+", "100 10", "END IONS"),
-    mgf_file
-  )
+  mgf_file <- .write_minimal_mgf()
 
   expect_error(
     create_edges_spectra(input = mgf_file, output = 123),
@@ -129,17 +131,11 @@ test_that("create_edges_spectra checks input file exists", {
 
 test_that("create_edges_spectra handles single spectrum", {
   withr::local_dir(new = temp_test_dir("create_edges_spectra_single"))
-  mgf_file <- tempfile(fileext = ".mgf")
-  mgf <- c(
-    "BEGIN IONS",
-    "TITLE=Spectrum1",
-    "PEPMASS=100.5",
-    "CHARGE=1+",
-    "100 10",
-    "101 20",
-    "END IONS"
-  )
-  writeLines(mgf, mgf_file)
+  mgf_file <- local_test_mgf(format_mgf_block(
+    pepmass = "100.5",
+    peaks = c("100 10", "101 20"),
+    title = "Spectrum1"
+  ))
 
   output <- create_edges_spectra(
     input = mgf_file,
@@ -157,29 +153,7 @@ test_that("create_edges_spectra handles single spectrum", {
 
 test_that("create_edges_spectra creates output file", {
   withr::local_dir(new = temp_test_dir("create_edges_spectra_output"))
-  mgf_file <- tempfile(fileext = ".mgf")
-  mgf <- c(
-    "BEGIN IONS",
-    "TITLE=Spectrum1",
-    "FEATURE_ID=1",
-    "PEPMASS=100",
-    "CHARGE=1+",
-    "50 10",
-    "75 20",
-    "100 30",
-    "END IONS",
-    "",
-    "BEGIN IONS",
-    "TITLE=Spectrum2",
-    "FEATURE_ID=2",
-    "PEPMASS=200",
-    "CHARGE=1+",
-    "50 15",
-    "75 25",
-    "200 35",
-    "END IONS"
-  )
-  writeLines(mgf, mgf_file)
+  mgf_file <- .write_two_spec_mgf()
 
   output <- create_edges_spectra(
     input = mgf_file
@@ -198,30 +172,9 @@ test_that("create_edges_spectra creates output file", {
 
 test_that("create_edges_spectra ignores thresholds and uses the full graph", {
   withr::local_dir(new = temp_test_dir("create_edges_spectra_no_threshold"))
-  mgf_file <- tempfile(fileext = ".mgf")
-  writeLines(
-    c(
-      "BEGIN IONS",
-      "TITLE=Spectrum1",
-      "FEATURE_ID=1",
-      "PEPMASS=100",
-      "CHARGE=1+",
-      "50 10",
-      "75 20",
-      "100 30",
-      "END IONS",
-      "",
-      "BEGIN IONS",
-      "TITLE=Spectrum2",
-      "FEATURE_ID=2",
-      "PEPMASS=101",
-      "CHARGE=1+",
-      "50 15",
-      "75 25",
-      "100 35",
-      "END IONS"
-    ),
-    mgf_file
+  mgf_file <- .write_two_spec_mgf(
+    mz2 = 101,
+    peaks2 = c("50 15", "75 25", "100 35")
   )
 
   out <- create_edges_spectra(
@@ -263,28 +216,12 @@ test_that("create_edges_spectra attributes edges by Louvain community", {
 
 test_that("create_edges_spectra keeps feature IDs from FEATURE_ID (mzTab proxy MGF style)", {
   withr::local_dir(new = temp_test_dir("create_edges_spectra_feature_ids"))
-  mgf_file <- tempfile(fileext = ".mgf")
-  writeLines(
-    c(
-      "BEGIN IONS",
-      "TITLE=1",
-      "FEATURE_ID=1",
-      "PEPMASS=100",
-      "CHARGE=1+",
-      "50 10",
-      "75 20",
-      "END IONS",
-      "",
-      "BEGIN IONS",
-      "TITLE=2",
-      "FEATURE_ID=2",
-      "PEPMASS=101",
-      "CHARGE=1+",
-      "50 12",
-      "75 18",
-      "END IONS"
-    ),
-    mgf_file
+  mgf_file <- .write_two_spec_mgf(
+    mz2 = 101,
+    peaks1 = c("50 10", "75 20"),
+    peaks2 = c("50 12", "75 18"),
+    title1 = "1",
+    title2 = "2"
   )
 
   output <- create_edges_spectra(
@@ -298,31 +235,7 @@ test_that("create_edges_spectra keeps feature IDs from FEATURE_ID (mzTab proxy M
 
 test_that("create_edges_spectra() creates edges from two spectra with entropy", {
   withr::local_dir(new = temp_test_dir("create_edges_spectra_entropy"))
-  mgf_file <- tempfile(fileext = ".mgf")
-  writeLines(
-    c(
-      "BEGIN IONS",
-      "TITLE=Spectrum1",
-      "FEATURE_ID=1",
-      "PEPMASS=100",
-      "CHARGE=1+",
-      "50 10",
-      "75 20",
-      "100 30",
-      "END IONS",
-      "",
-      "BEGIN IONS",
-      "TITLE=Spectrum2",
-      "FEATURE_ID=2",
-      "PEPMASS=200",
-      "CHARGE=1+",
-      "50 15",
-      "75 25",
-      "200 35",
-      "END IONS"
-    ),
-    mgf_file
-  )
+  mgf_file <- .write_two_spec_mgf()
   out <- create_edges_spectra(
     input = mgf_file,
     method = "entropy"
@@ -336,31 +249,7 @@ test_that("create_edges_spectra() creates edges from two spectra with entropy", 
 
 test_that("create_edges_spectra() runs with cosine method", {
   withr::local_dir(new = temp_test_dir("create_edges_spectra_cosine"))
-  mgf_file <- tempfile(fileext = ".mgf")
-  writeLines(
-    c(
-      "BEGIN IONS",
-      "TITLE=Spectrum1",
-      "FEATURE_ID=1",
-      "PEPMASS=100",
-      "CHARGE=1+",
-      "50 10",
-      "75 20",
-      "100 30",
-      "END IONS",
-      "",
-      "BEGIN IONS",
-      "TITLE=Spectrum2",
-      "FEATURE_ID=2",
-      "PEPMASS=200",
-      "CHARGE=1+",
-      "50 15",
-      "75 25",
-      "200 35",
-      "END IONS"
-    ),
-    mgf_file
-  )
+  mgf_file <- .write_two_spec_mgf()
   out <- create_edges_spectra(
     input = mgf_file,
     method = "cosine"
@@ -370,8 +259,7 @@ test_that("create_edges_spectra() runs with cosine method", {
 
 test_that("create_edges_spectra handles empty MGF file gracefully", {
   withr::local_dir(new = temp_test_dir("create_edges_empty"))
-  mgf_file <- tempfile(fileext = ".mgf")
-  writeLines("", mgf_file)
+  mgf_file <- local_test_mgf("")
 
   # Empty MGF now degrades gracefully with a warning, returns empty output
   expect_warning(
@@ -382,8 +270,7 @@ test_that("create_edges_spectra handles empty MGF file gracefully", {
 
 test_that("create_edges_spectra handles invalid/no-content MGF format", {
   withr::local_dir(new = temp_test_dir("create_edges_invalid"))
-  mgf_file <- tempfile(fileext = ".mgf")
-  writeLines("INVALID MGF CONTENT", mgf_file)
+  mgf_file <- local_test_mgf("INVALID MGF CONTENT")
 
   # MGF without BEGIN IONS markers yields no spectra; degrades gracefully
   expect_warning(
@@ -395,30 +282,11 @@ test_that("create_edges_spectra handles invalid/no-content MGF format", {
 test_that("create_edges_spectra completes downstream edge-building from parsed spectra", {
   withr::local_dir(new = temp_test_dir("create_edges_spectra_downstream"))
 
-  input_file <- tempfile(fileext = ".mgf")
-  writeLines(
-    c(
-      "BEGIN IONS",
-      "TITLE=Spectrum1",
-      "FEATURE_ID=F1",
-      "PEPMASS=100",
-      "CHARGE=1+",
-      "50 10",
-      "75 20",
-      "100 30",
-      "END IONS",
-      "",
-      "BEGIN IONS",
-      "TITLE=Spectrum2",
-      "FEATURE_ID=F2",
-      "PEPMASS=101",
-      "CHARGE=1+",
-      "50 15",
-      "75 25",
-      "100 35",
-      "END IONS"
-    ),
-    input_file
+  input_file <- .write_two_spec_mgf(
+    mz2 = 101,
+    peaks2 = c("50 15", "75 25", "100 35"),
+    fid1 = "F1",
+    fid2 = "F2"
   )
 
   output_file <- tempfile(fileext = ".tsv")

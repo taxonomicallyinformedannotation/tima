@@ -2,6 +2,46 @@
 
 library(testthat)
 
+call_decorate_bio <- function(
+  df,
+  ...,
+  include_domain = FALSE,
+  include_subranks = FALSE,
+  .score_all = NULL
+) {
+  scores <- if (!missing(.score_all)) {
+    default_bio_scores(
+      include_domain = include_domain,
+      include_subranks = include_subranks,
+      .all = .score_all
+    )
+  } else if (!include_domain && !include_subranks) {
+    default_bio_scores(
+      include_domain = FALSE,
+      include_subranks = FALSE,
+      score_biological_kingdom = 0.1,
+      score_biological_phylum = 0.2,
+      score_biological_class = 0.3,
+      score_biological_order = 0.4,
+      score_biological_family = 0.5,
+      score_biological_tribe = 0.6,
+      score_biological_genus = 0.7,
+      score_biological_species = 0.8,
+      score_biological_variety = 0.9
+    )
+  } else {
+    default_bio_scores(
+      include_domain = include_domain,
+      include_subranks = include_subranks
+    )
+  }
+  overrides <- list(...)
+  if (length(overrides) > 0L) {
+    scores[names(overrides)] <- overrides
+  }
+  do.call(decorate_bio, c(list(annot_table_wei_bio = df), scores))
+}
+
 test_that("decorate_bio handles empty input", {
   # Create empty annotation table
   empty_df <- tidytable::tidytable(
@@ -9,19 +49,7 @@ test_that("decorate_bio handles empty input", {
     score_biological = numeric(0)
   )
 
-  result <- decorate_bio(
-    annot_table_wei_bio = empty_df,
-    score_biological_kingdom = 0.1,
-    score_biological_phylum = 0.2,
-    score_biological_class = 0.3,
-    score_biological_order = 0.4,
-    score_biological_family = 0.5,
-    score_biological_tribe = 0.6,
-    score_biological_genus = 0.7,
-    score_biological_species = 0.8,
-    score_biological_variety = 0.9,
-    score_biological_biota = 1.007276
-  )
+  result <- call_decorate_bio(empty_df)
 
   expect_s3_class(result, "data.frame")
   expect_equal(nrow(result), 0)
@@ -34,19 +62,7 @@ test_that("decorate_bio returns input unchanged", {
     score_biological = c(0.8, 0.9)
   )
 
-  result <- decorate_bio(
-    annot_table_wei_bio = test_df,
-    score_biological_kingdom = 0.1,
-    score_biological_phylum = 0.2,
-    score_biological_class = 0.3,
-    score_biological_order = 0.4,
-    score_biological_family = 0.5,
-    score_biological_tribe = 0.6,
-    score_biological_genus = 0.7,
-    score_biological_species = 0.8,
-    score_biological_variety = 0.9,
-    score_biological_biota = 1.007276
-  )
+  result <- call_decorate_bio(test_df)
 
   # Should return input unchanged (decorator pattern)
   expect_identical(result, test_df)
@@ -59,19 +75,7 @@ test_that("decorate_bio warns on missing columns", {
   )
 
   expect_warning(
-    decorate_bio(
-      annot_table_wei_bio = incomplete_df,
-      score_biological_kingdom = 0.1,
-      score_biological_phylum = 0.2,
-      score_biological_class = 0.3,
-      score_biological_order = 0.4,
-      score_biological_family = 0.5,
-      score_biological_tribe = 0.6,
-      score_biological_genus = 0.7,
-      score_biological_species = 0.8,
-      score_biological_variety = 0.9,
-      score_biological_biota = 1.007276
-    ),
+    call_decorate_bio(incomplete_df),
     NA # Should log warning but not throw error
   )
 })
@@ -86,19 +90,7 @@ test_that("decorate_bio logs both candidate and unique structure counts", {
   log_file <- withr::local_tempfile(fileext = ".log")
   setup_logger(filename = log_file, threshold = 400)
 
-  decorate_bio(
-    annot_table_wei_bio = test_df,
-    score_biological_kingdom = 0.7,
-    score_biological_phylum = 0.7,
-    score_biological_class = 0.7,
-    score_biological_order = 0.7,
-    score_biological_family = 0.7,
-    score_biological_tribe = 0.7,
-    score_biological_genus = 0.7,
-    score_biological_species = 0.7,
-    score_biological_variety = 0.7,
-    score_biological_biota = 0.7
-  )
+  call_decorate_bio(test_df, .score_all = 0.7)
 
   logged <- paste(readLines(log_file, warn = FALSE), collapse = "\n")
 
@@ -127,19 +119,7 @@ test_that("decoration functions are fast", {
 
   # Should complete quickly
   start_time <- Sys.time()
-  result <- decorate_bio(
-    annot_table_wei_bio = large_df,
-    score_biological_kingdom = 0.1,
-    score_biological_phylum = 0.2,
-    score_biological_class = 0.3,
-    score_biological_order = 0.4,
-    score_biological_family = 0.5,
-    score_biological_tribe = 0.6,
-    score_biological_genus = 0.7,
-    score_biological_species = 0.8,
-    score_biological_variety = 0.9,
-    score_biological_biota = 1.007276
-  )
+  result <- call_decorate_bio(large_df)
   end_time <- Sys.time()
 
   # Should be fast (<1 second for 1000 rows)
@@ -162,19 +142,7 @@ test_that("decorate_bio ignores below-minimum rows when counting unique structur
   log_file <- withr::local_tempfile(fileext = ".log")
   setup_logger(filename = log_file, threshold = 400)
 
-  decorate_bio(
-    annot_table_wei_bio = test_df,
-    score_biological_kingdom = 0.1,
-    score_biological_phylum = 0.2,
-    score_biological_class = 0.3,
-    score_biological_order = 0.4,
-    score_biological_family = 0.5,
-    score_biological_tribe = 0.6,
-    score_biological_genus = 0.7,
-    score_biological_species = 0.8,
-    score_biological_variety = 0.9,
-    score_biological_biota = 1.0
-  )
+  call_decorate_bio(test_df, score_biological_biota = 1.0)
 
   logged <- paste(readLines(log_file, warn = FALSE), collapse = "\n")
   expect_true(grepl("Kingdom\\s+level:\\s+3 candidates \\(2 unique\\)", logged))
@@ -188,19 +156,7 @@ test_that("decorate_bio ignores below-minimum rows when counting unique structur
     candidate_structure_inchikey_connectivity_layer = "IK_NA"
   )
   expect_identical(
-    decorate_bio(
-      annot_table_wei_bio = na_df,
-      score_biological_kingdom = 0.1,
-      score_biological_phylum = 0.2,
-      score_biological_class = 0.3,
-      score_biological_order = 0.4,
-      score_biological_family = 0.5,
-      score_biological_tribe = 0.6,
-      score_biological_genus = 0.7,
-      score_biological_species = 0.8,
-      score_biological_variety = 0.9,
-      score_biological_biota = 1.0
-    ),
+    call_decorate_bio(na_df, score_biological_biota = 1.0),
     na_df
   )
 })
@@ -222,22 +178,16 @@ test_that("decorate_bio formats optional domain and sub-rank biological levels",
     candidate_structure_inchikey_connectivity_layer = c("IK1", "IK2", "IK3")
   )
 
-  res <- decorate_bio(
-    annot_table_wei_bio = df_sub,
+  res <- call_decorate_bio(
+    df_sub,
+    include_domain = TRUE,
+    include_subranks = TRUE,
     score_biological_domain = 0.05,
     score_biological_kingdom = 0.1,
     score_biological_phylum = 0.2,
     score_biological_class = 0.3,
     score_biological_order = 0.4,
     score_biological_infraorder = 0.5,
-    score_biological_family = 0.6,
-    score_biological_subfamily = 0.65,
-    score_biological_tribe = 0.7,
-    score_biological_subtribe = 0.75,
-    score_biological_genus = 0.8,
-    score_biological_subgenus = 0.85,
-    score_biological_species = 0.9,
-    score_biological_subspecies = 0.95,
     score_biological_variety = 0.98,
     score_biological_biota = 1.0
   )

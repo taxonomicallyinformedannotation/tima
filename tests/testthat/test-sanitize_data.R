@@ -81,14 +81,8 @@ test_that("sanitize_csv handles custom feature_col", {
 
 ## sanitize_mgf Tests ----
 
-write_mgf_file <- function(lines) {
-  tf <- temp_test_path(paste0("mgf_", as.integer(Sys.time()), ".mgf"))
-  writeLines(lines, tf)
-  tf
-}
-
 test_that("sanitize_mgf detects mismatched BEGIN/END IONS (vectorised path)", {
-  tf <- write_mgf_file(c(
+  tf <- local_test_mgf(c(
     "BEGIN IONS",
     "PEPMASS=100.5",
     "MSLEVEL=2",
@@ -106,22 +100,25 @@ test_that("sanitize_mgf detects mismatched BEGIN/END IONS (vectorised path)", {
 })
 
 test_that("sanitize_mgf counts only MS2 via MSLEVEL=2 tag (vectorised path)", {
-  tf <- write_mgf_file(c(
-    "BEGIN IONS",
-    "PEPMASS=100",
-    "MSLEVEL=1",
-    "50 10",
-    "END IONS",
-    "BEGIN IONS",
-    "PEPMASS=200",
-    "MSLEVEL=2",
-    "75 20",
-    "END IONS",
-    "BEGIN IONS",
-    "PEPMASS=300",
-    "MSLEVEL=2",
-    "90 30",
-    "END IONS"
+  tf <- local_test_mgf(c(
+    format_mgf_block(
+      pepmass = 100,
+      peaks = "50 10",
+      charge = NULL,
+      mslevel = "1"
+    ),
+    format_mgf_block(
+      pepmass = 200,
+      peaks = "75 20",
+      charge = NULL,
+      mslevel = "2"
+    ),
+    format_mgf_block(
+      pepmass = 300,
+      peaks = "90 30",
+      charge = NULL,
+      mslevel = "2"
+    )
   ))
   result <- sanitize_mgf(tf)
   expect_true(result$valid)
@@ -130,22 +127,16 @@ test_that("sanitize_mgf counts only MS2 via MSLEVEL=2 tag (vectorised path)", {
 
 test_that("sanitize_mgf counts spectra without MSLEVEL that have peaks as MS2", {
   # No MSLEVEL tag; has peaks → treat as MS2
-  tf <- write_mgf_file(c(
-    "BEGIN IONS",
-    "PEPMASS=100",
-    "50 10",
-    "END IONS",
-    "BEGIN IONS",
-    "PEPMASS=200",
-    "75 20",
-    "END IONS"
+  tf <- local_test_mgf(c(
+    format_mgf_block(pepmass = 100, peaks = "50 10", charge = NULL),
+    format_mgf_block(pepmass = 200, peaks = "75 20", charge = NULL)
   ))
   result <- sanitize_mgf(tf)
   expect_equal(result$n_spectra, 2L)
 })
 
 test_that("sanitize_mgf detects missing PEPMASS in first MS2 spectrum", {
-  tf <- write_mgf_file(c(
+  tf <- local_test_mgf(c(
     "BEGIN IONS",
     "MSLEVEL=2",
     "50 10",
@@ -454,7 +445,7 @@ test_that("sanitize_sirius handles ZIP files", {
 })
 
 test_that("sanitize_mgf supports lowercase headers and mslevel tags", {
-  tf <- write_mgf_file(c(
+  tf <- local_test_mgf(c(
     "begin ions",
     "pepmass=150.2",
     "mslevel=2",

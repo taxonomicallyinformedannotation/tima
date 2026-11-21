@@ -2,6 +2,28 @@
 
 library(testthat)
 
+call_decorate_chemo <- function(df, ..., .score_all = NULL) {
+  scores <- if (!missing(.score_all)) {
+    default_chemo_scores(.all = .score_all)
+  } else {
+    default_chemo_scores(
+      score_chemical_cla_kingdom = 0.1,
+      score_chemical_cla_superclass = 0.2,
+      score_chemical_cla_class = 0.3,
+      score_chemical_cla_parent = 0.4,
+      score_chemical_npc_pathway = 0.5,
+      score_chemical_npc_superclass = 0.6,
+      score_chemical_npc_class = 0.7
+    )
+  }
+  args <- c(list(annot_table_wei_chemo = df), scores)
+  overrides <- list(...)
+  if (length(overrides) > 0L) {
+    args[names(overrides)] <- overrides
+  }
+  do.call(decorate_chemo, args)
+}
+
 test_that("decorate_chemo returns input unchanged", {
   test_df <- tidytable::tidytable(
     feature_id = c("FT001", "FT002"),
@@ -16,16 +38,7 @@ test_that("decorate_chemo returns input unchanged", {
     feature_pred_tax_npc_03cla_val = c("NPC1", "NPC2")
   )
 
-  result <- decorate_chemo(
-    annot_table_wei_chemo = test_df,
-    score_chemical_cla_kingdom = 0.1,
-    score_chemical_cla_superclass = 0.2,
-    score_chemical_cla_class = 0.3,
-    score_chemical_cla_parent = 0.4,
-    score_chemical_npc_pathway = 0.5,
-    score_chemical_npc_superclass = 0.6,
-    score_chemical_npc_class = 0.7
-  )
+  result <- call_decorate_chemo(test_df)
 
   # Should return input unchanged (decorator pattern)
   expect_identical(result, test_df)
@@ -37,16 +50,7 @@ test_that("decorate_chemo warns on missing columns", {
   )
 
   expect_warning(
-    decorate_chemo(
-      annot_table_wei_chemo = incomplete_df,
-      score_chemical_cla_kingdom = 0.1,
-      score_chemical_cla_superclass = 0.2,
-      score_chemical_cla_class = 0.3,
-      score_chemical_cla_parent = 0.4,
-      score_chemical_npc_pathway = 0.5,
-      score_chemical_npc_superclass = 0.6,
-      score_chemical_npc_class = 0.7
-    ),
+    call_decorate_chemo(incomplete_df),
     NA
   )
 })
@@ -68,16 +72,7 @@ test_that("decorate_chemo logs both candidate and unique structure counts", {
   log_file <- withr::local_tempfile(fileext = ".log")
   setup_logger(filename = log_file, threshold = 400)
 
-  decorate_chemo(
-    annot_table_wei_chemo = test_df,
-    score_chemical_cla_kingdom = 0.7,
-    score_chemical_cla_superclass = 0.7,
-    score_chemical_cla_class = 0.7,
-    score_chemical_cla_parent = 0.7,
-    score_chemical_npc_pathway = 0.7,
-    score_chemical_npc_superclass = 0.7,
-    score_chemical_npc_class = 0.7
-  )
+  call_decorate_chemo(test_df, .score_all = 0.7)
 
   logged <- paste(readLines(log_file, warn = FALSE), collapse = "\n")
 
@@ -125,15 +120,13 @@ test_that("decorate_chemo cascades ClassyFire and NPClassifier filters independe
   log_file <- withr::local_tempfile(fileext = ".log")
   setup_logger(filename = log_file, threshold = 400)
 
-  res <- decorate_chemo(
-    annot_table_wei_chemo = test_df,
+  res <- call_decorate_chemo(
+    test_df,
     score_chemical_cla_kingdom = 0.5,
     score_chemical_cla_superclass = 0.8,
     score_chemical_cla_class = 0.8,
     score_chemical_cla_parent = 0.8,
-    score_chemical_npc_pathway = 0.5,
-    score_chemical_npc_superclass = 0.5,
-    score_chemical_npc_class = 0.5
+    .score_all = 0.5
   )
 
   expect_identical(res, test_df)
@@ -156,15 +149,13 @@ test_that("decorate_chemo cascades ClassyFire and NPClassifier filters independe
     with = FALSE
   ]
   expect_identical(
-    decorate_chemo(
-      annot_table_wei_chemo = df_no_sub,
+    call_decorate_chemo(
+      df_no_sub,
       score_chemical_cla_kingdom = 0.5,
       score_chemical_cla_superclass = 0.8,
       score_chemical_cla_class = 0.8,
       score_chemical_cla_parent = 0.8,
-      score_chemical_npc_pathway = 0.5,
-      score_chemical_npc_superclass = 0.5,
-      score_chemical_npc_class = 0.5
+      .score_all = 0.5
     ),
     df_no_sub
   )
