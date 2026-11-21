@@ -49,6 +49,49 @@ library(testthat)
     tidytable::distinct()
 }
 
+.mock_process_smiles_select <- function(distinct_rows = FALSE) {
+  function(table, cache) {
+    force(cache)
+    res <- table |>
+      tidytable::select(
+        structure_smiles_initial,
+        tidyselect::any_of(
+          x = c(
+            "structure_inchikey",
+            "structure_inchikey_connectivity_layer",
+            "structure_smiles",
+            "structure_smiles_no_stereo",
+            "structure_molecular_formula",
+            "structure_exact_mass",
+            "structure_xlogp",
+            "structure_tag"
+          )
+        )
+      )
+    if (distinct_rows) tidytable::distinct(res) else res
+  }
+}
+
+.mock_process_smiles_cco_ccc <- function(table, cache) {
+  force(table)
+  force(cache)
+  tidytable::tidytable(
+    structure_smiles_initial = c("CCO", "CCC"),
+    structure_inchikey = c(
+      "LFQSCWFLJHTTHZ-UHFFFAOYSA-N",
+      "ATUOYWHBWRKTHZ-UHFFFAOYSA-N"
+    ),
+    structure_inchikey_connectivity_layer = c(
+      "LFQSCWFLJHTTHZ",
+      "ATUOYWHBWRKTHZ"
+    ),
+    structure_smiles = c("CCO", "CCC"),
+    structure_smiles_no_stereo = c("CCO", "CCC"),
+    structure_molecular_formula = c("C2H6O", "C3H8"),
+    structure_exact_mass = c(46.0419, 44.0626)
+  )
+}
+
 ## Input validation ----
 
 test_that("split_tables_sop validates data frame input", {
@@ -104,25 +147,7 @@ test_that("split_tables_sop splits table into components", {
 
   # Mock process_smiles to return the same structure data
   with_mocked_bindings(
-    process_smiles = function(table, cache) {
-      table |>
-        tidytable::select(
-          structure_smiles_initial,
-          tidyselect::any_of(
-            x = c(
-              "structure_inchikey",
-              "structure_inchikey_connectivity_layer",
-              "structure_smiles",
-              "structure_smiles_no_stereo",
-              "structure_molecular_formula",
-              "structure_exact_mass",
-              "structure_xlogp",
-              "structure_tag"
-            )
-          )
-        ) |>
-        tidytable::distinct()
-    },
+    process_smiles = .mock_process_smiles_select(distinct_rows = TRUE),
     {
       result <- split_tables_sop(table = sop_table, cache = NULL)
 
@@ -163,24 +188,7 @@ test_that("split_tables_sop handles missing SMILES gracefully", {
   sop_table <- load_fixture("sop_table_missing_smiles")
 
   with_mocked_bindings(
-    process_smiles = function(table, cache) {
-      table |>
-        tidytable::select(
-          structure_smiles_initial,
-          tidyselect::any_of(
-            x = c(
-              "structure_inchikey",
-              "structure_inchikey_connectivity_layer",
-              "structure_smiles",
-              "structure_smiles_no_stereo",
-              "structure_molecular_formula",
-              "structure_exact_mass",
-              "structure_xlogp",
-              "structure_tag"
-            )
-          )
-        )
-    },
+    process_smiles = .mock_process_smiles_select(),
     {
       result <- split_tables_sop(table = sop_table, cache = NULL)
 
@@ -196,24 +204,7 @@ test_that("split_tables_sop preserves unique organisms", {
   sop_table <- load_fixture("sop_table_duplicate_organisms")
 
   with_mocked_bindings(
-    process_smiles = function(table, cache) {
-      table |>
-        tidytable::select(
-          structure_smiles_initial,
-          tidyselect::any_of(
-            x = c(
-              "structure_inchikey",
-              "structure_inchikey_connectivity_layer",
-              "structure_smiles",
-              "structure_smiles_no_stereo",
-              "structure_molecular_formula",
-              "structure_exact_mass",
-              "structure_xlogp",
-              "structure_tag"
-            )
-          )
-        )
-    },
+    process_smiles = .mock_process_smiles_select(),
     {
       result <- split_tables_sop(table = sop_table, cache = NULL)
 
@@ -397,23 +388,7 @@ test_that("split_tables_sop drops NA reference_doi only when non-NA reference ex
   )
 
   with_mocked_bindings(
-    process_smiles = function(table, cache) {
-      tidytable::tidytable(
-        structure_smiles_initial = c("CCO", "CCC"),
-        structure_inchikey = c(
-          "LFQSCWFLJHTTHZ-UHFFFAOYSA-N",
-          "ATUOYWHBWRKTHZ-UHFFFAOYSA-N"
-        ),
-        structure_inchikey_connectivity_layer = c(
-          "LFQSCWFLJHTTHZ",
-          "ATUOYWHBWRKTHZ"
-        ),
-        structure_smiles = c("CCO", "CCC"),
-        structure_smiles_no_stereo = c("CCO", "CCC"),
-        structure_molecular_formula = c("C2H6O", "C3H8"),
-        structure_exact_mass = c(46.0419, 44.0626)
-      )
-    },
+    process_smiles = .mock_process_smiles_cco_ccc,
     {
       res <- split_tables_sop(table = sop_table, cache = NULL)
     }
@@ -457,23 +432,7 @@ test_that("split_tables_sop drops NA reference_doi only when non-NA reference ex
     reference_doi = c("10.1/a", "10.1/b", "10.1/c", "10.1/d")
   )
   with_mocked_bindings(
-    process_smiles = function(table, cache) {
-      tidytable::tidytable(
-        structure_smiles_initial = c("CCO", "CCC"),
-        structure_inchikey = c(
-          "LFQSCWFLJHTTHZ-UHFFFAOYSA-N",
-          "ATUOYWHBWRKTHZ-UHFFFAOYSA-N"
-        ),
-        structure_inchikey_connectivity_layer = c(
-          "LFQSCWFLJHTTHZ",
-          "ATUOYWHBWRKTHZ"
-        ),
-        structure_smiles = c("CCO", "CCC"),
-        structure_smiles_no_stereo = c("CCO", "CCC"),
-        structure_molecular_formula = c("C2H6O", "C3H8"),
-        structure_exact_mass = c(46.0419, 44.0626)
-      )
-    },
+    process_smiles = .mock_process_smiles_cco_ccc,
     {
       res_il <- split_tables_sop(table = sop_interleaved, cache = NULL)
     }

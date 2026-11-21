@@ -3,6 +3,37 @@
 library(testthat)
 set.seed(NULL)
 
+make_clean_bio_annot <- function(
+  feature_id = rep("F1", 3L),
+  seed,
+  cla_01kin = rep("Organic compounds", length(feature_id)),
+  npc_01pat = rep("Alkaloids", length(feature_id)),
+  cla_02sup = rep("Phenylpropanoids", length(feature_id)),
+  npc_02sup = rep("Alkaloids", length(feature_id)),
+  cla_03cla = rep("Flavonoids", length(feature_id)),
+  npc_03cla = rep("Benzylisoquinoline", length(feature_id)),
+  cla_04dirpar = rep("Flavones", length(feature_id)),
+  score_weighted_bio = c(0.8, 0.75, 0.7),
+  ...
+) {
+  tidytable::tidytable(
+    feature_id = feature_id,
+    candidate_structure_inchikey_connectivity_layer = generate_fake_inchikey(
+      length(feature_id),
+      seed = seed
+    ),
+    candidate_structure_tax_cla_01kin = cla_01kin,
+    candidate_structure_tax_npc_01pat = npc_01pat,
+    candidate_structure_tax_cla_02sup = cla_02sup,
+    candidate_structure_tax_npc_02sup = npc_02sup,
+    candidate_structure_tax_cla_03cla = cla_03cla,
+    candidate_structure_tax_npc_03cla = npc_03cla,
+    candidate_structure_tax_cla_04dirpar = cla_04dirpar,
+    score_weighted_bio = score_weighted_bio,
+    ...
+  )
+}
+
 ## Input Validation ----
 
 test_that("clean_bio validates data frame inputs", {
@@ -164,44 +195,14 @@ test_that("clean_bio handles features with only 1 neighbor", {
 
 test_that("clean_bio handles features with zero entropy", {
   # Create annotation table
-  annotations <- tidytable::tidytable(
+  annotations <- make_clean_bio_annot(
     feature_id = c("F1", "F2", "F3"),
-    candidate_structure_inchikey_connectivity_layer = generate_fake_inchikey(
-      3,
-      seed = 3
-    ),
-    candidate_structure_tax_cla_01kin = rep("Organic compounds", 3),
-    candidate_structure_tax_npc_01pat = c(
-      "Alkaloids",
-      "Alkaloids",
-      "Terpenoids"
-    ),
-    candidate_structure_tax_cla_02sup = c(
-      "Phenylpropanoids",
-      "Phenylpropanoids",
-      "Isoprenoids"
-    ),
-    candidate_structure_tax_npc_02sup = c(
-      "Alkaloids",
-      "Alkaloids",
-      "Terpenoids"
-    ),
-    candidate_structure_tax_cla_03cla = c(
-      "Flavonoids",
-      "Flavonoids",
-      "Monoterpenoids"
-    ),
-    candidate_structure_tax_npc_03cla = c(
-      "Benzylisoquinoline",
-      "Benzylisoquinoline",
-      "Iridoids"
-    ),
-    candidate_structure_tax_cla_04dirpar = c(
-      "Flavones",
-      "Flavones",
-      "Monoterpenoids"
-    ),
-    score_weighted_bio = c(0.8, 0.75, 0.7)
+    seed = 3,
+    npc_01pat = c("Alkaloids", "Alkaloids", "Terpenoids"),
+    cla_02sup = c("Phenylpropanoids", "Phenylpropanoids", "Isoprenoids"),
+    cla_03cla = c("Flavonoids", "Flavonoids", "Monoterpenoids"),
+    npc_03cla = c("Benzylisoquinoline", "Benzylisoquinoline", "Iridoids"),
+    cla_04dirpar = c("Flavones", "Flavones", "Monoterpenoids")
   )
 
   # Create edges with zero entropy
@@ -227,38 +228,10 @@ test_that("clean_bio handles features with zero entropy", {
 
 test_that("clean_bio calculates consistency correctly for perfect agreement", {
   # Create annotation table where all neighbors agree on classification
-  annotations <- tidytable::tidytable(
-    feature_id = rep("F1", 3),
-    candidate_structure_inchikey_connectivity_layer = generate_fake_inchikey(
-      3,
-      seed = 10
-    ),
-    candidate_structure_tax_cla_01kin = rep("Organic compounds", 3),
-    candidate_structure_tax_npc_01pat = rep("Alkaloids", 3),
-    candidate_structure_tax_cla_02sup = rep("Phenylpropanoids", 3),
-    candidate_structure_tax_npc_02sup = rep("Alkaloids", 3),
-    candidate_structure_tax_cla_03cla = rep("Flavonoids", 3),
-    candidate_structure_tax_npc_03cla = rep("Benzylisoquinoline", 3),
-    candidate_structure_tax_cla_04dirpar = rep("Flavones", 3),
-    score_weighted_bio = c(0.8, 0.75, 0.7)
-  ) |>
+  annotations <- make_clean_bio_annot(seed = 10) |>
     tidytable::bind_rows(
       # Neighbors F2, F3, F4 all have same classification
-      tidytable::tidytable(
-        feature_id = rep(c("F2", "F3", "F4"), each = 1),
-        candidate_structure_inchikey_connectivity_layer = generate_fake_inchikey(
-          3,
-          seed = 11
-        ),
-        candidate_structure_tax_cla_01kin = rep("Organic compounds", 3),
-        candidate_structure_tax_npc_01pat = rep("Alkaloids", 3),
-        candidate_structure_tax_cla_02sup = rep("Phenylpropanoids", 3),
-        candidate_structure_tax_npc_02sup = rep("Alkaloids", 3),
-        candidate_structure_tax_cla_03cla = rep("Flavonoids", 3),
-        candidate_structure_tax_npc_03cla = rep("Benzylisoquinoline", 3),
-        candidate_structure_tax_cla_04dirpar = rep("Flavones", 3),
-        score_weighted_bio = c(0.8, 0.75, 0.7)
-      )
+      make_clean_bio_annot(feature_id = c("F2", "F3", "F4"), seed = 11)
     )
 
   # Create edges: F1 connects to F2, F3, F4 (all have same classification)
@@ -286,61 +259,18 @@ test_that("clean_bio calculates consistency correctly for perfect agreement", {
 
 test_that("clean_bio calculates consistency correctly for partial agreement", {
   # Create annotation table where neighbors partially agree
-  annotations <- tidytable::tidytable(
-    feature_id = rep("F1", 3),
-    candidate_structure_inchikey_connectivity_layer = generate_fake_inchikey(
-      3,
-      seed = 20
-    ),
-    candidate_structure_tax_cla_01kin = rep("Organic compounds", 3),
-    candidate_structure_tax_npc_01pat = rep("Alkaloids", 3),
-    candidate_structure_tax_cla_02sup = rep("Phenylpropanoids", 3),
-    candidate_structure_tax_npc_02sup = rep("Alkaloids", 3),
-    candidate_structure_tax_cla_03cla = rep("Flavonoids", 3),
-    candidate_structure_tax_npc_03cla = rep("Benzylisoquinoline", 3),
-    candidate_structure_tax_cla_04dirpar = rep("Flavones", 3),
-    score_weighted_bio = c(0.8, 0.75, 0.7)
-  ) |>
+  annotations <- make_clean_bio_annot(seed = 20) |>
     tidytable::bind_rows(
       # F2 and F3 have Alkaloids, F4 has Terpenoids
-      tidytable::tidytable(
+      make_clean_bio_annot(
         feature_id = c("F2", "F3", "F4"),
-        candidate_structure_inchikey_connectivity_layer = generate_fake_inchikey(
-          3,
-          seed = 21
-        ),
-        candidate_structure_tax_cla_01kin = rep("Organic compounds", 3),
-        candidate_structure_tax_npc_01pat = c(
-          "Alkaloids",
-          "Alkaloids",
-          "Terpenoids"
-        ),
-        candidate_structure_tax_cla_02sup = c(
-          "Phenylpropanoids",
-          "Phenylpropanoids",
-          "Isoprenoids"
-        ),
-        candidate_structure_tax_npc_02sup = c(
-          "Alkaloids",
-          "Alkaloids",
-          "Terpenoids"
-        ),
-        candidate_structure_tax_cla_03cla = c(
-          "Flavonoids",
-          "Flavonoids",
-          "Monoterpenoids"
-        ),
-        candidate_structure_tax_npc_03cla = c(
-          "Benzylisoquinoline",
-          "Benzylisoquinoline",
-          "Iridoids"
-        ),
-        candidate_structure_tax_cla_04dirpar = c(
-          "Flavones",
-          "Flavones",
-          "Monoterpenoids"
-        ),
-        score_weighted_bio = c(0.8, 0.75, 0.7)
+        seed = 21,
+        npc_01pat = c("Alkaloids", "Alkaloids", "Terpenoids"),
+        cla_02sup = c("Phenylpropanoids", "Phenylpropanoids", "Isoprenoids"),
+        npc_02sup = c("Alkaloids", "Alkaloids", "Terpenoids"),
+        cla_03cla = c("Flavonoids", "Flavonoids", "Monoterpenoids"),
+        npc_03cla = c("Benzylisoquinoline", "Benzylisoquinoline", "Iridoids"),
+        cla_04dirpar = c("Flavones", "Flavones", "Monoterpenoids")
       )
     )
 
@@ -370,60 +300,18 @@ test_that("clean_bio calculates consistency correctly for partial agreement", {
 
 test_that("clean_bio filters out classifications below minimal_consistency", {
   # Create annotation table
-  annotations <- tidytable::tidytable(
-    feature_id = rep("F1", 3),
-    candidate_structure_inchikey_connectivity_layer = generate_fake_inchikey(
-      3,
-      seed = 30
-    ),
-    candidate_structure_tax_cla_01kin = rep("Organic compounds", 3),
-    candidate_structure_tax_npc_01pat = rep("Alkaloids", 3),
-    candidate_structure_tax_cla_02sup = rep("Phenylpropanoids", 3),
-    candidate_structure_tax_npc_02sup = rep("Alkaloids", 3),
-    candidate_structure_tax_cla_03cla = rep("Flavonoids", 3),
-    candidate_structure_tax_npc_03cla = rep("Benzylisoquinoline", 3),
-    candidate_structure_tax_cla_04dirpar = rep("Flavones", 3),
-    score_weighted_bio = c(0.8, 0.75, 0.7)
-  ) |>
+  annotations <- make_clean_bio_annot(seed = 30) |>
     tidytable::bind_rows(
       # All neighbors have different NPC pathway (no consensus)
-      tidytable::tidytable(
+      make_clean_bio_annot(
         feature_id = c("F2", "F3", "F4"),
-        candidate_structure_inchikey_connectivity_layer = generate_fake_inchikey(
-          3,
-          seed = 31
-        ),
-        candidate_structure_tax_cla_01kin = rep("Organic compounds", 3),
-        candidate_structure_tax_npc_01pat = c(
-          "Alkaloids",
-          "Terpenoids",
-          "Polyketides"
-        ),
-        candidate_structure_tax_cla_02sup = c(
-          "Phenylpropanoids",
-          "Isoprenoids",
-          "Polyketides"
-        ),
-        candidate_structure_tax_npc_02sup = c(
-          "Alkaloids",
-          "Terpenoids",
-          "Polyketides"
-        ),
-        candidate_structure_tax_cla_03cla = c(
-          "Flavonoids",
-          "Monoterpenoids",
-          "Type I"
-        ),
-        candidate_structure_tax_npc_03cla = c(
-          "Benzylisoquinoline",
-          "Iridoids",
-          "Modular"
-        ),
-        candidate_structure_tax_cla_04dirpar = c(
-          "Flavones",
-          "Monoterpenoids",
-          "Type I"
-        ),
+        seed = 31,
+        npc_01pat = c("Alkaloids", "Terpenoids", "Polyketides"),
+        cla_02sup = c("Phenylpropanoids", "Isoprenoids", "Polyketides"),
+        npc_02sup = c("Alkaloids", "Terpenoids", "Polyketides"),
+        cla_03cla = c("Flavonoids", "Monoterpenoids", "Type I"),
+        npc_03cla = c("Benzylisoquinoline", "Iridoids", "Modular"),
+        cla_04dirpar = c("Flavones", "Monoterpenoids", "Type I"),
         score_weighted_bio = c(0.2, 0.15, 0.1) # Low scores
       )
     )
@@ -458,19 +346,9 @@ test_that("clean_bio filters out classifications below minimal_consistency", {
 
 test_that("clean_bio returns expected columns", {
   # Create simple annotation table
-  annotations <- tidytable::tidytable(
-    feature_id = c("F1"),
-    candidate_structure_inchikey_connectivity_layer = generate_fake_inchikey(
-      1,
-      seed = 40
-    ),
-    candidate_structure_tax_cla_01kin = "Organic compounds",
-    candidate_structure_tax_npc_01pat = "Alkaloids",
-    candidate_structure_tax_cla_02sup = "Phenylpropanoids",
-    candidate_structure_tax_npc_02sup = "Alkaloids",
-    candidate_structure_tax_cla_03cla = "Flavonoids",
-    candidate_structure_tax_npc_03cla = "Benzylisoquinoline",
-    candidate_structure_tax_cla_04dirpar = "Flavones",
+  annotations <- make_clean_bio_annot(
+    feature_id = "F1",
+    seed = 40,
     score_weighted_bio = 0.8
   )
 
@@ -523,19 +401,15 @@ test_that("clean_bio returns expected columns", {
 
 test_that("clean_bio preserves already computed predictions", {
   # Create annotation table with some features already having predictions
-  annotations <- tidytable::tidytable(
+  annotations <- make_clean_bio_annot(
     feature_id = c("F1", "F2"),
-    candidate_structure_inchikey_connectivity_layer = generate_fake_inchikey(
-      2,
-      seed = 50
-    ),
-    candidate_structure_tax_cla_01kin = rep("Organic compounds", 2),
-    candidate_structure_tax_npc_01pat = c("Alkaloids", "Terpenoids"),
-    candidate_structure_tax_cla_02sup = c("Phenylpropanoids", "Isoprenoids"),
-    candidate_structure_tax_npc_02sup = c("Alkaloids", "Terpenoids"),
-    candidate_structure_tax_cla_03cla = c("Flavonoids", "Monoterpenoids"),
-    candidate_structure_tax_npc_03cla = c("Benzylisoquinoline", "Iridoids"),
-    candidate_structure_tax_cla_04dirpar = c("Flavones", "Monoterpenoids"),
+    seed = 50,
+    npc_01pat = c("Alkaloids", "Terpenoids"),
+    cla_02sup = c("Phenylpropanoids", "Isoprenoids"),
+    npc_02sup = c("Alkaloids", "Terpenoids"),
+    cla_03cla = c("Flavonoids", "Monoterpenoids"),
+    npc_03cla = c("Benzylisoquinoline", "Iridoids"),
+    cla_04dirpar = c("Flavones", "Monoterpenoids"),
     score_weighted_bio = c(0.8, 0.75),
     # F1 already has predictions
     feature_pred_tax_cla_02sup_val = c("Phenylpropanoids", NA),
@@ -660,24 +534,11 @@ test_that("clean_bio handles moderate-scale data efficiently", {
 })
 
 test_that("clean_bio breaks ties deterministically and deduplicates neighbor edges", {
-  annotations <- tidytable::tidytable(
+  annotations <- make_clean_bio_annot(
     feature_id = c("F1", "F1", "F2", "F3"),
-    candidate_structure_inchikey_connectivity_layer = generate_fake_inchikey(
-      4,
-      seed = 200
-    ),
-    candidate_structure_tax_cla_01kin = rep("Organic compounds", 4),
-    candidate_structure_tax_npc_01pat = c(
-      "Terpenoids",
-      "Alkaloids",
-      "Terpenoids",
-      "Alkaloids"
-    ),
-    candidate_structure_tax_cla_02sup = rep("Phenylpropanoids", 4),
-    candidate_structure_tax_npc_02sup = rep("Alkaloids", 4),
-    candidate_structure_tax_cla_03cla = rep("Flavonoids", 4),
-    candidate_structure_tax_npc_03cla = rep("Iridoids", 4),
-    candidate_structure_tax_cla_04dirpar = rep("Flavones", 4),
+    seed = 200,
+    npc_01pat = c("Terpenoids", "Alkaloids", "Terpenoids", "Alkaloids"),
+    npc_03cla = rep("Iridoids", 4),
     score_weighted_bio = c(0.8, 0.8, 0.9, 0.9)
   )
 
@@ -703,23 +564,10 @@ test_that("clean_bio breaks ties deterministically and deduplicates neighbor edg
 })
 
 test_that("clean_bio handles unique vs duplicate feature-inchikey pairs and does not mutate input", {
-  ik <- generate_fake_inchikey(2, seed = 201)
-  annotations_unique <- tidytable::tidytable(
+  annotations_unique <- make_clean_bio_annot(
     feature_id = c("F1", "F2"),
-    candidate_structure_inchikey_connectivity_layer = ik,
-    candidate_structure_tax_cla_01kin = c(
-      "Organic compounds",
-      "Organic compounds"
-    ),
-    candidate_structure_tax_npc_01pat = c("Alkaloids", "Alkaloids"),
-    candidate_structure_tax_cla_02sup = c(
-      "Phenylpropanoids",
-      "Phenylpropanoids"
-    ),
-    candidate_structure_tax_npc_02sup = c("Alkaloids", "Alkaloids"),
-    candidate_structure_tax_cla_03cla = c("Flavonoids", "Flavonoids"),
-    candidate_structure_tax_npc_03cla = c("Iridoids", "Iridoids"),
-    candidate_structure_tax_cla_04dirpar = c("Flavones", "Flavones"),
+    seed = 201,
+    npc_03cla = c("Iridoids", "Iridoids"),
     score_weighted_bio = c(0.8, 0.9)
   )
 

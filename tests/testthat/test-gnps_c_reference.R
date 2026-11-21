@@ -67,23 +67,22 @@ sp_zero <- cbind(mz = c(100, 200), intensity = c(0, 0))
 
 # ---- independent reference implementation -----------------------------------
 
-# Transliteration of gnps_chain_dp_core_api() + score_matched(). Returns the
-# documented c(score, matches, score_forward, score_reverse).
-gnps_reference_score <- function(x, y, x_pre, y_pre, tol, ppm) {
+# Shared direct/shifted matching and conflict detection used by both
+# gnps_reference_score() and gnps_reference_branches().
+.gnps_ref_match_passes <- function(x, y, x_pre, y_pre, tol, ppm) {
   x_mz <- as.double(x[, 1L])
   x_int <- as.double(x[, 2L])
   y_mz <- as.double(y[, 1L])
   y_int <- as.double(y[, 2L])
   nx <- length(x_mz)
   ny <- length(y_mz)
-
   if (nx == 0L || ny == 0L) {
-    return(c(0, 0, 0, 0))
+    return(NULL)
   }
   xsum <- sum(x_int)
   ysum <- sum(y_int)
   if (xsum == 0 || ysum == 0) {
-    return(c(0, 0, 0, 0))
+    return(NULL)
   }
 
   eps <- sqrt(.Machine$double.eps)
@@ -171,13 +170,6 @@ gnps_reference_score <- function(x, y, x_pre, y_pre, tol, ppm) {
     }
   }
 
-  scaled_x <- sqrt(x_int) / sqrt(xsum)
-  scaled_y <- sqrt(y_int) / sqrt(ysum)
-
-  total <- 0
-  matched <- 0L
-  matched_xsum <- 0
-  matched_ysum <- 0
   has_conflict <- FALSE
   for (i in seq_len(nx)) {
     sj <- sm[i]
@@ -191,8 +183,48 @@ gnps_reference_score <- function(x, y, x_pre, y_pre, tol, ppm) {
     }
   }
 
+  list(
+    x_int = x_int,
+    y_int = y_int,
+    nx = nx,
+    ny = ny,
+    xsum = xsum,
+    ysum = ysum,
+    do_shift = do_shift,
+    dm = dm,
+    bd = bd,
+    sm = sm,
+    has_conflict = has_conflict
+  )
+}
+
+# Transliteration of gnps_chain_dp_core_api() + score_matched(). Returns the
+# documented c(score, matches, score_forward, score_reverse).
+gnps_reference_score <- function(x, y, x_pre, y_pre, tol, ppm) {
+  m <- .gnps_ref_match_passes(x, y, x_pre, y_pre, tol, ppm)
+  if (is.null(m)) {
+    return(c(0, 0, 0, 0))
+  }
+  x_int <- m$x_int
+  y_int <- m$y_int
+  nx <- m$nx
+  ny <- m$ny
+  xsum <- m$xsum
+  ysum <- m$ysum
+  dm <- m$dm
+  bd <- m$bd
+  sm <- m$sm
+
+  scaled_x <- sqrt(x_int) / sqrt(xsum)
+  scaled_y <- sqrt(y_int) / sqrt(ysum)
+
+  total <- 0
+  matched <- 0L
+  matched_xsum <- 0
+  matched_ysum <- 0
+
   # Step 3a: no conflict - greedy max(direct, shifted) per query peak.
-  if (!has_conflict) {
+  if (!m$has_conflict) {
     for (i in seq_len(nx)) {
       d <- dm[i]
       s <- sm[i]
@@ -351,116 +383,16 @@ gnps_reference_score <- function(x, y, x_pre, y_pre, tol, ppm) {
   c(total, matched, score_fwd, score_rev)
 }
 
-# Branch-flag introspection for the randomized cross-check below. Duplicates
-# only the decision logic (which peaks the direct and shifted passes claim and
-# whether they collide), not the scoring, so a test can assert the case it
-# generated actually reached the branch it means to exercise.
+# Branch-flag introspection for the randomized cross-check below.
 gnps_reference_branches <- function(x, y, x_pre, y_pre, tol, ppm) {
-  x_mz <- as.double(x[, 1L])
-  x_int <- as.double(x[, 2L])
-  y_mz <- as.double(y[, 1L])
-  y_int <- as.double(y[, 2L])
-  nx <- length(x_mz)
-  ny <- length(y_mz)
-  if (nx == 0L || ny == 0L || sum(x_int) == 0 || sum(y_int) == 0) {
+  m <- .gnps_ref_match_passes(x, y, x_pre, y_pre, tol, ppm)
+  if (is.null(m)) {
     return(c(had_conflict = FALSE, did_shift = FALSE, n_matches = 0L))
   }
-  eps <- sqrt(.Machine$double.eps)
-  do_shift <- !is.na(x_pre) && !is.na(y_pre)
-  pdiff <- 0
-  if (do_shift) {
-    pdiff <- y_pre - x_pre
-    if (abs(pdiff) <= tol + ppm * max(x_pre, y_pre) * 1e-6) do_shift <- FALSE
-  }
-  x_tol <- tol + ppm * x_mz * 1e-6 + eps
-  dm <- rep(-1L, nx)
-  bd <- rep(-1L, ny)
-  ilo <- 1L
-  for (j in seq_len(ny)) {
-    ym <- y_mz[j]
-    while (ilo <= nx && x_mz[ilo] + x_tol[ilo] < ym) {
-      ilo <- ilo + 1L
-    }
-    best_i <- -1L
-    best_d <- Inf
-    if (ilo <= nx) {
-      for (i in ilo:nx) {
-        xm <- x_mz[i]
-        ai <- x_tol[i]
-        if (xm - ai > ym) {
-          break
-        }
-        dij <- abs(xm - ym)
-        if (dij <= ai && dij < best_d) {
-          best_d <- dij
-          best_i <- i
-        }
-      }
-    }
-    if (best_i >= 1L) {
-      if (dm[best_i] < 0L) {
-        dm[best_i] <- j
-        bd[j] <- best_i
-      } else {
-        prev_j <- dm[best_i]
-        if (best_d < abs(x_mz[best_i] - y_mz[prev_j])) {
-          bd[prev_j] <- -1L
-          dm[best_i] <- j
-          bd[j] <- best_i
-        }
-      }
-    }
-  }
-  sm <- rep(-1L, nx)
-  if (do_shift) {
-    sv <- x_mz + pdiff
-    s_tol <- tol + ppm * abs(sv) * 1e-6 + eps
-    ilo <- 1L
-    for (j in seq_len(ny)) {
-      ym <- y_mz[j]
-      while (ilo <= nx && sv[ilo] + s_tol[ilo] < ym) {
-        ilo <- ilo + 1L
-      }
-      best_i <- -1L
-      best_d <- Inf
-      if (ilo <= nx) {
-        for (i in ilo:nx) {
-          if (sv[i] - s_tol[i] > ym) {
-            break
-          }
-          dij <- abs(sv[i] - ym)
-          if (dij <= s_tol[i] && dij < best_d) {
-            best_d <- dij
-            best_i <- i
-          }
-        }
-      }
-      if (best_i >= 1L) {
-        if (sm[best_i] < 0L) {
-          sm[best_i] <- j
-        } else {
-          prev_j <- sm[best_i]
-          if (best_d < abs(sv[best_i] - y_mz[prev_j])) sm[best_i] <- j
-        }
-      }
-    }
-  }
-  had_conflict <- FALSE
-  for (i in seq_len(nx)) {
-    sj <- sm[i]
-    if (sj < 0L) {
-      next
-    }
-    k <- bd[sj]
-    if (k >= 1L && k != i) {
-      had_conflict <- TRUE
-      break
-    }
-  }
   c(
-    had_conflict = had_conflict,
-    did_shift = do_shift,
-    n_matches = sum(dm > 0L) + sum(sm > 0L)
+    had_conflict = m$has_conflict,
+    did_shift = m$do_shift,
+    n_matches = sum(m$dm > 0L) + sum(m$sm > 0L)
   )
 }
 

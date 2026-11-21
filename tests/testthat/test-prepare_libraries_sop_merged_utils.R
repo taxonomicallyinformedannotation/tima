@@ -13,100 +13,62 @@ std_outputs <- function() {
   )
 }
 
+call_validate_sop_merged <- function(
+  files = c("a.tsv", "b.tsv"),
+  filter = FALSE,
+  level = "genus",
+  value = "Homo",
+  ...
+) {
+  out <- std_outputs()
+  args <- c(
+    list(files = files, filter = filter, level = level, value = value),
+    out
+  )
+  overrides <- list(...)
+  if (length(overrides) > 0L) {
+    args[names(overrides)] <- overrides
+  }
+  do.call(validate_sop_merged_inputs, args)
+}
+
 # ── validate_sop_merged_inputs ─────────────────────────────────────────────────
 
 test_that("validate_sop_merged_inputs passes with valid minimal inputs", {
-  out <- std_outputs()
-  expect_invisible(validate_sop_merged_inputs(
-    files = c("a.tsv", "b.tsv"),
-    filter = FALSE,
-    level = "genus",
-    value = "Homo",
-    output_key = out$output_key,
-    output_org_tax_ott = out$output_org_tax_ott,
-    output_str_can = out$output_str_can,
-    output_str_stereo = out$output_str_stereo,
-    output_str_met = out$output_str_met,
-    output_str_tax_cla = out$output_str_tax_cla,
-    output_str_tax_npc = out$output_str_tax_npc
-  ))
+  expect_invisible(call_validate_sop_merged())
 })
 
 test_that("validate_sop_merged_inputs errors on empty files vector", {
-  out <- std_outputs()
   expect_error(
-    validate_sop_merged_inputs(
-      files = character(0),
-      filter = FALSE,
-      level = "genus",
-      value = "Homo",
-      output_key = out$output_key,
-      output_org_tax_ott = out$output_org_tax_ott,
-      output_str_can = out$output_str_can,
-      output_str_stereo = out$output_str_stereo,
-      output_str_met = out$output_str_met,
-      output_str_tax_cla = out$output_str_tax_cla,
-      output_str_tax_npc = out$output_str_tax_npc
-    ),
+    call_validate_sop_merged(files = character(0)),
     class = "tima_validation_error"
   )
 })
 
 test_that("validate_sop_merged_inputs errors on non-logical filter", {
-  out <- std_outputs()
   expect_error(
-    validate_sop_merged_inputs(
-      files = "a.tsv",
-      filter = "yes",
-      level = "genus",
-      value = "Homo",
-      output_key = out$output_key,
-      output_org_tax_ott = out$output_org_tax_ott,
-      output_str_can = out$output_str_can,
-      output_str_stereo = out$output_str_stereo,
-      output_str_met = out$output_str_met,
-      output_str_tax_cla = out$output_str_tax_cla,
-      output_str_tax_npc = out$output_str_tax_npc
-    ),
+    call_validate_sop_merged(files = "a.tsv", filter = "yes"),
     class = "tima_validation_error"
   )
 })
 
 test_that("validate_sop_merged_inputs errors on invalid taxonomic level", {
-  out <- std_outputs()
   expect_error(
-    validate_sop_merged_inputs(
+    call_validate_sop_merged(
       files = "a.tsv",
       filter = TRUE,
-      level = "not_a_rank",
-      value = "Homo",
-      output_key = out$output_key,
-      output_org_tax_ott = out$output_org_tax_ott,
-      output_str_can = out$output_str_can,
-      output_str_stereo = out$output_str_stereo,
-      output_str_met = out$output_str_met,
-      output_str_tax_cla = out$output_str_tax_cla,
-      output_str_tax_npc = out$output_str_tax_npc
+      level = "not_a_rank"
     ),
     class = "tima_validation_error"
   )
 })
 
 test_that("validate_sop_merged_inputs errors when value not a single string", {
-  out <- std_outputs()
   expect_error(
-    validate_sop_merged_inputs(
+    call_validate_sop_merged(
       files = "a.tsv",
       filter = TRUE,
-      level = "genus",
-      value = c("Homo", "Pan"),
-      output_key = out$output_key,
-      output_org_tax_ott = out$output_org_tax_ott,
-      output_str_can = out$output_str_can,
-      output_str_stereo = out$output_str_stereo,
-      output_str_met = out$output_str_met,
-      output_str_tax_cla = out$output_str_tax_cla,
-      output_str_tax_npc = out$output_str_tax_npc
+      value = c("Homo", "Pan")
     ),
     class = "tima_validation_error"
   )
@@ -114,19 +76,7 @@ test_that("validate_sop_merged_inputs errors when value not a single string", {
 
 test_that("validate_sop_merged_inputs errors on invalid output paths", {
   expect_error(
-    validate_sop_merged_inputs(
-      files = "a.tsv",
-      filter = FALSE,
-      level = "genus",
-      value = "Homo",
-      output_key = c("a.tsv", "b.tsv"),
-      output_org_tax_ott = tempfile(fileext = ".tsv"),
-      output_str_can = tempfile(fileext = ".tsv"),
-      output_str_stereo = tempfile(fileext = ".tsv"),
-      output_str_met = tempfile(fileext = ".tsv"),
-      output_str_tax_cla = tempfile(fileext = ".tsv"),
-      output_str_tax_npc = tempfile(fileext = ".tsv")
-    ),
+    call_validate_sop_merged(files = "a.tsv", output_key = c("a.tsv", "b.tsv")),
     class = "tima_validation_error"
   )
 })

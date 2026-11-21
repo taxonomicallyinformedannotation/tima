@@ -2,35 +2,63 @@
 
 library(testthat)
 
+make_rt_df <- function(
+  rt = c(5.2, 7.8, 10.3),
+  inchikey = c(
+    "LFQSCWFLJHTTHZ-UHFFFAOYSA-N",
+    "RYYVLZVUVIJVGH-UHFFFAOYSA-N",
+    "GHVNFZFCNZKVNT-UHFFFAOYSA-N"
+  ),
+  smiles = c("CC(C)C", "CCO", "CC(=O)O")
+) {
+  out <- tidytable::tidytable(rt = rt)
+  if (!is.null(inchikey)) {
+    out$inchikey <- inchikey
+  }
+  if (!is.null(smiles)) {
+    out$smiles <- smiles
+  }
+  out
+}
+
+call_prepare_libraries_rt <- function(
+  ...,
+  dir = withr::local_tempdir(.local_envir = .local_envir),
+  .local_envir = parent.frame()
+) {
+  args <- list(
+    mgf_exp = NULL,
+    mgf_is = NULL,
+    temp_exp = NULL,
+    temp_is = NULL,
+    unit_rt = "minutes",
+    name_rt = "rt",
+    name_inchikey = "inchikey",
+    name_smiles = "smiles",
+    name_name = "structure_name",
+    output_rt = file.path(dir, "rt_library.tsv"),
+    output_sop = file.path(dir, "sop.tsv")
+  )
+  overrides <- list(...)
+  if (length(overrides) > 0L) {
+    args[names(overrides)] <- overrides
+  }
+  do.call(prepare_libraries_rt, args)
+}
+
 ## Input Validation ----
 
 test_that("prepare_libraries_rt validates unit_rt parameter", {
   # Invalid unit should error
   expect_error(
-    prepare_libraries_rt(
-      mgf_exp = NULL,
-      mgf_is = NULL,
-      temp_exp = NULL,
-      temp_is = NULL,
-      unit_rt = "hours",
-      output_rt = file.path(tempdir(), "rt.tsv"),
-      output_sop = file.path(tempdir(), "sop.tsv")
-    ),
+    call_prepare_libraries_rt(unit_rt = "hours"),
     "unit_rt",
     class = "tima_validation_error"
   )
 
   # Empty string should error
   expect_error(
-    prepare_libraries_rt(
-      mgf_exp = NULL,
-      mgf_is = NULL,
-      temp_exp = NULL,
-      temp_is = NULL,
-      unit_rt = "",
-      output_rt = file.path(tempdir(), "rt.tsv"),
-      output_sop = file.path(tempdir(), "sop.tsv")
-    ),
+    call_prepare_libraries_rt(unit_rt = ""),
     "unit_rt",
     class = "tima_validation_error"
   )
@@ -39,30 +67,14 @@ test_that("prepare_libraries_rt validates unit_rt parameter", {
 test_that("prepare_libraries_rt validates output_rt parameter", {
   # Non-character should error
   expect_error(
-    prepare_libraries_rt(
-      mgf_exp = NULL,
-      mgf_is = NULL,
-      temp_exp = NULL,
-      temp_is = NULL,
-      unit_rt = "minutes",
-      output_rt = 123,
-      output_sop = file.path(tempdir(), "sop.tsv")
-    ),
+    call_prepare_libraries_rt(output_rt = 123),
     "output_rt",
     class = "tima_validation_error"
   )
 
   # Vector should error
   expect_error(
-    prepare_libraries_rt(
-      mgf_exp = NULL,
-      mgf_is = NULL,
-      temp_exp = NULL,
-      temp_is = NULL,
-      unit_rt = "minutes",
-      output_rt = c("file1.tsv", "file2.tsv"),
-      output_sop = file.path(tempdir(), "sop.tsv")
-    ),
+    call_prepare_libraries_rt(output_rt = c("file1.tsv", "file2.tsv")),
     "output_rt",
     class = "tima_validation_error"
   )
@@ -71,15 +83,7 @@ test_that("prepare_libraries_rt validates output_rt parameter", {
 test_that("prepare_libraries_rt validates output_sop parameter", {
   # Non-character should error
   expect_error(
-    prepare_libraries_rt(
-      mgf_exp = NULL,
-      mgf_is = NULL,
-      temp_exp = NULL,
-      temp_is = NULL,
-      unit_rt = "minutes",
-      output_rt = file.path(tempdir(), "rt.tsv"),
-      output_sop = NULL
-    ),
+    call_prepare_libraries_rt(output_sop = NULL),
     "output_sop",
     class = "tima_validation_error"
   )
@@ -88,19 +92,8 @@ test_that("prepare_libraries_rt validates output_sop parameter", {
 ## Edge Cases and Empty Input ----
 
 test_that("prepare_libraries_rt handles all NULL inputs", {
-  output_rt <- file.path(tempdir(), "rt_library.tsv")
-  output_sop <- file.path(tempdir(), "sop.tsv")
-
   # Should handle all NULL inputs gracefully
-  result <- prepare_libraries_rt(
-    mgf_exp = NULL,
-    mgf_is = NULL,
-    temp_exp = NULL,
-    temp_is = NULL,
-    unit_rt = "minutes",
-    output_rt = output_rt,
-    output_sop = output_sop
-  )
+  result <- call_prepare_libraries_rt()
 
   # Should return paths
   expect_type(result, "character")
@@ -123,18 +116,12 @@ test_that("prepare_libraries_rt handles all NULL inputs", {
 })
 
 test_that("prepare_libraries_rt handles empty character vectors", {
-  output_rt <- file.path(tempdir(), "rt_library.tsv")
-  output_sop <- file.path(tempdir(), "sop.tsv")
-
   # Empty character vectors should be treated as NULL
-  result <- prepare_libraries_rt(
+  result <- call_prepare_libraries_rt(
     mgf_exp = character(0),
     mgf_is = character(0),
     temp_exp = character(0),
-    temp_is = character(0),
-    unit_rt = "minutes",
-    output_rt = output_rt,
-    output_sop = output_sop
+    temp_is = character(0)
   )
 
   expect_type(result, "character")
@@ -143,18 +130,11 @@ test_that("prepare_libraries_rt handles empty character vectors", {
 })
 
 test_that("prepare_libraries_rt handles NA in input vectors", {
-  output_rt <- file.path(tempdir(), "rt_library.tsv")
-  output_sop <- file.path(tempdir(), "sop.tsv")
-
   # NA values should be filtered out
-  result <- prepare_libraries_rt(
+  result <- call_prepare_libraries_rt(
     mgf_exp = c(NA_character_, NA_character_),
     mgf_is = NA_character_,
-    temp_exp = c(NA, ""),
-    temp_is = NULL,
-    unit_rt = "minutes",
-    output_rt = output_rt,
-    output_sop = output_sop
+    temp_exp = c(NA, "")
   )
 
   expect_type(result, "character")
@@ -164,36 +144,11 @@ test_that("prepare_libraries_rt handles NA in input vectors", {
 # Functional Tests - CSV Input ----
 
 test_that("prepare_libraries_rt processes CSV with experimental RT", {
-  # Create experimental CSV with RT data
-  csv_exp <- file.path(tempdir(), "exp_rt.csv")
+  dir <- withr::local_tempdir()
+  csv_exp <- file.path(dir, "exp_rt.csv")
+  export_output(x = make_rt_df(), file = csv_exp)
 
-  exp_data <- tidytable::tidytable(
-    rt = c(5.2, 7.8, 10.3),
-    inchikey = c(
-      "LFQSCWFLJHTTHZ-UHFFFAOYSA-N",
-      "RYYVLZVUVIJVGH-UHFFFAOYSA-N",
-      "GHVNFZFCNZKVNT-UHFFFAOYSA-N"
-    ),
-    smiles = c("CC(C)C", "CCO", "CC(=O)O")
-  )
-  export_output(x = exp_data, file = csv_exp)
-
-  output_rt <- file.path(tempdir(), "rt_library.tsv")
-  output_sop <- file.path(tempdir(), "sop.tsv")
-
-  result <- prepare_libraries_rt(
-    mgf_exp = NULL,
-    mgf_is = NULL,
-    temp_exp = csv_exp,
-    temp_is = NULL,
-    unit_rt = "minutes",
-    name_rt = "rt",
-    name_inchikey = "inchikey",
-    name_smiles = "smiles",
-    name_name = "structure_name",
-    output_rt = output_rt,
-    output_sop = output_sop
-  )
+  result <- call_prepare_libraries_rt(temp_exp = csv_exp, dir = dir)
 
   expect_type(result, "character")
   expect_named(result, c("rt", "sop"))
@@ -219,36 +174,11 @@ test_that("prepare_libraries_rt processes CSV with experimental RT", {
 })
 
 test_that("prepare_libraries_rt processes CSV with predicted RT", {
-  # Create predicted CSV with RT data
-  csv_is <- file.path(tempdir(), "predicted_rt.csv")
+  dir <- withr::local_tempdir()
+  csv_is <- file.path(dir, "predicted_rt.csv")
+  export_output(x = make_rt_df(rt = c(4.5, 6.2, 9.8)), file = csv_is)
 
-  is_data <- tidytable::tidytable(
-    rt = c(4.5, 6.2, 9.8),
-    inchikey = c(
-      "LFQSCWFLJHTTHZ-UHFFFAOYSA-N",
-      "RYYVLZVUVIJVGH-UHFFFAOYSA-N",
-      "GHVNFZFCNZKVNT-UHFFFAOYSA-N"
-    ),
-    smiles = c("CC(C)C", "CCO", "CC(=O)O")
-  )
-  export_output(x = is_data, file = csv_is)
-
-  output_rt <- file.path(tempdir(), "rt_library.tsv")
-  output_sop <- file.path(tempdir(), "sop.tsv")
-
-  result <- prepare_libraries_rt(
-    mgf_exp = NULL,
-    mgf_is = NULL,
-    temp_exp = NULL,
-    temp_is = csv_is,
-    unit_rt = "minutes",
-    name_rt = "rt",
-    name_inchikey = "inchikey",
-    name_smiles = "smiles",
-    name_name = "structure_name",
-    output_rt = output_rt,
-    output_sop = output_sop
-  )
+  result <- call_prepare_libraries_rt(temp_is = csv_is, dir = dir)
 
   # Check RT library
   rt_table <- tidytable::fread(result["rt"], colClasses = "character")
@@ -259,35 +189,14 @@ test_that("prepare_libraries_rt processes CSV with predicted RT", {
 })
 
 test_that("prepare_libraries_rt converts seconds to minutes", {
-  # Create CSV with RT in seconds
-  csv_exp <- file.path(tempdir(), "exp_rt_seconds.csv")
+  dir <- withr::local_tempdir()
+  csv_exp <- file.path(dir, "exp_rt_seconds.csv")
+  export_output(x = make_rt_df(rt = c(312, 468, 618)), file = csv_exp)
 
-  exp_data <- tidytable::tidytable(
-    rt = c(312, 468, 618), # 5.2, 7.8, 10.3 minutes in seconds
-    inchikey = c(
-      "LFQSCWFLJHTTHZ-UHFFFAOYSA-N",
-      "RYYVLZVUVIJVGH-UHFFFAOYSA-N",
-      "GHVNFZFCNZKVNT-UHFFFAOYSA-N"
-    ),
-    smiles = c("CC(C)C", "CCO", "CC(=O)O")
-  )
-  export_output(x = exp_data, file = csv_exp)
-
-  output_rt <- file.path(tempdir(), "rt_library.tsv")
-  output_sop <- file.path(tempdir(), "sop.tsv")
-
-  result <- prepare_libraries_rt(
-    mgf_exp = NULL,
-    mgf_is = NULL,
+  result <- call_prepare_libraries_rt(
     temp_exp = csv_exp,
-    temp_is = NULL,
     unit_rt = "seconds", # Input in seconds
-    name_rt = "rt",
-    name_inchikey = "inchikey",
-    name_smiles = "smiles",
-    name_name = "structure_name",
-    output_rt = output_rt,
-    output_sop = output_sop
+    dir = dir
   )
 
   # Check RT library
@@ -304,12 +213,9 @@ test_that("prepare_libraries_rt converts seconds to minutes", {
 })
 
 test_that("prepare_libraries_rt filters out invalid entries", {
-  # Setup temporary test environment
-
-  # Create CSV with some invalid entries
-  csv_exp <- file.path(tempdir(), "exp_mixed.csv")
-
-  exp_data <- tidytable::tidytable(
+  dir <- withr::local_tempdir()
+  csv_exp <- file.path(dir, "exp_mixed.csv")
+  exp_data <- make_rt_df(
     rt = c(5.2, NA, 7.8, -1, 10.3),
     inchikey = c(
       "LFQSCWFLJHTTHZ-UHFFFAOYSA-N",
@@ -322,22 +228,7 @@ test_that("prepare_libraries_rt filters out invalid entries", {
   )
   export_output(x = exp_data, file = csv_exp)
 
-  output_rt <- file.path(tempdir(), "rt_library.tsv")
-  output_sop <- file.path(tempdir(), "sop.tsv")
-
-  result <- prepare_libraries_rt(
-    mgf_exp = NULL,
-    mgf_is = NULL,
-    temp_exp = csv_exp,
-    temp_is = NULL,
-    unit_rt = "minutes",
-    name_rt = "rt",
-    name_inchikey = "inchikey",
-    name_smiles = "smiles",
-    name_name = "structure_name",
-    output_rt = output_rt,
-    output_sop = output_sop
-  )
+  result <- call_prepare_libraries_rt(temp_exp = csv_exp, dir = dir)
 
   # Check RT library - should filter out NA rt and NA inchikey
   rt_table <- tidytable::fread(result["rt"], colClasses = "character")
@@ -353,48 +244,37 @@ test_that("prepare_libraries_rt filters out invalid entries", {
 # Functional Tests - Combined Sources ----
 
 test_that("prepare_libraries_rt combines experimental and predicted data", {
-  # Setup temporary test environment
-
-  # Create experimental CSV
-  csv_exp <- file.path(tempdir(), "exp_rt.csv")
-
-  exp_data <- tidytable::tidytable(
-    rt = c(5.2, 7.8),
-    inchikey = c(
-      "LFQSCWFLJHTTHZ-UHFFFAOYSA-N",
-      "RYYVLZVUVIJVGH-UHFFFAOYSA-N"
+  dir <- withr::local_tempdir()
+  csv_exp <- file.path(dir, "exp_rt.csv")
+  export_output(
+    x = make_rt_df(
+      rt = c(5.2, 7.8),
+      inchikey = c(
+        "LFQSCWFLJHTTHZ-UHFFFAOYSA-N",
+        "RYYVLZVUVIJVGH-UHFFFAOYSA-N"
+      ),
+      smiles = c("CC(C)C", "CCO")
     ),
-    smiles = c("CC(C)C", "CCO")
+    file = csv_exp
   )
-  export_output(x = exp_data, file = csv_exp)
 
-  # Create predicted CSV
-  csv_is <- file.path(tempdir(), "pred_rt.csv")
-  is_data <- tidytable::tidytable(
-    rt = c(10.3, 12.5),
-    inchikey = c(
-      "GHVNFZFCNZKVNT-UHFFFAOYSA-N",
-      "XLYOFNOQVPJJNP-UHFFFAOYSA-M"
+  csv_is <- file.path(dir, "pred_rt.csv")
+  export_output(
+    x = make_rt_df(
+      rt = c(10.3, 12.5),
+      inchikey = c(
+        "GHVNFZFCNZKVNT-UHFFFAOYSA-N",
+        "XLYOFNOQVPJJNP-UHFFFAOYSA-M"
+      ),
+      smiles = c("CC(=O)O", "CCCC")
     ),
-    smiles = c("CC(=O)O", "CCCC")
+    file = csv_is
   )
-  export_output(x = is_data, file = csv_is)
 
-  output_rt <- file.path(tempdir(), "rt_library.tsv")
-  output_sop <- file.path(tempdir(), "sop.tsv")
-
-  result <- prepare_libraries_rt(
-    mgf_exp = NULL,
-    mgf_is = NULL,
+  result <- call_prepare_libraries_rt(
     temp_exp = csv_exp,
     temp_is = csv_is,
-    unit_rt = "minutes",
-    name_rt = "rt",
-    name_inchikey = "inchikey",
-    name_smiles = "smiles",
-    name_name = "structure_name",
-    output_rt = output_rt,
-    output_sop = output_sop
+    dir = dir
   )
 
   # Check RT library combines both sources
@@ -411,38 +291,22 @@ test_that("prepare_libraries_rt combines experimental and predicted data", {
 })
 
 test_that("prepare_libraries_rt handles duplicate InChIKeys", {
-  # Setup temporary test environment
-
-  # Create CSV with duplicate structures but different RTs
-  csv_exp <- file.path(tempdir(), "duplicates.csv")
-
-  exp_data <- tidytable::tidytable(
-    rt = c(5.2, 5.3, 7.8), # Same structure with slightly different RTs
-    inchikey = c(
-      "LFQSCWFLJHTTHZ-UHFFFAOYSA-N",
-      "LFQSCWFLJHTTHZ-UHFFFAOYSA-N",
-      "RYYVLZVUVIJVGH-UHFFFAOYSA-N"
+  dir <- withr::local_tempdir()
+  csv_exp <- file.path(dir, "duplicates.csv")
+  export_output(
+    x = make_rt_df(
+      rt = c(5.2, 5.3, 7.8), # Same structure with slightly different RTs
+      inchikey = c(
+        "LFQSCWFLJHTTHZ-UHFFFAOYSA-N",
+        "LFQSCWFLJHTTHZ-UHFFFAOYSA-N",
+        "RYYVLZVUVIJVGH-UHFFFAOYSA-N"
+      ),
+      smiles = c("CC(C)C", "CC(C)C", "CCO")
     ),
-    smiles = c("CC(C)C", "CC(C)C", "CCO")
+    file = csv_exp
   )
-  export_output(x = exp_data, file = csv_exp)
 
-  file_rt <- file.path(tempdir(), "rt_library.tsv")
-  file_sop <- file.path(tempdir(), "sop.tsv")
-
-  result <- prepare_libraries_rt(
-    mgf_exp = NULL,
-    mgf_is = NULL,
-    temp_exp = csv_exp,
-    temp_is = NULL,
-    unit_rt = "minutes",
-    name_rt = "rt",
-    name_inchikey = "inchikey",
-    name_name = "structure_name",
-    name_smiles = "smiles",
-    output_rt = file_rt,
-    output_sop = file_sop
-  )
+  result <- call_prepare_libraries_rt(temp_exp = csv_exp, dir = dir)
 
   # RT library can have multiple RTs per structure
   rt_table <- tidytable::fread(result["rt"], colClasses = "character")
@@ -457,34 +321,18 @@ test_that("prepare_libraries_rt handles duplicate InChIKeys", {
 # Output Structure ----
 
 test_that("prepare_libraries_rt creates correct output structure", {
-  # Setup temporary test environment
-
-  # Create simple CSV
-  csv_exp <- file.path(tempdir(), "simple_rt.csv")
-
-  exp_data <- tidytable::tidytable(
-    rt = c(5.2),
-    inchikey = c("LFQSCWFLJHTTHZ-UHFFFAOYSA-N"),
-    smiles = c("CC(C)C")
+  dir <- withr::local_tempdir()
+  csv_exp <- file.path(dir, "simple_rt.csv")
+  export_output(
+    x = make_rt_df(
+      rt = c(5.2),
+      inchikey = c("LFQSCWFLJHTTHZ-UHFFFAOYSA-N"),
+      smiles = c("CC(C)C")
+    ),
+    file = csv_exp
   )
-  export_output(x = exp_data, file = csv_exp)
 
-  output_rt <- file.path(tempdir(), "rt_library.tsv")
-  output_sop <- file.path(tempdir(), "sop.tsv")
-
-  result <- prepare_libraries_rt(
-    mgf_exp = NULL,
-    mgf_is = NULL,
-    temp_exp = csv_exp,
-    temp_is = NULL,
-    unit_rt = "minutes",
-    name_rt = "rt",
-    name_inchikey = "inchikey",
-    name_smiles = "smiles",
-    name_name = "structure_name",
-    output_rt = output_rt,
-    output_sop = output_sop
-  )
+  result <- call_prepare_libraries_rt(temp_exp = csv_exp, dir = dir)
 
   # Check RT library columns
   rt_table <- tidytable::fread(result["rt"], colClasses = "character")
@@ -512,11 +360,11 @@ test_that("prepare_libraries_rt creates correct output structure", {
 # Performance ----
 
 test_that("prepare_libraries_rt handles moderate-scale data efficiently", {
-  # Create CSV with 500 RT entries
-  csv_exp <- file.path(tempdir(), "large_rt.csv")
+  dir <- withr::local_tempdir()
+  csv_exp <- file.path(dir, "large_rt.csv")
 
   n_entries <- 500
-  exp_data <- tidytable::tidytable(
+  exp_data <- make_rt_df(
     rt = runif(n_entries, 1, 30),
     inchikey = generate_fake_inchikey(n_entries, seed = 777),
     smiles = replicate(
@@ -529,25 +377,10 @@ test_that("prepare_libraries_rt handles moderate-scale data efficiently", {
   )
   export_output(x = exp_data, file = csv_exp)
 
-  output_rt <- file.path(tempdir(), "rt_library.tsv")
-  output_sop <- file.path(tempdir(), "sop.tsv")
-
   # Should complete in reasonable time (<3 seconds)
   start_time <- Sys.time()
 
-  result <- prepare_libraries_rt(
-    mgf_exp = NULL,
-    mgf_is = NULL,
-    temp_exp = csv_exp,
-    temp_is = NULL,
-    unit_rt = "minutes",
-    name_rt = "rt",
-    name_inchikey = "inchikey",
-    name_smiles = "smiles",
-    name_name = "structure_name",
-    output_rt = output_rt,
-    output_sop = output_sop
-  )
+  result <- call_prepare_libraries_rt(temp_exp = csv_exp, dir = dir)
 
   elapsed_time <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
 
@@ -579,43 +412,29 @@ test_that("prepare_libraries_rt validates RT unit and outputs", {
 })
 
 test_that("prepare_libraries_rt handles missing InChIKeys", {
-  # Setup temporary test environment
-
-  # Create CSV with SMILES but no InChIKey
-  csv_exp <- file.path(tempdir(), "exp_no_ik.csv")
-
-  exp_data <- tidytable::tidytable(
-    rt = c(5.2, 7.8),
-    smiles = c("CC(C)C", "CCO")
+  dir <- withr::local_tempdir()
+  csv_exp <- file.path(dir, "exp_no_ik.csv")
+  export_output(
+    x = make_rt_df(
+      rt = c(5.2, 7.8),
+      inchikey = NULL,
+      smiles = c("CC(C)C", "CCO")
+    ),
+    file = csv_exp
   )
-  export_output(x = exp_data, file = csv_exp)
-
-  output_rt <- file.path(tempdir(), "rt_library.tsv")
-  output_sop <- file.path(tempdir(), "sop.tsv")
 
   # Should warn about missing InChIKeys
   # TODO the WARN is as log, not as real warning
   expect_no_error({
-    result <- prepare_libraries_rt(
-      mgf_exp = NULL,
-      mgf_is = NULL,
-      temp_exp = csv_exp,
-      temp_is = NULL,
-      unit_rt = "minutes",
-      name_rt = "rt",
-      name_inchikey = "inchikey",
-      name_smiles = "smiles",
-      name_name = "structure_name",
-      output_rt = output_rt,
-      output_sop = output_sop
-    )
+    result <- call_prepare_libraries_rt(temp_exp = csv_exp, dir = dir)
   })
 
   expect_type(result, "character")
 })
 
 test_that("prepare_libraries_rt keeps MGF entries without peaks or precursor", {
-  mgf_exp <- file.path(tempdir(), "exp_rt.mgf")
+  dir <- withr::local_tempdir()
+  mgf_exp <- file.path(dir, "exp_rt.mgf")
   write_test_mgf(
     c(
       format_mgf_block(
@@ -640,26 +459,15 @@ test_that("prepare_libraries_rt keeps MGF entries without peaks or precursor", {
     ),
     mgf_exp
   )
-  output_rt <- file.path(tempdir(), "rt_library_mgf.tsv")
-  output_sop <- file.path(tempdir(), "sop_mgf.tsv")
 
   # `unit_rt` is ignored for RTINSECONDS, which is always in seconds
-  result <- prepare_libraries_rt(
+  result <- call_prepare_libraries_rt(
     mgf_exp = mgf_exp,
-    mgf_is = NULL,
-    temp_exp = NULL,
-    temp_is = NULL,
     col_ik = "INCHIKEY",
     col_na = "NAME",
     col_rt = "RTINSECONDS",
     col_sm = "SMILES",
-    unit_rt = "minutes",
-    name_rt = "rt",
-    name_inchikey = "inchikey",
-    name_smiles = "smiles",
-    name_name = "structure_name",
-    output_rt = output_rt,
-    output_sop = output_sop
+    dir = dir
   )
 
   rt_table <- tidytable::fread(result["rt"], colClasses = "character")
@@ -698,20 +506,13 @@ test_that("read_mgf_metadata reads every block's fields", {
   writeLines("other_col\n1", csv_no_rt)
   out_rt_edge <- file.path(tempdir(), "rt_edge.tsv")
   out_sop_edge <- file.path(tempdir(), "sop_edge.tsv")
-  res_edge <- prepare_libraries_rt(
-    mgf_exp = NULL,
+  res_edge <- call_prepare_libraries_rt(
     mgf_is = list(mgf_is_file),
     temp_exp = list(csv_no_rt),
-    temp_is = NULL,
     col_ik = "INCHIKEY",
     col_na = "NAME",
     col_rt = "rtime",
     col_sm = "smiles",
-    unit_rt = "minutes",
-    name_rt = "rt",
-    name_inchikey = "inchikey",
-    name_smiles = "smiles",
-    name_name = "structure_name",
     output_rt = out_rt_edge,
     output_sop = out_sop_edge
   )

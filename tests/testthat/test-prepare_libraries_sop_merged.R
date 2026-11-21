@@ -2,15 +2,9 @@
 
 library(testthat)
 
-## Validation ----
-
-test_that("validate_sop_merged_inputs accepts valid inputs", {
-  expect_silent(
-    validate_sop_merged_inputs(
-      files = c("file1.tsv"),
-      filter = FALSE,
-      level = "family",
-      value = "Test",
+sop_merged_outputs <- function(prefix_dir = NULL) {
+  if (is.null(prefix_dir)) {
+    list(
       output_key = temp_test_path("key.tsv"),
       output_org_tax_ott = temp_test_path("org.tsv"),
       output_str_can = temp_test_path("can.tsv"),
@@ -19,24 +13,57 @@ test_that("validate_sop_merged_inputs accepts valid inputs", {
       output_str_tax_cla = temp_test_path("cla.tsv"),
       output_str_tax_npc = temp_test_path("npc.tsv")
     )
+  } else {
+    list(
+      output_key = file.path(prefix_dir, "keys.tsv"),
+      output_org_tax_ott = file.path(prefix_dir, "org_tax.tsv"),
+      output_str_can = file.path(prefix_dir, "canonical.tsv"),
+      output_str_stereo = file.path(prefix_dir, "stereo.tsv"),
+      output_str_met = file.path(prefix_dir, "metadata.tsv"),
+      output_str_tax_cla = file.path(prefix_dir, "classyfire.tsv"),
+      output_str_tax_npc = file.path(prefix_dir, "npc.tsv")
+    )
+  }
+}
+
+call_validate_sop_merged <- function(..., outputs = sop_merged_outputs()) {
+  args <- c(
+    list(
+      files = c("file1.tsv"),
+      filter = FALSE,
+      level = "family",
+      value = "Test"
+    ),
+    outputs
   )
+  overrides <- list(...)
+  if (length(overrides) > 0L) {
+    args[names(overrides)] <- overrides
+  }
+  do.call(validate_sop_merged_inputs, args)
+}
+
+call_prepare_libraries_sop_merged <- function(
+  ...,
+  outputs = sop_merged_outputs()
+) {
+  args <- c(list(files = c("file1.tsv"), filter = FALSE), outputs)
+  overrides <- list(...)
+  if (length(overrides) > 0L) {
+    args[names(overrides)] <- overrides
+  }
+  do.call(prepare_libraries_sop_merged, args)
+}
+
+## Validation ----
+
+test_that("validate_sop_merged_inputs accepts valid inputs", {
+  expect_silent(call_validate_sop_merged())
 })
 
 test_that("validate_sop_merged_inputs rejects invalid filter", {
   expect_error(
-    validate_sop_merged_inputs(
-      files = c("file1.tsv"),
-      filter = "yes",
-      level = "family",
-      value = "Test",
-      output_key = temp_test_path("key.tsv"),
-      output_org_tax_ott = temp_test_path("org.tsv"),
-      output_str_can = temp_test_path("can.tsv"),
-      output_str_stereo = temp_test_path("stereo.tsv"),
-      output_str_met = temp_test_path("met.tsv"),
-      output_str_tax_cla = temp_test_path("cla.tsv"),
-      output_str_tax_npc = temp_test_path("npc.tsv")
-    ),
+    call_validate_sop_merged(filter = "yes"),
     "filter must be a single logical value",
     class = "tima_validation_error"
   )
@@ -44,19 +71,7 @@ test_that("validate_sop_merged_inputs rejects invalid filter", {
 
 test_that("validate_sop_merged_inputs rejects invalid level", {
   expect_error(
-    validate_sop_merged_inputs(
-      files = c("file1.tsv"),
-      filter = TRUE,
-      level = "invalid_level",
-      value = "Test",
-      output_key = temp_test_path("key.tsv"),
-      output_org_tax_ott = temp_test_path("org.tsv"),
-      output_str_can = temp_test_path("can.tsv"),
-      output_str_stereo = temp_test_path("stereo.tsv"),
-      output_str_met = temp_test_path("met.tsv"),
-      output_str_tax_cla = temp_test_path("cla.tsv"),
-      output_str_tax_npc = temp_test_path("npc.tsv")
-    ),
+    call_validate_sop_merged(filter = TRUE, level = "invalid_level"),
     "supported taxonomic ranks",
     class = "tima_validation_error"
   )
@@ -130,18 +145,10 @@ test_that("test-validate_sop_merged_inputs accepts all valid taxonomic levels", 
     X = valid_levels,
     FUN = function(lvl) {
       expect_silent(
-        validate_sop_merged_inputs(
-          files = c("file1.tsv"),
+        call_validate_sop_merged(
           filter = TRUE,
           level = lvl,
-          value = "TestValue",
-          output_key = temp_test_path("key.tsv"),
-          output_org_tax_ott = temp_test_path("org.tsv"),
-          output_str_can = temp_test_path("can.tsv"),
-          output_str_stereo = temp_test_path("stereo.tsv"),
-          output_str_met = temp_test_path("met.tsv"),
-          output_str_tax_cla = temp_test_path("cla.tsv"),
-          output_str_tax_npc = temp_test_path("npc.tsv")
+          value = "TestValue"
         )
       )
       TRUE
@@ -152,19 +159,7 @@ test_that("test-validate_sop_merged_inputs accepts all valid taxonomic levels", 
 
 test_that("test-validate_sop_merged_inputs rejects non-character output paths", {
   expect_error(
-    validate_sop_merged_inputs(
-      files = c("file1.tsv"),
-      filter = FALSE,
-      level = "family",
-      value = "Test",
-      output_key = 123, # Invalid
-      output_org_tax_ott = temp_test_path("org.tsv"),
-      output_str_can = temp_test_path("can.tsv"),
-      output_str_stereo = temp_test_path("stereo.tsv"),
-      output_str_met = temp_test_path("met.tsv"),
-      output_str_tax_cla = temp_test_path("cla.tsv"),
-      output_str_tax_npc = temp_test_path("npc.tsv")
-    ),
+    call_validate_sop_merged(output_key = 123),
     "Output parameter\\(s\\) must be single character strings.*output_key",
     class = "tima_validation_error"
   )
@@ -172,19 +167,7 @@ test_that("test-validate_sop_merged_inputs rejects non-character output paths", 
 
 test_that("test-validate_sop_merged_inputs rejects vector output paths", {
   expect_error(
-    validate_sop_merged_inputs(
-      files = c("file1.tsv"),
-      filter = FALSE,
-      level = "family",
-      value = "Test",
-      output_key = temp_test_path("key.tsv"),
-      output_org_tax_ott = c("org1.tsv", "org2.tsv"), # Invalid - vector
-      output_str_can = temp_test_path("can.tsv"),
-      output_str_stereo = temp_test_path("stereo.tsv"),
-      output_str_met = temp_test_path("met.tsv"),
-      output_str_tax_cla = temp_test_path("cla.tsv"),
-      output_str_tax_npc = temp_test_path("npc.tsv")
-    ),
+    call_validate_sop_merged(output_org_tax_ott = c("org1.tsv", "org2.tsv")),
     "Output parameter\\(s\\) must be single character strings.*output_org_tax_ott",
     class = "tima_validation_error"
   )
@@ -192,19 +175,7 @@ test_that("test-validate_sop_merged_inputs rejects vector output paths", {
 
 test_that("test-validate_sop_merged_inputs requires value when filtering", {
   expect_error(
-    validate_sop_merged_inputs(
-      files = c("file1.tsv"),
-      filter = TRUE,
-      level = "family",
-      value = 123, # Invalid - not character
-      output_key = temp_test_path("key.tsv"),
-      output_org_tax_ott = temp_test_path("org.tsv"),
-      output_str_can = temp_test_path("can.tsv"),
-      output_str_stereo = temp_test_path("stereo.tsv"),
-      output_str_met = temp_test_path("met.tsv"),
-      output_str_tax_cla = temp_test_path("cla.tsv"),
-      output_str_tax_npc = temp_test_path("npc.tsv")
-    ),
+    call_validate_sop_merged(filter = TRUE, value = 123),
     "value must be a single character string",
     class = "tima_validation_error"
   )
@@ -212,38 +183,12 @@ test_that("test-validate_sop_merged_inputs requires value when filtering", {
 
 test_that("test-validate_sop_merged_inputs accepts filter=FALSE without checking level/value", {
   # When filter=FALSE, level and value are not validated
-  expect_silent(
-    validate_sop_merged_inputs(
-      files = c("file1.tsv"),
-      filter = FALSE,
-      level = "invalid_level", # This should be ignored when filter=FALSE
-      value = "Test",
-      output_key = temp_test_path("key.tsv"),
-      output_org_tax_ott = temp_test_path("org.tsv"),
-      output_str_can = temp_test_path("can.tsv"),
-      output_str_stereo = temp_test_path("stereo.tsv"),
-      output_str_met = temp_test_path("met.tsv"),
-      output_str_tax_cla = temp_test_path("cla.tsv"),
-      output_str_tax_npc = temp_test_path("npc.tsv")
-    )
-  )
+  expect_silent(call_validate_sop_merged(level = "invalid_level"))
 })
 
 test_that("test-validate_sop_merged_inputs rejects NULL filter", {
   expect_error(
-    validate_sop_merged_inputs(
-      files = c("file1.tsv"),
-      filter = NULL,
-      level = "family",
-      value = "Test",
-      output_key = temp_test_path("key.tsv"),
-      output_org_tax_ott = temp_test_path("org.tsv"),
-      output_str_can = temp_test_path("can.tsv"),
-      output_str_stereo = temp_test_path("stereo.tsv"),
-      output_str_met = temp_test_path("met.tsv"),
-      output_str_tax_cla = temp_test_path("cla.tsv"),
-      output_str_tax_npc = temp_test_path("npc.tsv")
-    ),
+    call_validate_sop_merged(filter = NULL),
     "filter must be a single logical value",
     class = "tima_validation_error"
   )
@@ -264,18 +209,14 @@ test_that("test-validate_sop_merged_inputs validates all output parameters", {
   invisible(vapply(
     X = output_params,
     FUN = function(param) {
-      args <- list(
-        files = c("file1.tsv"),
-        filter = FALSE,
-        level = "family",
-        value = "Test",
-        output_key = temp_test_path("key.tsv"),
-        output_org_tax_ott = temp_test_path("org.tsv"),
-        output_str_can = temp_test_path("can.tsv"),
-        output_str_stereo = temp_test_path("stereo.tsv"),
-        output_str_met = temp_test_path("met.tsv"),
-        output_str_tax_cla = temp_test_path("cla.tsv"),
-        output_str_tax_npc = temp_test_path("npc.tsv")
+      args <- c(
+        list(
+          files = c("file1.tsv"),
+          filter = FALSE,
+          level = "family",
+          value = "Test"
+        ),
+        sop_merged_outputs()
       )
       args[[param]] <- c("path1.tsv", "path2.tsv")
       expect_error(
@@ -457,18 +398,11 @@ test_that("apply_taxonomic_filter distinguishes order from infraorder and suppor
   )
   expect_identical(res_subfamily$organism_name, "OrgA")
 
-  expect_silent(validate_sop_merged_inputs(
+  expect_silent(call_validate_sop_merged(
     files = "dummy.csv",
     filter = TRUE,
     level = "subfamily",
-    value = "SubfamA",
-    output_key = tempfile(),
-    output_org_tax_ott = tempfile(),
-    output_str_can = tempfile(),
-    output_str_stereo = tempfile(),
-    output_str_met = tempfile(),
-    output_str_tax_cla = tempfile(),
-    output_str_tax_npc = tempfile()
+    value = "SubfamA"
   ))
 })
 
@@ -529,18 +463,13 @@ test_that("test-apply_taxonomic_filter handles missing taxonomy column", {
 test_that("test-prepare_libraries_sop_merged validates inputs before processing", {
   # Test that validation happens first
   expect_error(
-    prepare_libraries_sop_merged(
+    call_prepare_libraries_sop_merged(
       files = c("file.tsv"),
-      filter = "invalid", # Invalid type
+      filter = "invalid",
       level = "family",
       value = "Test",
       output_key = "key.tsv",
-      output_org_tax_ott = "org.tsv",
-      output_str_can = temp_test_path("can.tsv"),
-      output_str_stereo = temp_test_path("stereo.tsv"),
-      output_str_met = temp_test_path("met.tsv"),
-      output_str_tax_cla = temp_test_path("cla.tsv"),
-      output_str_tax_npc = temp_test_path("npc.tsv")
+      output_org_tax_ott = "org.tsv"
     ),
     "filter must be a single logical value",
     class = "tima_validation_error"
@@ -550,21 +479,7 @@ test_that("test-prepare_libraries_sop_merged validates inputs before processing"
 ## Edge cases and boundary conditions ----
 
 test_that("test-validate_sop_merged_inputs accepts empty value when filter=FALSE", {
-  expect_silent(
-    validate_sop_merged_inputs(
-      files = c("file1.tsv"),
-      filter = FALSE,
-      level = "family",
-      value = "", # Empty string OK when not filtering
-      output_key = temp_test_path("key.tsv"),
-      output_org_tax_ott = temp_test_path("org.tsv"),
-      output_str_can = temp_test_path("can.tsv"),
-      output_str_stereo = temp_test_path("stereo.tsv"),
-      output_str_met = temp_test_path("met.tsv"),
-      output_str_tax_cla = temp_test_path("cla.tsv"),
-      output_str_tax_npc = temp_test_path("npc.tsv")
-    )
-  )
+  expect_silent(call_validate_sop_merged(value = ""))
 })
 
 test_that("test-complete_organism_taxonomy handles duplicate organism names", {
@@ -650,15 +565,6 @@ test_that("prepare_libraries_sop_merged() runs without filtering", {
   input_file <- file.path(tmpdir, "library.tsv")
   tidytable::fwrite(x = sop_data, file = input_file, sep = "\t")
 
-  # Output files
-  output_key <- file.path(tmpdir, "keys.tsv")
-  output_org <- file.path(tmpdir, "org_tax.tsv")
-  output_can <- file.path(tmpdir, "canonical.tsv")
-  output_stereo <- file.path(tmpdir, "stereo.tsv")
-  output_met <- file.path(tmpdir, "metadata.tsv")
-  output_cla <- file.path(tmpdir, "classyfire.tsv")
-  output_npc <- file.path(tmpdir, "npc.tsv")
-
   # Mock get_params and export_params
   local_mocked_bindings(
     get_params = function(step) list(step = "prepare_libraries_sop_merged"),
@@ -667,24 +573,18 @@ test_that("prepare_libraries_sop_merged() runs without filtering", {
   )
 
   # Run function
-  result <- prepare_libraries_sop_merged(
+  outputs <- sop_merged_outputs(tmpdir)
+  result <- call_prepare_libraries_sop_merged(
     files = input_file,
-    filter = FALSE,
-    output_key = output_key,
-    output_org_tax_ott = output_org,
-    output_str_can = output_can,
-    output_str_stereo = output_stereo,
-    output_str_met = output_met,
-    output_str_tax_cla = output_cla,
-    output_str_tax_npc = output_npc
+    outputs = outputs
   )
 
   # Verify outputs created
-  expect_true(file.exists(output_key))
-  expect_true(file.exists(output_org))
+  expect_true(file.exists(outputs$output_key))
+  expect_true(file.exists(outputs$output_org_tax_ott))
 
   # Verify data
-  keys <- tidytable::fread(output_key)
+  keys <- tidytable::fread(outputs$output_key)
   expect_equal(nrow(keys), 3)
   expect_true(all(c("structure_inchikey", "organism_name") %in% names(keys)))
 })
@@ -724,14 +624,6 @@ test_that("prepare_libraries_sop_merged() filters by taxonomy", {
   input_file <- file.path(tmpdir, "library.tsv")
   tidytable::fwrite(x = sop_data, file = input_file, sep = "\t")
 
-  output_key <- file.path(tmpdir, "keys.tsv")
-  output_org <- file.path(tmpdir, "org_tax.tsv")
-  output_can <- file.path(tmpdir, "canonical.tsv")
-  output_stereo <- file.path(tmpdir, "stereo.tsv")
-  output_met <- file.path(tmpdir, "metadata.tsv")
-  output_cla <- file.path(tmpdir, "classyfire.tsv")
-  output_npc <- file.path(tmpdir, "npc.tsv")
-
   local_mocked_bindings(
     get_params = function(step) list(step = "prepare_libraries_sop_merged"),
     export_params = function(...) invisible(NULL),
@@ -739,22 +631,17 @@ test_that("prepare_libraries_sop_merged() filters by taxonomy", {
   )
 
   # Filter by family
-  result <- prepare_libraries_sop_merged(
+  outputs <- sop_merged_outputs(tmpdir)
+  result <- call_prepare_libraries_sop_merged(
     files = input_file,
     filter = TRUE,
     level = "family",
     value = "Fam1",
-    output_key = output_key,
-    output_org_tax_ott = output_org,
-    output_str_can = output_can,
-    output_str_stereo = output_stereo,
-    output_str_met = output_met,
-    output_str_tax_cla = output_cla,
-    output_str_tax_npc = output_npc
+    outputs = outputs
   )
 
   # Verify filtered output
-  keys <- tidytable::fread(output_key)
+  keys <- tidytable::fread(outputs$output_key)
   expect_equal(nrow(keys), 2) # Only Fam1 entries
   expect_true(all(c("Plant1", "Plant2") %in% keys$organism_name))
   expect_false("Plant3" %in% keys$organism_name)
@@ -842,14 +729,6 @@ test_that("prepare_libraries_sop_merged() merges multiple input files", {
   tidytable::fwrite(x = sop_data1, file = file1, sep = "\t")
   tidytable::fwrite(x = sop_data2, file = file2, sep = "\t")
 
-  output_key <- file.path(tmpdir, "keys.tsv")
-  output_org <- file.path(tmpdir, "org_tax.tsv")
-  output_can <- file.path(tmpdir, "canonical.tsv")
-  output_stereo <- file.path(tmpdir, "stereo.tsv")
-  output_met <- file.path(tmpdir, "metadata.tsv")
-  output_cla <- file.path(tmpdir, "classyfire.tsv")
-  output_npc <- file.path(tmpdir, "npc.tsv")
-
   local_mocked_bindings(
     get_params = function(step) list(step = "prepare_libraries_sop_merged"),
     export_params = function(...) invisible(NULL),
@@ -857,20 +736,14 @@ test_that("prepare_libraries_sop_merged() merges multiple input files", {
   )
 
   # Merge both files
-  result <- prepare_libraries_sop_merged(
+  outputs <- sop_merged_outputs(tmpdir)
+  result <- call_prepare_libraries_sop_merged(
     files = c(file1, file2),
-    filter = FALSE,
-    output_key = output_key,
-    output_org_tax_ott = output_org,
-    output_str_can = output_can,
-    output_str_stereo = output_stereo,
-    output_str_met = output_met,
-    output_str_tax_cla = output_cla,
-    output_str_tax_npc = output_npc
+    outputs = outputs
   )
 
   # Verify merged output
-  keys <- tidytable::fread(output_key)
+  keys <- tidytable::fread(outputs$output_key)
   expect_equal(nrow(keys), 2)
 })
 
@@ -1113,40 +986,26 @@ test_that("prepare_libraries_sop_merged() enriches taxonomy from additional cach
   cla_cache_path <- file.path(tmpdir, "c.tsv")
   tidytable::fwrite(cla_cache, cla_cache_path, sep = "\t")
 
-  output_key <- file.path(tmpdir, "keys.tsv")
-  output_org <- file.path(tmpdir, "org_tax.tsv")
-  output_can <- file.path(tmpdir, "canonical.tsv")
-  output_stereo <- file.path(tmpdir, "stereo.tsv")
-  output_met <- file.path(tmpdir, "metadata.tsv")
-  output_cla <- file.path(tmpdir, "classyfire.tsv")
-  output_npc <- file.path(tmpdir, "npc.tsv")
-
   local_mocked_bindings(
     get_params = function(step) list(step = "prepare_libraries_sop_merged"),
     export_params = function(...) invisible(NULL),
     .package = "tima"
   )
 
-  result <- prepare_libraries_sop_merged(
+  outputs <- sop_merged_outputs(tmpdir)
+  result <- call_prepare_libraries_sop_merged(
     files = input_file,
-    filter = FALSE,
     npc_cache = npc_cache_path,
     cla_cache = cla_cache_path,
-    output_key = output_key,
-    output_org_tax_ott = output_org,
-    output_str_can = output_can,
-    output_str_stereo = output_stereo,
-    output_str_met = output_met,
-    output_str_tax_cla = output_cla,
-    output_str_tax_npc = output_npc
+    outputs = outputs
   )
 
   # Check that NPC taxonomy was enriched
-  npc_result <- tidytable::fread(output_npc)
+  npc_result <- tidytable::fread(outputs$output_str_tax_npc)
   expect_true("CC" %in% npc_result$structure_smiles)
 
   # Check that CLA taxonomy was enriched
-  cla_result <- tidytable::fread(output_cla)
+  cla_result <- tidytable::fread(outputs$output_str_tax_cla)
   expect_true("OTMSDBZUPAUEDD-UHFFFAOYSA-N" %in% cla_result$structure_inchikey)
 })
 
@@ -1665,11 +1524,8 @@ test_that("load_and_merge_libraries, export_library_tables, and apply_taxonomic_
 
   # 3. apply_taxonomic_filter aborts when matching_orgs is non-empty in taxonomy table but absent from table_keys
   expect_error(
-    validate_sop_merged_inputs(
+    call_validate_sop_merged(
       files = character(0),
-      filter = FALSE,
-      level = "family",
-      value = "Test",
       output_key = "k.tsv",
       output_org_tax_ott = "o.tsv",
       output_str_can = "c.tsv",

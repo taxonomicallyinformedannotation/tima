@@ -5,20 +5,31 @@ library(testthat)
 # Use a temporary ~/.tima, never the user's real one
 local_test_home()
 
-make_small_cache_dir <- function() {
-  tmpdir <- tempfile()
+make_small_cache_dir <- function(
+  pattern = "test",
+  mztab_raw = NULL,
+  raw_prefix = NULL,
+  sirius_raw = "sirius.zip",
+  create_dummy_files = FALSE,
+  .local_envir = parent.frame()
+) {
+  tmpdir <- withr::local_tempdir(.local_envir = .local_envir)
   dir.create(file.path(tmpdir, "params"), recursive = TRUE)
   dir.create(file.path(tmpdir, "data/source"), recursive = TRUE)
+  prefix <- function(x) if (is.null(raw_prefix)) x else file.path(raw_prefix, x)
   minimal_params <- list(
     ms = list(polarity = "pos"),
     files = list(
-      pattern = "test",
-      features = list(raw = "features.csv"),
-      metadata = list(raw = "metadata.tsv"),
-      annotations = list(raw = list(sirius = "sirius.zip")),
-      spectral = list(raw = "spectra.mgf")
+      pattern = pattern,
+      features = list(raw = prefix("features.csv")),
+      metadata = list(raw = prefix("metadata.tsv")),
+      annotations = list(raw = list(sirius = sirius_raw)),
+      spectral = list(raw = prefix("spectra.mgf"))
     )
   )
+  if (!is.null(mztab_raw)) {
+    minimal_params$files$mztab <- list(raw = mztab_raw)
+  }
   yaml::write_yaml(
     minimal_params,
     file.path(tmpdir, "params/prepare_params.yaml")
@@ -27,7 +38,74 @@ make_small_cache_dir <- function() {
     minimal_params,
     file.path(tmpdir, "params/prepare_params_advanced.yaml")
   )
+  if (create_dummy_files) {
+    source_dir <- file.path(tmpdir, "data/source")
+    write.csv(
+      data.frame(a = 1),
+      file.path(source_dir, "features.csv"),
+      row.names = FALSE
+    )
+    write.table(
+      data.frame(b = 1),
+      file.path(source_dir, "metadata.tsv"),
+      sep = "\t",
+      row.names = FALSE
+    )
+    writeLines("dummy", file.path(source_dir, "sirius.zip"))
+    writeLines("dummy", file.path(source_dir, "spectra.mgf"))
+  }
   tmpdir
+}
+
+setup_go_to_cache_mocks <- function(
+  tmp,
+  prepare_params,
+  go_to_cache_fn = function() invisible(NULL),
+  .local_envir = parent.frame()
+) {
+  captured <- new.env(parent = emptyenv())
+  local_mocked_bindings(
+    go_to_cache = go_to_cache_fn,
+    get_default_paths = function() {
+      list(
+        data = list(
+          source = list(path = file.path(tmp, "data", "source")),
+          interim = list(
+            annotations = list(
+              path = file.path(tmp, "data", "interim", "annotations")
+            )
+          )
+        ),
+        params = list(
+          prepare_params = file.path(tmp, "params", "prepare_params.yaml")
+        )
+      )
+    },
+    create_dir = function(path) {
+      dir.create(path, recursive = TRUE, showWarnings = FALSE)
+      invisible(NULL)
+    },
+    load_yaml_files = function() {
+      list(yamls_params = list(prepare_params = prepare_params))
+    },
+    copy_file_to_target = function(file_path, target_dir, file_description) {
+      force(file_path)
+      force(target_dir)
+      force(file_description)
+      file.path(target_dir, basename(file_path))
+    },
+    .package = "tima",
+    .env = .local_envir
+  )
+  local_mocked_bindings(
+    write_yaml = function(x, file, ...) {
+      captured$yaml <- x
+      invisible(NULL)
+    },
+    .package = "yaml",
+    .env = .local_envir
+  )
+  captured
 }
 
 
@@ -124,49 +202,7 @@ test_that("change_params_small errors on missing mzTab file", {
 
 test_that("change_params_small runs with valid polarity", {
   # Create minimal environment
-  tmpdir <- tempfile()
-  dir.create(tmpdir, recursive = TRUE)
-  dir.create(file.path(tmpdir, "params"), recursive = TRUE)
-  on.exit(unlink(tmpdir, recursive = TRUE))
-
-  # Create minimal params files
-  minimal_params <- list(
-    ms = list(polarity = "pos"),
-    files = list(
-      pattern = "test",
-      features = list(raw = "features.csv"),
-      metadata = list(raw = "metadata.tsv"),
-      annotations = list(raw = list(sirius = "sirius.zip")),
-      spectral = list(raw = "spectra.mgf")
-    )
-  )
-
-  yaml::write_yaml(
-    minimal_params,
-    file.path(tmpdir, "params/prepare_params.yaml")
-  )
-  yaml::write_yaml(
-    minimal_params,
-    file.path(tmpdir, "params/prepare_params_advanced.yaml")
-  )
-
-  # Create dummy files in source directory
-  source_dir <- file.path(tmpdir, "data/source")
-  dir.create(source_dir, recursive = TRUE)
-
-  write.csv(
-    data.frame(a = 1),
-    file.path(source_dir, "features.csv"),
-    row.names = FALSE
-  )
-  write.table(
-    data.frame(b = 1),
-    file.path(source_dir, "metadata.tsv"),
-    sep = "\t",
-    row.names = FALSE
-  )
-  writeLines("dummy", file.path(source_dir, "sirius.zip"))
-  writeLines("dummy", file.path(source_dir, "spectra.mgf"))
+  tmpdir <- make_small_cache_dir(create_dummy_files = TRUE)
 
   # Should run without error using cache_dir parameter
   result <- change_params_small(ms_pol = "neg", cache_dir = tmpdir)
@@ -181,30 +217,10 @@ test_that("change_params_small runs with valid polarity", {
 })
 
 test_that("change_params_small updates all file parameters", {
-  tmpdir <- tempfile()
-  dir.create(tmpdir, recursive = TRUE)
-  dir.create(file.path(tmpdir, "params"), recursive = TRUE)
-  on.exit(unlink(tmpdir, recursive = TRUE))
-
-  # Create params
-  minimal_params <- list(
-    ms = list(polarity = "pos"),
-    files = list(
-      pattern = "old",
-      features = list(raw = "old_features.csv"),
-      metadata = list(raw = "old_metadata.tsv"),
-      annotations = list(raw = list(sirius = "old_sirius.zip")),
-      spectral = list(raw = "old_spectra.mgf")
-    )
-  )
-
-  yaml::write_yaml(
-    minimal_params,
-    file.path(tmpdir, "params/prepare_params.yaml")
-  )
-  yaml::write_yaml(
-    minimal_params,
-    file.path(tmpdir, "params/prepare_params_advanced.yaml")
+  tmpdir <- make_small_cache_dir(
+    pattern = "old",
+    raw_prefix = "old",
+    sirius_raw = "old_sirius.zip"
   )
 
   # Create source directory for test files
@@ -253,25 +269,18 @@ test_that("change_params_small updates all file parameters", {
 })
 
 test_that("change_params_small supports mzTab-only update while keeping existing core files", {
-  tmpdir <- tempfile()
-  dir.create(tmpdir, recursive = TRUE)
-  dir.create(file.path(tmpdir, "params"), recursive = TRUE)
-  on.exit(unlink(tmpdir, recursive = TRUE))
-
-  minimal_params <- list(
-    ms = list(polarity = "pos"),
-    files = list(
-      pattern = "old",
-      mztab = list(raw = "null"),
-      features = list(raw = "data/source/old_features.csv"),
-      metadata = list(raw = "data/source/old_metadata.tsv"),
-      annotations = list(
-        raw = list(sirius = "data/interim/annotations/old_sirius.zip")
-      ),
-      spectral = list(raw = "data/source/old_spectra.mgf")
-    )
+  tmpdir <- make_small_cache_dir(
+    pattern = "old",
+    mztab_raw = "null",
+    raw_prefix = "data/source",
+    sirius_raw = "data/interim/annotations/old_sirius.zip"
   )
-
+  minimal_params <- yaml::read_yaml(
+    file.path(tmpdir, "params/prepare_params.yaml")
+  )
+  minimal_params$files$features$raw <- "data/source/old_features.csv"
+  minimal_params$files$metadata$raw <- "data/source/old_metadata.tsv"
+  minimal_params$files$spectral$raw <- "data/source/old_spectra.mgf"
   yaml::write_yaml(
     minimal_params,
     file.path(tmpdir, "params/prepare_params.yaml")
@@ -299,25 +308,17 @@ test_that("change_params_small supports mzTab-only update while keeping existing
 })
 
 test_that("change_params_small accepts mzTab with explicit overlays for features/metadata/spectra", {
-  tmpdir <- tempfile()
-  dir.create(tmpdir, recursive = TRUE)
-  dir.create(file.path(tmpdir, "params"), recursive = TRUE)
-  on.exit(unlink(tmpdir, recursive = TRUE))
-
-  minimal_params <- list(
-    ms = list(polarity = "pos"),
-    files = list(
-      pattern = "old",
-      mztab = list(raw = "null"),
-      features = list(raw = "data/source/old_features.csv"),
-      metadata = list(raw = "data/source/old_metadata.tsv"),
-      annotations = list(
-        raw = list(sirius = "data/interim/annotations/old_sirius.zip")
-      ),
-      spectral = list(raw = "data/source/old_spectra.mgf")
-    )
+  tmpdir <- make_small_cache_dir(
+    pattern = "old",
+    mztab_raw = "null",
+    sirius_raw = "data/interim/annotations/old_sirius.zip"
   )
-
+  minimal_params <- yaml::read_yaml(
+    file.path(tmpdir, "params/prepare_params.yaml")
+  )
+  minimal_params$files$features$raw <- "data/source/old_features.csv"
+  minimal_params$files$metadata$raw <- "data/source/old_metadata.tsv"
+  minimal_params$files$spectral$raw <- "data/source/old_spectra.mgf"
   yaml::write_yaml(
     minimal_params,
     file.path(tmpdir, "params/prepare_params.yaml")
@@ -466,50 +467,10 @@ test_that("create_yaml_null_handler creates proper function", {
 })
 
 test_that("change_params_small handles NULL parameters gracefully", {
-  tmpdir <- tempfile()
-  dir.create(tmpdir, recursive = TRUE)
-  dir.create(file.path(tmpdir, "params"), recursive = TRUE)
-  on.exit(unlink(tmpdir, recursive = TRUE))
-
-  # Create minimal params
-  minimal_params <- list(
-    ms = list(polarity = "pos"),
-    files = list(
-      pattern = "original",
-      features = list(raw = "features.csv"),
-      metadata = list(raw = "metadata.tsv"),
-      annotations = list(raw = list(sirius = "sirius.zip")),
-      spectral = list(raw = "spectra.mgf")
-    )
+  tmpdir <- make_small_cache_dir(
+    pattern = "original",
+    create_dummy_files = TRUE
   )
-
-  yaml::write_yaml(
-    minimal_params,
-    file.path(tmpdir, "params/prepare_params.yaml")
-  )
-  yaml::write_yaml(
-    minimal_params,
-    file.path(tmpdir, "params/prepare_params_advanced.yaml")
-  )
-
-  # Create source directory
-  source_dir <- file.path(tmpdir, "data/source")
-  dir.create(source_dir, recursive = TRUE)
-
-  # Create dummy files
-  write.csv(
-    data.frame(a = 1),
-    file.path(source_dir, "features.csv"),
-    row.names = FALSE
-  )
-  write.table(
-    data.frame(b = 1),
-    file.path(source_dir, "metadata.tsv"),
-    sep = "\t",
-    row.names = FALSE
-  )
-  writeLines("dummy", file.path(source_dir, "sirius.zip"))
-  writeLines("dummy", file.path(source_dir, "spectra.mgf"))
 
   # Run with all NULL parameters - should not error
   expect_no_error(
@@ -523,31 +484,7 @@ test_that("change_params_small handles NULL parameters gracefully", {
 })
 
 test_that("change_params_small handles partial updates", {
-  tmpdir <- tempfile()
-  dir.create(tmpdir, recursive = TRUE)
-  dir.create(file.path(tmpdir, "params"), recursive = TRUE)
-  on.exit(unlink(tmpdir, recursive = TRUE))
-
-  # Create params
-  minimal_params <- list(
-    ms = list(polarity = "pos"),
-    files = list(
-      pattern = "original",
-      features = list(raw = "features.csv"),
-      metadata = list(raw = "metadata.tsv"),
-      annotations = list(raw = list(sirius = "sirius.zip")),
-      spectral = list(raw = "spectra.mgf")
-    )
-  )
-
-  yaml::write_yaml(
-    minimal_params,
-    file.path(tmpdir, "params/prepare_params.yaml")
-  )
-  yaml::write_yaml(
-    minimal_params,
-    file.path(tmpdir, "params/prepare_params_advanced.yaml")
-  )
+  tmpdir <- make_small_cache_dir(pattern = "original")
 
   # Create source directory
   source_dir <- file.path(tmpdir, "test_files")
@@ -573,33 +510,8 @@ test_that("change_params_small handles partial updates", {
 })
 
 test_that("change_params_small updates both yaml files", {
-  tmpdir <- tempfile()
-  dir.create(tmpdir, recursive = TRUE)
-  dir.create(file.path(tmpdir, "params"), recursive = TRUE)
-  on.exit(unlink(tmpdir, recursive = TRUE))
-
+  tmpdir <- make_small_cache_dir()
   withr::local_dir(new = tmpdir)
-
-  # Create params
-  minimal_params <- list(
-    ms = list(polarity = "pos"),
-    files = list(
-      pattern = "test",
-      features = list(raw = "features.csv"),
-      metadata = list(raw = "metadata.tsv"),
-      annotations = list(raw = list(sirius = "sirius.zip")),
-      spectral = list(raw = "spectra.mgf")
-    )
-  )
-
-  yaml::write_yaml(
-    minimal_params,
-    file.path(tmpdir, "params/prepare_params.yaml")
-  )
-  yaml::write_yaml(
-    minimal_params,
-    file.path(tmpdir, "params/prepare_params_advanced.yaml")
-  )
 
   # Create files
   writeLines("dummy", "features.csv")
@@ -627,72 +539,31 @@ test_that("change_params_small updates both yaml files", {
 
 test_that("change_params_small uses go_to_cache when cache_dir is NULL", {
   tmp <- withr::local_tempdir()
-  captured <- new.env(parent = emptyenv())
-
-  local_mocked_bindings(
-    go_to_cache = function() {
+  captured <- setup_go_to_cache_mocks(
+    tmp = tmp,
+    prepare_params = list(
+      files = list(
+        pattern = "old",
+        features = list(raw = "old_features.csv"),
+        metadata = list(raw = "old_metadata.tsv"),
+        annotations = list(
+          raw = list(
+            sirius = "old_sirius.zip",
+            spectral = list(mzmine = "old_mzmine.csv")
+          )
+        ),
+        spectral = list(raw = "old_spectra.mgf")
+      ),
+      ms = list(polarity = "pos"),
+      organisms = list(taxon = "Old taxon"),
+      options = list(high_evidence = FALSE, summarize = FALSE)
+    ),
+    go_to_cache_fn = function() {
       old_wd <- getwd()
       on.exit(setwd(old_wd), add = TRUE)
       setwd(tmp)
       invisible(NULL)
-    },
-    get_default_paths = function() {
-      list(
-        data = list(
-          source = list(path = file.path(tmp, "data", "source")),
-          interim = list(
-            annotations = list(
-              path = file.path(tmp, "data", "interim", "annotations")
-            )
-          )
-        ),
-        params = list(
-          prepare_params = file.path(tmp, "params", "prepare_params.yaml")
-        )
-      )
-    },
-    create_dir = function(path) {
-      dir.create(path, recursive = TRUE, showWarnings = FALSE)
-      invisible(NULL)
-    },
-    load_yaml_files = function() {
-      list(
-        yamls_params = list(
-          prepare_params = list(
-            files = list(
-              pattern = "old",
-              features = list(raw = "old_features.csv"),
-              metadata = list(raw = "old_metadata.tsv"),
-              annotations = list(
-                raw = list(
-                  sirius = "old_sirius.zip",
-                  spectral = list(mzmine = "old_mzmine.csv")
-                )
-              ),
-              spectral = list(raw = "old_spectra.mgf")
-            ),
-            ms = list(polarity = "pos"),
-            organisms = list(taxon = "Old taxon"),
-            options = list(high_evidence = FALSE, summarize = FALSE)
-          )
-        )
-      )
-    },
-    copy_file_to_target = function(file_path, target_dir, file_description) {
-      force(file_path)
-      force(target_dir)
-      force(file_description)
-      file.path(target_dir, basename(file_path))
-    },
-    .package = "tima"
-  )
-
-  local_mocked_bindings(
-    write_yaml = function(x, file, ...) {
-      captured$yaml <- x
-      invisible(NULL)
-    },
-    .package = "yaml"
+    }
   )
 
   expect_no_error(change_params_small(
@@ -897,64 +768,20 @@ test_that("change_params_small initializes missing mztab entry and updates optio
   )
   writeLines("MTD\tmzTab-version\t2.0.0-M", file.path(tmp, "input.mztab"))
 
-  captured <- new.env(parent = emptyenv())
-
-  local_mocked_bindings(
-    go_to_cache = function() {
-      invisible(NULL)
-    },
-    get_default_paths = function() {
-      list(
-        data = list(
-          source = list(path = file.path(tmp, "data", "source")),
-          interim = list(
-            annotations = list(
-              path = file.path(tmp, "data", "interim", "annotations")
-            )
-          )
-        ),
-        params = list(
-          prepare_params = file.path(tmp, "params", "prepare_params.yaml")
-        )
-      )
-    },
-    create_dir = function(path) {
-      dir.create(path, recursive = TRUE, showWarnings = FALSE)
-      invisible(NULL)
-    },
-    load_yaml_files = function() {
-      list(
-        yamls_params = list(
-          prepare_params = list(
-            files = list(
-              pattern = "keep",
-              features = list(raw = "features.csv"),
-              metadata = list(raw = "metadata.tsv"),
-              annotations = list(raw = list(sirius = "sirius.zip")),
-              spectral = list(raw = "spectra.mgf")
-            ),
-            ms = list(polarity = "pos"),
-            organisms = list(taxon = "existing taxon"),
-            options = list(high_evidence = FALSE, summarize = FALSE)
-          )
-        )
-      )
-    },
-    copy_file_to_target = function(file_path, target_dir, file_description) {
-      force(file_path)
-      force(target_dir)
-      force(file_description)
-      file.path(target_dir, basename(file_path))
-    },
-    .package = "tima"
-  )
-
-  local_mocked_bindings(
-    write_yaml = function(x, file, ...) {
-      captured$yaml <- x
-      invisible(NULL)
-    },
-    .package = "yaml"
+  captured <- setup_go_to_cache_mocks(
+    tmp = tmp,
+    prepare_params = list(
+      files = list(
+        pattern = "keep",
+        features = list(raw = "features.csv"),
+        metadata = list(raw = "metadata.tsv"),
+        annotations = list(raw = list(sirius = "sirius.zip")),
+        spectral = list(raw = "spectra.mgf")
+      ),
+      ms = list(polarity = "pos"),
+      organisms = list(taxon = "existing taxon"),
+      options = list(high_evidence = FALSE, summarize = FALSE)
+    )
   )
 
   expect_no_error(change_params_small(

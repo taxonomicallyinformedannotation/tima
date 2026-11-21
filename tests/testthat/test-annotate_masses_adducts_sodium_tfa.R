@@ -26,6 +26,41 @@ create_test_features <- function(
   )
 }
 
+run_neg_adduct_test <- function(
+  mz_values,
+  rt,
+  adducts_neg,
+  clusters_neg = NULL,
+  .local_envir = parent.frame()
+) {
+  features <- create_test_features(mz_values, rt = rt)
+  env <- prepare_annotation_fixture_env(
+    feature_fixture = "features_small.csv",
+    library_fixture = "library_realistic.csv"
+  )
+  withr::local_dir(new = env$dirs$root, .local_envir = .local_envir)
+  utils::write.csv(features, env$features, row.names = FALSE)
+
+  args <- list(
+    features = env$features,
+    library = env$library,
+    str_stereo = env$str_stereo,
+    str_met = env$str_met,
+    str_tax_cla = env$str_tax_cla,
+    str_tax_npc = env$str_tax_npc,
+    adducts_list = list(neg = adducts_neg),
+    ms_mode = "neg",
+    tolerance_ppm = 10,
+    tolerance_rt = 0.02,
+    output_annotations = env$output_annotations,
+    output_edges = env$output_edges
+  )
+  if (!is.null(clusters_neg)) {
+    args$clusters_list <- list(neg = clusters_neg)
+  }
+  do.call(annotate_masses, args)
+}
+
 ## Annotation Pipeline Tests ----
 
 test_that("Two features with [M-H]- and [M-H2+Na]- delta (~21 Da) both appear in annotations", {
@@ -42,34 +77,11 @@ test_that("Two features with [M-H]- and [M-H2+Na]- delta (~21 Da) both appear in
   mz_neg <- M - H_mass - electron_mass # [M-H]-
   mz_na <- M + Na_mass - 2 * H_mass - electron_mass # [M-H2+Na]-
 
-  features <- create_test_features(c(mz_neg, mz_na), rt = 2.5)
-
-  env <- prepare_annotation_fixture_env(
-    feature_fixture = "features_small.csv",
-    library_fixture = "library_realistic.csv"
-  )
-
-  withr::local_dir(new = env$dirs$root)
-
-  # Write test features
-  utils::write.csv(features, env$features, row.names = FALSE)
-
   # Run annotation with both adducts configured
-  result <- annotate_masses(
-    features = env$features,
-    library = env$library,
-    str_stereo = env$str_stereo,
-    str_met = env$str_met,
-    str_tax_cla = env$str_tax_cla,
-    str_tax_npc = env$str_tax_npc,
-    adducts_list = list(
-      neg = c("[M-H]-", "[M-H2+Na]-")
-    ),
-    ms_mode = "neg",
-    tolerance_ppm = 10,
-    tolerance_rt = 0.02,
-    output_annotations = env$output_annotations,
-    output_edges = env$output_edges
+  result <- run_neg_adduct_test(
+    c(mz_neg, mz_na),
+    rt = 2.5,
+    adducts_neg = c("[M-H]-", "[M-H2+Na]-")
   )
 
   # Verify output exists
@@ -109,33 +121,12 @@ test_that("Two features with [M-H]- and [M-H+C2HF3O2]- delta (~114 Da) both appe
   mz_neg <- M - H_mass - electron_mass # [M-H]-
   mz_tfa <- M - H_mass + TFA_mass - electron_mass # [M-H+C2HF3O2]-
 
-  features <- create_test_features(c(mz_neg, mz_tfa), rt = 3.5)
-
-  env <- prepare_annotation_fixture_env(
-    feature_fixture = "features_small.csv",
-    library_fixture = "library_realistic.csv"
-  )
-
-  withr::local_dir(new = env$dirs$root)
-  utils::write.csv(features, env$features, row.names = FALSE)
-
   # Run annotation with TFA cluster
-  result <- annotate_masses(
-    features = env$features,
-    library = env$library,
-    str_stereo = env$str_stereo,
-    str_met = env$str_met,
-    str_tax_cla = env$str_tax_cla,
-    str_tax_npc = env$str_tax_npc,
-    adducts_list = list(
-      neg = c("[M-H]-", "[M-H+C2HF3O2]-")
-    ),
-    clusters_list = list(neg = c("C2HF3O2")),
-    ms_mode = "neg",
-    tolerance_ppm = 10,
-    tolerance_rt = 0.02,
-    output_annotations = env$output_annotations,
-    output_edges = env$output_edges
+  result <- run_neg_adduct_test(
+    c(mz_neg, mz_tfa),
+    rt = 3.5,
+    adducts_neg = c("[M-H]-", "[M-H+C2HF3O2]-"),
+    clusters_neg = c("C2HF3O2")
   )
 
   expect_type(result, "character")
@@ -176,33 +167,12 @@ test_that("Three feature pair with [M-H]-, [M-H2+Na]-, [M-H+C2HF3O2]- in same RT
 
   rt <- 4.0
 
-  features <- create_test_features(c(mz1, mz2, mz3), rt = rt)
-
-  env <- prepare_annotation_fixture_env(
-    feature_fixture = "features_small.csv",
-    library_fixture = "library_realistic.csv"
-  )
-
-  withr::local_dir(new = env$dirs$root)
-  utils::write.csv(features, env$features, row.names = FALSE)
-
   # Run annotation with all adducts
-  result <- annotate_masses(
-    features = env$features,
-    library = env$library,
-    str_stereo = env$str_stereo,
-    str_met = env$str_met,
-    str_tax_cla = env$str_tax_cla,
-    str_tax_npc = env$str_tax_npc,
-    adducts_list = list(
-      neg = c("[M-H]-", "[M-H2+Na]-", "[M-H+C2HF3O2]-")
-    ),
-    clusters_list = list(neg = c("C2HF3O2")),
-    ms_mode = "neg",
-    tolerance_ppm = 10,
-    tolerance_rt = 0.02,
-    output_annotations = env$output_annotations,
-    output_edges = env$output_edges
+  result <- run_neg_adduct_test(
+    c(mz1, mz2, mz3),
+    rt = rt,
+    adducts_neg = c("[M-H]-", "[M-H2+Na]-", "[M-H+C2HF3O2]-"),
+    clusters_neg = c("C2HF3O2")
   )
 
   expect_type(result, "character")
@@ -245,31 +215,10 @@ test_that("Ion pair edges correctly link [M-H]- and [M-H2+Na]- as same compound"
   mz_neg <- M - H_mass - electron_mass
   mz_na <- M + Na_mass - 2 * H_mass - electron_mass
 
-  features <- create_test_features(c(mz_neg, mz_na), rt = 2.5)
-
-  env <- prepare_annotation_fixture_env(
-    feature_fixture = "features_small.csv",
-    library_fixture = "library_realistic.csv"
-  )
-
-  withr::local_dir(new = env$dirs$root)
-  utils::write.csv(features, env$features, row.names = FALSE)
-
-  result <- annotate_masses(
-    features = env$features,
-    library = env$library,
-    str_stereo = env$str_stereo,
-    str_met = env$str_met,
-    str_tax_cla = env$str_tax_cla,
-    str_tax_npc = env$str_tax_npc,
-    adducts_list = list(
-      neg = c("[M-H]-", "[M-H2+Na]-")
-    ),
-    ms_mode = "neg",
-    tolerance_ppm = 10,
-    tolerance_rt = 0.02,
-    output_annotations = env$output_annotations,
-    output_edges = env$output_edges
+  result <- run_neg_adduct_test(
+    c(mz_neg, mz_na),
+    rt = 2.5,
+    adducts_neg = c("[M-H]-", "[M-H2+Na]-")
   )
 
   annotations <- tidytable::fread(
@@ -307,32 +256,11 @@ test_that("Two features with [M-H]- and [M+COONa]- show sodium carboxylate adduc
   mz_neg <- M - H_mass - electron_mass # [M-H]-
   mz_cooNa <- M + COONa_mass - electron_mass # [M+COONa]-
 
-  features <- create_test_features(c(mz_neg, mz_cooNa), rt = 5.0)
-
-  env <- prepare_annotation_fixture_env(
-    feature_fixture = "features_small.csv",
-    library_fixture = "library_realistic.csv"
-  )
-
-  withr::local_dir(new = env$dirs$root)
-  utils::write.csv(features, env$features, row.names = FALSE)
-
   # Run annotation with both adducts configured
-  result <- annotate_masses(
-    features = env$features,
-    library = env$library,
-    str_stereo = env$str_stereo,
-    str_met = env$str_met,
-    str_tax_cla = env$str_tax_cla,
-    str_tax_npc = env$str_tax_npc,
-    adducts_list = list(
-      neg = c("[M-H]-", "[M+COONa]-")
-    ),
-    ms_mode = "neg",
-    tolerance_ppm = 10,
-    tolerance_rt = 0.02,
-    output_annotations = env$output_annotations,
-    output_edges = env$output_edges
+  result <- run_neg_adduct_test(
+    c(mz_neg, mz_cooNa),
+    rt = 5.0,
+    adducts_neg = c("[M-H]-", "[M+COONa]-")
   )
 
   # Verify output exists
